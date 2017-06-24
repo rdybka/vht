@@ -24,4 +24,6 @@
 int jack_process(jack_nframes_t nframes, void *arg);
 int jack_buffer_size_changed(jack_nframes_t nframes, void *arg);
 
+extern int passthrough;
+
 #endif //__JACK_PROCESS_H__

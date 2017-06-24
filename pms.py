@@ -103,6 +103,14 @@ start = _pms.start
 def stop():
     return _pms.stop()
 stop = _pms.stop
+
+def get_passthrough():
+    return _pms.get_passthrough()
+get_passthrough = _pms.get_passthrough
+
+def set_passthrough(val):
+    return _pms.set_passthrough(val)
+set_passthrough = _pms.set_passthrough
 # This file is compatible with both classic and new-style classes.
 
 

@@ -21,26 +21,29 @@
 #include "jack_client.h"
 #include "midi_event.h"
 
-
+int passthrough;
 
 int jack_process(jack_nframes_t nframes, void *arg) {
-  void *inp = jack_port_get_buffer(jack_input_port, nframes);
-  void *outp = jack_port_get_buffer(jack_output_port, nframes);
-  jack_nframes_t ninp;
-  jack_midi_event_t evt;
+	void *inp = jack_port_get_buffer(jack_input_port, nframes);
+	void *outp = jack_port_get_buffer(jack_output_port, nframes);
+	jack_nframes_t ninp;
+	jack_midi_event_t evt;
 
-  jack_midi_clear_buffer(outp);
+	jack_midi_clear_buffer(outp);
 
-  ninp = jack_midi_get_event_count(inp);
-  int empty = 0;
+	ninp = jack_midi_get_event_count(inp);
+	int empty = 0;
 
-  for (jack_nframes_t n = 0; (n < ninp) && !empty; n++) {
+	if (!passthrough)
+		return 0;
+		
+	for (jack_nframes_t n = 0; (n < ninp) && !empty; n++) {
     empty = jack_midi_event_get(&evt, inp, n);
-    if (!empty) {
-      jack_midi_event_write(outp, evt.time, evt.buffer, evt.size);
-      midi_event mev = midi_decode_event(evt.buffer, evt.size);
-    }
-  }
+	if (!empty) {
+		jack_midi_event_write(outp, evt.time, evt.buffer, evt.size);
+		midi_event mev = midi_decode_event(evt.buffer, evt.size);
+	}
+}
 
   return 0;
 }

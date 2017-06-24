@@ -34,5 +34,4 @@ extern jack_nframes_t jack_buffer_size;
 int jack_start();
 void jack_stop();
 
-
 #endif //__JACK_CLIENT_H__

@@ -13,4 +13,7 @@
 extern int start();
 extern void stop();
 
+extern int get_passthrough();
+extern void set_passthrough(int val);
+
 #endif //__PMS_H__
