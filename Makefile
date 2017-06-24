@@ -29,6 +29,6 @@ _pms.so: $(OBJ) lib/pms_wrap.o pms.py
 	ld -shared $(OBJ) lib/pms_wrap.o -o $@ $(LIBS)
 		
 clean:
-	rm -f *.so *.o lib/pms.py
+	rm -f *.so *.o lib/pms.py pms.py
 	rm -f lib/*.so lib/*.o lib/pms_wrap.c
 	rm -rf __pycache__	
