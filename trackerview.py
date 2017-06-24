@@ -9,6 +9,8 @@ class TrackerView(Gtk.DrawingArea):
 		self.connect("draw", self.on_draw);
 		#self.connect("realize", self.on_realize)
 		
+		self.highlight = 4
+		
 	def on_realize(self, widget):
 		pass
 		
@@ -20,11 +22,28 @@ class TrackerView(Gtk.DrawingArea):
 		cr.fill()
 		
 		cr.set_source_rgb(0, .8, 0)
-		cr.select_font_face("Monospace", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD )
+		cr.select_font_face("Roboto Mono", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL )
 		cr.set_font_size(12)
 		cr.move_to(10, 10)
-		for b in range(10):
-			for a in range(32):
-				cr.move_to(b * 40, a * 12)	
+		
+		for b in range(16):
+			for a in range(65):
+				if (a - 1 ) % self.highlight == 0:
+					cr.set_source_rgb(0, 1, 0)		
+				else:
+					cr.set_source_rgb(0, .7, 0)
+					
+				cr.move_to(30 + b * 40, a * 12)	
 				cr.show_text("---")
+		
+		cr.select_font_face("Roboto Mono", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD )
+		for y in range(65):
+			if (y - 1) % self.highlight == 0:
+				cr.set_source_rgb(0, 1, 0)		
+			else:
+				cr.set_source_rgb(0, .7, 0)
+
+			cr.move_to(0, y * 12)
+			cr.show_text("%03d" % (y))		
+	
 

@@ -7,7 +7,11 @@ LIBS=-lm -ljack
 DEPS=lib/pms.h \
 	lib/jack_client.h \
 	lib/jack_process.h \
-	lib/midi_event.h 
+	lib/midi_event.h \
+	lib/row.h \
+	lib/track.h \
+	lib/module.h \
+	lib/sequence.h
 	
 OBJ=lib/jack_client.o lib/jack_process.o lib/midi_event.o lib/pms.o
 

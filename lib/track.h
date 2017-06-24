@@ -1,4 +1,4 @@
-/* pms.h
+/* track.h
  *
  * Copyright (C) 2017 Remigiusz Dybka
  *
@@ -15,21 +15,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
-#ifndef __PMS_H__
-#define __PMS_H__
 
-#ifdef SWIG
-%module pms
-%{
-#include "pms.h"
-%}
-#endif
+#ifndef __TRACK_H__
+#define __TRACK_H__
 
-extern int start();
-extern void stop();
+#include "row.h"
 
-extern int get_passthrough();
-extern void set_passthrough(int val);
+#define TRIGGER_NONE 	0
+#define TRIGGER_NORMAL 	1
+#define TRIGGER_HOLD	2
 
-#endif //__PMS_H__
+typedef struct track_t {
+	int channel;
+	int nrows; // actual rows
+	int nsrows; // song rows
+	row ***rows;
+	int trigger_channel;
+	int trigger_note;
+	int loop;
+	unsigned char trigger_type;
+} track;
+
+#endif //__TRACK_H__

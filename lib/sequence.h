@@ -1,4 +1,4 @@
-/* pms.h
+/* sequence.h
  *
  * Copyright (C) 2017 Remigiusz Dybka
  *
@@ -16,20 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#ifndef __PMS_H__
-#define __PMS_H__
-
-#ifdef SWIG
-%module pms
-%{
-#include "pms.h"
-%}
-#endif
-
-extern int start();
-extern void stop();
-
-extern int get_passthrough();
-extern void set_passthrough(int val);
-
-#endif //__PMS_H__
+ #ifndef __SEQUENCE_H__
+ #define __SEQUENCE_H__
+ 
+ typedef struct sequence_t {
+	 track **trk;
+ } sequence;
+ 
+ #endif //__SEQUENCE_H__

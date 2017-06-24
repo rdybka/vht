@@ -18,10 +18,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import pms
-import gi
 from mainwin import *
 
-pms.start()
+if pms.start() != 0: 
+	exit()
+	
 win = Pms_MainWin(pms)
 win.connect("delete-event", Gtk.main_quit)
 win.show_all()
