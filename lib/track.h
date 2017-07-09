@@ -29,11 +29,15 @@ typedef struct track_t {
 	int channel;
 	int nrows; // actual rows
 	int nsrows; // song rows
-	row ***rows;
+	int ncols;
+	row **rows;
 	int trigger_channel;
 	int trigger_note;
 	int loop;
 	unsigned char trigger_type;
 } track;
+
+track *track_new(track *);
+void track_free(track *);
 
 #endif //__TRACK_H__

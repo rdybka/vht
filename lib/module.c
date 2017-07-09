@@ -16,24 +16,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __MODULE_H__
-#define __MODULE_H__
+#include "module.h"
+ 
+struct module_t module;
 
-#include <stdlib.h>
-#include "sequence.h"
+int add_sequence(int seq_clone) {
+	// fresh module
+	if (module.nseq == 0) {
+			module.seq = malloc(sizeof(sequence *));
+			module.seq[0] = sequence_new();
+			module.nseq = 1;
+			return 1;
+	}
+}
+ 
+ void module_new() {
+	module_free();
+	module.bpm = 120;
+	module.def_nrows = 64;
+	module.rpb = 4;
+	module.seq = NULL;
+	module.nseq = 0;
+	module.curr_seq = 0;
+	 
+	add_sequence(-1);
+	sequence_add_track(module.seq[0], track_new(NULL));
+ }
 
-struct module_t {
-	int bpm;
-	int rpb; // rows per beat
-	int def_nrows;
-	sequence **seq;
-	int nseq;
-	int curr_seq;
-};
-
-extern struct module_t module;
-
-void module_new();
-void module_free();
-
-#endif //__MODULE_H__
+void module_free() {
+	// fresh start?
+	if (module.bpm == 0) { 
+			return;
+	}
+	
+	if (module.seq != NULL) {
+		for (int s = 0; s < module.nseq; s++)
+			sequence_free(module.seq[s]);
+	
+		free(module.seq);
+		module.seq = NULL;
+	}
+}

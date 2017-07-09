@@ -1,4 +1,4 @@
-/* pms.h
+/* sequence.c
  *
  * Copyright (C) 2017 Remigiusz Dybka
  *
@@ -15,28 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include <stdlib.h>
+
+#include "sequence.h"
  
-#ifndef __PMS_H__
-#define __PMS_H__
+sequence *sequence_new() {
+	sequence *seq = malloc(sizeof(sequence));
+	seq->ntrk = 0;
+	seq->trk = 0;
+	return seq;
+}
 
-#ifdef SWIG
-%module pms
-%{
-#include "pms.h"
-%}
-#endif
+void sequence_add_track(sequence *seq, track *trk) {
+	// fresh?
+	if (seq->ntrk == 0) {
+		seq->trk = malloc(sizeof(track *));
+		seq->trk[0] = trk;
+		seq->ntrk = 1;
+		return;
+	}
+}
 
-extern int start();
-extern void stop();
-
-extern int get_bpm();
-extern void set_bpm(int);
-
-extern int get_nseq();
-
-extern int add_sequence(int);
-
-extern int get_passthrough();
-extern void set_passthrough(int val);
-
-#endif //__PMS_H__
+void sequence_free(sequence *seq) {
+	for (int t = 0; t < seq->ntrk; t++) {
+		track_free(seq->trk[t]);
+	}
+	
+	if (seq->trk)
+		free(seq->trk);
+	
+	free(seq);
+}

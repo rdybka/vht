@@ -19,8 +19,16 @@
  #ifndef __SEQUENCE_H__
  #define __SEQUENCE_H__
  
+ #include "track.h"
+ 
  typedef struct sequence_t {
 	 track **trk;
+	 int ntrk;
  } sequence;
+ 
+ sequence *sequence_new();
+ void sequence_add_track(sequence *, track *);
+ void sequence_free(sequence *);
+ 
  
  #endif //__SEQUENCE_H__

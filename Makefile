@@ -13,7 +13,14 @@ DEPS=lib/pms.h \
 	lib/module.h \
 	lib/sequence.h
 	
-OBJ=lib/jack_client.o lib/jack_process.o lib/midi_event.o lib/pms.o
+OBJ=lib/jack_client.o \
+	lib/jack_process.o \
+	lib/midi_event.o \
+	lib/pms.o \
+	lib/module.o \
+	lib/sequence.o \
+	lib/track.o \
+	lib/row.o
 
 all: _pms.so
 

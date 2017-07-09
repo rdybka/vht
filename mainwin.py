@@ -44,7 +44,7 @@ class Pms_MainWin(Gtk.Window):
 		self.bpmbutton = Gtk.SpinButton()
 		self.bpmbutton.set_adjustment(self.adj)
 		hb.pack_start(self.bpmbutton)
-		self.adj.set_value(120)
+		self.adj.set_value(self.pms.get_bpm())
 
 		self.vbox = Gtk.Box()
 		self.hbox = Gtk.Box();
@@ -55,7 +55,7 @@ class Pms_MainWin(Gtk.Window):
 		self.hbox.pack_start(self.seqlab, False, True, 0)
 		self.hbox.pack_start(Gtk.Label("track props"), True, True, 0)
 		
-		self.trackerview = TrackerView()
+		self.trackerview = TrackerView(self.pms)
 
 		self.vbox.pack_start(self.hbox, False, False, 0)
 		self.vbox.pack_start(self.trackerview, True, True, 0)
