@@ -27,32 +27,32 @@ jack_nframes_t jack_nframes;
 jack_nframes_t jack_buffer_size;
 
 int jack_start() {
-	jack_options_t opt;
-	opt = JackNoStartServer;
+    jack_options_t opt;
+    opt = JackNoStartServer;
 
-	if ((jack_client = jack_client_open (JACK_CLIENT_NAME, opt, NULL)) == 0) {
-		fprintf (stderr, "Could not connect to JACK. Is server running?\n");
-		return 1;
-	}
+    if ((jack_client = jack_client_open (JACK_CLIENT_NAME, opt, NULL)) == 0) {
+        fprintf (stderr, "Could not connect to JACK. Is server running?\n");
+        return 1;
+    }
 
-  // jack_nframes = jack_get_buffer_size(jack_client);
+    // jack_nframes = jack_get_buffer_size(jack_client);
 
-  //
+    //
 
-	passthrough = 1;
+    passthrough = 1;
 
-	jack_set_process_callback (jack_client, jack_process, 0);
-	jack_set_buffer_size_callback(jack_client, jack_buffer_size_changed, 0);
-	jack_output_port = jack_port_register (jack_client, "out", JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
-	jack_input_port = jack_port_register (jack_client, "in", JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0);
-	jack_activate(jack_client);
+    jack_set_process_callback (jack_client, jack_process, 0);
+    jack_set_buffer_size_callback(jack_client, jack_buffer_size_changed, 0);
+    jack_output_port = jack_port_register (jack_client, "out", JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
+    jack_input_port = jack_port_register (jack_client, "in", JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0);
+    jack_activate(jack_client);
 
-	return 0;
+    return 0;
 }
 
 void jack_stop() {
-  if (!jack_client)
-    return;
+    if (!jack_client)
+        return;
 
-  jack_client_close(jack_client);
+    jack_client_close(jack_client);
 }

@@ -13,6 +13,7 @@ class TrackerView(Gtk.ScrolledWindow):
 		self.trackBox = Gtk.Box()
 		self.trackBox.add(trackview.TrackView())
 		self.trackBox.add(trackview.TrackView(1))
+		
 		self.trackBox.set_spacing(1)
 		
 		self.add_with_viewport(self.trackBox)

@@ -4,9 +4,9 @@ from gi.repository import Gtk, Gio
 
 from trackerview import TrackerView
 
-class Pms_MainWin(Gtk.Window):
-	def __init__(self, pms_handle):
-		Gtk.Window.__init__(self, title = "PMS")
+class Pms_MainWin(Gtk.ApplicationWindow):
+	def __init__(self, pms_handle, app):
+		Gtk.ApplicationWindow.__init__(self, application = app)
 
 		self.pms = pms_handle
 		

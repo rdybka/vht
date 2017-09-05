@@ -22,18 +22,18 @@
 enum MIDI_EVENT_TYPE {unknown, note_on, note_off, pitch_wheel, control_change};
 
 typedef struct midi_event_t {
-	int type;
-	unsigned char channel;
-	union {
-		unsigned char note;
-		unsigned char control;
-		unsigned char lsb;
-	};
-	union {
-		unsigned char velocity;
-		unsigned char data;
-		unsigned char msb;
-	};
+    int type;
+    unsigned char channel;
+    union {
+        unsigned char note;
+        unsigned char control;
+        unsigned char lsb;
+    };
+    union {
+        unsigned char velocity;
+        unsigned char data;
+        unsigned char msb;
+    };
 } midi_event;
 
 

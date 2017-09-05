@@ -15,15 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 #ifndef __PMS_H__
 #define __PMS_H__
 
 #ifdef SWIG
 %module pms
-%{
+    % {
 #include "pms.h"
-%}
+%
+}
 #endif
 
 extern int start();

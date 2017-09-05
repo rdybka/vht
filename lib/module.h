@@ -23,12 +23,12 @@
 #include "sequence.h"
 
 struct module_t {
-	int bpm;
-	int rpb; // rows per beat
-	int def_nrows;
-	sequence **seq;
-	int nseq;
-	int curr_seq;
+    int bpm;
+    int rpb; // rows per beat
+    int def_nrows;
+    sequence **seq;
+    int nseq;
+    int curr_seq;
 };
 
 extern struct module_t module;

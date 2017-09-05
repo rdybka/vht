@@ -19,31 +19,31 @@
 #include <stdlib.h>
 
 #include "sequence.h"
- 
+
 sequence *sequence_new() {
-	sequence *seq = malloc(sizeof(sequence));
-	seq->ntrk = 0;
-	seq->trk = 0;
-	return seq;
+    sequence *seq = malloc(sizeof(sequence));
+    seq->ntrk = 0;
+    seq->trk = 0;
+    return seq;
 }
 
 void sequence_add_track(sequence *seq, track *trk) {
-	// fresh?
-	if (seq->ntrk == 0) {
-		seq->trk = malloc(sizeof(track *));
-		seq->trk[0] = trk;
-		seq->ntrk = 1;
-		return;
-	}
+    // fresh?
+    if (seq->ntrk == 0) {
+        seq->trk = malloc(sizeof(track *));
+        seq->trk[0] = trk;
+        seq->ntrk = 1;
+        return;
+    }
 }
 
 void sequence_free(sequence *seq) {
-	for (int t = 0; t < seq->ntrk; t++) {
-		track_free(seq->trk[t]);
-	}
-	
-	if (seq->trk)
-		free(seq->trk);
-	
-	free(seq);
+    for (int t = 0; t < seq->ntrk; t++) {
+        track_free(seq->trk[t]);
+    }
+
+    if (seq->trk)
+        free(seq->trk);
+
+    free(seq);
 }

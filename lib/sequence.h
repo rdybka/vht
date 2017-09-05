@@ -15,20 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
- #ifndef __SEQUENCE_H__
- #define __SEQUENCE_H__
- 
- #include "track.h"
- 
- typedef struct sequence_t {
-	 track **trk;
-	 int ntrk;
- } sequence;
- 
- sequence *sequence_new();
- void sequence_add_track(sequence *, track *);
- void sequence_free(sequence *);
- 
- 
- #endif //__SEQUENCE_H__
+
+#ifndef __SEQUENCE_H__
+#define __SEQUENCE_H__
+
+#include "track.h"
+
+typedef struct sequence_t {
+    track **trk;
+    int ntrk;
+    int length;
+} sequence;
+
+sequence *sequence_new();
+void sequence_add_track(sequence *, track *);
+void sequence_free(sequence *);
+
+
+#endif //__SEQUENCE_H__

@@ -18,15 +18,29 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import pms
+import sys
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gio
+from gi.repository import Gtk
+
 from mainwin import *
 
-if pms.start() != 0: 
-	exit()
+class PmsApp(Gtk.Application):
+	def __init__(self):
+		Gtk.Application.__init__(self, application_id = "com.github.rdybka.pms", 
+			flags = Gio.ApplicationFlags.FLAGS_NONE)
 	
-win = Pms_MainWin(pms)
-win.connect("delete-event", Gtk.main_quit)
-win.show_all()
+	def do_activate(self):
+		win = Pms_MainWin(pms, self)
+		win.show_all()
 
-Gtk.main()
-pms.stop()
+if __name__ == "__main__":
+	if pms.start() != 0: 
+		exit()
+	
+	app = PmsApp()
+	app.run(sys.argv)
+
+	pms.stop()
 

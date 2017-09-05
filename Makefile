@@ -1,6 +1,6 @@
 #Poor Man's Sequencer by Remigiusz Dybka
 
-PYTHON_INCLUDE=/usr/include/python3.5m
+PYTHON_INCLUDE=/usr/include/python3.6m
 CC=gcc
 CFLAGS=-I$(PYTHON_INCLUDE) -fPIC
 LIBS=-lm -ljack

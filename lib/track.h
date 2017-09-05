@@ -18,7 +18,7 @@
 
 #ifndef __TRACK_H__
 #define __TRACK_H__
-
+#include <pthread.h>
 #include "row.h"
 
 #define TRIGGER_NONE 	0
@@ -26,18 +26,29 @@
 #define TRIGGER_HOLD	2
 
 typedef struct track_t {
-	int channel;
-	int nrows; // actual rows
-	int nsrows; // song rows
-	int ncols;
-	row **rows;
-	int trigger_channel;
-	int trigger_note;
-	int loop;
-	unsigned char trigger_type;
+    int port;
+    int channel;
+    int nrows; // actual rows
+    int nsrows; // song rows
+    int ncols;
+    row **rows;
+    int trigger_channel;
+    int trigger_note;
+    int loop;
+    unsigned char trigger_type;
+    pthread_mutex_t excl;
 } track;
 
-track *track_new(track *);
+track *track_new(int port, int channel, int len, int songlen);
+track *track_clone(track *t);
+
+void track_set_row(track *trk, int c, int n, row_type type, int note, int velocity, int delay);
+int track_get_row(track *trk, int c, int n, row *r);
 void track_free(track *);
+void track_clear_rows(track *trk, int c);
+
+void track_add_col(track *trk);
+void track_del_col(track *trk, int c);
+void track_resize(track *trk, int size);
 
 #endif //__TRACK_H__
