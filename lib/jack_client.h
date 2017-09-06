@@ -28,8 +28,10 @@ extern jack_client_t *jack_client;
 extern jack_port_t *jack_input_port;
 extern jack_port_t *jack_output_port;
 extern jack_status_t jack_status;
-extern jack_nframes_t jack_nframes;
+extern jack_nframes_t jack_sample_rate;
 extern jack_nframes_t jack_buffer_size;
+extern jack_nframes_t jack_start_frames;
+extern jack_time_t jack_start_time;
 
 int jack_start();
 void jack_stop();

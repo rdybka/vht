@@ -32,10 +32,41 @@ int jack_process(jack_nframes_t nframes, void *arg) {
     jack_midi_clear_buffer(outp);
 
     ninp = jack_midi_get_event_count(inp);
-    int empty = 0;
+
+//get timing
+    jack_nframes_t curr_frames;
+    jack_time_t curr_usecs;
+    jack_time_t next_usecs;
+    float period_usecs;
+
+    jack_get_cycle_times(jack_client, &curr_frames, &curr_usecs, &next_usecs, &period_usecs);
+
+    if (jack_start_frames == 0)
+        jack_start_frames = curr_frames;
+
+    if (jack_start_time == 0)
+        jack_start_time = curr_usecs;
+
+    jack_time_t usecs = curr_usecs - jack_start_time;
+
+    int min = 0;
+    int sec = 0;
+    int ms = 0;
+
+    sec = usecs / 1000000;
+    min = sec / 60;
+    sec -= (min * 60);
+
+    ms = usecs / 1000;
+    ms -= sec * 1000;
+    ms -= min * 60000;
+
+    printf("usecs: %10.3f %lu %02d:%02d:%03d\n", period_usecs, curr_frames - jack_start_frames, min, sec, ms);
 
     if (!passthrough)
         return 0;
+
+    int empty = 0;
 
     for (jack_nframes_t n = 0; (n < ninp) && !empty; n++) {
         empty = jack_midi_event_get(&evt, inp, n);
@@ -50,5 +81,12 @@ int jack_process(jack_nframes_t nframes, void *arg) {
 
 int jack_buffer_size_changed(jack_nframes_t nframes, void *arg) {
     jack_buffer_size = nframes;
+    printf("jack buffer size:%d\n", jack_buffer_size);
+    return 0;
+}
+
+int jack_sample_rate_changed(jack_nframes_t nframes, void *arg) {
+    jack_sample_rate = nframes;
+    printf("jack sample rate:%d\n", jack_sample_rate);
     return 0;
 }

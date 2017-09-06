@@ -38,7 +38,7 @@ void module_new() {
     module.seq = NULL;
     module.nseq = 0;
     module.curr_seq = 0;
-
+    module.playing = 0;
     add_sequence(-1);
     sequence_add_track(module.seq[0], track_new(0, 1, module.def_nrows, module.def_nrows));
 }

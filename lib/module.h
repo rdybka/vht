@@ -29,6 +29,7 @@ struct module_t {
     sequence **seq;
     int nseq;
     int curr_seq;
+    int playing;
 };
 
 extern struct module_t module;
