@@ -20,20 +20,26 @@
 #define __MODULE_H__
 
 #include <stdlib.h>
+#include <jack/jack.h>
+#include <jack/midiport.h>
+
 #include "sequence.h"
 
 struct module_t {
+    int playing;
+    jack_nframes_t zero_time;
+
     int bpm;
     int rpb; // rows per beat
     int def_nrows;
     sequence **seq;
     int nseq;
     int curr_seq;
-    int playing;
 };
 
 extern struct module_t module;
 
+void module_advance(void *outport, void *inport, jack_nframes_t curr_frames);
 void module_new();
 void module_free();
 

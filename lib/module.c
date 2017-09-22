@@ -16,9 +16,75 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
+#include <math.h>
 #include "module.h"
+#include "midi_event.h"
+#include "jack_process.h"
 
 struct module_t module;
+
+int lastsec;
+
+// the GOD function
+void module_advance(void *outp, void *inp, jack_nframes_t curr_frames) {
+    if (!module.playing)
+        return;
+
+    if (module.zero_time == 0)
+        module.zero_time = curr_frames;
+
+    float time = (curr_frames - module.zero_time) / (double)jack_sample_rate;
+
+    int sec = time;
+    int min = sec / 60;
+    sec -= (min * 60);
+
+    int ms = (time - floorf(time)) * 1000;
+
+    jack_midi_clear_buffer(outp);
+    midi_buffer_clear();
+
+    if (sec != lastsec) {
+        printf("time: %02d:%02d:%03d\n", min, sec, ms);
+
+        lastsec = sec;
+
+        midi_event evt;
+
+        evt.time = 0;
+        evt.channel = 1;
+        evt.type = note_on;
+        evt.note = 64;
+        evt.velocity = 100;
+
+        if (sec%2 == 0)
+            evt.type = note_off;
+
+        midi_buffer_add(evt);
+    }
+
+// handle input
+
+    jack_nframes_t ninp;
+    jack_midi_event_t evt;
+
+    ninp = jack_midi_get_event_count(inp);
+
+    int empty = 0;
+
+    for (jack_nframes_t n = 0; (n < ninp) && !empty; n++) {
+        empty = jack_midi_event_get(&evt, inp, n);
+        if (!empty) {
+            midi_event mev = midi_decode_event(evt.buffer, evt.size);
+            mev.time = evt.time;
+            midi_buffer_add(mev);
+        }
+    }
+
+    midi_buffer_flush(outp);
+}
+
 
 int add_sequence(int seq_clone) {
     // fresh module
@@ -38,7 +104,9 @@ void module_new() {
     module.seq = NULL;
     module.nseq = 0;
     module.curr_seq = 0;
-    module.playing = 0;
+    module.playing = 1;
+    module.zero_time = 0;
+
     add_sequence(-1);
     sequence_add_track(module.seq[0], track_new(0, 1, module.def_nrows, module.def_nrows));
 }

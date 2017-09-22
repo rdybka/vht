@@ -32,9 +32,6 @@ extern void stop();
 extern int get_bpm();
 extern void set_bpm(int);
 
-extern int get_passthrough();
-extern void set_passthrough(int val);
-
 extern int get_nseq();
 extern int add_sequence(int);
 

@@ -20,7 +20,7 @@ class Pms_MainWin(Gtk.ApplicationWindow):
 		hb.pack_end(button)
 		
 		self.ptswitch = Gtk.Switch()
-		self.ptswitch.set_active(self.pms.get_passthrough())
+		self.ptswitch.set_active(False)
 		self.ptswitch.connect("notify::active", self.on_ptswitch_activated)
 		
 		hb.pack_end(self.ptswitch)
@@ -67,7 +67,8 @@ class Pms_MainWin(Gtk.ApplicationWindow):
 
 	
 	def on_ptswitch_activated(self, switch, gparam):
-		self.pms.set_passthrough(switch.get_active())
+		pass
+#		self.pms.set_passthrough(switch.get_active())
 		
 		
 	

@@ -17,16 +17,13 @@
  */
 
 #include <stdio.h>
+#include <jack/midiport.h>
 #include "jack_client.h"
 #include "jack_process.h"
 
 jack_client_t *jack_client;
 jack_port_t *jack_output_port;
 jack_port_t *jack_input_port;
-jack_nframes_t jack_sample_rate;
-jack_nframes_t jack_buffer_size;
-jack_nframes_t jack_start_frames;
-jack_time_t jack_start_time;
 
 int jack_start() {
     jack_options_t opt;
@@ -37,19 +34,10 @@ int jack_start() {
         return 1;
     }
 
-    // jack_nframes = jack_get_buffer_size(jack_client);
-
-    //
-
-    passthrough = 1;
-
     jack_set_process_callback (jack_client, jack_process, 0);
-    jack_set_buffer_size_callback(jack_client, jack_buffer_size_changed, 0);
     jack_set_sample_rate_callback(jack_client, jack_sample_rate_changed, 0);
     jack_output_port = jack_port_register (jack_client, "out", JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
     jack_input_port = jack_port_register (jack_client, "in", JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0);
-    jack_start_frames = 0;
-    jack_start_time = 0;
     jack_activate(jack_client);
     return 0;
 }

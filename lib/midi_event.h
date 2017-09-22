@@ -19,9 +19,14 @@
 #ifndef __MIDI_EVENT_H__
 #define __MIDI_EVENT_H__
 
+#include <jack/jack.h>
+
+#define EVT_BUFFER_LENGTH 1024
+
 enum MIDI_EVENT_TYPE {unknown, note_on, note_off, pitch_wheel, control_change};
 
 typedef struct midi_event_t {
+    jack_nframes_t time;
     int type;
     unsigned char channel;
     union {
@@ -36,9 +41,12 @@ typedef struct midi_event_t {
     };
 } midi_event;
 
-
 midi_event midi_decode_event(unsigned char *data, int len);
 char *midi_describe_event(midi_event evt, char *output, int len);
 char *i2n(unsigned char i);
+
+void midi_buffer_clear();
+void midi_buffer_flush(void *outp);
+void midi_buffer_add(midi_event evt);
 
 #endif //__MIDI_EVENT_H__ 

@@ -15,14 +15,6 @@ void stop() {
     module_free();
 }
 
-int get_passthrough() {
-    return passthrough;
-}
-
-void set_passthrough(int val) {
-    passthrough = val;
-}
-
 int get_bpm() {
     return module.bpm;
 }

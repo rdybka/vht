@@ -17,8 +17,39 @@
  */
 
 #include <stdio.h>
-
+#include <stdlib.h>
+#include <jack/midiport.h>
 #include "midi_event.h"
+
+midi_event midi_buffer[EVT_BUFFER_LENGTH];
+
+int curr_midi_event;
+
+int midi_encode_event(midi_event evt, unsigned char *buff) {
+    if (evt.type == unknown)
+        return 0;
+
+    switch(evt.type) {
+    case note_off:
+        buff[0] = 0x80;
+        break;
+    case note_on:
+        buff[0] = 0x90;
+        break;
+    case control_change:
+        buff[0] = 0xB0;
+        break;
+    case pitch_wheel:
+        buff[0] = 0xE0;
+        break;
+    }
+
+    buff[0]+= evt.channel - 1;
+    buff[1] = evt.note;
+    buff[2] = evt.velocity;
+
+    return 1;
+}
 
 midi_event midi_decode_event(unsigned char *data, int len) {
     midi_event ret;
@@ -52,6 +83,7 @@ midi_event midi_decode_event(unsigned char *data, int len) {
 
     ret.note = data[1];
     ret.velocity = data[2];
+    ret.time = 0;
 
     return ret;
 }
@@ -79,9 +111,9 @@ char * midi_describe_event(midi_event  evt, char *buff, int len) {
     }
 
     if (evt.type == note_on || evt.type == note_off) {
-        sprintf(buff, "ch: %02d %-15s %3s %d", evt.channel, b, i2n(evt.note), evt.velocity);
+        sprintf(buff, "ch: %02d %-15s %3s %d offset: %lu", evt.channel, b, i2n(evt.note), evt.velocity, evt.time);
     } else
-        sprintf(buff, "ch: %02d %-15s %d %d", evt.channel, b, evt.note, evt.velocity);
+        sprintf(buff, "ch: %02d %-15s %d %d offset: %lu", evt.channel, b, evt.note, evt.velocity, evt.time);
 
 
     return buff;
@@ -96,4 +128,32 @@ char *i2n(unsigned char i) {
 
     sprintf(buff, "%s%x", notes[note], oct);
     return buff;
+}
+
+void midi_buffer_clear() {
+    curr_midi_event = 0;
+}
+
+void midi_buffer_add(midi_event evt) {
+    if (curr_midi_event == EVT_BUFFER_LENGTH)
+        return;
+
+    midi_buffer[curr_midi_event++] = evt;
+}
+
+int midi_buffer_compare(const void *a, const void *b) {
+    return ((midi_event *)a)->time - ((midi_event *)b)->time;
+}
+
+void midi_buffer_flush(void *outp) {
+    if (curr_midi_event == 0)
+        return;
+
+    qsort(midi_buffer, curr_midi_event, sizeof(midi_event), midi_buffer_compare);
+
+    for (int i = 0; i < curr_midi_event; i++) {
+        unsigned char buff[3];
+        if (midi_encode_event(midi_buffer[i], buff))
+            jack_midi_event_write(outp, midi_buffer[i].time, buff, 3);
+    }
 }
