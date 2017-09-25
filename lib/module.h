@@ -28,9 +28,12 @@
 struct module_t {
     int playing;
     jack_nframes_t zero_time;
+    float song_pos;
+    int min, sec, ms;
 
     int bpm;
     int rpb; // rows per beat
+
     int def_nrows;
     sequence **seq;
     int nseq;

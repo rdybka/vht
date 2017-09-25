@@ -23,7 +23,7 @@
 
 #define EVT_BUFFER_LENGTH 1024
 
-enum MIDI_EVENT_TYPE {unknown, note_on, note_off, pitch_wheel, control_change};
+enum MIDI_EVENT_TYPE {none, note_on, note_off, pitch_wheel, control_change};
 
 typedef struct midi_event_t {
     jack_nframes_t time;

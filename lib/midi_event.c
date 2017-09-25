@@ -26,7 +26,7 @@ midi_event midi_buffer[EVT_BUFFER_LENGTH];
 int curr_midi_event;
 
 int midi_encode_event(midi_event evt, unsigned char *buff) {
-    if (evt.type == unknown)
+    if (evt.type == none)
         return 0;
 
     switch(evt.type) {
@@ -53,7 +53,7 @@ int midi_encode_event(midi_event evt, unsigned char *buff) {
 
 midi_event midi_decode_event(unsigned char *data, int len) {
     midi_event ret;
-    ret.type = unknown;
+    ret.type = none;
 
     if (len != 3) {
         return ret;
@@ -93,8 +93,8 @@ char * midi_describe_event(midi_event  evt, char *buff, int len) {
 
     char *b;
     switch(evt.type) {
-    case unknown:
-        b = "unknown";
+    case none:
+        b = "none";
         break;
     case note_on:
         b = "note_on";

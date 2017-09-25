@@ -21,6 +21,7 @@
 #include "module.h"
 
 jack_nframes_t jack_sample_rate;
+jack_nframes_t jack_buffer_size;
 
 int jack_process(jack_nframes_t nframes, void *arg) {
     jack_nframes_t curr_frames;
@@ -38,4 +39,8 @@ int jack_process(jack_nframes_t nframes, void *arg) {
 
 int jack_sample_rate_changed(jack_nframes_t srate, void *arg) {
     jack_sample_rate = srate;
+}
+
+int jack_buffer_size_changed(jack_nframes_t size, void *arg) {
+    jack_buffer_size = size;
 }

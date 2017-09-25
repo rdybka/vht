@@ -30,8 +30,13 @@ typedef struct track_t {
     int channel;
     int nrows; // actual rows
     int nsrows; // song rows
+
+    float fpos;
+    int	npos;
+
     int ncols;
     row **rows;
+    int *ring;
     int trigger_channel;
     int trigger_note;
     int loop;
@@ -42,7 +47,7 @@ typedef struct track_t {
 track *track_new(int port, int channel, int len, int songlen);
 track *track_clone(track *t);
 
-void track_set_row(track *trk, int c, int n, row_type type, int note, int velocity, int delay);
+void track_set_row(track *trk, int c, int n, int type, int note, int velocity, int delay);
 int track_get_row(track *trk, int c, int n, row *r);
 void track_free(track *);
 void track_clear_rows(track *trk, int c);
@@ -50,5 +55,9 @@ void track_clear_rows(track *trk, int c);
 void track_add_col(track *trk);
 void track_del_col(track *trk, int c);
 void track_resize(track *trk, int size);
+
+// don't touch those from python
+void track_reset(track *trk);
+void track_advance(track *trk, float speriod);
 
 #endif //__TRACK_H__

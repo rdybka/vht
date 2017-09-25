@@ -19,11 +19,8 @@
 #ifndef __ROW_H__
 #define __ROW_H__
 
-typedef enum {NONE, NOTE_ON, NOTE_OFF, PITCH, CONTROL}
-row_type;
-
 typedef struct row_t {
-    row_type type;
+    int type;
     int note;
     int velocity;
     int delay;

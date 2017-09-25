@@ -22,8 +22,10 @@
 #include <jack/jack.h>
 
 extern jack_nframes_t jack_sample_rate;
+extern jack_nframes_t jack_buffer_size;
 
 int jack_process(jack_nframes_t nframes, void *arg);
 int jack_sample_rate_changed(jack_nframes_t srate, void *arg);
+int jack_buffer_size_changed(jack_nframes_t size, void *arg);
 
 #endif //__JACK_PROCESS_H__
