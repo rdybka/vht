@@ -23,7 +23,7 @@ typedef struct row_t {
     int type;
     int note;
     int velocity;
-    int delay;
+    int delay; // +/- 1-999
 } row;
 
 #endif //__ROW_H__

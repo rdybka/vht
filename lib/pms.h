@@ -29,6 +29,10 @@
 extern int start();
 extern void stop();
 
+extern void module_play(int);
+extern int module_is_playing();
+extern void module_reset();
+
 extern int get_bpm();
 extern void set_bpm(int);
 

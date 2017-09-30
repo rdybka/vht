@@ -29,12 +29,15 @@ class Pms_MainWin(Gtk.ApplicationWindow):
 		icon = Gio.ThemedIcon(name="media-playback-stop")
 		image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
 		button.add(image)
+		button.connect("clicked", self.on_stop_button_activate)
 		hb.pack_start(button)
+		
 		
 		button = Gtk.Button()
 		icon = Gio.ThemedIcon(name="media-playback-start")
 		image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
 		button.add(image)
+		button.connect("clicked", self.on_start_button_activate)
 		hb.pack_start(button)
 		
 		label = Gtk.Label("BMP:")
@@ -45,6 +48,7 @@ class Pms_MainWin(Gtk.ApplicationWindow):
 		self.bpmbutton.set_adjustment(self.adj)
 		hb.pack_start(self.bpmbutton)
 		self.adj.set_value(self.pms.get_bpm())
+		self.adj.connect("value-changed", self.on_bpm_changed)
 
 		self.vbox = Gtk.Box()
 		self.hbox = Gtk.Box();
@@ -69,6 +73,20 @@ class Pms_MainWin(Gtk.ApplicationWindow):
 	def on_ptswitch_activated(self, switch, gparam):
 		pass
 #		self.pms.set_passthrough(switch.get_active())
+
+	def on_start_button_activate(self, switch):
+		print("Play")
+		self.pms.module_play(1)
 		
-		
+	def on_stop_button_activate(self, switch):
+		if not self.pms.module_is_playing():
+			print("Reset")
+			self.pms.module_reset()
+		else:
+			print("Stop")
+
+		self.pms.module_play(0)			
 	
+	def on_bpm_changed(self, adj):
+		print("BMP Change:", adj.get_value())
+		self.pms.set_bpm(int(adj.get_value()))

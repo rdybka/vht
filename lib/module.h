@@ -28,7 +28,7 @@
 struct module_t {
     int playing;
     jack_nframes_t zero_time;
-    float song_pos;
+    double song_pos;
     int min, sec, ms;
 
     int bpm;

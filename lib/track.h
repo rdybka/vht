@@ -31,8 +31,7 @@ typedef struct track_t {
     int nrows; // actual rows
     int nsrows; // song rows
 
-    float fpos;
-    int	npos;
+    double pos;
 
     int ncols;
     row **rows;
@@ -40,6 +39,7 @@ typedef struct track_t {
     int trigger_channel;
     int trigger_note;
     int loop;
+    int playing;
     unsigned char trigger_type;
     pthread_mutex_t excl;
 } track;
@@ -58,6 +58,7 @@ void track_resize(track *trk, int size);
 
 // don't touch those from python
 void track_reset(track *trk);
-void track_advance(track *trk, float speriod);
+void track_advance(track *trk, double speriod);
+void track_wind(track *trk, double speriod);
 
 #endif //__TRACK_H__

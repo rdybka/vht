@@ -20,9 +20,6 @@
 #include "jack_client.h"
 #include "module.h"
 
-jack_nframes_t jack_sample_rate;
-jack_nframes_t jack_buffer_size;
-
 int jack_process(jack_nframes_t nframes, void *arg) {
     jack_nframes_t curr_frames;
     jack_time_t curr_usecs;

@@ -24,6 +24,8 @@
 jack_client_t *jack_client;
 jack_port_t *jack_output_port;
 jack_port_t *jack_input_port;
+jack_nframes_t jack_sample_rate;
+jack_nframes_t jack_buffer_size;
 
 int jack_start() {
     jack_options_t opt;

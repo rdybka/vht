@@ -20,6 +20,7 @@
 #include <pthread.h>
 #include <math.h>
 
+#include "jack_client.h"
 #include "module.h"
 #include "track.h"
 #include "row.h"
@@ -34,7 +35,8 @@ track *track_new(int port, int channel, int len, int songlen) {
     trk->trigger_note = 0;
     trk->loop = 0;
     trk->trigger_type = TRIGGER_NORMAL;
-    trk->ncols = 1;
+    trk->ncols = 2;
+    trk->playing = 0;
 
     pthread_mutex_init(&trk->excl, NULL);
 
@@ -47,14 +49,43 @@ track *track_new(int port, int channel, int len, int songlen) {
     };
 
 // insert random data - should probably get deleted one day
-    float s = 0;
-    for (int n = 0; n < trk->nrows; n+=2) {
-        row *r = &trk->rows[0][n];
-        r->type = note_on;
-        r->note = 64 + (16.0 * (sin(s)));
-        r->velocity = 100;
+    trk->playing = 1;
+    if (channel == 1) {
+        float s = 0;
+        for (int n = 0; n < trk->nrows; n+=2) {
+            row *r = &trk->rows[0][n];
+            r->type = note_on;
+            r->note = 64 + (16.0 * (sin(s)));
+            r->velocity = 100;
 
-        s += 0.3;
+            s += 0.5;
+
+            r = &trk->rows[1][n + 1];
+            r->type = note_on;
+            r->note = 64 + (16.0 * (sin(s)));
+            r->velocity = 100;
+
+            s += 0.3;
+        }
+    }
+
+    if (channel == 2) {
+        float s = 0;
+        for (int n = 0; n < trk->nrows; n+=16) {
+            row *r = &trk->rows[0][n];
+            r->type = note_on;
+            r->note = 64 + (16.0 * (sin(s)));
+            r->velocity = 100;
+
+            s += 0.5;
+
+            r = &trk->rows[1][n + 2];
+            r->type = note_on;
+            r->note = 64 + (16.0 * (sin(s)));
+            r->velocity = 100;
+
+            s += 0.3;
+        }
     }
 
     track_reset(trk);
@@ -62,8 +93,7 @@ track *track_new(int port, int channel, int len, int songlen) {
 };
 
 void track_reset(track *trk) {
-    trk->fpos = 0.0;
-    trk->npos = -1;
+    trk->pos = 0.0;
     for (int f = 0; f < trk->ncols; f++)
         trk->ring[f] = -1;
 }
@@ -134,65 +164,90 @@ track *track_clone(track *src) {
 }
 
 // yooohoooo!!!
-void track_trigger(track *trk, int pos, int delay) {
-    for (int c = 0; c < trk->ncols; c++) {
-        row r;
-        track_get_row(trk, c, pos, &r);
+void track_trigger(track *trk, int pos, int c, int delay) {
+    row r;
+    track_get_row(trk, c, pos, &r);
 
-        if (r.type == none)
-            return;
+    if (r.type == none)
+        return;
 
-        midi_event evt;
+    midi_event evt;
 
-        if (r.type == note_on) {
-            if (trk->ring[c] != -1) {
-                evt.time = delay;
-                evt.channel = trk->channel;
-                evt.type = note_off;
-                evt.note = trk->ring[c];
-                evt.velocity = 0;
-                midi_buffer_add(evt);
+    if (r.type == note_on) {
+        if (trk->ring[c] != -1) {
+            evt.time = delay;
+            evt.channel = trk->channel;
+            evt.type = note_off;
+            evt.note = trk->ring[c];
+            evt.velocity = 0;
+            midi_buffer_add(evt);
 
-                trk->ring[c] = -1;
+            trk->ring[c] = -1;
 
-                char desc[256];
-                midi_describe_event(evt, desc, 256);
-                printf("%02d:%02d:%03d %02d:%s\n", module.min, module.sec, module.ms, trk->npos, desc);
+            char desc[256];
+            midi_describe_event(evt, desc, 256);
+            if (trk->channel == 2)
+                printf("**** %02d:%02d:%03d %02d:%s\n", module.min, module.sec, module.ms, pos, desc);
+        }
+    }
+
+    evt.time = delay;
+    evt.channel = trk->channel;
+    evt.type = r.type;
+    evt.note = r.note;
+    evt.velocity = r.velocity;
+    midi_buffer_add(evt);
+
+    if (r.type == note_on) {
+        trk->ring[c] = r.note;
+    }
+
+    char desc[256];
+    midi_describe_event(evt, desc, 256);
+    if (trk->channel == 2)
+        printf("%02d:%02d:%03d %02d:%s\n", module.min, module.sec, module.ms, pos, desc);
+}
+
+void track_advance(track *trk, double speriod) {
+    // length of period in track time
+    double tperiod = ((double)trk->nrows / (double)trk->nsrows) * speriod;
+    double tmul = (double) jack_buffer_size / tperiod;
+
+    int row_start = floorf(trk->pos);
+    int row_end = floorf(trk->pos + tperiod) + 1;
+
+//	printf("%d\n", force_loop);
+
+    for (int c = 0; c < trk->ncols; c++)
+        for (int n = row_start; n <= row_end; n++) {
+            int nn = n;
+
+            if (trk->loop)
+                if (nn >= trk->nrows)
+                    nn = 0;
+
+            if (nn < trk->nrows) {
+                row r;
+                track_get_row(trk, c, nn, &r);
+
+                double trigger_time = (double)n + ((double)r.delay / 1000.0);
+                double delay = trigger_time - trk->pos;
+                if ((delay >= 0) & (delay < tperiod)) {
+                    if (trk->playing)
+                        track_trigger(trk, nn, c, delay * tmul);
+                }
             }
         }
 
-        evt.time = delay;
-        evt.channel = trk->channel;
-        evt.type = r.type;
-        evt.note = r.note;
-        evt.velocity = r.velocity;
-        midi_buffer_add(evt);
+    trk->pos += tperiod;
 
-        if (r.type == note_on) {
-            trk->ring[c] = r.note;
-        }
-
-        char desc[256];
-        midi_describe_event(evt, desc, 256);
-        printf("%02d:%02d:%03d %02d:%s\n", module.min, module.sec, module.ms, trk->npos, desc);
+    if (trk->loop) {
+        if (trk->pos > trk->nrows)
+            trk->pos -= trk->nrows;
     }
 }
 
-void track_advance(track *trk, float speriod) {
-    // length of period in track time
-    float tperiod = (float)trk->nrows / (float)trk->nsrows;
-    tperiod *= speriod;
-
-    int n = floorf(trk->fpos);
-
-    // trigger?
-    if (trk->npos != n) {
-        track_trigger(trk, n, 0);
-    }
-
-    trk->npos = n;
-    trk->fpos += tperiod;
-
-    if (trk->fpos > trk->nrows)
-        trk->fpos -= trk->nrows;
+void track_wind(track *trk, double period) {
+    double tperiod = ((double)trk->nrows / (double)trk->nsrows) * period;
+    trk->pos += tperiod;
 }

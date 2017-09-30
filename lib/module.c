@@ -22,6 +22,7 @@
 #include "module.h"
 #include "midi_event.h"
 #include "jack_process.h"
+#include "jack_client.h"
 
 struct module_t module;
 
@@ -35,9 +36,9 @@ void module_advance(void *outp, void *inp, jack_nframes_t curr_frames) {
     if (module.zero_time == 0)
         module.zero_time = curr_frames;
 
-    float time = (curr_frames - module.zero_time) / (float)jack_sample_rate;
-    float row_length = 60.0 / ((float)module.rpb * (float)module.bpm);
-    float period = ((float)jack_buffer_size / (float)jack_sample_rate) / row_length;
+    double time = (curr_frames - module.zero_time) / (double)jack_sample_rate;
+    double row_length = 60.0 / ((double)module.rpb * (double)module.bpm);
+    double period = ((double)jack_buffer_size / (double)jack_sample_rate) / row_length;
 
     module.sec = time;
     module.min = module.sec / 60;
@@ -48,27 +49,8 @@ void module_advance(void *outp, void *inp, jack_nframes_t curr_frames) {
     jack_midi_clear_buffer(outp);
     midi_buffer_clear();
 
-    track *trk = module.seq[0]->trk[0];
-    track_advance(trk, period);
-
-    /*    if (sec != lastsec) {
-            lastsec = sec;
-
-            midi_event evt;
-
-            evt.time = 0;
-            evt.channel = 1;
-            evt.type = note_on;
-            evt.note = 64;
-            evt.velocity = 100;
-
-            if (sec%2 == 0)
-                evt.type = note_off;
-
-            midi_buffer_add(evt);
-        }
-    */
-
+    sequence *seq = module.seq[0];
+    sequence_advance(seq, period);
 
 // handle input
 
@@ -106,18 +88,24 @@ int add_sequence(int seq_clone) {
 
 void module_new() {
     module_free();
-    module.bpm = 120;
+    module.bpm = 150;
     module.def_nrows = 64;
     module.rpb = 4;
     module.seq = NULL;
     module.nseq = 0;
     module.curr_seq = 0;
-    module.playing = 1;
+    module.playing = 0;
     module.zero_time = 0;
     module.song_pos = 0.0;
 
     add_sequence(-1);
-    sequence_add_track(module.seq[0], track_new(0, 1, module.def_nrows, module.def_nrows));
+    for (int t = 1; t < 3; t++) {
+        //track *trk = track_new(0, t, module.def_nrows, module.def_nrows);
+        track *trk = track_new(0, t, 8, 8);
+        if (t == 2)
+            trk->loop = 1;
+        sequence_add_track(module.seq[0], trk);
+    }
 }
 
 void module_free() {

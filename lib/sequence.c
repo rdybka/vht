@@ -17,6 +17,7 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "sequence.h"
 
@@ -24,6 +25,8 @@ sequence *sequence_new() {
     sequence *seq = malloc(sizeof(sequence));
     seq->ntrk = 0;
     seq->trk = 0;
+    seq->pos = 0;
+    seq->length = 16;
     return seq;
 }
 
@@ -31,10 +34,10 @@ void sequence_add_track(sequence *seq, track *trk) {
     // fresh?
     if (seq->ntrk == 0) {
         seq->trk = malloc(sizeof(track *));
-        seq->trk[0] = trk;
-        seq->ntrk = 1;
-        return;
     }
+
+    seq->trk[seq->ntrk++] = trk;
+    return;
 }
 
 void sequence_free(sequence *seq) {
@@ -46,4 +49,35 @@ void sequence_free(sequence *seq) {
         free(seq->trk);
 
     free(seq);
+}
+
+void sequence_advance(sequence *seq, double period) {
+    for (int t = 0; t < seq->ntrk; t++) {
+        if (seq->trk[t]->playing) {
+            track_advance(seq->trk[t], period);
+
+            // if track past end, stop playing
+            if (seq->trk[t]->pos > seq->trk[t]->nrows)
+                if (!seq->trk[t]->loop)
+                    seq->trk[t]->playing = 0;
+        }
+    }
+
+    // will we reach the end of sequence?
+    // if so, reset non-looping tracks
+    if (seq->pos + period > seq->length) {
+        // reset track positions
+        for (int t = 0; t < seq->ntrk; t++) {
+            if (!seq->trk[t]->loop) {
+                seq->trk[t]->pos = 0;
+                seq->trk[t]->playing = 1;
+                track_wind(seq->trk[t], (double)seq->length - (seq->pos + period));
+            }
+        }
+    }
+
+    seq->pos += period;
+
+    if (seq->pos > seq->length)
+        seq->pos -= seq->length;
 }

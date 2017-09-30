@@ -25,11 +25,11 @@ typedef struct sequence_t {
     track **trk;
     int ntrk;
     int length;
+    double pos;
 } sequence;
 
 sequence *sequence_new();
 void sequence_add_track(sequence *, track *);
 void sequence_free(sequence *);
-
-
+void sequence_advance(sequence *seq, double period);
 #endif //__SEQUENCE_H__
