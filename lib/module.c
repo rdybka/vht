@@ -30,8 +30,25 @@ int lastsec;
 
 // the GOD function
 void module_advance(void *outp, void *inp, jack_nframes_t curr_frames) {
-    if (!module.playing)
+    // are we muting after stop?
+    if (!module.playing && module.mute) {
+        jack_midi_clear_buffer(outp);
+        midi_buffer_clear();
+
+        for (int t = 0; t < module.seq[module.curr_seq]->ntrk; t++)
+            track_kill_notes(module.seq[module.curr_seq]->trk[t]);
+
+        module.mute = 0;
+        midi_buffer_flush(outp);
+    }
+
+    if (!module.playing) {
+        // are we paused?
+        if (module.zero_time > 0)
+            module.zero_time += jack_buffer_size;
+
         return;
+    }
 
     if (module.zero_time == 0)
         module.zero_time = curr_frames;
@@ -49,8 +66,12 @@ void module_advance(void *outp, void *inp, jack_nframes_t curr_frames) {
     jack_midi_clear_buffer(outp);
     midi_buffer_clear();
 
+
+    printf("%02d:%02d:%04d\n", module.min, module.sec, module.ms);
+
     sequence *seq = module.seq[0];
-    sequence_advance(seq, period);
+    if (module.playing)
+        sequence_advance(seq, period);
 
 // handle input
 
@@ -88,7 +109,7 @@ int add_sequence(int seq_clone) {
 
 void module_new() {
     module_free();
-    module.bpm = 150;
+    module.bpm = 120;
     module.def_nrows = 64;
     module.rpb = 4;
     module.seq = NULL;
@@ -97,15 +118,20 @@ void module_new() {
     module.playing = 0;
     module.zero_time = 0;
     module.song_pos = 0.0;
+    module.mute = 0;
 
     add_sequence(-1);
     for (int t = 1; t < 3; t++) {
         //track *trk = track_new(0, t, module.def_nrows, module.def_nrows);
         track *trk = track_new(0, t, 8, 8);
         if (t == 2)
-            trk->loop = 1;
+            trk->loop = 0;
         sequence_add_track(module.seq[0], trk);
     }
+}
+
+void module_mute() {
+    module.mute = 1;
 }
 
 void module_free() {

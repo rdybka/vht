@@ -40,7 +40,7 @@ class Pms_MainWin(Gtk.ApplicationWindow):
 		button.connect("clicked", self.on_start_button_activate)
 		hb.pack_start(button)
 		
-		label = Gtk.Label("BMP:")
+		label = Gtk.Label("BPM:")
 		hb.pack_start(label)
 		
 		self.adj = Gtk.Adjustment(120.0, 30.0, 400.0, 1.0, 10.0)

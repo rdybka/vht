@@ -11,7 +11,8 @@ DEPS=lib/pms.h \
 	lib/row.h \
 	lib/track.h \
 	lib/module.h \
-	lib/sequence.h
+	lib/sequence.h \
+	lib/random_composer.h
 	
 OBJ=lib/jack_client.o \
 	lib/jack_process.o \
@@ -20,7 +21,8 @@ OBJ=lib/jack_client.o \
 	lib/module.o \
 	lib/sequence.o \
 	lib/track.o \
-	lib/row.o
+	lib/row.o \
+	lib/random_composer.o
 
 all: _pms.so
 

@@ -60,5 +60,6 @@ void track_resize(track *trk, int size);
 void track_reset(track *trk);
 void track_advance(track *trk, double speriod);
 void track_wind(track *trk, double speriod);
+void track_kill_notes(track *trk);
 
 #endif //__TRACK_H__

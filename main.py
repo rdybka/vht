@@ -42,5 +42,8 @@ if __name__ == "__main__":
 	app = PmsApp()
 	app.run(sys.argv)
 
+	# is this reliable? should we wait for module.mute == 0?
+	pms.module_play(0)
+	
 	pms.stop()
 

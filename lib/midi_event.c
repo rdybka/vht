@@ -88,7 +88,7 @@ midi_event midi_decode_event(unsigned char *data, int len) {
     return ret;
 }
 
-char * midi_describe_event(midi_event  evt, char *buff, int len) {
+char * midi_describe_event(midi_event evt, char *buff, int len) {
     buff[0] = 0;
 
     char *b;

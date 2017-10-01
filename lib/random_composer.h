@@ -1,4 +1,4 @@
-/* module.h
+/* random_composer.h
  *
  * Copyright (C) 2017 Remigiusz Dybka
  *
@@ -16,36 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __MODULE_H__
-#define __MODULE_H__
+#ifndef __RANDOM_COMPOSER_H__
+#define __RANDOM_COMPOSER_H__
 
-#include <stdlib.h>
-#include <jack/jack.h>
-#include <jack/midiport.h>
+#include "track.h"
 
-#include "sequence.h"
+void random_composer_compose(track *trk); // :)
 
-struct module_t {
-    int playing;
-    jack_nframes_t zero_time;
-    double song_pos;
-    int min, sec, ms;
+#endif // __RANDOM_COMPOSER_H__
 
-    int bpm;
-    int rpb; // rows per beat
-
-    int def_nrows;
-    sequence **seq;
-    int nseq;
-    int curr_seq;
-    int mute;
-};
-
-extern struct module_t module;
-
-void module_advance(void *outport, void *inport, jack_nframes_t curr_frames);
-void module_new();
-void module_free();
-void module_mute();
-
-#endif //__MODULE_H__

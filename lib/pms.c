@@ -29,6 +29,8 @@ int get_nseq(void) {
 
 void module_play(int play) {
     module.playing = play;
+    if (play == 0)
+        module_mute();
 }
 
 int module_is_playing() {
@@ -37,6 +39,7 @@ int module_is_playing() {
 
 void module_reset() {
     module.seq[0]->pos = 0;
+    module.zero_time = 0;
     for (int t = 0; t < module.seq[0]->ntrk; t++)
         track_reset(module.seq[0]->trk[t]);
 }

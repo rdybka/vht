@@ -26,6 +26,8 @@
 #include "row.h"
 #include "midi_event.h"
 
+#include "random_composer.h"
+
 track *track_new(int port, int channel, int len, int songlen) {
     track *trk = malloc(sizeof(track));
     trk->channel = channel;
@@ -48,47 +50,9 @@ track *track_new(int port, int channel, int len, int songlen) {
         trk->ring = malloc(sizeof(int) * trk->ncols);
     };
 
-// insert random data - should probably get deleted one day
-    trk->playing = 1;
-    if (channel == 1) {
-        float s = 0;
-        for (int n = 0; n < trk->nrows; n+=2) {
-            row *r = &trk->rows[0][n];
-            r->type = note_on;
-            r->note = 64 + (16.0 * (sin(s)));
-            r->velocity = 100;
-
-            s += 0.5;
-
-            r = &trk->rows[1][n + 1];
-            r->type = note_on;
-            r->note = 64 + (16.0 * (sin(s)));
-            r->velocity = 100;
-
-            s += 0.3;
-        }
-    }
-
-    if (channel == 2) {
-        float s = 0;
-        for (int n = 0; n < trk->nrows; n+=16) {
-            row *r = &trk->rows[0][n];
-            r->type = note_on;
-            r->note = 64 + (16.0 * (sin(s)));
-            r->velocity = 100;
-
-            s += 0.5;
-
-            r = &trk->rows[1][n + 2];
-            r->type = note_on;
-            r->note = 64 + (16.0 * (sin(s)));
-            r->velocity = 100;
-
-            s += 0.3;
-        }
-    }
-
+    random_composer_compose(trk);
     track_reset(trk);
+    trk->playing = 1;
     return trk;
 };
 
@@ -183,11 +147,6 @@ void track_trigger(track *trk, int pos, int c, int delay) {
             midi_buffer_add(evt);
 
             trk->ring[c] = -1;
-
-            char desc[256];
-            midi_describe_event(evt, desc, 256);
-            if (trk->channel == 2)
-                printf("**** %02d:%02d:%03d %02d:%s\n", module.min, module.sec, module.ms, pos, desc);
         }
     }
 
@@ -201,11 +160,6 @@ void track_trigger(track *trk, int pos, int c, int delay) {
     if (r.type == note_on) {
         trk->ring[c] = r.note;
     }
-
-    char desc[256];
-    midi_describe_event(evt, desc, 256);
-    if (trk->channel == 2)
-        printf("%02d:%02d:%03d %02d:%s\n", module.min, module.sec, module.ms, pos, desc);
 }
 
 void track_advance(track *trk, double speriod) {
@@ -215,8 +169,6 @@ void track_advance(track *trk, double speriod) {
 
     int row_start = floorf(trk->pos);
     int row_end = floorf(trk->pos + tperiod) + 1;
-
-//	printf("%d\n", force_loop);
 
     for (int c = 0; c < trk->ncols; c++)
         for (int n = row_start; n <= row_end; n++) {
@@ -250,4 +202,21 @@ void track_advance(track *trk, double speriod) {
 void track_wind(track *trk, double period) {
     double tperiod = ((double)trk->nrows / (double)trk->nsrows) * period;
     trk->pos += tperiod;
+}
+
+void track_kill_notes(track *trk) {
+    midi_event evt;
+
+    for (int c = 0; c < trk->ncols; c++) {
+        if (trk->ring[c] != -1) {
+            evt.time = 0;
+            evt.channel = trk->channel;
+            evt.type = note_off;
+            evt.note = trk->ring[c];
+            evt.velocity = 0;
+            midi_buffer_add(evt);
+
+            trk->ring[c] = -1;
+        }
+    }
 }

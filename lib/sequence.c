@@ -72,6 +72,7 @@ void sequence_advance(sequence *seq, double period) {
                 seq->trk[t]->pos = 0;
                 seq->trk[t]->playing = 1;
                 track_wind(seq->trk[t], (double)seq->length - (seq->pos + period));
+                track_advance(seq->trk[t], period);
             }
         }
     }
