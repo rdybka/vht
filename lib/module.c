@@ -121,9 +121,16 @@ void module_new() {
     module.mute = 0;
 
     add_sequence(-1);
+
+    track *trk;
     for (int t = 1; t < 3; t++) {
         //track *trk = track_new(0, t, module.def_nrows, module.def_nrows);
-        track *trk = track_new(0, t, 8, 8);
+        if (t == 2) {
+            trk = track_new(0, t, 3, 8);
+            trk->loop = 1;
+        } else {
+            trk = track_new(0, t, 8, 8);
+        }
         if (t == 2)
             trk->loop = 0;
         sequence_add_track(module.seq[0], trk);

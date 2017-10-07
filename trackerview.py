@@ -8,7 +8,7 @@ class TrackerView(Gtk.ScrolledWindow):
 	def __init__(self, pms_handle):
 		Gtk.ScrolledWindow.__init__(self)
 		
-		self.pms = pms_handle
+		self.mod = pms_handle
 
 		self.trackBox = Gtk.Box()
 		self.trackBox.add(trackview.TrackView())

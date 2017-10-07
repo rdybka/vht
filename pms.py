@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import pms
+from pypms import pms
 import sys
 import gi
 gi.require_version('Gtk', '3.0')
@@ -36,14 +36,14 @@ class PmsApp(Gtk.Application):
 		win.show_all()
 
 if __name__ == "__main__":
-	if pms.start() != 0: 
+	if pms.jack_start() != 0: 
 		exit()
-	
+
 	app = PmsApp()
 	app.run(sys.argv)
 
 	# is this reliable? should we wait for module.mute == 0?
-	pms.module_play(0)
+	pms.play = False
 	
-	pms.stop()
+	pms.jack_stop()
 

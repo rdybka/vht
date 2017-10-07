@@ -36,7 +36,7 @@ void random_composer_compose(track *trk) {
             r->note = 64 + (16.0 * (sin(s)));
             r->velocity = 100;
 
-            s += 0.3;
+            s += 1;
         }
     }
 

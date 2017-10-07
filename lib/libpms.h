@@ -16,27 +16,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __PMS_H__
-#define __PMS_H__
+#ifndef __LIBPMS_H__
+#define __LIBPMS_H__
 
 #ifdef SWIG
-%module pms
+%module libpms
 %{
-#include "pms.h"
+#include "libpms.h"
 %}
 #endif
+
+#include "module.h"
 
 extern int start();
 extern void stop();
 
+// module
+extern void module_new();
+extern void module_free();
 extern void module_play(int);
 extern int module_is_playing();
 extern void module_reset();
 
-extern int get_bpm();
-extern void set_bpm(int);
+extern int module_get_bpm();
+extern void module_set_bpm(int);
 
-extern int get_nseq();
-extern int add_sequence(int);
+extern int module_get_nseq();
+sequence *module_get_seq(int);
 
-#endif //__PMS_H__
+#endif //__LIBPMS_H__

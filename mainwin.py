@@ -8,7 +8,8 @@ class Pms_MainWin(Gtk.ApplicationWindow):
 	def __init__(self, pms_handle, app):
 		Gtk.ApplicationWindow.__init__(self, application = app)
 
-		self.pms = pms_handle
+		print("appinit")
+		self.mod = pms_handle
 		
 		hb = Gtk.HeaderBar()
 		hb.set_show_close_button(True)
@@ -47,7 +48,7 @@ class Pms_MainWin(Gtk.ApplicationWindow):
 		self.bpmbutton = Gtk.SpinButton()
 		self.bpmbutton.set_adjustment(self.adj)
 		hb.pack_start(self.bpmbutton)
-		self.adj.set_value(self.pms.get_bpm())
+		self.adj.set_value(self.mod.bpm)
 		self.adj.connect("value-changed", self.on_bpm_changed)
 
 		self.vbox = Gtk.Box()
@@ -59,7 +60,7 @@ class Pms_MainWin(Gtk.ApplicationWindow):
 		self.hbox.pack_start(self.seqlab, False, True, 0)
 		self.hbox.pack_start(Gtk.Label("track props"), True, True, 0)
 		
-		self.trackerview = TrackerView(self.pms)
+		self.trackerview = TrackerView(self.mod)
 
 		self.vbox.pack_start(self.hbox, False, False, 0)
 		self.vbox.pack_start(self.trackerview, True, True, 0)
@@ -76,17 +77,17 @@ class Pms_MainWin(Gtk.ApplicationWindow):
 
 	def on_start_button_activate(self, switch):
 		print("Play")
-		self.pms.module_play(1)
+		self.mod.playing = 1
 		
 	def on_stop_button_activate(self, switch):
-		if not self.pms.module_is_playing():
+		if not self.mod.playing:
 			print("Reset")
-			self.pms.module_reset()
+			self.mod.reset()
 		else:
 			print("Stop")
 
-		self.pms.module_play(0)			
+		self.mod.playing = False
 	
 	def on_bpm_changed(self, adj):
 		print("BMP Change:", adj.get_value())
-		self.pms.set_bpm(int(adj.get_value()))
+		self.mod.bpm = int(adj.get_value())

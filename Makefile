@@ -4,7 +4,7 @@ PYTHON_INCLUDE=/usr/include/python3.6m
 CC=gcc
 CFLAGS=-I$(PYTHON_INCLUDE) -fPIC
 LIBS=-lm -ljack
-DEPS=lib/pms.h \
+DEPS=lib/libpms.h \
 	lib/jack_client.h \
 	lib/jack_process.h \
 	lib/midi_event.h \
@@ -17,31 +17,34 @@ DEPS=lib/pms.h \
 OBJ=lib/jack_client.o \
 	lib/jack_process.o \
 	lib/midi_event.o \
-	lib/pms.o \
+	lib/libpms.o \
 	lib/module.o \
 	lib/sequence.o \
 	lib/track.o \
 	lib/row.o \
 	lib/random_composer.o
 
-all: _pms.so
+all: pypms/_libpms.so
 
 %.o: %c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-lib/pms_wrap.c: $(DEPS) $(OBJ)
-	swig -python lib/pms.h
+lib/libpms_wrap.c: $(DEPS) $(OBJ)
+	swig -python lib/libpms.h
 
 lib/pms_wrap.o: lib/pms_wrap.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-pms.py: lib/pms_wrap.c
-	cp lib/pms.py .
+pypms/libpms.py: lib/libpms_wrap.c
+	cp lib/libpms.py pypms
 
-_pms.so: $(OBJ) lib/pms_wrap.o pms.py
-	ld -shared $(OBJ) lib/pms_wrap.o -o $@ $(LIBS)
+pypms/_libpms.so: $(OBJ) lib/libpms_wrap.o pypms/libpms.py
+	ld -shared $(OBJ) lib/libpms_wrap.o -o $@ $(LIBS)
 		
 clean:
-	rm -f *.so *.o lib/pms.py pms.py
-	rm -f lib/*.so lib/*.o lib/pms_wrap.c
-	rm -rf __pycache__	
+	rm -f *.so *.o lib/libpms.py pypms/libpms.py pypms/*.so
+	rm -f lib/*.so lib/*.o lib/libpms_wrap.c
+	rm -rf __pycache__
+	rm -rf pypms/__pycache__
+	rm -rf pypms/*.pyc
+	
