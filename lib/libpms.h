@@ -42,6 +42,13 @@ extern int module_get_bpm();
 extern void module_set_bpm(int);
 
 extern int module_get_nseq();
-sequence *module_get_seq(int);
+extern sequence *module_get_seq(int);
+
+// sequence
+extern int sequence_get_ntrk(sequence *seq);
+extern track *sequence_get_trk(sequence *seq, int n);
+
+// track
+extern row *track_get_row_ptr(track *, int c, int r);
 
 #endif //__LIBPMS_H__

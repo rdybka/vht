@@ -1,19 +1,20 @@
 from collections.abc import MutableSequence
-from pypms.pmssequence import PMSSequence
+from pypms.pmstrack import PMSTrack
 
-class PMSSequenceList(MutableSequence):
-	def __init__(self, pms):
+class PMSTrackList(MutableSequence):
+	def __init__(self, pms, seq):
 		self._pms_handle = pms
+		self._seq_handle = seq;
 		super()
 	
 	def __len__(self):
-		return self._pms_handle.module_get_nseq()
+		return self._pms_handle.sequence_get_ntrk(self._seq_handle)
 
 	def __delitem__(self, itm):
 		pass
 
 	def __getitem__(self, itm):
-		return PMSSequence(self._pms_handle, self._pms_handle.module_get_seq(itm))
+		return PMSTrack(self._pms_handle, self._pms_handle.sequence_get_trk(self._seq_handle, itm))
 
 	def __setitem__(self, itm, val):
 		pass

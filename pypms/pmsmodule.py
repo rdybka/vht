@@ -49,10 +49,6 @@ class PMSModule():
 		libpms.module_reset()
 
 	@property
-	def nseq(self):
-		return libpms.module_get_nseq()
-
-	@property
 	def seq(self):
 		if self._seq == None:
 			self._seq = PMSSequenceList(libpms)

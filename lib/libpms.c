@@ -53,3 +53,17 @@ int module_get_nseq(void) {
 sequence *module_get_seq(int n) {
     return module.seq[n];
 }
+
+int sequence_get_ntrk(sequence *seq) {
+	return seq->ntrk;
+}
+
+track *sequence_get_trk(sequence *seq, int n)
+{
+	return seq->trk[n];
+}
+
+row *track_get_row_ptr(track *trk, int c, int r) 
+{
+	return &trk->rows[c][r];
+}
