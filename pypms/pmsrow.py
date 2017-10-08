@@ -30,8 +30,7 @@ class PMSRow():
 		self._velocity = 0;
 		self._delay = 0;
 		self._pms_handle.row_set(self._rowptr, 0, 0, 0, 0)
-		self.update_strrep();
-		print(self._strrep)
+		self.update_strrep();	
 	
 	@property
 	def type(self):
@@ -56,6 +55,8 @@ class PMSRow():
 			self._note = self._pms_handle.parse_note(value)
 			self._pms_handle.row_set_note(self._rowptr, self._note)
 			self.type = 1
+			if self.velocity == 0:
+				self.velocity = 100
 		
 		self.update_strrep()
 						
