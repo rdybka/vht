@@ -55,15 +55,63 @@ sequence *module_get_seq(int n) {
 }
 
 int sequence_get_ntrk(sequence *seq) {
-	return seq->ntrk;
+    return seq->ntrk;
 }
 
-track *sequence_get_trk(sequence *seq, int n)
-{
-	return seq->trk[n];
+track *sequence_get_trk(sequence *seq, int n) {
+    return seq->trk[n];
 }
 
-row *track_get_row_ptr(track *trk, int c, int r) 
-{
-	return &trk->rows[c][r];
+row *track_get_row_ptr(track *trk, int c, int r) {
+    return &trk->rows[c][r];
 }
+
+int track_get_length(track *trk) {
+    return trk->nrows;
+}
+
+int track_get_ncols(track *trk) {
+    return trk->ncols;
+}
+
+int track_get_port(track *trk) {
+    return trk->port;
+}
+
+int track_get_channel(track *trk) {
+    return trk->channel;
+}
+
+int track_get_nrows(track *trk) {
+    return trk->nrows;
+}
+
+int track_get_nsrows(track *trk) {
+    return trk->nsrows;
+}
+
+int track_get_playing(track *trk) {
+    return trk->playing;
+}
+
+double track_get_pos(track *trk) {
+    return trk->pos;
+}
+
+void track_set_port(track *trk, int n) {
+    trk->port = n;
+}
+
+void track_set_channel(track *trk, int n) {
+    trk->channel = n;
+}
+
+void track_set_nrows(track *trk, int n) {
+    trk->nrows = n;
+}
+
+void track_set_nsrows(track *trk, int n) {
+    trk->nsrows = n;
+}
+
+

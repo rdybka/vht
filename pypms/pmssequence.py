@@ -1,18 +1,26 @@
-from pypms.pmstracklist import PMSTrackList
+from collections.abc import MutableSequence
+from pypms.pmstrack import PMSTrack
 
-class PMSSequence():
-	def __init__(self, pms, seqptr):
+class PMSSequence(MutableSequence):
+	def __init__(self, pms, seq):
 		self._pms_handle = pms
-		self._seqptr = seqptr
-		self._trk = None
+		self._seq_handle = seq;
+		super()
 	
-	@property
-	def trk(self):
-		if self._trk == None:
-			self._trk = PMSTrackList(self._pms_handle, self._seqptr)
-		
-		return self._trk
+	def __len__(self):
+		return self._pms_handle.sequence_get_ntrk(self._seq_handle)
 
-			
+	def __delitem__(self, itm):
+		pass
+
+	def __getitem__(self, itm):
+		return PMSTrack(self._pms_handle, self._pms_handle.sequence_get_trk(self._seq_handle, itm))
+
+	def __setitem__(self, itm, val):
+		pass
+
+	def insert(self, itm, val):
+		pass
+    
 	def __str__(self):
-		return "dupa"
+		return self.trk.__str__()

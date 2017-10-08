@@ -30,7 +30,7 @@ typedef struct track_t {
     int channel;
     int nrows; // actual rows
     int nsrows; // song rows
-
+    int playing;
     double pos;
 
     int ncols;
@@ -39,7 +39,7 @@ typedef struct track_t {
     int trigger_channel;
     int trigger_note;
     int loop;
-    int playing;
+
     unsigned char trigger_type;
     pthread_mutex_t excl;
 } track;

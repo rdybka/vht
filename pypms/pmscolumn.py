@@ -1,26 +1,36 @@
-from collections.abc import MutableSequence
+from collections.abc import Iterable
 from pypms.pmsrow import PMSRow
 
-class PMSColumn(MutableSequence):
+class PMSColumn(Iterable):
 	def __init__(self, pms, trk, col):
 		self._pms_handle = pms
 		self._trk_handle = trk;
 		self._col = col
 		super()
-	
+		
 	def __len__(self):
-		return 0;
+		return self._pms_handle.track_get_length(self._trk_handle)
 
-	def __delitem__(self, itm):
-		pass
+	def clear(self):
+		for r in self:
+			r.clear()
 
-	# returns row info
+	def __iter__(self):
+		for i in range(self.__len__()):
+			yield PMSRow(self._pms_handle, self._pms_handle.track_get_row_ptr(self._trk_handle, self._col, i))
+
+	# returns row
 	def __getitem__(self, itm):
+		if (itm > self.__len__()):
+			raise IndexError()
+			
 		return PMSRow(self._pms_handle, self._pms_handle.track_get_row_ptr(self._trk_handle, self._col, itm))
 		
-	def __setitem__(self, itm, val):
-		pass
+	def __str__(self):
+		ret = ""
+		for r in range(self.__len__()):
+			ret = ret + str(self[r])
+			ret = ret + "\n"
 
-	def insert(self, itm, val):
-		pass
-
+		return ret
+		

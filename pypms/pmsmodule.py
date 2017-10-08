@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from pypms import libpms
 from pypms.pmssequencelist import PMSSequenceList
 
@@ -23,7 +24,6 @@ class PMSModule():
 	def __init__(self):
 		self._seq = None
 		libpms.module_new();
-		pass
 	
 	def __del__(self):   
 		libpms.module_free();
@@ -47,6 +47,10 @@ class PMSModule():
 
 	def reset(self):
 		libpms.module_reset()
+
+	def new(self):
+		self._seq = None
+		libpms.module_new();
 
 	@property
 	def seq(self):

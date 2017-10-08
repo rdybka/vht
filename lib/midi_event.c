@@ -18,6 +18,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include <jack/midiport.h>
 #include "midi_event.h"
 
@@ -156,4 +158,41 @@ void midi_buffer_flush(void *outp) {
         if (midi_encode_event(midi_buffer[i], buff))
             jack_midi_event_write(outp, midi_buffer[i].time, buff, 3);
     }
+}
+
+int parse_note(char *buff) {
+    char b[256];
+    int note = 0;
+    int octave = 0;
+
+    static int notes[] = {'C', '#', 'D', '#', 'E', 'F', '#', 'G', '#', 'A', '#', 'B'};
+
+    b[0] = 0;
+    int ii = strlen(buff);
+    for(int i = 0; i < ii; i++) {
+        char bb[2];
+        bb[0] = 0;
+        bb[1] = 0;
+        if (buff[i] != '-')
+            bb[0] = buff[i];
+
+        strcat(b, bb);
+    }
+
+    note = toupper(b[0]);
+    int i;
+
+    for (i = 0; (notes[i] != note) && (i < 12); i++);
+    note = i;
+
+    if (strlen(b) == 3) { // sharpie
+        note++;
+        octave = atoi(b + 2);
+    }
+
+    if (strlen(b) == 2) {
+        octave = atoi(b + 1);
+    }
+
+    return note + octave * 12;
 }

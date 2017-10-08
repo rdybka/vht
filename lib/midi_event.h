@@ -44,6 +44,7 @@ typedef struct midi_event_t {
 midi_event midi_decode_event(unsigned char *data, int len);
 char *midi_describe_event(midi_event evt, char *output, int len);
 char *i2n(unsigned char i);
+int parse_note(char *);
 
 void midi_buffer_clear();
 void midi_buffer_flush(void *outp);

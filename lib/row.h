@@ -26,4 +26,16 @@ typedef struct row_t {
     int delay; // +/- 1-999
 } row;
 
+int row_get_type(row *rw);
+int row_get_note(row *rw);
+int row_get_velocity(row *rw);
+int row_get_delay(row *rw);
+
+void row_set_type(row *rw, int type);
+void row_set_note(row *rw, int note);
+void row_set_velocity(row *rw, int velocity);
+void row_set_delay(row *rw, int delay);
+
+void row_set(row *rw, int type, int note, int velocity, int delay);
+
 #endif //__ROW_H__

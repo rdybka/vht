@@ -50,5 +50,33 @@ extern track *sequence_get_trk(sequence *seq, int n);
 
 // track
 extern row *track_get_row_ptr(track *, int c, int r);
+extern int track_get_length(track *trk);
+extern int track_get_ncols(track *trk);
+extern int track_get_port(track *trk);
+extern int track_get_channel(track *trk);
+extern int track_get_nrows(track *trk);
+extern int track_get_nsrows(track *trk);
+extern int track_get_playing(track *trk);
+extern double track_get_pos(track *trk);
 
+extern void track_set_port(track *trk, int n);
+extern void track_set_channel(track *trk, int n);
+extern void track_set_nrows(track *trk, int n);
+extern void track_set_nsrows(track *trk, int n);
+
+
+// row
+int row_get_type(row *rw);
+int row_get_note(row *rw);
+int row_get_velocity(row *rw);
+int row_get_delay(row *rw);
+
+void row_set_type(row *rw, int type);
+void row_set_note(row *rw, int note);
+void row_set_velocity(row *rw, int velocity);
+void row_set_delay(row *rw, int delay);
+
+void row_set(row *rw, int type, int note, int velocity, int delay);
+
+int parse_note(char *);
 #endif //__LIBPMS_H__
