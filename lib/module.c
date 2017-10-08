@@ -67,7 +67,7 @@ void module_advance(void *outp, void *inp, jack_nframes_t curr_frames) {
     midi_buffer_clear();
 
 
-    printf("%02d:%02d:%04d\n", module.min, module.sec, module.ms);
+    //printf("%02d:%02d:%04d\n", module.min, module.sec, module.ms);
 
     sequence *seq = module.seq[0];
     if (module.playing)
