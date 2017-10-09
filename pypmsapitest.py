@@ -1,5 +1,22 @@
 #!/usr/bin/env python3
 
+# Poor Man's Sequencer
+#
+# Copyright (C) 2017 Remigiusz Dybka
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import sys
 from pypms import pms
 
@@ -13,12 +30,8 @@ pms.seq[0][0][0][0] = "D3" # int, "C1" "C-1" "C#1" allowed
 pms.seq[0][0][0][0].note = "D3"
 
 trk = pms.seq[0][0]
-print(trk)
 
-# dynamic resize
-trk.nrows = 10
-print(trk)
-
+# fill with random data
 vel = 100
 n = 12
 for col in trk:
@@ -30,10 +43,17 @@ for col in trk:
 		n = n + 1
 		vel = vel + 1
 
+print(trk)
+
+# dynamic resize
+trk.nrows = 10
+print(trk)
+
 # going smaller leaves hidden rows
 trk.nrows = 2
 print(trk)
 trk.nrows = 15
+print(trk)
 
 # columns
 trk.add_column()
