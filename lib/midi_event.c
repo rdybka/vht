@@ -22,6 +22,7 @@
 #include <ctype.h>
 #include <jack/midiport.h>
 #include "midi_event.h"
+#include "module.h"
 
 midi_event midi_buffer[EVT_BUFFER_LENGTH];
 
@@ -113,9 +114,9 @@ char * midi_describe_event(midi_event evt, char *buff, int len) {
     }
 
     if (evt.type == note_on || evt.type == note_off) {
-        sprintf(buff, "ch: %02d %-15s %3s %d offset: %lu", evt.channel, b, i2n(evt.note), evt.velocity, evt.time);
+        sprintf(buff, "ch: %02d %-15s %3s %3d offset: %lu", evt.channel, b, i2n(evt.note), evt.velocity, evt.time);
     } else
-        sprintf(buff, "ch: %02d %-15s %d %d offset: %lu", evt.channel, b, evt.note, evt.velocity, evt.time);
+        sprintf(buff, "ch: %02d %-15s %3d %3d offset: %lu", evt.channel, b, evt.note, evt.velocity, evt.time);
 
 
     return buff;
@@ -141,6 +142,12 @@ void midi_buffer_add(midi_event evt) {
         return;
 
     midi_buffer[curr_midi_event++] = evt;
+    
+    if (module.dump_notes) {
+		char desc[256];
+		midi_describe_event(evt, desc, 256);
+		printf("%02d:%02d:%03d %s\n", module.min, module.sec, module.ms, desc);
+	}
 }
 
 int midi_buffer_compare(const void *a, const void *b) {

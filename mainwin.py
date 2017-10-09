@@ -72,22 +72,18 @@ class Pms_MainWin(Gtk.ApplicationWindow):
 
 	
 	def on_ptswitch_activated(self, switch, gparam):
-		pass
-#		self.pms.set_passthrough(switch.get_active())
+		self.mod.dump_notes(switch.get_active())
 
 	def on_start_button_activate(self, switch):
-		print("Play")
 		self.mod.playing = 1
 		
 	def on_stop_button_activate(self, switch):
 		if not self.mod.playing:
-			print("Reset")
 			self.mod.reset()
 		else:
-			print("Stop")
+			pass
 
 		self.mod.playing = False
 	
 	def on_bpm_changed(self, adj):
-		print("BMP Change:", adj.get_value())
 		self.mod.bpm = int(adj.get_value())

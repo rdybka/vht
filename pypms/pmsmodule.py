@@ -35,7 +35,9 @@ class PMSModule():
 	# disconnect from jack
 	def jack_stop(self):
 		libpms.stop()
-		pass
+		
+	def dump_notes(self, n):
+		libpms.module_dump_notes(n)
 
 	def __str__(self):
 		r = {}

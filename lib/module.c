@@ -84,7 +84,7 @@ void module_advance(void *outp, void *inp, jack_nframes_t curr_frames) {
     midi_buffer_clear();
 
 
-    //printf("%02d:%02d:%04d\n", module.min, module.sec, module.ms);
+    //printf("%02d:%02d:%03d\n", module.min, module.sec, module.ms);
 
     sequence *seq = module.seq[0];
     if (module.playing)
@@ -110,7 +110,7 @@ void module_advance(void *outp, void *inp, jack_nframes_t curr_frames) {
 
     midi_buffer_flush(outp);
 
-    //printf("time: %02d:%02d:%03d track_pos: %3.3f %3.5f %d\n", module.min, module.sec, module.ms, trk->fpos, period, module.bpm);
+//    printf("time: %02d:%02d:%03d track_pos: %3.3f %3.5f %d\n", module.min, module.sec, module.ms, trk->fpos, period, module.bpm);
     module.song_pos += period;
 
     module_excl_out();
@@ -139,6 +139,7 @@ void module_new() {
     module.zero_time = 0;
     module.song_pos = 0.0;
     module.mute = 0;
+    module.dump_notes = 0;
 
     add_sequence(-1);
 
@@ -176,4 +177,9 @@ void module_free() {
         module.seq = NULL;
         module.bpm = 0;
     }
+}
+
+void module_dump_notes(int n)
+{
+	module.dump_notes = n;
 }

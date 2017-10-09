@@ -44,6 +44,8 @@ extern void module_set_bpm(int);
 extern int module_get_nseq();
 extern sequence *module_get_seq(int);
 
+extern void module_dump_notes(int);
+
 // sequence
 extern int sequence_get_ntrk(sequence *seq);
 extern track *sequence_get_trk(sequence *seq, int n);

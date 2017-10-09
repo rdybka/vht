@@ -40,6 +40,7 @@ struct module_t {
     int curr_seq;
     int mute;
     int jack_running;
+    int dump_notes;
     pthread_mutex_t excl; // to block structural changes when jack thread advances module
 };
 
@@ -49,6 +50,7 @@ void module_advance(void *outport, void *inport, jack_nframes_t curr_frames);
 void module_new();
 void module_free();
 void module_mute();
+void module_dump_notes(int n);
 
 void module_excl_in();
 void module_excl_out();

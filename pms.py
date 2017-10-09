@@ -39,6 +39,8 @@ if __name__ == "__main__":
 	if pms.jack_start() != 0: 
 		exit()
 
+	pms.seq[0][0][0][0] = "c5"
+
 	app = PmsApp()
 	app.run(sys.argv)
 
