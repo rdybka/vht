@@ -64,19 +64,23 @@ extern void track_set_channel(track *trk, int n);
 extern void track_set_nrows(track *trk, int n);
 extern void track_set_nsrows(track *trk, int n);
 
+extern void track_add_col(track *trk);
+extern void track_del_col(track *trk, int c);
+extern void track_swap_col(track *trk, int c, int c2);
+extern void track_resize(track *trk, int size);
 
 // row
-int row_get_type(row *rw);
-int row_get_note(row *rw);
-int row_get_velocity(row *rw);
-int row_get_delay(row *rw);
+extern int row_get_type(row *rw);
+extern int row_get_note(row *rw);
+extern int row_get_velocity(row *rw);
+extern int row_get_delay(row *rw);
 
-void row_set_type(row *rw, int type);
-void row_set_note(row *rw, int note);
-void row_set_velocity(row *rw, int velocity);
-void row_set_delay(row *rw, int delay);
+extern void row_set_type(row *rw, int type);
+extern void row_set_note(row *rw, int note);
+extern void row_set_velocity(row *rw, int velocity);
+extern void row_set_delay(row *rw, int delay);
 
-void row_set(row *rw, int type, int note, int velocity, int delay);
+extern void row_set(row *rw, int type, int note, int velocity, int delay);
 
-int parse_note(char *);
+extern int parse_note(char *);
 #endif //__LIBPMS_H__

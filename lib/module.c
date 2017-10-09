@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <pthread.h>
 #include "track.h"
 #include "module.h"
 #include "midi_event.h"
@@ -28,8 +29,23 @@ struct module_t module;
 
 int lastsec;
 
+void module_excl_in() {
+    if (!module.jack_running)
+        return;
+
+    pthread_mutex_lock(&module.excl);
+}
+
+void module_excl_out() {
+    if (!module.jack_running)
+        return;
+
+    pthread_mutex_unlock(&module.excl);
+}
+
 // the GOD function
 void module_advance(void *outp, void *inp, jack_nframes_t curr_frames) {
+    module_excl_in();
     // are we muting after stop?
     if (!module.playing && module.mute) {
         jack_midi_clear_buffer(outp);
@@ -47,6 +63,7 @@ void module_advance(void *outp, void *inp, jack_nframes_t curr_frames) {
         if (module.zero_time > 0)
             module.zero_time += jack_buffer_size;
 
+        module_excl_out();
         return;
     }
 
@@ -95,6 +112,8 @@ void module_advance(void *outp, void *inp, jack_nframes_t curr_frames) {
 
     //printf("time: %02d:%02d:%03d track_pos: %3.3f %3.5f %d\n", module.min, module.sec, module.ms, trk->fpos, period, module.bpm);
     module.song_pos += period;
+
+    module_excl_out();
 }
 
 int add_sequence(int seq_clone) {
@@ -108,6 +127,7 @@ int add_sequence(int seq_clone) {
 }
 
 void module_new() {
+    module_excl_in();
     module_free();
     module.bpm = 120;
     module.def_nrows = 64;
@@ -135,6 +155,7 @@ void module_new() {
             trk->loop = 0;
         sequence_add_track(module.seq[0], trk);
     }
+    module_excl_out();
 }
 
 void module_mute() {

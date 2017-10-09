@@ -19,7 +19,9 @@ class PMSColumn(Iterable):
 		for i in range(self.__len__()):
 			yield PMSRow(self._pms_handle, self._pms_handle.track_get_row_ptr(self._trk_handle, self._col, i))
 
-	# returns row
+	def __setitem__(self, itm, val):
+		self[itm].note = val
+
 	def __getitem__(self, itm):
 		if (itm > self.__len__()):
 			raise IndexError()

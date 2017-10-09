@@ -11,8 +11,8 @@ DEPS=lib/libpms.h \
 	lib/row.h \
 	lib/track.h \
 	lib/module.h \
-	lib/sequence.h \
-	lib/random_composer.h
+	lib/sequence.h
+
 	
 OBJ=lib/jack_client.o \
 	lib/jack_process.o \
@@ -21,8 +21,7 @@ OBJ=lib/jack_client.o \
 	lib/module.o \
 	lib/sequence.o \
 	lib/track.o \
-	lib/row.o \
-	lib/random_composer.o
+	lib/row.o 
 
 all: pypms/_libpms.so
 

@@ -107,7 +107,7 @@ void track_set_channel(track *trk, int n) {
 }
 
 void track_set_nrows(track *trk, int n) {
-    trk->nrows = n;
+    track_resize(trk, n);
 }
 
 void track_set_nsrows(track *trk, int n) {

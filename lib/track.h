@@ -35,13 +35,14 @@ typedef struct track_t {
 
     int ncols;
     row **rows;
+    int arows; // allocated rows
     int *ring;
     int trigger_channel;
     int trigger_note;
     int loop;
 
     unsigned char trigger_type;
-    pthread_mutex_t excl;
+    pthread_mutex_t excl; // for atomic row access
 } track;
 
 track *track_new(int port, int channel, int len, int songlen);
@@ -54,6 +55,7 @@ void track_clear_rows(track *trk, int c);
 
 void track_add_col(track *trk);
 void track_del_col(track *trk, int c);
+void track_swap_col(track *trk, int c, int c2);
 void track_resize(track *trk, int size);
 
 // don't touch those from python

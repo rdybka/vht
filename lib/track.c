@@ -26,18 +26,17 @@
 #include "row.h"
 #include "midi_event.h"
 
-#include "random_composer.h"
-
 track *track_new(int port, int channel, int len, int songlen) {
     track *trk = malloc(sizeof(track));
     trk->channel = channel;
     trk->nrows = len;
+    trk->arows = len;
     trk->nsrows = songlen;
     trk->trigger_channel = 0;
     trk->trigger_note = 0;
     trk->loop = 0;
     trk->trigger_type = TRIGGER_NORMAL;
-    trk->ncols = 2;
+    trk->ncols = 1;
     trk->playing = 0;
 
     pthread_mutex_init(&trk->excl, NULL);
@@ -50,7 +49,6 @@ track *track_new(int port, int channel, int len, int songlen) {
         trk->ring = malloc(sizeof(int) * trk->ncols);
     };
 
-    random_composer_compose(trk);
     track_reset(trk);
     trk->playing = 1;
     return trk;
@@ -86,6 +84,7 @@ int track_get_row(track *trk, int c, int n, row *r) {
     }
 
     pthread_mutex_lock(&trk->excl);
+
     row *s = &trk->rows[c][n];
     r->type = s->type;
     r->note = s->note;
@@ -93,7 +92,6 @@ int track_get_row(track *trk, int c, int n, row *r) {
     r->delay = s->delay;
 
     pthread_mutex_unlock(&trk->excl);
-
     return 0;
 }
 
@@ -219,4 +217,78 @@ void track_kill_notes(track *trk) {
             trk->ring[c] = -1;
         }
     }
+}
+
+void track_add_col(track *trk) {
+    module_excl_in();
+
+    trk->ncols++;
+
+    trk->rows = realloc(trk->rows, sizeof(row*) * trk->ncols);
+    trk->rows[trk->ncols -1] = malloc(sizeof(row) * trk->arows);
+    trk->ring = realloc(trk->ring, sizeof(int) * trk->ncols);
+    track_clear_rows(trk, trk->ncols - 1);
+
+    module_excl_out();
+}
+
+void track_del_col(track *trk, int c) {
+    module_excl_in();
+
+    if ((c >= trk->ncols) || (c < 0) || (trk->ncols == 1)) {
+        module_excl_out();
+        return;
+    }
+
+    for (int cc = c; cc < trk->ncols - 1; cc++) {
+        trk->rows[cc] = trk->rows[cc+1];
+        trk->ring[cc] = trk->ring[cc+1];
+    }
+
+    trk->ncols--;
+
+    trk->rows = realloc(trk->rows, sizeof(row*) * trk->ncols);
+    trk->ring = realloc(trk->ring, sizeof(int) * trk->ncols);
+
+    module_excl_out();
+}
+
+void track_swap_col(track *trk, int c, int c2) {
+    if ((c > trk->ncols) || (c2 > trk->ncols)) {
+        return;
+    }
+
+    module_excl_in();
+    row *c3 = trk->rows[c];
+    trk->rows[c] = trk->rows[c2];
+    trk->rows[c2] = c3;
+    module_excl_out();
+}
+
+void track_resize(track *trk, int size) {
+    module_excl_in();
+
+    // no need to realloc?
+    if (trk->arows >= size) {
+        trk->nrows = size;
+        module_excl_out();
+        return;
+    }
+
+    trk->arows = size * 2;
+
+    for (int c = 0; c < trk->ncols; c++) {
+        trk->rows[c] = realloc(trk->rows[c], sizeof(row) * trk->arows);
+
+        for (int n = trk->nrows; n < trk->arows; n++) {
+            trk->rows[c][n].type = none;
+            trk->rows[c][n].note = 0;
+            trk->rows[c][n].velocity = 0;
+            trk->rows[c][n].delay = 0;
+        }
+    }
+
+    trk->nrows = size;
+
+    module_excl_out();
 }

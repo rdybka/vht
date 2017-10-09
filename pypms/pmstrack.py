@@ -18,7 +18,6 @@ class PMSTrack(Iterable):
 		for col in self:
 			col.clear()
 	
-	# returns column
 	def __getitem__(self, itm):
 		return PMSColumn(self._pms_handle, self._trk_handle, itm)
 
@@ -27,6 +26,18 @@ class PMSTrack(Iterable):
 
 	def insert(self, itm, val):
 		pass
+
+	def add_column(self):
+		self._pms_handle.track_add_col(self._trk_handle)
+		
+	def swap_column(self, c1, c2):
+		self._pms_handle.track_swap_col(self._trk_handle, c1, c2)
+
+	def del_column(self, c = -1):
+		if c == -1:
+			self._pms_handle.track_del_col(self._trk_handle, self.__len__() - 1)
+		else:
+			self._pms_handle.track_del_col(self._trk_handle, c)
 
 	@property
 	def port(self):

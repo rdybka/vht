@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <jack/jack.h>
 #include <jack/midiport.h>
-
+#include <pthread.h>
 #include "sequence.h"
 
 struct module_t {
@@ -39,6 +39,8 @@ struct module_t {
     int nseq;
     int curr_seq;
     int mute;
+    int jack_running;
+    pthread_mutex_t excl; // to block structural changes when jack thread advances module
 };
 
 extern struct module_t module;
@@ -47,5 +49,8 @@ void module_advance(void *outport, void *inport, jack_nframes_t curr_frames);
 void module_new();
 void module_free();
 void module_mute();
+
+void module_excl_in();
+void module_excl_out();
 
 #endif //__MODULE_H__
