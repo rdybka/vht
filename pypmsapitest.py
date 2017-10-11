@@ -23,6 +23,8 @@ from pypms import pms
 if pms.jack_start():
 	sys.exit(-1)
 
+pms.nports = 32
+
 # pms.seq.trk.column.row
 
 # assignment
@@ -43,8 +45,10 @@ for col in trk:
 		n = n + 1
 		vel = vel + 1
 
+trk.port = 2
 print(trk)
 
+input("hmmm")
 # dynamic resize
 trk.nrows = 10
 print(trk)

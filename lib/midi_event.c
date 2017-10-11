@@ -21,12 +21,13 @@
 #include <string.h>
 #include <ctype.h>
 #include <jack/midiport.h>
+#include "jack_client.h"
 #include "midi_event.h"
 #include "module.h"
 
-midi_event midi_buffer[EVT_BUFFER_LENGTH];
+midi_event midi_buffer[JACK_CLIENT_MAX_PORTS][EVT_BUFFER_LENGTH];
 
-int curr_midi_event;
+int curr_midi_event[JACK_CLIENT_MAX_PORTS];
 
 int midi_encode_event(midi_event evt, unsigned char *buff) {
     if (evt.type == none)
@@ -134,37 +135,49 @@ char *i2n(unsigned char i) {
 }
 
 void midi_buffer_clear() {
-    curr_midi_event = 0;
+    for (int i = 0; i < JACK_CLIENT_MAX_PORTS; i++)
+        curr_midi_event[i] = 0;
 }
 
-void midi_buffer_add(midi_event evt) {
-    if (curr_midi_event == EVT_BUFFER_LENGTH)
+void midi_buffer_add(int port, midi_event evt) {
+    if (curr_midi_event[port] == EVT_BUFFER_LENGTH)
         return;
 
-    midi_buffer[curr_midi_event++] = evt;
-    
+    if ((port >= jack_n_output_ports) || (port < 0))
+        return;
+
+    midi_buffer[port][curr_midi_event[port]++] = evt;
+
     if (module.dump_notes) {
-		char desc[256];
-		midi_describe_event(evt, desc, 256);
-		printf("%02d:%02d:%03d %s\n", module.min, module.sec, module.ms, desc);
-	}
+        char desc[256];
+        midi_describe_event(evt, desc, 256);
+        printf("%02d:%02d:%03d %s\n", module.min, module.sec, module.ms, desc);
+    }
 }
 
 int midi_buffer_compare(const void *a, const void *b) {
     return ((midi_event *)a)->time - ((midi_event *)b)->time;
 }
 
-void midi_buffer_flush(void *outp) {
-    if (curr_midi_event == 0)
+void midi_buffer_flush_port(int port) {
+    void *outp = jack_port_get_buffer(jack_output_ports[port], jack_buffer_size);
+    jack_midi_clear_buffer(outp);
+
+    if (curr_midi_event[port] == 0)
         return;
 
-    qsort(midi_buffer, curr_midi_event, sizeof(midi_event), midi_buffer_compare);
+    qsort(midi_buffer[port], curr_midi_event[port], sizeof(midi_event), midi_buffer_compare);
 
-    for (int i = 0; i < curr_midi_event; i++) {
+    for (int i = 0; i < curr_midi_event[port]; i++) {
         unsigned char buff[3];
-        if (midi_encode_event(midi_buffer[i], buff))
-            jack_midi_event_write(outp, midi_buffer[i].time, buff, 3);
+        if (midi_encode_event(midi_buffer[port][i], buff))
+            jack_midi_event_write(outp, midi_buffer[port][i].time, buff, 3);
     }
+}
+
+void midi_buffer_flush() {
+    for (int p = 0; p < module.nports; p++)
+        midi_buffer_flush_port(p);
 }
 
 int parse_note(char *buff) {

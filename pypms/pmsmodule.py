@@ -43,7 +43,8 @@ class PMSModule():
 		r = {}
 		r["bpm"] = self.bpm
 		r["playing"] = self.playing
-		r["nseq"] = self.nseq
+		r["nseq"] = len(self.seq)
+		r["nports"] = self.nports
 		
 		return r.__str__()
 
@@ -71,7 +72,7 @@ class PMSModule():
 			libpms.module_play(1)
 		else:
 			libpms.module_play(0)
-			
+
 	@property
 	def bpm(self):
 		return libpms.module_get_bpm()
@@ -79,3 +80,11 @@ class PMSModule():
 	@bpm.setter
 	def bpm(self, value):
 		libpms.module_set_bpm(value)
+
+	@property
+	def nports(self):
+		return libpms.module_get_nports()
+	
+	@nports.setter
+	def nports(self, value):
+		libpms.module_set_nports(value)

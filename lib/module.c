@@ -44,18 +44,18 @@ void module_excl_out() {
 }
 
 // the GOD function
-void module_advance(void *outp, void *inp, jack_nframes_t curr_frames) {
+void module_advance(jack_nframes_t curr_frames) {
     module_excl_in();
+
     // are we muting after stop?
     if (!module.playing && module.mute) {
-        jack_midi_clear_buffer(outp);
         midi_buffer_clear();
 
         for (int t = 0; t < module.seq[module.curr_seq]->ntrk; t++)
             track_kill_notes(module.seq[module.curr_seq]->trk[t]);
 
         module.mute = 0;
-        midi_buffer_flush(outp);
+        midi_buffer_flush();
     }
 
     if (!module.playing) {
@@ -80,17 +80,14 @@ void module_advance(void *outp, void *inp, jack_nframes_t curr_frames) {
 
     module.ms = (time - floorf(time)) * 1000;
 
-    jack_midi_clear_buffer(outp);
     midi_buffer_clear();
-
-
-    //printf("%02d:%02d:%03d\n", module.min, module.sec, module.ms);
 
     sequence *seq = module.seq[0];
     if (module.playing)
         sequence_advance(seq, period);
 
 // handle input
+    void *inp = jack_port_get_buffer(jack_input_port, jack_buffer_size);
 
     jack_nframes_t ninp;
     jack_midi_event_t evt;
@@ -104,12 +101,11 @@ void module_advance(void *outp, void *inp, jack_nframes_t curr_frames) {
         if (!empty) {
             midi_event mev = midi_decode_event(evt.buffer, evt.size);
             mev.time = evt.time;
-            midi_buffer_add(mev);
+            midi_buffer_add(0, mev);
         }
     }
 
-    midi_buffer_flush(outp);
-
+    midi_buffer_flush();
 //    printf("time: %02d:%02d:%03d track_pos: %3.3f %3.5f %d\n", module.min, module.sec, module.ms, trk->fpos, period, module.bpm);
     module.song_pos += period;
 
@@ -140,6 +136,7 @@ void module_new() {
     module.song_pos = 0.0;
     module.mute = 0;
     module.dump_notes = 0;
+    module.nports = 1;
 
     add_sequence(-1);
 
@@ -179,7 +176,6 @@ void module_free() {
     }
 }
 
-void module_dump_notes(int n)
-{
-	module.dump_notes = n;
+void module_dump_notes(int n) {
+    module.dump_notes = n;
 }

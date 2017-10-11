@@ -25,12 +25,12 @@ int jack_process(jack_nframes_t nframes, void *arg) {
     jack_time_t curr_usecs;
     jack_time_t next_usecs;
     float period_usecs;
-    void *outp = jack_port_get_buffer(jack_output_port, nframes);
-    void *inp = jack_port_get_buffer(jack_input_port, nframes);
+
+    //void *outp = jack_port_get_buffer(jack_output_ports[0], nframes);
+    //void *inp = jack_port_get_buffer(jack_input_port, nframes);
 
     jack_get_cycle_times(jack_client, &curr_frames, &curr_usecs, &next_usecs, &period_usecs);
-    module_advance(outp, inp, curr_frames);
-
+    module_advance(curr_frames);
     return 0;
 }
 

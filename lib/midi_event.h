@@ -47,7 +47,7 @@ char *i2n(unsigned char i);
 int parse_note(char *);
 
 void midi_buffer_clear();
-void midi_buffer_flush(void *outp);
-void midi_buffer_add(midi_event evt);
+void midi_buffer_flush();
+void midi_buffer_add(int port, midi_event evt);
 
 #endif //__MIDI_EVENT_H__ 

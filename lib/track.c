@@ -38,6 +38,7 @@ track *track_new(int port, int channel, int len, int songlen) {
     trk->trigger_type = TRIGGER_NORMAL;
     trk->ncols = 1;
     trk->playing = 0;
+    trk->port = 0;
 
     pthread_mutex_init(&trk->excl, NULL);
 
@@ -142,7 +143,7 @@ void track_trigger(track *trk, int pos, int c, int delay) {
             evt.type = note_off;
             evt.note = trk->ring[c];
             evt.velocity = 0;
-            midi_buffer_add(evt);
+            midi_buffer_add(trk->port, evt);
 
             trk->ring[c] = -1;
         }
@@ -153,7 +154,7 @@ void track_trigger(track *trk, int pos, int c, int delay) {
     evt.type = r.type;
     evt.note = r.note;
     evt.velocity = r.velocity;
-    midi_buffer_add(evt);
+    midi_buffer_add(trk->port, evt);
 
     if (r.type == note_on) {
         trk->ring[c] = r.note;
@@ -212,7 +213,7 @@ void track_kill_notes(track *trk) {
             evt.type = note_off;
             evt.note = trk->ring[c];
             evt.velocity = 0;
-            midi_buffer_add(evt);
+            midi_buffer_add(trk->port, evt);
 
             trk->ring[c] = -1;
         }

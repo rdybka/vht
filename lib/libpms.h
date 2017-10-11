@@ -41,6 +41,9 @@ extern void module_reset();
 extern int module_get_bpm();
 extern void module_set_bpm(int);
 
+extern int module_get_nports();
+extern void module_set_nports(int);
+
 extern int module_get_nseq();
 extern sequence *module_get_seq(int);
 
