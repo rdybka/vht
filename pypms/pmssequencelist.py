@@ -25,6 +25,7 @@ class PMSSequenceList(Iterable):
 	def add_sequence(self, length = -1):
 		seq = self._pms_handle.sequence_new(length)
 		self._pms_handle.module_add_sequence(seq)
+		return self[self.__len__() - 1]
 		
 	def swap_sequence(self, s1, s2):
 		self._pms_handle.module_swap_sequence(s1, s2)

@@ -24,8 +24,12 @@ class PMSSequence(Iterable):
 		return PMSTrack(self._pms_handle, self._pms_handle.sequence_get_trk(self._seq_handle, itm))
 
 	def add_track(self, port = 0, channel = 1, length = -1, songlength = -1):
+		if length == -1:
+			length = self.length
+			
 		trk = self._pms_handle.track_new(port, channel, length, songlength)
 		self._pms_handle.sequence_add_track(self._seq_handle, trk)
+		return self[self.__len__() - 1]
 		
 	def swap_track(self, t1, t2):
 		self._pms_handle.sequence_swap_track(self._seq_handle, t1, t2)

@@ -25,6 +25,12 @@ from pypms import pms
 
 pms.nports = 32
 
-seq = pms.seq[1]
+seq = pms.seq.add_sequence(8)
+trk1 = seq.add_track()
+trk2 = seq.add_track()
+
+trk1.add_column()
+
+print(seq)
 
 #pms.jack_stop()
