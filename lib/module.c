@@ -45,6 +45,9 @@ void module_excl_out() {
 
 // the GOD function
 void module_advance(jack_nframes_t curr_frames) {
+	if (module.nseq == 0)
+		return;
+		
     module_excl_in();
 
     // are we muting after stop?
@@ -112,16 +115,6 @@ void module_advance(jack_nframes_t curr_frames) {
     module_excl_out();
 }
 
-int add_sequence(int seq_clone) {
-    // fresh module
-    if (module.nseq == 0) {
-        module.seq = malloc(sizeof(sequence *));
-        module.seq[0] = sequence_new();
-        module.nseq = 1;
-        return 1;
-    }
-}
-
 void module_new() {
     module_excl_in();
     module_free();
@@ -138,21 +131,6 @@ void module_new() {
     module.dump_notes = 0;
     module.nports = 1;
 
-    add_sequence(-1);
-
-    track *trk;
-    for (int t = 1; t < 3; t++) {
-        //track *trk = track_new(0, t, module.def_nrows, module.def_nrows);
-        if (t == 2) {
-            trk = track_new(0, t, 3, 8);
-            trk->loop = 1;
-        } else {
-            trk = track_new(0, t, 8, 8);
-        }
-        if (t == 2)
-            trk->loop = 0;
-        sequence_add_track(module.seq[0], trk);
-    }
     module_excl_out();
 }
 
@@ -178,4 +156,73 @@ void module_free() {
 
 void module_dump_notes(int n) {
     module.dump_notes = n;
+}
+
+void module_add_sequence(sequence *seq)
+{
+	module_excl_in();
+    
+    // fresh module
+    if (module.nseq == 0) {
+        module.seq = malloc(sizeof(sequence *));
+        module.seq[0] = seq;
+        module.nseq = 1;
+		module_excl_out();    
+        return;
+    }
+	
+	module.seq = realloc(module.seq, sizeof(sequence *) * (module.nseq + 1));
+	module.seq[module.nseq++] = seq;
+	
+	module_excl_out();
+}
+
+void module_del_sequence(int s)
+{
+	if (s == -1)
+		s = module.nseq - 1;
+	
+	if ((s < 0) || (s >= module.nseq))
+		return;
+	
+	module_excl_in();
+	
+	sequence_free(module.seq[s]);
+	
+	for (int i = s; i < module.nseq - 1; i++)
+	{
+		module.seq[i] = module.seq[i + 1];
+	}
+	
+	module.nseq--;
+	
+	if (module.nseq == 0)
+	{
+		free(module.seq);
+		module.seq = 0;
+	} else {
+		module.seq = realloc(module.seq, sizeof(sequence *) * module.nseq);		
+	}
+	
+	module_excl_out();	
+}
+
+void module_swap_sequence(int s1, int s2)
+{
+	if ((s1 < 0) || (s1 >= module.nseq))
+		return;
+	
+	if ((s2 < 0) || (s2 >= module.nseq))
+		return;
+		
+	if (s1 == s2)
+		return;
+
+	module_excl_in();
+			
+	sequence *s3 = module.seq[s1];
+	module.seq[s1] = module.seq[s2];
+	module.seq[s2] = s3;
+	
+	module_excl_out();
 }

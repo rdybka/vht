@@ -57,4 +57,8 @@ void module_dump_notes(int n);
 void module_excl_in();
 void module_excl_out();
 
+void module_add_sequence(sequence *seq);
+void module_del_sequence(int s);
+void module_swap_sequence(int s1, int s2);
+
 #endif //__MODULE_H__

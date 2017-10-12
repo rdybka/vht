@@ -23,7 +23,10 @@ class PMSColumn(Iterable):
 		self[itm].note = val
 
 	def __getitem__(self, itm):
-		if (itm > self.__len__()):
+		if itm >= self.__len__():
+			raise IndexError()
+			
+		if itm < 0:
 			raise IndexError()
 			
 		return PMSRow(self._pms_handle, self._pms_handle.track_get_row_ptr(self._trk_handle, self._col, itm))

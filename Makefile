@@ -11,8 +11,7 @@ DEPS=lib/libpms.h \
 	lib/row.h \
 	lib/track.h \
 	lib/module.h \
-	lib/sequence.h
-
+	lib/sequence.h 
 	
 OBJ=lib/jack_client.o \
 	lib/jack_process.o \

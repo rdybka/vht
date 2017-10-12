@@ -18,25 +18,32 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-
+#include "module.h"
 #include "sequence.h"
 
-sequence *sequence_new() {
+sequence *sequence_new(int length) {
+    if (length == -1)
+		length = module.def_nrows;
+    
     sequence *seq = malloc(sizeof(sequence));
     seq->ntrk = 0;
     seq->trk = 0;
     seq->pos = 0;
-    seq->length = 16;
+    seq->length = length;
     return seq;
 }
 
 void sequence_add_track(sequence *seq, track *trk) {
+	module_excl_in();
     // fresh?
     if (seq->ntrk == 0) {
         seq->trk = malloc(sizeof(track *));
     }
 
+	seq->trk = realloc(seq->trk, sizeof(track *) * (seq->ntrk + 1));
+
     seq->trk[seq->ntrk++] = trk;
+    module_excl_out();
     return;
 }
 
@@ -81,4 +88,55 @@ void sequence_advance(sequence *seq, double period) {
 
     if (seq->pos > seq->length)
         seq->pos -= seq->length;
+}
+
+
+void sequence_del_track(sequence *seq, int t)
+{
+	if (t == -1)
+		t = seq->ntrk - 1;
+	
+	if ((t >= seq->ntrk) || (t < 0))
+		return;
+
+	module_excl_in();
+	
+	track_free(seq->trk[t]);
+	
+	for (int i = t; i < seq->ntrk - 1; i++)
+	{
+		seq->trk[i] = seq->trk[i + 1];
+	}
+	
+	seq->ntrk--;
+	
+	if (seq->ntrk  == 0)
+	{
+		free(seq->trk);
+		seq->trk = 0;
+	} else {
+		seq->trk = realloc(seq->trk, sizeof(track *) * seq->ntrk);		
+	}
+	
+	module_excl_out();
+}
+
+void sequence_swap_track(sequence *seq, int t1, int t2)
+{
+	if ((t1 < 0) || (t1 >= seq->ntrk))
+		module_excl_out();
+	
+	if ((t2 < 0) || (t2 >= seq->ntrk))
+		return;
+		
+	if (t1 == t2)
+		return;
+
+	module_excl_in();
+			
+	track *t3 = seq->trk[t1];
+	seq->trk[t1] = seq->trk[t2];
+	seq->trk[t2] = t3;
+	
+	module_excl_out();
 }

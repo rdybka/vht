@@ -1,7 +1,7 @@
-from collections.abc import MutableSequence
+from collections.abc import Iterable
 from pypms.pmstrack import PMSTrack
 
-class PMSSequence(MutableSequence):
+class PMSSequence(Iterable):
 	def __init__(self, pms, seq):
 		self._pms_handle = pms
 		self._seq_handle = seq;
@@ -10,17 +10,37 @@ class PMSSequence(MutableSequence):
 	def __len__(self):
 		return self._pms_handle.sequence_get_ntrk(self._seq_handle)
 
-	def __delitem__(self, itm):
-		pass
-
+	def __iter__(self):
+		for itm in range(self.__len__()):
+			yield PMSTrack(self._pms_handle, self._pms_handle.sequence_get_trk(self._seq_handle, itm))
+			
 	def __getitem__(self, itm):
+		if itm >= self.__len__():
+			raise IndexError()
+			
+		if itm < 0:
+			raise IndexError()
+			
 		return PMSTrack(self._pms_handle, self._pms_handle.sequence_get_trk(self._seq_handle, itm))
 
-	def __setitem__(self, itm, val):
-		pass
+	def add_track(self, port = 0, channel = 1, length = -1, songlength = -1):
+		trk = self._pms_handle.track_new(port, channel, length, songlength)
+		self._pms_handle.sequence_add_track(self._seq_handle, trk)
+		
+	def swap_track(self, t1, t2):
+		self._pms_handle.sequence_swap_track(self._seq_handle, t1, t2)
 
-	def insert(self, itm, val):
-		pass
-    
+	def del_track(self, t = -1):
+		self._pms_handle.sequence_del_track(self._seq_handle, t)
+
+	@property
+	def length(self):
+		return self._pms_handle.sequence_get_length(self._seq_handle)
+
 	def __str__(self):
-		return self.trk.__str__()
+		ret = ""
+		for itm in self:
+			ret = ret + itm.__str__()
+			ret = ret + "\n"
+			
+		return ret

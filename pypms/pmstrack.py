@@ -11,14 +11,20 @@ class PMSTrack(Iterable):
 		return self._pms_handle.track_get_ncols(self._trk_handle)
 
 	def __iter__(self):
-		for i in range(self.__len__()):
-			yield PMSColumn(self._pms_handle, self._trk_handle, i)
+		for itm in range(self.__len__()):
+			yield PMSColumn(self._pms_handle, self._trk_handle, itm)
 
 	def clear(self):
 		for col in self:
 			col.clear()
 	
 	def __getitem__(self, itm):
+		if itm >= self.__len__():
+			raise IndexError()
+			
+		if itm < 0:
+			raise IndexError()
+
 		return PMSColumn(self._pms_handle, self._trk_handle, itm)
 
 	def __setitem__(self, itm, val):

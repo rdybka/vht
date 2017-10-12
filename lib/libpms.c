@@ -58,6 +58,11 @@ int sequence_get_ntrk(sequence *seq) {
     return seq->ntrk;
 }
 
+int sequence_get_length(sequence *seq) {
+	return seq->length;
+}
+
+
 track *sequence_get_trk(sequence *seq, int n) {
     return seq->trk[n];
 }
@@ -127,5 +132,6 @@ void module_set_nports(int np) {
     jack_synch_n_output_ports();
     //}
 }
+
 
 

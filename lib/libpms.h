@@ -46,12 +46,20 @@ extern void module_set_nports(int);
 
 extern int module_get_nseq();
 extern sequence *module_get_seq(int);
+extern void module_add_sequence(sequence *seq);
+extern void module_del_sequence(int s);
+extern void module_swap_sequence(int s1, int s2);
 
 extern void module_dump_notes(int);
 
 // sequence
+extern sequence *sequence_new(int length);
 extern int sequence_get_ntrk(sequence *seq);
+extern int sequence_get_length(sequence *seq);
 extern track *sequence_get_trk(sequence *seq, int n);
+extern void sequence_add_track(sequence *seq, track *trk);
+extern void sequence_del_track(sequence *seq, int t);
+extern void sequence_swap_track(sequence *seq, int t1, int t2);
 
 // track
 extern row *track_get_row_ptr(track *, int c, int r);
@@ -73,6 +81,8 @@ extern void track_add_col(track *trk);
 extern void track_del_col(track *trk, int c);
 extern void track_swap_col(track *trk, int c, int c2);
 extern void track_resize(track *trk, int size);
+
+extern track *track_new(int port, int channel, int len, int songlen);
 
 // row
 extern int row_get_type(row *rw);

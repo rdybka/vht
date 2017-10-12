@@ -28,6 +28,12 @@
 
 track *track_new(int port, int channel, int len, int songlen) {
     track *trk = malloc(sizeof(track));
+	if (len == -1)
+		len = module.def_nrows;
+	
+	if (songlen == -1)
+		songlen = len;
+
     trk->channel = channel;
     trk->nrows = len;
     trk->arows = len;
