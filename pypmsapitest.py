@@ -20,17 +20,23 @@
 import sys
 from pypms import pms
 
-#if pms.jack_start():
-#	sys.exit(-1)
+if pms.jack_start():
+	sys.exit(-1)
 
-pms.nports = 32
-
-seq = pms.seq.add_sequence(8)
+seq = pms.add_sequence(8)
 trk1 = seq.add_track()
 trk2 = seq.add_track()
 
-trk1.add_column()
+pms.dump_notes = 1
+pms.play = 0
 
+input("dupa")
+
+trk1[0][7]="c5"
+print(seq)
+seq.length = 4
+print(seq)
+seq.length = 8
 print(seq)
 
-#pms.jack_stop()
+pms.jack_stop()

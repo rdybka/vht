@@ -56,6 +56,7 @@ extern void module_dump_notes(int);
 extern sequence *sequence_new(int length);
 extern int sequence_get_ntrk(sequence *seq);
 extern int sequence_get_length(sequence *seq);
+extern void sequence_set_length(sequence *seq, int length);
 extern track *sequence_get_trk(sequence *seq, int n);
 extern void sequence_add_track(sequence *seq, track *trk);
 extern void sequence_del_track(sequence *seq, int t);

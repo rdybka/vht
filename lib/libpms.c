@@ -5,6 +5,8 @@
 #include "libpms.h"
 #include "module.h"
 
+// all wrappers and getters/setters go here
+
 int start() {
     return jack_start();
 }
@@ -59,7 +61,7 @@ int sequence_get_ntrk(sequence *seq) {
 }
 
 int sequence_get_length(sequence *seq) {
-	return seq->length;
+    return seq->length;
 }
 
 
@@ -134,4 +136,9 @@ void module_set_nports(int np) {
 }
 
 
+void sequence_set_length(sequence *seq, int length) {
+    seq->length = length;
+    for (int t = 0; t < seq->ntrk; t++)
+        track_resize(seq->trk[t], length);
+}
 

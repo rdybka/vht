@@ -75,7 +75,7 @@ class PMSRow():
 	
 	@delay.setter
 	def delay(self, value):
-		self._delay = value
+		self._delay = int(value)
 		self._pms_handle.row_set_delay(self._rowptr, self._delay)
 
 	def __str__(self):

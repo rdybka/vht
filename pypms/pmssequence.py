@@ -41,6 +41,12 @@ class PMSSequence(Iterable):
 	def length(self):
 		return self._pms_handle.sequence_get_length(self._seq_handle)
 
+	@length.setter
+	def length(self, value):
+		self._pms_handle.sequence_set_length(self._seq_handle, value)
+
+
+
 	def __str__(self):
 		ret = ""
 		for itm in self:

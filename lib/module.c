@@ -45,29 +45,25 @@ void module_excl_out() {
 
 // the GOD function
 void module_advance(jack_nframes_t curr_frames) {
-	if (module.nseq == 0)
-		return;
-		
+    if (module.nseq == 0)
+        return;
+
     module_excl_in();
 
-    // are we muting after stop?
-    if (!module.playing && module.mute) {
-        midi_buffer_clear();
-
-        for (int t = 0; t < module.seq[module.curr_seq]->ntrk; t++)
-            track_kill_notes(module.seq[module.curr_seq]->trk[t]);
-
-        module.mute = 0;
-        midi_buffer_flush();
-    }
+    midi_buffer_clear();
 
     if (!module.playing) {
         // are we paused?
         if (module.zero_time > 0)
             module.zero_time += jack_buffer_size;
+    }
 
-        module_excl_out();
-        return;
+    // are we muting after stop?
+    if (!module.playing && module.mute) {
+        for (int t = 0; t < module.seq[module.curr_seq]->ntrk; t++)
+            track_kill_notes(module.seq[module.curr_seq]->trk[t]);
+
+        module.mute = 0;
     }
 
     if (module.zero_time == 0)
@@ -83,9 +79,8 @@ void module_advance(jack_nframes_t curr_frames) {
 
     module.ms = (time - floorf(time)) * 1000;
 
-    midi_buffer_clear();
-
     sequence *seq = module.seq[0];
+
     if (module.playing)
         sequence_advance(seq, period);
 
@@ -109,7 +104,7 @@ void module_advance(jack_nframes_t curr_frames) {
     }
 
     midi_buffer_flush();
-//    printf("time: %02d:%02d:%03d track_pos: %3.3f %3.5f %d\n", module.min, module.sec, module.ms, trk->fpos, period, module.bpm);
+    //printf("time: %02d:%02d:%03d %3.5f %d\n", module.min, module.sec, module.ms, period, module.bpm);
     module.song_pos += period;
 
     module_excl_out();
@@ -158,71 +153,66 @@ void module_dump_notes(int n) {
     module.dump_notes = n;
 }
 
-void module_add_sequence(sequence *seq)
-{
-	module_excl_in();
-    
+void module_add_sequence(sequence *seq) {
+    module_excl_in();
+
     // fresh module
     if (module.nseq == 0) {
         module.seq = malloc(sizeof(sequence *));
         module.seq[0] = seq;
         module.nseq = 1;
-		module_excl_out();    
+        module_excl_out();
         return;
     }
-	
-	module.seq = realloc(module.seq, sizeof(sequence *) * (module.nseq + 1));
-	module.seq[module.nseq++] = seq;
-	
-	module_excl_out();
+
+    module.seq = realloc(module.seq, sizeof(sequence *) * (module.nseq + 1));
+    module.seq[module.nseq++] = seq;
+
+    module_excl_out();
 }
 
-void module_del_sequence(int s)
-{
-	if (s == -1)
-		s = module.nseq - 1;
-	
-	if ((s < 0) || (s >= module.nseq))
-		return;
-	
-	module_excl_in();
-	
-	sequence_free(module.seq[s]);
-	
-	for (int i = s; i < module.nseq - 1; i++)
-	{
-		module.seq[i] = module.seq[i + 1];
-	}
-	
-	module.nseq--;
-	
-	if (module.nseq == 0)
-	{
-		free(module.seq);
-		module.seq = 0;
-	} else {
-		module.seq = realloc(module.seq, sizeof(sequence *) * module.nseq);		
-	}
-	
-	module_excl_out();	
+void module_del_sequence(int s) {
+    if (s == -1)
+        s = module.nseq - 1;
+
+    if ((s < 0) || (s >= module.nseq))
+        return;
+
+    module_excl_in();
+
+    sequence_free(module.seq[s]);
+
+    for (int i = s; i < module.nseq - 1; i++) {
+        module.seq[i] = module.seq[i + 1];
+    }
+
+    module.nseq--;
+
+    if (module.nseq == 0) {
+        free(module.seq);
+        module.seq = 0;
+    } else {
+        module.seq = realloc(module.seq, sizeof(sequence *) * module.nseq);
+    }
+
+    module_excl_out();
 }
 
-void module_swap_sequence(int s1, int s2)
-{
-	if ((s1 < 0) || (s1 >= module.nseq))
-		return;
-	
-	if ((s2 < 0) || (s2 >= module.nseq))
-		return;
-		
-	if (s1 == s2)
-		return;
+void module_swap_sequence(int s1, int s2) {
+    if ((s1 < 0) || (s1 >= module.nseq))
+        return;
 
-	module_excl_in();
-			
-	sequence *s3 = module.seq[s1];
-	module.seq[s1] = module.seq[s2];
-	module.seq[s2] = s3;
-	
-	module_excl_out();
+    if ((s2 < 0) || (s2 >= module.nseq))
+        return;
+
+    if (s1 == s2)
+        return;
+
+    module_excl_in();
+
+    sequence *s3 = module.seq[s1];
+    module.seq[s1] = module.seq[s2];
+    module.seq[s2] = s3;
+
+    module_excl_out();
 }

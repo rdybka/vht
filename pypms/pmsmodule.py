@@ -15,15 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections.abc import Iterable
 from pypms import libpms
-from pypms.pmssequencelist import PMSSequenceList
+from pypms.pmssequence import PMSSequence
 
-class PMSModule():
+class PMSModule(Iterable):
 	# a somewhat pythonic interface to the pms magic
 	# see pypmsapitest.py for general usage
 	def __init__(self):
 		self._seq = None
 		libpms.module_new();
+		super()
 	
 	def __del__(self):   
 		libpms.module_free();
@@ -36,9 +38,6 @@ class PMSModule():
 	def jack_stop(self):
 		libpms.stop()
 		
-	def dump_notes(self, n):
-		libpms.module_dump_notes(n)
-
 	def __str__(self):
 		r = {}
 		r["bpm"] = self.bpm
@@ -55,23 +54,58 @@ class PMSModule():
 		self._seq = None
 		libpms.module_new();
 
-	@property
-	def seq(self):
-		if self._seq == None:
-			self._seq = PMSSequenceList(libpms)
-		
-		return self._seq
+	def __len__(self):
+		return self.libpms.module_get_nseq()
 
+	def __iter__(self):
+		for itm in range(self.__len__()):
+			yield PMSSequence(libpms, libpms.module_get_seq(itm))
+		
+	def __getitem__(self, itm):
+		if itm >= self.__len__():
+			raise IndexError()
+			
+		if itm < 0:
+			raise IndexError()
+			
+		return PMSSequence(libpms, libpms.module_get_seq(itm))
+    
+	def add_sequence(self, length = -1):
+		seq = libpms.sequence_new(length)
+		libpms.module_add_sequence(seq)
+		return PMSSequence(libpms, seq)
+    
+	def swap_sequence(self, s1, s2):
+		libpms.module_swap_sequence(s1, s2)
+
+	def del_sequence(self, s = -1):
+		libpms.module_del_sequence(s)
+    
+	def __str__(self):
+		ret = "seq: %d\n" % self.__len__()
+		for itm in self:
+			ret = ret + "%d : %d\n" % (len(itm), itm.length)
+		return ret
+	
 	@property
-	def playing(self):
+	def play(self):
 		return libpms.module_is_playing()
 		
-	@playing.setter
-	def playing(self, value):
+	@play.setter
+	def play(self, value):
 		if value:
 			libpms.module_play(1)
 		else:
 			libpms.module_play(0)
+
+	@property
+	def dump_notes(self):
+		return 0	# we need write-only properties in python :)
+		
+	@dump_notes.setter
+	def dump_notes(self, n):
+		libpms.module_dump_notes(n)
+
 
 	@property
 	def bpm(self):
