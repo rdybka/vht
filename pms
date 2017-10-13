@@ -30,16 +30,16 @@ class PmsApp(Gtk.Application):
 	def __init__(self):
 		Gtk.Application.__init__(self, application_id = "com.github.rdybka.pms", 
 			flags = Gio.ApplicationFlags.FLAGS_NONE)
-	
+		
 	def do_activate(self):
 		win = Pms_MainWin(pms, self)
+		#win.set_icon_from_file("dist/icons/pms.png")
+		self.add_window(win)
 		win.show_all()
 
 if __name__ == "__main__":
 	if pms.jack_start() != 0: 
 		exit()
-
-	pms.seq[0][0][0][0] = "c5"
 
 	app = PmsApp()
 	app.run(sys.argv)
