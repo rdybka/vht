@@ -28,8 +28,10 @@
 
 #include "module.h"
 
-extern int start();
+extern int start(char *name);
 extern void stop();
+
+extern char *get_jack_error();
 
 // module
 extern void module_new();

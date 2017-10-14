@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 # Poor Man's Sequencer
 #
 # Copyright (C) 2017 Remigiusz Dybka
@@ -23,7 +22,6 @@ try:
 	from pypms import pms
 except ImportError:
 	sys.path.append(__file__.replace("/bin/pms", "/lib/pms"))
-	print(sys.path)
 
 from pypms import pms
 import gi
@@ -39,16 +37,21 @@ class PmsApp(Gtk.Application):
 			flags = Gio.ApplicationFlags.FLAGS_NONE)
 		
 	def do_activate(self):
-		win = Pms_MainWin(pms, self)
-		#win.set_icon_from_file("dist/icons/pms.png")
+		win = MainWin(pms, self)
+		
+		if (pms.start_error):
+			self.quit()
+			
 		self.add_window(win)
 		win.show_all()
 
 if __name__ == "__main__":
-	if pms.jack_start() != 0: 
-		exit()
-
 	app = PmsApp()
+
+	pms.start_error = None
+	if pms.jack_start() != 0:
+		pms.start_error = "You will need JACK for running for this"
+
 	app.run(sys.argv)
 
 	# is this reliable? should we wait for module.mute == 0?

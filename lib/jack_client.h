@@ -24,15 +24,16 @@
 #define JACK_CLIENT_NAME 		"pms"
 #define JACK_CLIENT_MAX_PORTS	16
 
-extern jack_client_t *jack_client;
-extern jack_port_t *jack_input_port;
+jack_client_t *jack_client;
+jack_port_t *jack_input_port;
 extern jack_port_t *jack_output_ports[];
-extern int jack_n_output_ports;
-extern jack_status_t jack_status;
-extern jack_nframes_t jack_sample_rate;
-extern jack_nframes_t jack_buffer_size;
+int jack_n_output_ports;
+jack_status_t jack_status;
+jack_nframes_t jack_sample_rate;
+jack_nframes_t jack_buffer_size;
+extern char *jack_error;
 
-int jack_start();
+int jack_start(char *clt_name);
 void jack_stop();
 void jack_synch_n_output_ports();
 

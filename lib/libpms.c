@@ -7,8 +7,8 @@
 
 // all wrappers and getters/setters go here
 
-int start() {
-    return jack_start();
+int start(char *name) {
+    return jack_start(name);
 }
 
 void stop() {
@@ -142,3 +142,6 @@ void sequence_set_length(sequence *seq, int length) {
         track_resize(seq->trk[t], length);
 }
 
+char *get_jack_error() {
+	return jack_error;
+}

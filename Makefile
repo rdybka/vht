@@ -1,7 +1,9 @@
 #Poor Man's Sequencer by Remigiusz Dybka
 
+# change these two to suit your stuff
 PYTHON_INCLUDE=/usr/include/python3.6m
-INST_DIR=/home/mal1ce/.local
+INST_DIR=$(HOME)/.local
+
 CC=gcc
 CFLAGS=-I$(PYTHON_INCLUDE) -fPIC
 LIBS=-lm -ljack
@@ -31,7 +33,7 @@ all: pypms/_libpms.so
 lib/libpms_wrap.c: $(DEPS) $(OBJ)
 	swig -python lib/libpms.h
 
-lib/pms_wrap.o: lib/pms_wrap.c
+lib/pms_wrap.o: lib/libpms_wrap.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 pypms/libpms.py: lib/libpms_wrap.c
@@ -40,7 +42,7 @@ pypms/libpms.py: lib/libpms_wrap.c
 pypms/_libpms.so: $(OBJ) lib/libpms_wrap.o pypms/libpms.py
 	ld -shared $(OBJ) lib/libpms_wrap.o -o $@ $(LIBS)
 
-install:
+install: pypms/_libpms.so
 	mkdir -p $(INST_DIR)/lib/pms/pypms 
 	mkdir -p $(INST_DIR)/lib/pms 
 	cp -r dist/* $(INST_DIR)

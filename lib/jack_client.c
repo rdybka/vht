@@ -28,13 +28,21 @@ jack_port_t *jack_input_port;
 jack_nframes_t jack_sample_rate;
 jack_nframes_t jack_buffer_size;
 int jack_n_output_ports;
+char *jack_error;
 
-int jack_start() {
+int jack_start(char *clt_name) {
     jack_options_t opt;
     opt = JackNoStartServer;
 
-    if ((jack_client = jack_client_open (JACK_CLIENT_NAME, opt, NULL)) == 0) {
-        fprintf (stderr, "Could not connect to JACK. Is server running?\n");
+    char *cn = clt_name;	
+	if (cn == NULL)
+		cn = JACK_CLIENT_NAME;
+
+	jack_client = NULL;
+	jack_error = NULL;
+    if ((jack_client = jack_client_open (cn, opt, NULL)) == 0) {
+        jack_error = "Could not connect to JACK. Is server running?";
+        fprintf (stderr, "%s\n", jack_error);
         return 1;
     }
 

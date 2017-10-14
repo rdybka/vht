@@ -31,13 +31,13 @@ class PMSModule(Iterable):
 		libpms.module_free();
 	
 	# this will connect and initialise an empty module
-	def jack_start(self):
-		return libpms.start()
+	def jack_start(self, name = None):
+		return libpms.start(name)
 	
 	# disconnect from jack
 	def jack_stop(self):
 		libpms.stop()
-		
+
 	def __str__(self):
 		r = {}
 		r["bpm"] = self.bpm
@@ -86,6 +86,10 @@ class PMSModule(Iterable):
 		for itm in self:
 			ret = ret + "%d : %d\n" % (len(itm), itm.length)
 		return ret
+
+	@property
+	def jack_error(self):
+		return libpms.get_jack_error()
 	
 	@property
 	def play(self):

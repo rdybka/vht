@@ -4,12 +4,11 @@ from gi.repository import Gtk, Gio
 
 from trackerview import TrackerView
 
-class Pms_MainWin(Gtk.ApplicationWindow):
+class MainWin(Gtk.ApplicationWindow):
 	def __init__(self, pms_handle, app):
 		Gtk.ApplicationWindow.__init__(self, application = app)
 
-		print("appinit")
-		self.mod = pms_handle
+		self._pms_handle = pms_handle
 		
 		hb = Gtk.HeaderBar()
 		hb.set_show_close_button(True)
@@ -48,7 +47,7 @@ class Pms_MainWin(Gtk.ApplicationWindow):
 		self.bpmbutton = Gtk.SpinButton()
 		self.bpmbutton.set_adjustment(self.adj)
 		hb.pack_start(self.bpmbutton)
-		self.adj.set_value(self.mod.bpm)
+		self.adj.set_value(self._pms_handle.bpm)
 		self.adj.connect("value-changed", self.on_bpm_changed)
 
 		self.vbox = Gtk.Box()
@@ -60,7 +59,7 @@ class Pms_MainWin(Gtk.ApplicationWindow):
 		self.hbox.pack_start(self.seqlab, False, True, 0)
 		self.hbox.pack_start(Gtk.Label("track props"), True, True, 0)
 		
-		self.trackerview = TrackerView(self.mod)
+		self.trackerview = TrackerView(self._pms_handle)
 
 		self.vbox.pack_start(self.hbox, False, False, 0)
 		self.vbox.pack_start(self.trackerview, True, True, 0)
@@ -70,20 +69,26 @@ class Pms_MainWin(Gtk.ApplicationWindow):
 		self.set_default_size(800, 600)
 		self.show_all()
 
-	
+		if self._pms_handle.start_error:
+			dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
+				Gtk.ButtonsType.CANCEL, self._pms_handle.start_error)
+			#dialog.format_secondary_text(self._pms_handle.jack_error)
+			dialog.run()
+			dialog.destroy()
+
 	def on_ptswitch_activated(self, switch, gparam):
-		self.mod.dump_notes(switch.get_active())
+		self._pms_handle.dump_notes(switch.get_active())
 
 	def on_start_button_activate(self, switch):
-		self.mod.playing = 1
+		self._pms_handle.playing = 1
 		
 	def on_stop_button_activate(self, switch):
-		if not self.mod.playing:
-			self.mod.reset()
+		if not self._pms_handle.playing:
+			self._pms_handle.reset()
 		else:
 			pass
 
-		self.mod.playing = False
+		self._pms_handle.playing = False
 	
 	def on_bpm_changed(self, adj):
-		self.mod.bpm = int(adj.get_value())
+		self._pms_handle.bpm = int(adj.get_value())
