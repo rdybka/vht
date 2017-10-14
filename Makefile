@@ -41,7 +41,12 @@ pypms/_libpms.so: $(OBJ) lib/libpms_wrap.o pypms/libpms.py
 	ld -shared $(OBJ) lib/libpms_wrap.o -o $@ $(LIBS)
 
 install:
+	mkdir -p $(INST_DIR)/lib/pms/pypms 
+	mkdir -p $(INST_DIR)/lib/pms 
 	cp -r dist/* $(INST_DIR)
+	cp pms $(INST_DIR)/bin
+	cp -r pypms/* $(INST_DIR)/lib/pms/pypms
+	cp -r *.py $(INST_DIR)/lib/pms
 		
 clean:
 	rm -f *.so *.o lib/libpms.py pypms/libpms.py pypms/*.so
