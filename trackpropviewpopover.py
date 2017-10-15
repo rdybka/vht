@@ -22,7 +22,7 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.port_adj.set_value(trk.port)
 		self.port_adj.connect("value-changed", self.on_port_changed)
 
-		lbl = Gtk.Label("port:")
+		lbl = Gtk.Label("port")
 		lbl.set_xalign(1.0)
 
 		self.grid.attach(lbl, 0, 0, 1, 1)
@@ -34,7 +34,7 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.channel_adj.set_value(trk.channel)
 		self.channel_adj.connect("value-changed", self.on_channel_changed)
 
-		lbl = Gtk.Label("channel:")
+		lbl = Gtk.Label("channel")
 		lbl.set_xalign(1.0)
 		
 		self.grid.attach(lbl, 0, 1, 1, 1)
@@ -46,7 +46,7 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.nrows_adj.set_value(trk.nrows)
 		self.nrows_adj.connect("value-changed", self.on_nrows_changed)
 
-		lbl = Gtk.Label("nrows:")
+		lbl = Gtk.Label("nrows")
 		lbl.set_xalign(1.0)
 		
 		self.grid.attach(lbl, 0, 2, 1, 1)

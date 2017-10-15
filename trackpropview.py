@@ -42,7 +42,7 @@ class TrackPropView(Gtk.DrawingArea):
 		self.popover.popdown()
 		
 	def on_click(self, widget, data):
-		pass
+		pass 
 		
 	def on_draw(self, widget, cr):
 		w = widget.get_allocated_width()
