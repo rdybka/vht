@@ -38,14 +38,16 @@ class PMSSequence(Iterable):
 		self._pms_handle.sequence_del_track(self._seq_handle, t)
 
 	@property
+	def pos(self):
+		return self._pms_handle.sequence_get_pos(self._seq_handle)
+
+	@property
 	def length(self):
 		return self._pms_handle.sequence_get_length(self._seq_handle)
 
 	@length.setter
 	def length(self, value):
 		self._pms_handle.sequence_set_length(self._seq_handle, value)
-
-
 
 	def __str__(self):
 		ret = ""

@@ -2,7 +2,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
 
-from trackerview import TrackerView
+from sequenceview import SequenceView
 
 class MainWin(Gtk.ApplicationWindow):
 	def __init__(self, pms_handle, app):
@@ -10,6 +10,7 @@ class MainWin(Gtk.ApplicationWindow):
 
 		self._pms_handle = pms_handle
 		
+		# fucking gui
 		hb = Gtk.HeaderBar()
 		hb.set_show_close_button(True)
 		hb.props.title = "PMS"
@@ -50,6 +51,10 @@ class MainWin(Gtk.ApplicationWindow):
 		self.adj.set_value(self._pms_handle.bpm)
 		self.adj.connect("value-changed", self.on_bpm_changed)
 
+		self.time_display = Gtk.Label()
+		self.time_display.use_markup = True
+		hb.pack_start(self.time_display)
+		
 		self.vbox = Gtk.Box()
 		self.hbox = Gtk.Box();
 
@@ -59,10 +64,16 @@ class MainWin(Gtk.ApplicationWindow):
 		self.hbox.pack_start(self.seqlab, False, True, 0)
 		self.hbox.pack_start(Gtk.Label("track props"), True, True, 0)
 		
-		self.trackerview = TrackerView(self._pms_handle)
-
+		#
+		#
+		#
+		self._sequenceview = SequenceView(self._pms_handle)
+		#
+		#
+		#
+		
 		self.vbox.pack_start(self.hbox, False, False, 0)
-		self.vbox.pack_start(self.trackerview, True, True, 0)
+		self.vbox.pack_start(self._sequenceview, True, True, 0)
 		self.vbox.set_orientation(Gtk.Orientation.VERTICAL)
 		
 		self.add(self.vbox)
@@ -76,19 +87,26 @@ class MainWin(Gtk.ApplicationWindow):
 			dialog.run()
 			dialog.destroy()
 
+		self.add_tick_callback(self.tick)
+	
+	def tick(self, wdg, param):
+		self.time_display.set_markup("""<span foreground="blue" size="x-large">%s</span>""" % self._pms_handle.time)
+		self.time_display.queue_draw()
+		return 1
+
 	def on_ptswitch_activated(self, switch, gparam):
 		self._pms_handle.dump_notes(switch.get_active())
 
 	def on_start_button_activate(self, switch):
-		self._pms_handle.playing = 1
+		self._pms_handle.play = 1
 		
 	def on_stop_button_activate(self, switch):
-		if not self._pms_handle.playing:
+		if not self._pms_handle.play:
 			self._pms_handle.reset()
 		else:
 			pass
 
-		self._pms_handle.playing = False
+		self._pms_handle.play = False
 	
 	def on_bpm_changed(self, adj):
 		self._pms_handle.bpm = int(adj.get_value())

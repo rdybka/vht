@@ -55,7 +55,7 @@ class PMSModule(Iterable):
 		libpms.module_new();
 
 	def __len__(self):
-		return self.libpms.module_get_nseq()
+		return libpms.module_get_nseq()
 
 	def __iter__(self):
 		for itm in range(self.__len__()):
@@ -126,3 +126,7 @@ class PMSModule(Iterable):
 	@nports.setter
 	def nports(self, value):
 		libpms.module_set_nports(value)
+		
+	@property
+	def time(self):
+		return libpms.module_get_time()

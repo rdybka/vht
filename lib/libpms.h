@@ -32,6 +32,7 @@ extern int start(char *name);
 extern void stop();
 
 extern char *get_jack_error();
+extern char *module_get_time();
 
 // module
 extern void module_new();
@@ -63,6 +64,7 @@ extern track *sequence_get_trk(sequence *seq, int n);
 extern void sequence_add_track(sequence *seq, track *trk);
 extern void sequence_del_track(sequence *seq, int t);
 extern void sequence_swap_track(sequence *seq, int t1, int t2);
+extern double sequence_get_pos(sequence *seq);
 
 // track
 extern row *track_get_row_ptr(track *, int c, int r);

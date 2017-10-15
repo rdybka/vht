@@ -145,3 +145,7 @@ void sequence_set_length(sequence *seq, int length) {
 char *get_jack_error() {
 	return jack_error;
 }
+
+double sequence_get_pos(sequence *seq){
+	return seq->pos;
+}

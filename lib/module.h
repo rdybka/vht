@@ -60,5 +60,6 @@ void module_excl_out();
 void module_add_sequence(sequence *seq);
 void module_del_sequence(int s);
 void module_swap_sequence(int s1, int s2);
+char *modue_get_time();
 
 #endif //__MODULE_H__

@@ -216,3 +216,10 @@ void module_swap_sequence(int s1, int s2) {
 
     module_excl_out();
 }
+
+char *module_get_time()
+{
+	static char buff[256];
+	sprintf(buff, "%02d:%02d:%03d", module.min, module.sec, module.ms);
+	return buff;
+}
