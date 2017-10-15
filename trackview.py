@@ -35,7 +35,7 @@ class TrackView(Gtk.DrawingArea):
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000")
 		
 		if w != (width + (self.padding * 2)):
-			self.set_size_request(len(self.trk) * (width + (self.padding * 2)), ((height + (self.padding)) * self.trk.nrows) + self.padding)
+			self.set_size_request(len(self.trk) * (width + (self.padding * 2)) + self.padding * 2, ((height + (self.padding)) * self.trk.nrows) + self.padding)
 		
 		for c in range(len(self.trk)):
 			for r in range(self.trk.nrows):
@@ -60,3 +60,8 @@ class TrackView(Gtk.DrawingArea):
 			cr.move_to(0, yy)
 			cr.line_to(w, yy)
 			cr.stroke()					
+
+		cr.set_source_rgb(0, .5, 0)
+		cr.move_to(len(self.trk) * (width + (self.padding * 2)) + self.padding, self.padding)
+		cr.line_to(len(self.trk) * (width + (self.padding * 2)) + self.padding, ((height + (self.padding)) * self.trk.nrows) - self.padding)
+		cr.stroke()

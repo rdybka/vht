@@ -35,7 +35,7 @@ class TrackSideView(Gtk.DrawingArea):
 		(x, y, width, height, dx, dy) = cr.text_extents("000")
 		
 		if w != (width + (self.padding * 2)):
-			self.set_size_request(width + (self.padding * 2), ((height + (self.padding)) * self.nrows) + self.padding)
+			self.set_size_request(width + (self.padding * 3) + self.padding, ((height + (self.padding)) * self.nrows) + self.padding)
 		
 		for a in range(self.nrows):
 			if (a) % self.highlight == 0:
@@ -44,7 +44,7 @@ class TrackSideView(Gtk.DrawingArea):
 				cr.set_source_rgb(0, .7, 0)
 					
 			cr.move_to(self.padding, (a + 1) * (height + self.padding))	
-			cr.show_text("%02d" % a)
+			cr.show_text("%03d" % a)
 
 		pos = self.seq.pos
 		if pos != 0.0:
@@ -52,3 +52,9 @@ class TrackSideView(Gtk.DrawingArea):
 			cr.move_to(0, yy)
 			cr.line_to(w, yy)
 			cr.stroke()
+		
+		cr.set_source_rgb(0, .5, 0)
+		cr.move_to(width + (self.padding * 2) + self.padding, self.padding)
+		cr.line_to(width + (self.padding * 2) + self.padding, ((height + (self.padding)) * self.nrows) - self.padding)
+		cr.stroke()
+		

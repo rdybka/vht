@@ -3,6 +3,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
 
 from sequenceview import SequenceView
+from propview import PropView
 
 class MainWin(Gtk.ApplicationWindow):
 	def __init__(self, pms_handle, app):
@@ -64,16 +65,12 @@ class MainWin(Gtk.ApplicationWindow):
 		self.hbox.pack_start(self.seqlab, False, True, 0)
 		self.hbox.pack_start(Gtk.Label("track props"), True, True, 0)
 		
-		#
-		#
-		#
-		self._sequenceview = SequenceView(self._pms_handle)
-		#
-		#
-		#
+		self._sequence_view = SequenceView(self._pms_handle)
+		self._prop_view = PropView(self._pms_handle, self._sequence_view)
 		
 		self.vbox.pack_start(self.hbox, False, False, 0)
-		self.vbox.pack_start(self._sequenceview, True, True, 0)
+		self.vbox.pack_start(self._prop_view, False, True, 0)
+		self.vbox.pack_start(self._sequence_view, True, True, 0)
 		self.vbox.set_orientation(Gtk.Orientation.VERTICAL)
 		
 		self.add(self.vbox)
@@ -90,7 +87,7 @@ class MainWin(Gtk.ApplicationWindow):
 		self.add_tick_callback(self.tick)
 	
 	def tick(self, wdg, param):
-		self.time_display.set_markup("""<span foreground="blue" size="x-large">%s</span>""" % self._pms_handle.time)
+		self.time_display.set_markup("""<span font_desc="Roboto bold" font_family="monospace" foreground="black" size="x-large">%s</span>""" % self._pms_handle.time)
 		self.time_display.queue_draw()
 		return 1
 
