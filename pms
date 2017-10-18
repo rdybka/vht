@@ -37,10 +37,10 @@ import randomcomposer
 class PMSApp(Gtk.Application):
 	def __init__(self):
 		Gtk.Application.__init__(self, application_id = "com.github.rdybka.pms", 
-			flags = Gio.ApplicationFlags.FLAGS_NONE)
+			flags = Gio.ApplicationFlags.NON_UNIQUE)
 		
 	def do_activate(self):
-		win = MainWin(pms, self)
+		win = MainWin(self)
 		
 		if pms.start_error:
 			self.quit()
@@ -55,7 +55,7 @@ if __name__ == "__main__":
 	if pms.jack_start() != 0:
 		pms.start_error = "you will need JACK for this"
 
-	randomcomposer.muzakize(pms)
+	randomcomposer.muzakize()
 
 	app.run(sys.argv)
 	

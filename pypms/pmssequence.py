@@ -12,16 +12,19 @@ class PMSSequence(Iterable):
 
 	def __iter__(self):
 		for itm in range(self.__len__()):
-			yield PMSTrack(self._pms_handle, self._pms_handle.sequence_get_trk(self._seq_handle, itm))
+			yield PMSTrack(self._pms_handle, self._pms_handle.sequence_get_trk(self._seq_handle, itm), itm)
 			
 	def __getitem__(self, itm):
 		if itm >= self.__len__():
 			raise IndexError()
 			
-		if itm < 0:
-			raise IndexError()
+		if itm == -1:
+			if not len(self):
+				raise IndexError()	
 			
-		return PMSTrack(self._pms_handle, self._pms_handle.sequence_get_trk(self._seq_handle, itm))
+			return PMSTrack(self._pms_handle, self._pms_handle.sequence_get_trk(self._seq_handle, self.__len__() - 1), self.__len__() - 1)
+			
+		return PMSTrack(self._pms_handle, self._pms_handle.sequence_get_trk(self._seq_handle, itm), itm)
 
 	def add_track(self, port = 0, channel = 1, length = -1, songlength = -1):
 		if length == -1:

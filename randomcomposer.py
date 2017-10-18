@@ -1,8 +1,14 @@
 
-def muzakize(pms):
+
+from pypms import pms
+
+def muzakize():
 	seq = pms.add_sequence(32)
+
 	trk1 = seq.add_track()
 	trk2 = seq.add_track()
+	trk3 = seq.add_track()
+	
 
 	trk1.add_column()
 
@@ -11,7 +17,7 @@ def muzakize(pms):
 	
 	trk2.port = 0;
 	trk2.channel = 10;
-
+	
 	trk1[0][0] = "c3"
 	trk1[0][8] = "c3"
 	trk1.nrows = 16

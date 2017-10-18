@@ -12,17 +12,11 @@ class TrackView(Gtk.DrawingArea):
 		self.trk = trk
 		self.highlight = 4
 		self.padding = 3
-		#self.connect("tick", self.tick)
-		self.add_tick_callback(self.tick)
 	
-	def tick(self, wdg, param):
-		self.queue_draw()
-		return 1
-		
-	def on_realize(self, widget):
-		pass
-
 	def on_draw(self, widget, cr):
+		if not self.trk:
+			return
+			
 		w = widget.get_allocated_width()
 		h = widget.get_allocated_height()
 		cr.set_source_rgb(0,.3,0)

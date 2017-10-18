@@ -8,9 +8,8 @@ class TrackSideView(Gtk.DrawingArea):
 		Gtk.DrawingArea.__init__(self)
 		
 		self.connect("draw", self.on_draw);
-
+		self.trk = None
 		self.seq = seq
-		self.nrows = seq.length
 		self.highlight = 4
 		self.padding = 3
 		self.add_tick_callback(self.tick)
@@ -35,9 +34,9 @@ class TrackSideView(Gtk.DrawingArea):
 		(x, y, width, height, dx, dy) = cr.text_extents("000")
 		
 		if w != (width + (self.padding * 2)):
-			self.set_size_request(width + (self.padding * 3) + self.padding, ((height + (self.padding)) * self.nrows) + self.padding)
+			self.set_size_request(width + (self.padding * 3) + self.padding, ((height + (self.padding)) * self.seq.length) + self.padding)
 		
-		for a in range(self.nrows):
+		for a in range(self.seq.length):
 			if (a) % self.highlight == 0:
 				cr.set_source_rgb(0, 1, 0)		
 			else:
@@ -55,6 +54,6 @@ class TrackSideView(Gtk.DrawingArea):
 		
 		cr.set_source_rgb(0, .5, 0)
 		cr.move_to(width + (self.padding * 2) + self.padding, self.padding)
-		cr.line_to(width + (self.padding * 2) + self.padding, ((height + (self.padding)) * self.nrows) - self.padding)
+		cr.line_to(width + (self.padding * 2) + self.padding, ((height + (self.padding)) * self.seq.length) - self.padding)
 		cr.stroke()
 		

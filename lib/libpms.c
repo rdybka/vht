@@ -135,11 +135,15 @@ void module_set_nports(int np) {
     //}
 }
 
-
 void sequence_set_length(sequence *seq, int length) {
+    for (int t = 0; t < seq->ntrk; t++){
+        if((seq->trk[t]->nrows == seq->trk[t]->nsrows) && (seq->trk[t]->nrows == seq->length)) {
+			track_resize(seq->trk[t], length);
+			seq->trk[t]->nsrows = length;
+		}
+	}
+        
     seq->length = length;
-    for (int t = 0; t < seq->ntrk; t++)
-        track_resize(seq->trk[t], length);
 }
 
 char *get_jack_error() {

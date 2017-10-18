@@ -2,9 +2,10 @@ from collections.abc import Iterable
 from pypms.pmscolumn import PMSColumn
 
 class PMSTrack(Iterable):
-	def __init__(self, pms, trk):
+	def __init__(self, pms, trk, index):
 		self._pms_handle = pms
 		self._trk_handle = trk;
+		self.index = index
 		super()
 	
 	def __len__(self):
@@ -17,6 +18,11 @@ class PMSTrack(Iterable):
 	def clear(self):
 		for col in self:
 			col.clear()
+	
+	def __eq__(self, other):
+		if not self or not other:
+			return False
+		return self.index == other.index
 	
 	def __getitem__(self, itm):
 		if itm >= self.__len__():

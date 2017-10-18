@@ -120,7 +120,7 @@ void sequence_del_track(sequence *seq, int t) {
 
 void sequence_swap_track(sequence *seq, int t1, int t2) {
     if ((t1 < 0) || (t1 >= seq->ntrk))
-        module_excl_out();
+        return;
 
     if ((t2 < 0) || (t2 >= seq->ntrk))
         return;
