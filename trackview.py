@@ -2,13 +2,13 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
 import cairo
-
+from threading import Lock
 from pypms import pms
 
 class TrackView(Gtk.DrawingArea):
 	def __init__(self, trk):
 		Gtk.DrawingArea.__init__(self)
-		self.tick_ref = self.add_tick_callback(self.tick)
+	
 		self.connect("draw", self.on_draw)
 		self.connect("realize", self.on_realize)
 
@@ -18,10 +18,6 @@ class TrackView(Gtk.DrawingArea):
 	
 	def on_realize(self, wdg):
 		self.set_size_request(1, 1)
-	
-	def tick(self, wdg, param):
-		self.queue_draw()
-		return 1
 	
 	def on_draw(self, widget, cr):
 		if not self.trk:

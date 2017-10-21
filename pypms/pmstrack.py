@@ -19,11 +19,6 @@ class PMSTrack(Iterable):
 		for col in self:
 			col.clear()
 	
-	def __eq__(self, other):
-		if not self or not other:
-			return False
-		return self.index == other.index
-	
 	def __getitem__(self, itm):
 		if itm >= self.__len__():
 			raise IndexError()

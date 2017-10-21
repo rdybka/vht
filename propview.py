@@ -1,17 +1,17 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, Gio
-import cairo
-
 from trackpropview import TrackPropView
-
 from pypms import pms
+import cairo
 
 class PropView(Gtk.ScrolledWindow):
 	def __init__(self, seqview):
 		Gtk.ScrolledWindow.__init__(self)
 		self.connect("draw", self.on_draw);
 		self.connect("leave-notify-event", self.on_leave)				
+		
+		self.add_tick_callback(self.tick)
 		
 		self.seqview = seqview
 		self.seq = seqview.seq;
@@ -27,6 +27,21 @@ class PropView(Gtk.ScrolledWindow):
 		self.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.NEVER)
 		self.add_with_viewport(self._track_box)
 		self._track_box.show_all()
+			
+	def tick(self, wdg, param):
+		for wdg in self._track_box.get_children()[1:]:
+				wdg.queue_draw()
+			
+		return 1
+
+	def del_track(self, trk):
+		i = 0
+		for wdg in self._track_box.get_children()[1:]:
+			if wdg.trk.index == trk.index:
+				self.seq.del_track(i)
+				return
+				
+			i = i + 1
 
 	def on_leave(self, wdg, prm):
 		if prm.detail == Gdk.NotifyType.NONLINEAR:
@@ -37,20 +52,8 @@ class PropView(Gtk.ScrolledWindow):
 		self._track_box.pack_start(t, False, True, 0)
 		t.show()
 
-	def del_track(self, trk):
-		ind = None
-		for wdg in self._track_box.get_children():
-			if wdg.trk == trk:
-				ind = trk.index
-				wdg.destroy()
-				
-		if ind:
-			self.seq.del_track(ind)
+	#self._track_box.reorder_child(wdg, wdg.trk.index  1)
 
-	def reorder(self):
-		print("reorder props")
-		#self._track_box.reorder_child(wdg, wdg.trk.index  1)
-	
 	def build(self):
 		for trk in self.seq:
 			self.add_track(trk)

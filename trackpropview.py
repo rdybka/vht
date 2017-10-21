@@ -3,15 +3,16 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, Gio
 import cairo
 
+from threading import Lock
+
 from trackpropviewpopover import TrackPropViewPopover
 from sequencepropviewpopover import SequencePropViewPopover
-
 from pypms import pms
 
 class TrackPropView(Gtk.DrawingArea):
-	def __init__(self, trk = None, seq = None, seqview = None, propview = None, index = -1):
+	def __init__(self, trk = None, seq = None, seqview = None, propview = None):
 		Gtk.DrawingArea.__init__(self)
-		self.tick_ref = self.add_tick_callback(self.tick)
+
 		self.connect("draw", self.on_draw)
 		self.connect("realize", self.on_realize)
 		
@@ -33,7 +34,6 @@ class TrackPropView(Gtk.DrawingArea):
 		self.trk = trk
 		self.propview = propview
 		self.seqview = seqview
-		self.index = index
 		self.padding = 3
 		self.button_rect = Gdk.Rectangle()
 	
@@ -50,12 +50,13 @@ class TrackPropView(Gtk.DrawingArea):
 		trk = self.seq.add_track(port, channel)
 		self.seqview.add_track(trk)
 		self.propview.add_track(trk)
-		
+	
 	def del_track(self):
 		self.popover.popdown()
 		self.seqview.del_track(self.trk)
 		self.propview.del_track(self.trk)
-	
+		self.destroy()
+		
 	def move_left(self):
 		self.seq.swap_track(self.trk.index, self.trk.index - 1)
 		self.seqview.update_order()
@@ -77,10 +78,6 @@ class TrackPropView(Gtk.DrawingArea):
 		
 	def on_click(self, widget, data):
 		pass 
-	
-	def tick(self, wdg, param):
-		self.queue_draw()
-		return 1
 
 	def on_draw(self, widget, cr):
 		w = widget.get_allocated_width()
@@ -146,4 +143,3 @@ class TrackPropView(Gtk.DrawingArea):
 		cr.move_to(len(self.trk) * (width + (self.padding * 2)) + self.padding, self.padding)
 		cr.line_to(len(self.trk) * (width + (self.padding * 2)) + self.padding, ((height + (self.padding)) * 2) - self.padding)
 		cr.stroke()
-		

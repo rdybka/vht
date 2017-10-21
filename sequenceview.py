@@ -18,7 +18,8 @@ class SequenceView(Gtk.ScrolledWindow):
 		self.connect("motion-notify-event", self.on_motion);
 		self.connect("button-press-event", self.on_button);
 		
-		
+		self.add_tick_callback(self.tick)
+	
 		self.seq = seq;
 		self.last_count = len(seq)
 
@@ -46,21 +47,22 @@ class SequenceView(Gtk.ScrolledWindow):
 		t.show()
 
 	def del_track(self, trk):
-		for wdg in self._track_box.get_children():
-			if wdg.trk == trk:
-				self._track_box.remove(wdg)
+		for wdg in self._track_box.get_children()[1:]:
+			if wdg.trk.index == trk.index:
 				wdg.destroy()
+				return
 	
-	def reorder(self):
-		print("reorder seq")
-		#self._track_box.reorder_child(wdg, wdg.trk.index  1)
+	#self._track_box.reorder_child(wdg, wdg.trk.index  1)
 		
 	def build(self):
 		for trk in self.seq:
 			self.add_track(trk)
 	
-	
-	
+	def tick(self, wdg, param):
+		for wdg in self._track_box.get_children()[1:]:
+				wdg.queue_draw()
+		
+		return 1
 	
 	def on_draw(self, widget, cr):
 		w = widget.get_allocated_width()
