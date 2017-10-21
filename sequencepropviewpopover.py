@@ -1,6 +1,6 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, Gdk, Gtk, Gio
+from gi.repository import Gdk, Gtk, Gio
 import cairo
 
 class SequencePropViewPopover(Gtk.Popover):
@@ -37,8 +37,6 @@ class SequencePropViewPopover(Gtk.Popover):
 		
 		self.grid.show_all()
 		self.add(self.grid)
-		
-		self.entered = False
 
 	def on_length_changed(self, adj):
 		self.seq.length = int(adj.get_value())

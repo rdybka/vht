@@ -1,37 +1,51 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio
+from gi.repository import Gdk, Gtk, Gio
 import cairo
 
 from trackpropview import TrackPropView
 
-class PropView(Gtk.Bin):
+from pypms import pms
+
+class PropView(Gtk.ScrolledWindow):
 	def __init__(self, seqview):
-		Gtk.Bin.__init__(self)
+		Gtk.ScrolledWindow.__init__(self)
 		self.connect("draw", self.on_draw);
-		self.tick_ref = self.add_tick_callback(self.tick)
+		self.connect("leave-notify-event", self.on_leave)				
 		
 		self.seqview = seqview
 		self.seq = seqview.seq;
 		
 		self._track_box = Gtk.Box()
-		self._track_box.add(TrackPropView(self.clear_popups, None, self.seq, self.seqview, self))
+		self._track_box.set_spacing(0)
+		pms.clear_popups = self.clear_popups
+		
+		self._track_box.add(TrackPropView(None, self.seq, self.seqview, self))
 
 		self.build()
 		
-		self._track_box.set_spacing(0)
-		self.add(self._track_box)
+		self.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.NEVER)
+		self.add_with_viewport(self._track_box)
 		self._track_box.show_all()
 
+	def on_leave(self, wdg, prm):
+		if prm.detail == Gdk.NotifyType.NONLINEAR:
+			self.clear_popups()
+
 	def add_track(self, trk):
-		t = TrackPropView(self.clear_popups, trk, self.seq, self.seqview, self)
-		self._track_box.add(t)
+		t = TrackPropView(trk, self.seq, self.seqview, self)
+		self._track_box.pack_start(t, False, True, 0)
 		t.show()
-	
+
 	def del_track(self, trk):
-		for wdg in self._track_box.get_children()[1:]:
+		ind = None
+		for wdg in self._track_box.get_children():
 			if wdg.trk == trk:
-				self._track_box.remove(wdg)
+				ind = trk.index
+				wdg.destroy()
+				
+		if ind:
+			self.seq.del_track(ind)
 
 	def reorder(self):
 		print("reorder props")
@@ -40,10 +54,6 @@ class PropView(Gtk.Bin):
 	def build(self):
 		for trk in self.seq:
 			self.add_track(trk)
-
-	def tick(self, wdg, param):
-		self.queue_draw()
-		return 1
 			
 	def clear_popups(self):
 		for wdg in self._track_box.get_children():

@@ -26,7 +26,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			button.add(image)
 			button.connect("clicked", self.on_remove_button_clicked)
 			button.set_tooltip_text("ctrl r")
-			self.grid.attach(button, 2, 0, 1, 1)
+			self.grid.attach(button, 3, 0, 1, 1)
 
 			button = Gtk.Button()
 			icon = Gio.ThemedIcon(name="list-remove")
@@ -42,7 +42,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			button.add(image)
 			button.connect("clicked", self.on_expand_button_clicked)
 			button.set_tooltip_text("ctrl +")
-			self.grid.attach(button, 1, 0, 1, 1)
+			self.grid.attach(button, 1, 0, 2, 1)
 
 			button = Gtk.Button()
 			icon = Gio.ThemedIcon(name="go-previous")
@@ -50,7 +50,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			button.add(image)
 			button.connect("clicked", self.on_move_left_button_clicked)
 			button.set_tooltip_text("ctrl left")
-			self.grid.attach(button, 0, 1, 1, 1)
+			self.grid.attach(button, 1, 1, 1, 1)
 
 			button = Gtk.Button()
 			icon = Gio.ThemedIcon(name="go-next")
@@ -59,6 +59,22 @@ class TrackPropViewPopover(Gtk.Popover):
 			button.connect("clicked", self.on_move_right_button_clicked)
 			button.set_tooltip_text("ctrl right")
 			self.grid.attach(button, 2, 1, 1, 1)
+
+			button = Gtk.Button()
+			icon = Gio.ThemedIcon(name="go-first")
+			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+			button.add(image)
+			button.connect("clicked", self.on_move_left_button_clicked)
+			button.set_tooltip_text("ctrl left")
+			self.grid.attach(button, 0, 1, 1, 1)
+
+			button = Gtk.Button()
+			icon = Gio.ThemedIcon(name="go-last")
+			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+			button.add(image)
+			button.connect("clicked", self.on_move_right_button_clicked)
+			button.set_tooltip_text("ctrl right")
+			self.grid.attach(button, 3, 1, 1, 1)
 
 			self.port_adj = Gtk.Adjustment(0, 0, 15, 1.0, 1.0)
 			self.port_button = Gtk.SpinButton()
@@ -70,7 +86,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			lbl.set_xalign(1.0)
 
 			self.grid.attach(lbl, 0, 2, 1, 1)
-			self.grid.attach(self.port_button, 1, 2, 1, 1)
+			self.grid.attach(self.port_button, 1, 2, 2, 1)
 
 			self.channel_adj = Gtk.Adjustment(1, 1, 16, 1.0, 1.0)
 			self.channel_button = Gtk.SpinButton()
@@ -82,7 +98,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			lbl.set_xalign(1.0)
 			
 			self.grid.attach(lbl, 0, 3, 1, 1)
-			self.grid.attach(self.channel_button, 1, 3, 1, 1)
+			self.grid.attach(self.channel_button, 1, 3, 2, 1)
 
 			self.nrows_adj = Gtk.Adjustment(1, 0, 256, 1.0, 1.0)
 			self.nrows_button = Gtk.SpinButton()
@@ -90,12 +106,30 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.nrows_adj.set_value(trk.nrows)
 			self.nrows_adj.connect("value-changed", self.on_nrows_changed)
 
-			lbl = Gtk.Label("nrows")
+			lbl = Gtk.Label("rows")
 			lbl.set_xalign(1.0)
-		
+			
+			self.nrows_check_button = Gtk.CheckButton()
+			
 			self.grid.attach(lbl, 0, 4, 1, 1)
-			self.grid.attach(self.nrows_button, 1, 4, 1, 1)
+			self.grid.attach(self.nrows_button, 1, 4, 2, 1)
+			self.grid.attach(self.nrows_check_button, 3, 4, 1, 1)
+			
+			self.nsrows_adj = Gtk.Adjustment(1, 0, 256, 1.0, 1.0)
+			self.nsrows_button = Gtk.SpinButton()
+			self.nsrows_button.set_adjustment(self.nsrows_adj)
+			self.nsrows_adj.set_value(trk.nsrows)
+			self.nsrows_adj.connect("value-changed", self.on_nsrows_changed)
 
+			lbl = Gtk.Label("over")
+			lbl.set_xalign(1.0)
+			
+			self.nsrows_check_button = Gtk.CheckButton()
+			
+			self.grid.attach(lbl, 0, 5, 1, 1)
+			self.grid.attach(self.nsrows_button, 1, 5, 2, 1)
+			self.grid.attach(self.nsrows_check_button, 3, 5, 1, 1)
+						
 			self.grid.show_all()
 			self.add(self.grid)
 
@@ -126,6 +160,9 @@ class TrackPropViewPopover(Gtk.Popover):
 
 	def on_nrows_changed(self, adj):
 		self.trk.nrows = int(adj.get_value())
+
+	def on_nsrows_changed(self, adj):
+		self.trk.nsrows = int(adj.get_value())
 
 	def on_move_left_button_clicked(self, switch):
 		self.parent.move_left()

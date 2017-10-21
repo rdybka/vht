@@ -3,15 +3,25 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
 import cairo
 
+from pypms import pms
+
 class TrackView(Gtk.DrawingArea):
 	def __init__(self, trk):
 		Gtk.DrawingArea.__init__(self)
-		
-		self.connect("draw", self.on_draw);
+		self.tick_ref = self.add_tick_callback(self.tick)
+		self.connect("draw", self.on_draw)
+		self.connect("realize", self.on_realize)
 
 		self.trk = trk
 		self.highlight = 4
 		self.padding = 3
+	
+	def on_realize(self, wdg):
+		self.set_size_request(1, 1)
+	
+	def tick(self, wdg, param):
+		self.queue_draw()
+		return 1
 	
 	def on_draw(self, widget, cr):
 		if not self.trk:
@@ -24,12 +34,13 @@ class TrackView(Gtk.DrawingArea):
 		cr.fill()
 		
 		cr.set_source_rgb(0, .8, 0)
-		cr.select_font_face("Roboto Mono", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL )
-		cr.set_font_size(12)
+		cr.select_font_face(pms.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+		cr.set_font_size(pms.seq_font_size)
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000")
-		
-		if w != (width + (self.padding * 2)):
-			self.set_size_request(len(self.trk) * (width + (self.padding * 2)) + self.padding * 2, ((height + (self.padding)) * self.trk.nrows) + self.padding)
+		self._width = len(self.trk) * (width + (self.padding * 2)) + self.padding * 2
+		self._height = ((height + (self.padding)) * self.trk.nrows) + self.padding
+		if w != self._width or h != self._height:
+			self.set_size_request(self._width, self._height)				
 		
 		for c in range(len(self.trk)):
 			for r in range(self.trk.nrows):

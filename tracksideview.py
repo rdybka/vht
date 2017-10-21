@@ -3,6 +3,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
 import cairo
 
+from pypms import pms
+
 class TrackSideView(Gtk.DrawingArea):
 	def __init__(self, seq):
 		Gtk.DrawingArea.__init__(self)
@@ -29,8 +31,8 @@ class TrackSideView(Gtk.DrawingArea):
 		cr.fill()
 		
 		cr.set_source_rgb(0, .8, 0)
-		cr.select_font_face("Roboto Mono", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL )
-		cr.set_font_size(12)
+		cr.select_font_face(pms.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD )
+		cr.set_font_size(pms.seq_font_size)
 		(x, y, width, height, dx, dy) = cr.text_extents("000")
 		
 		if w != (width + (self.padding * 2)):

@@ -60,16 +60,15 @@ class MainWin(Gtk.ApplicationWindow):
 		self._sequence_view = SequenceView(pms[0])
 		self._prop_view = PropView(self._sequence_view)
 
-		self._seq_scroll = Gtk.ScrolledWindow()
-		self._seq_scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-		sb = Gtk.Box()
-		sb.set_orientation(Gtk.Orientation.VERTICAL)
-		sb.pack_start(self._prop_view, False, True, 0)
-		sb.pack_start(self._sequence_view, True, True, 0)
-		self._seq_scroll.add_with_viewport(sb)
+		self._sequence_view_adj = self._sequence_view.get_hadjustment()
+		self._prop_view_adj = self._prop_view.get_hadjustment()
+
+		self._sequence_view_adj.connect("value-changed", self.on_seq_view_adj_changed)
+		self._prop_view_adj.connect("value-changed", self.on_prop_view_adj_changed)
 
 		self.vbox.pack_start(self.hbox, False, False, 0)
-		self.vbox.pack_start(self._seq_scroll, True, True, 0)
+		self.vbox.pack_start(self._prop_view, False, True, 0)
+		self.vbox.pack_start(self._sequence_view, True, True, 0)
 		self.vbox.set_orientation(Gtk.Orientation.VERTICAL)
 		
 		self.add(self.vbox)
@@ -78,7 +77,7 @@ class MainWin(Gtk.ApplicationWindow):
 
 		if pms.start_error:
 			dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
-				Gtk.ButtonsType.CANCEL, pms,start_error)
+				Gtk.ButtonsType.CANCEL, pms.start_error)
 
 			dialog.run()
 			dialog.destroy()
@@ -86,7 +85,7 @@ class MainWin(Gtk.ApplicationWindow):
 		self.add_tick_callback(self.tick)
 	
 	def tick(self, wdg, param):
-		self.time_display.set_markup("""<span font_desc="Roboto bold" font_family="monospace" foreground="black" size="x-large">%s</span>""" % self.pms.time)
+		self.time_display.set_markup("""<span font_desc="Roboto bold" font_family="monospace" size="x-large">%s</span>""" % self.pms.time)
 		self.time_display.queue_draw()
 		return 1
 
@@ -103,3 +102,11 @@ class MainWin(Gtk.ApplicationWindow):
 	
 	def on_bpm_changed(self, adj):
 		pms.bpm = int(adj.get_value())
+		
+	def on_seq_view_adj_changed(self, adj):
+		self._prop_view_adj.set_upper(adj.get_upper())
+		self._prop_view_adj.set_value(adj.get_value())
+	
+	def on_prop_view_adj_changed(self, adj):
+		self._sequence_view_adj.set_upper(adj.get_upper())
+		self._sequence_view_adj.set_value(adj.get_value())

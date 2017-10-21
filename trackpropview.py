@@ -6,13 +6,16 @@ import cairo
 from trackpropviewpopover import TrackPropViewPopover
 from sequencepropviewpopover import SequencePropViewPopover
 
-class TrackPropView(Gtk.DrawingArea):
-	def __init__(self, clear_popups, trk = None, seq = None, seqview = None, propview = None, index = -1):
-		Gtk.DrawingArea.__init__(self)
+from pypms import pms
 
-		self.connect("draw", self.on_draw);
+class TrackPropView(Gtk.DrawingArea):
+	def __init__(self, trk = None, seq = None, seqview = None, propview = None, index = -1):
+		Gtk.DrawingArea.__init__(self)
+		self.tick_ref = self.add_tick_callback(self.tick)
+		self.connect("draw", self.on_draw)
+		self.connect("realize", self.on_realize)
 		
-		self.clear_popups = clear_popups
+		self.clear_popups = pms.clear_popups
 				
 		self.set_events(Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK )
 		self.connect("button-press-event", self.on_click)
@@ -33,7 +36,10 @@ class TrackPropView(Gtk.DrawingArea):
 		self.index = index
 		self.padding = 3
 		self.button_rect = Gdk.Rectangle()
-
+	
+	def on_realize(self, wdg):
+		self.set_size_request(1, 1)
+	
 	def add_track(self):
 		port = 0
 		channel = 1
@@ -44,8 +50,7 @@ class TrackPropView(Gtk.DrawingArea):
 		trk = self.seq.add_track(port, channel)
 		self.seqview.add_track(trk)
 		self.propview.add_track(trk)
-
-	
+		
 	def del_track(self):
 		self.popover.popdown()
 		self.seqview.del_track(self.trk)
@@ -70,11 +75,13 @@ class TrackPropView(Gtk.DrawingArea):
 						self.popover.popup()
 						return
 		
-		self.popover.popdown()
-		
 	def on_click(self, widget, data):
 		pass 
-		
+	
+	def tick(self, wdg, param):
+		self.queue_draw()
+		return 1
+
 	def on_draw(self, widget, cr):
 		w = widget.get_allocated_width()
 		h = widget.get_allocated_height()
@@ -83,8 +90,8 @@ class TrackPropView(Gtk.DrawingArea):
 		cr.fill()
 
 		cr.set_source_rgb(0, .8, 0)
-		cr.select_font_face("Roboto Mono", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL )
-		cr.set_font_size(12)
+		cr.select_font_face(pms.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL )
+		cr.set_font_size(pms.seq_font_size)
 				
 		if self.trk == None:
 			(x, y, width, height, dx, dy) = cr.text_extents("000")
@@ -108,9 +115,10 @@ class TrackPropView(Gtk.DrawingArea):
 				return
 
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000")
-		
-		if w != (width + (self.padding * 2)):
-			self.set_size_request(len(self.trk) * (width + (self.padding * 2)) + self.padding * 2, (height + (self.padding)) * 2 + self.padding)
+		self._width = len(self.trk) * (width + (self.padding * 2)) + self.padding * 2
+		self._height = (height + (self.padding)) * 2 + self.padding
+		if w != self._width or h != self._height:
+			self.set_size_request(self._width, self._height)	
 		
 		cr.set_source_rgb(0, 1, 0)		
 		cr.set_source_rgb(0, .7, 0)

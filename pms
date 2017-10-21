@@ -49,16 +49,23 @@ class PMSApp(Gtk.Application):
 		win.show_all()
 
 if __name__ == "__main__":
-	app = PMSApp()
-
 	pms.start_error = None
 	if pms.jack_start() != 0:
 		pms.start_error = "you will need JACK for this"
 
-	randomcomposer.muzakize()
+	# move this stuff to proper configuration
+	pms.seq_font = "Roboto Mono"
+	pms.seq_font_size = 12
 
-	app.run(sys.argv)
-	
+	try:
+		app = PMSApp()
+		randomcomposer.muzakize()
+
+		app.run(sys.argv)
+	except:
+		pms.jack_stop()	
+		sys.exit()
+
 	# is this reliable? should we wait for module.mute == 0?
 	pms.play = False
 	
