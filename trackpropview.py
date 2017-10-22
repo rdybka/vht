@@ -15,12 +15,20 @@ class TrackPropView(Gtk.DrawingArea):
 
 		self.connect("draw", self.on_draw)
 		self.connect("realize", self.on_realize)
-		
+
+		self.seq = seq
+		self.trk = trk
+		self.propview = propview
+		self.seqview = seqview
+		self.padding = 3
+		self.button_rect = Gdk.Rectangle()
+
 		self.clear_popups = pms.clear_popups
 				
 		self.set_events(Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK )
 		self.connect("button-press-event", self.on_click)
 		self.connect("motion-notify-event", self.on_mouse_move)
+
 		if trk:
 			self.popover = TrackPropViewPopover(self, trk)
 		else:
@@ -29,13 +37,6 @@ class TrackPropView(Gtk.DrawingArea):
 		self.popover.set_position(Gtk.PositionType.BOTTOM)
 		self.popover.set_modal(False)
 		self.popover.set_transitions_enabled(False)
-		
-		self.seq = seq
-		self.trk = trk
-		self.propview = propview
-		self.seqview = seqview
-		self.padding = 3
-		self.button_rect = Gdk.Rectangle()
 	
 	def on_realize(self, wdg):
 		self.set_size_request(1, 1)
@@ -142,6 +143,8 @@ class TrackPropView(Gtk.DrawingArea):
 		self.popover.set_pointing_to(self.button_rect)
 	
 		cr.set_source_rgb(0, .5, 0)
-		cr.move_to(len(self.trk) * (width + (self.padding * 2)) + self.padding, self.padding)
+		cr.move_to((width + (self.padding * 2)) + self.padding, self.padding)
+		cr.line_to((width + (self.padding * 2)) + self.padding, height - self.padding)
+		cr.line_to(len(self.trk) * (width + (self.padding * 2)) + self.padding, ((height + (self.padding))) - self.padding)
 		cr.line_to(len(self.trk) * (width + (self.padding * 2)) + self.padding, ((height + (self.padding)) * 2) - self.padding)
 		cr.stroke()

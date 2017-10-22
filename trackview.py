@@ -15,6 +15,7 @@ class TrackView(Gtk.DrawingArea):
 		self.trk = trk
 		self.highlight = 4
 		self.padding = 3
+		self.spacing = 1.0
 	
 	def on_realize(self, wdg):
 		self.set_size_request(1, 1)
@@ -33,8 +34,10 @@ class TrackView(Gtk.DrawingArea):
 		cr.select_font_face(pms.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
 		cr.set_font_size(pms.seq_font_size)
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000")
+	
 		self._width = len(self.trk) * (width + (self.padding * 2)) + self.padding * 2
-		self._height = ((height + (self.padding)) * self.trk.nrows) + self.padding
+		self._height = ((height + (self.padding)) * (self.trk.nrows * self.spacing)) + self.padding
+		
 		if w != self._width or h != self._height:
 			self.set_size_request(self._width, self._height)				
 		
@@ -44,8 +47,10 @@ class TrackView(Gtk.DrawingArea):
 					cr.set_source_rgb(0, 1, 0)		
 				else:
 					cr.set_source_rgb(0, .7, 0)
-					
-				cr.move_to(self.padding + c * (self.padding * 2 + width), (r + 1) * (height + self.padding))
+		
+				yy = ((r * self.spacing)+ 1) * (height + self.padding)
+				
+				cr.move_to(self.padding + c * (self.padding * 2 + width), yy)
 				
 				rw = self.trk[c][r]
 								
@@ -57,12 +62,13 @@ class TrackView(Gtk.DrawingArea):
 
 		pos = self.trk.pos
 		if pos != 0.0:
-			yy = int(pos * (height + self.padding))
+			yy = pos * (height + self.padding)
+			yy *= self.spacing
 			cr.move_to(0, yy)
 			cr.line_to(w, yy)
-			cr.stroke()					
+			cr.stroke()
 
 		cr.set_source_rgb(0, .5, 0)
 		cr.move_to(len(self.trk) * (width + (self.padding * 2)) + self.padding, self.padding)
-		cr.line_to(len(self.trk) * (width + (self.padding * 2)) + self.padding, ((height + (self.padding)) * self.trk.nrows) - self.padding)
+		cr.line_to(len(self.trk) * (width + (self.padding * 2)) + self.padding, ((height + (self.padding)) * (self.trk.nrows * self.spacing)) - self.padding)
 		cr.stroke()

@@ -52,14 +52,29 @@ class SequenceView(Gtk.ScrolledWindow):
 				wdg.destroy()
 				return
 	
-	#self._track_box.reorder_child(wdg, wdg.trk.index  1)
-		
 	def build(self):
 		for trk in self.seq:
 			self.add_track(trk)
 	
+	def recalculate_row_spacing(self):
+		minspc = 1.0
+		
+		for wdg in self._track_box.get_children():
+			if wdg.trk is None:
+				spc = 1.0
+			else:
+				spc = wdg.trk.nsrows / wdg.trk.nrows
+			wdg.spacing = spc
+			if spc < minspc:
+				minspc = spc
+				
+		if minspc < 1.0:
+			for wdg in self._track_box.get_children():
+				wdg.spacing /= minspc
+	
 	def tick(self, wdg, param):
-		for wdg in self._track_box.get_children()[1:]:
+		self.recalculate_row_spacing()
+		for wdg in self._track_box.get_children():
 				wdg.queue_draw()
 		
 		return 1

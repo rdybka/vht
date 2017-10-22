@@ -57,9 +57,10 @@ if __name__ == "__main__":
 	pms.seq_font = "Roboto Mono"
 	pms.seq_font_size = 12
 
+	randomcomposer.muzakize()
+
 	try:
 		app = PMSApp()
-		randomcomposer.muzakize()
 
 		app.run(sys.argv)
 	except:

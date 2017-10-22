@@ -110,12 +110,14 @@ class TrackPropViewPopover(Gtk.Popover):
 			lbl.set_xalign(1.0)
 			
 			self.nrows_check_button = Gtk.CheckButton()
+			self.nrows_check_button.connect("toggled", self.on_nrows_toggled)
+
 			
 			self.grid.attach(lbl, 0, 4, 1, 1)
 			self.grid.attach(self.nrows_button, 1, 4, 2, 1)
 			self.grid.attach(self.nrows_check_button, 3, 4, 1, 1)
 			
-			self.nsrows_adj = Gtk.Adjustment(1, 0, 256, 1.0, 1.0)
+			self.nsrows_adj = Gtk.Adjustment(1, 0, self.parent.seq.length, 1.0, 1.0)
 			self.nsrows_button = Gtk.SpinButton()
 			self.nsrows_button.set_adjustment(self.nsrows_adj)
 			self.nsrows_adj.set_value(trk.nsrows)
@@ -125,11 +127,17 @@ class TrackPropViewPopover(Gtk.Popover):
 			lbl.set_xalign(1.0)
 			
 			self.nsrows_check_button = Gtk.CheckButton()
+			self.nsrows_check_button.connect("toggled", self.on_nsrows_toggled)
 			
 			self.grid.attach(lbl, 0, 5, 1, 1)
 			self.grid.attach(self.nsrows_button, 1, 5, 2, 1)
 			self.grid.attach(self.nsrows_check_button, 3, 5, 1, 1)
-						
+
+			self.nrows_button.set_sensitive(False)
+			self.nsrows_button.set_sensitive(False)
+			self.nsrows_check_button.set_sensitive(False)
+			
+
 			self.grid.show_all()
 			self.add(self.grid)
 
@@ -163,6 +171,24 @@ class TrackPropViewPopover(Gtk.Popover):
 
 	def on_nsrows_changed(self, adj):
 		self.trk.nsrows = int(adj.get_value())
+	
+	def on_nrows_toggled(self, wdg):
+		if (wdg.get_active()):
+			self.nrows_button.set_sensitive(True)
+			self.nsrows_check_button.set_sensitive(True)			
+		else:
+			self.nrows_button.set_sensitive(False)
+			self.nsrows_button.set_sensitive(False)
+			self.nsrows_check_button.set_sensitive(False)
+			self.nrows_adj.set_value(self.parent.seq.length)
+			self.nsrows_adj.set_value(self.parent.seq.length)
+		
+	def on_nsrows_toggled(self, wdg):
+		if (wdg.get_active()):
+			self.nsrows_button.set_sensitive(True)
+		else:
+			self.nsrows_button.set_sensitive(False)
+			self.nsrows_adj.set_value(self.parent.seq.length)
 
 	def on_move_left_button_clicked(self, switch):
 		self.parent.move_left()

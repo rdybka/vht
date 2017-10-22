@@ -14,11 +14,7 @@ class TrackSideView(Gtk.DrawingArea):
 		self.seq = seq
 		self.highlight = 4
 		self.padding = 3
-		self.add_tick_callback(self.tick)
-	
-	def tick(self, wdg, param):
-		self.queue_draw()
-		return 1
+		self.spacing = 1.0
 		
 	def on_realize(self, widget):
 		pass
@@ -36,15 +32,16 @@ class TrackSideView(Gtk.DrawingArea):
 		(x, y, width, height, dx, dy) = cr.text_extents("000")
 		
 		if w != (width + (self.padding * 2)):
-			self.set_size_request(width + (self.padding * 3) + self.padding, ((height + (self.padding)) * self.seq.length) + self.padding)
+			self.set_size_request(width + (self.padding * 3) + self.padding, ((height + (self.padding)) * (self.seq.length * self.spacing)) + self.padding)
 		
 		for a in range(self.seq.length):
 			if (a) % self.highlight == 0:
 				cr.set_source_rgb(0, 1, 0)		
 			else:
 				cr.set_source_rgb(0, .7, 0)
-					
-			cr.move_to(self.padding, (a + 1) * (height + self.padding))	
+
+			yy = ((a * self.spacing) + 1) * (height + self.padding)
+			cr.move_to(self.padding, yy)	
 			cr.show_text("%03d" % a)
 
 		pos = self.seq.pos
@@ -56,6 +53,6 @@ class TrackSideView(Gtk.DrawingArea):
 		
 		cr.set_source_rgb(0, .5, 0)
 		cr.move_to(width + (self.padding * 2) + self.padding, self.padding)
-		cr.line_to(width + (self.padding * 2) + self.padding, ((height + (self.padding)) * self.seq.length) - self.padding)
+		cr.line_to(width + (self.padding * 2) + self.padding, ((height + (self.padding)) * self.seq.length * self.spacing) - self.padding)
 		cr.stroke()
 		
