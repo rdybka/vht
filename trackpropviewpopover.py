@@ -64,7 +64,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			icon = Gio.ThemedIcon(name="go-first")
 			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
 			button.add(image)
-			button.connect("clicked", self.on_move_left_button_clicked)
+			button.connect("clicked", self.on_move_first_button_clicked)
 			button.set_tooltip_text("ctrl left")
 			self.grid.attach(button, 0, 1, 1, 1)
 
@@ -72,7 +72,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			icon = Gio.ThemedIcon(name="go-last")
 			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
 			button.add(image)
-			button.connect("clicked", self.on_move_right_button_clicked)
+			button.connect("clicked", self.on_move_last_button_clicked)
 			button.set_tooltip_text("ctrl right")
 			self.grid.attach(button, 3, 1, 1, 1)
 
@@ -170,3 +170,9 @@ class TrackPropViewPopover(Gtk.Popover):
 	def on_move_right_button_clicked(self, switch):
 		self.parent.move_right()
 		
+	def on_move_first_button_clicked(self, switch):
+		self.parent.move_first()
+		
+	def on_move_last_button_clicked(self, switch):
+		self.parent.move_last()
+	

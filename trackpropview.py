@@ -58,15 +58,17 @@ class TrackPropView(Gtk.DrawingArea):
 		self.destroy()
 		
 	def move_left(self):
-		self.seq.swap_track(self.trk.index, self.trk.index - 1)
-		self.seqview.update_order()
-		self.propview.update_order()
+		self.propview.move_left(self.trk)
 
 	def move_right(self):
-		self.seq.swap_track(self.trk.index, self.trk.index + 1)
-		self.seqview.reorder()
-		self.propview.reorder()
-				
+		self.propview.move_right(self.trk)
+	
+	def move_first(self):
+		self.propview.move_first(self.trk)
+
+	def move_last(self):
+		self.propview.move_last(self.trk)
+	
 	def on_mouse_move(self, widget, data):
 		if data.x >= self.button_rect.x:
 			if data.x <= self.button_rect.x + self.button_rect.width:
