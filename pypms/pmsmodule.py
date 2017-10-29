@@ -92,6 +92,10 @@ class PMSModule(Iterable):
 		return libpms.get_jack_error()
 	
 	@property
+	def playing(self):
+		return libpms.module_is_playing()
+	
+	@property
 	def play(self):
 		return libpms.module_is_playing()
 		

@@ -86,7 +86,6 @@ class MainWin(Gtk.ApplicationWindow):
 	
 	def tick(self, wdg, param):
 		self.time_display.set_markup("""<span font_desc="Roboto bold" font_family="monospace" size="x-large">%s</span>""" % self.pms.time)
-		self.time_display.queue_draw()
 		return 1
 
 	def on_start_button_activate(self, switch):

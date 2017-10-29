@@ -9,14 +9,15 @@ from pypms import pms
 
 class SequenceView(Gtk.ScrolledWindow):
 	def __init__(self, seq):
-		Gtk.ScrolledWindow.__init__(self)
+		Gtk.Overlay.__init__(self)
 		self.set_events(Gdk.EventMask.POINTER_MOTION_MASK | 
 			Gdk.EventMask.BUTTON_PRESS_MASK |
 			Gdk.EventMask.BUTTON_RELEASE_MASK)
-		
+
+		self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+				
 		self.connect("draw", self.on_draw);
 		self.connect("motion-notify-event", self.on_motion);
-		self.connect("button-press-event", self.on_button);
 		
 		self.add_tick_callback(self.tick)
 	
@@ -29,16 +30,13 @@ class SequenceView(Gtk.ScrolledWindow):
 		self._track_box.set_spacing(0)
 		self._track_box.pack_start(TrackSideView(self.seq), False, True, 0)		
 		self.build()
-		
-		self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-		self.add_with_viewport(self._track_box)
+
 		self._track_box.show_all()
-	
+
+		self.add_with_viewport(self._track_box)
+
 	def on_motion(self, widget, event):
 		pms.clear_popups()
-	
-	def on_button(self, widget, event):
-		pass
 	
 	def add_track(self, trk):
 		t = TrackView(trk)
@@ -52,6 +50,14 @@ class SequenceView(Gtk.ScrolledWindow):
 				wdg.destroy()
 				return
 	
+	def redraw_track(self, trk = None):
+		for wdg in self._track_box.get_children()[1:]:
+			if not trk or wdg.trk.index == trk.index:
+				wdg.queue_resize()
+				wdg.redraw()
+				wdg.queue_draw()
+				return
+				
 	def build(self):
 		for trk in self.seq:
 			self.add_track(trk)
@@ -60,7 +66,7 @@ class SequenceView(Gtk.ScrolledWindow):
 		minspc = 1.0
 		
 		for wdg in self._track_box.get_children():
-			if wdg.trk is None:
+			if isinstance(wdg, TrackSideView):
 				spc = 1.0
 			else:
 				spc = wdg.trk.nsrows / wdg.trk.nrows
@@ -71,25 +77,24 @@ class SequenceView(Gtk.ScrolledWindow):
 		if minspc < 1.0:
 			for wdg in self._track_box.get_children():
 				wdg.spacing /= minspc
+		
+		for wdg in self._track_box.get_children():
+			wdg.redraw()
+		
+		self.queue_draw()
 	
 	def tick(self, wdg, param):
-		self.recalculate_row_spacing()
+		#self.recalculate_row_spacing()
 		for wdg in self._track_box.get_children():
-				wdg.queue_draw()
-		
+			wdg.tick()
+			wdg.queue_draw()
 		return 1
 	
 	def on_draw(self, widget, cr):
 		w = widget.get_allocated_width()
 		h = widget.get_allocated_height()
 		
-		if not self.def_new_track_width:
-			cr.select_font_face("Roboto Mono", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL )
-			cr.set_font_size(12)
-			(x, y, width, height, dx, dy) = cr.text_extents("000 000")
-			self.def_new_track_width = width + 12
-		
-		cr.set_source_rgb(0,.3,0)
+		cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
 

@@ -11,8 +11,6 @@ class PropView(Gtk.ScrolledWindow):
 		self.connect("draw", self.on_draw);
 		self.connect("leave-notify-event", self.on_leave)				
 		
-		self.add_tick_callback(self.tick)
-		
 		self.seqview = seqview
 		self.seq = seqview.seq;
 		
@@ -28,12 +26,6 @@ class PropView(Gtk.ScrolledWindow):
 		self.add_with_viewport(self._track_box)
 		self._track_box.show_all()
 			
-	def tick(self, wdg, param):
-		for wdg in self._track_box.get_children()[1:]:
-				wdg.queue_draw()
-			
-		return 1
-
 	def del_track(self, trk):
 		i = 0
 		for wdg in self._track_box.get_children()[1:]:
@@ -88,9 +80,7 @@ class PropView(Gtk.ScrolledWindow):
 		self.move_track(trk, trk.index * -1)
 
 	def move_last(self, trk):
-		self.move_track(trk, len(self.seq) - trk.index)
-
-	#self._track_box.reorder_child(wdg, wdg.trk.index  1)
+		self.move_track(trk, (len(self.seq) - trk.index) - 1)
 
 	def build(self):
 		for trk in self.seq:
@@ -103,7 +93,7 @@ class PropView(Gtk.ScrolledWindow):
 	def on_draw(self, widget, cr):
 		w = widget.get_allocated_width()
 		h = widget.get_allocated_height()
-		cr.set_source_rgb(0,.3,0)
+		cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
 		

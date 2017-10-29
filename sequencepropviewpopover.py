@@ -40,6 +40,9 @@ class SequencePropViewPopover(Gtk.Popover):
 
 	def on_length_changed(self, adj):
 		self.seq.length = int(adj.get_value())
+		self.parent.seqview.recalculate_row_spacing()
+		self.parent.seqview.redraw_track()
+		self.parent.seqview.queue_draw()
 
 	def on_leave(self, wdg, prm):
 		if prm.detail == Gdk.NotifyType.NONLINEAR:

@@ -28,8 +28,7 @@ from pypms import pms
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gio
-from gi.repository import Gtk
+from gi.repository import GLib, Gtk, Gio
 
 from mainwin import *
 import randomcomposer
@@ -48,16 +47,33 @@ class PMSApp(Gtk.Application):
 		self.add_window(win)
 		win.show_all()
 
+def log_func(data):
+	raise MemoryError("gotcha!")
+
+class cfg:
+	pass
+
 if __name__ == "__main__":
 	pms.start_error = None
 	if pms.jack_start() != 0:
 		pms.start_error = "you will need JACK for this"
 
 	# move this stuff to proper configuration
-	pms.seq_font = "Roboto Mono"
-	pms.seq_font_size = 12
-
+	pms.cfg = cfg()
+	pms.cfg.seq_font = "Roboto Mono"
+	pms.cfg.seq_font_size = 12
+	pms.cfg.highlight = 4
+	pms.cfg.padding = 3
+	pms.cfg.colour = (1.0, 1.0, 1.0)
+	pms.cfg.intensity_background = .2
+	pms.cfg.intensity_txt = .7
+	pms.cfg.intensity_txt_highlight = 1.0
+	pms.cfg.intensity_lines = .5
+	pms.cfg.pointer_height = 8
+	
 	randomcomposer.muzakize()
+
+	#GLib.log_set_handler("", GLib.LogLevelFlags.LEVEL_MASK, log_func, None)
 
 	try:
 		app = PMSApp()

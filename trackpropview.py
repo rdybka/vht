@@ -51,6 +51,7 @@ class TrackPropView(Gtk.DrawingArea):
 		trk = self.seq.add_track(port, channel)
 		self.seqview.add_track(trk)
 		self.propview.add_track(trk)
+		self.seqview.redraw_track(trk)
 	
 	def del_track(self):
 		self.popover.popdown()
@@ -85,13 +86,12 @@ class TrackPropView(Gtk.DrawingArea):
 	def on_draw(self, widget, cr):
 		w = widget.get_allocated_width()
 		h = widget.get_allocated_height()
-		cr.set_source_rgb(0,.3,0)
+		cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
 
-		cr.set_source_rgb(0, .8, 0)
-		cr.select_font_face(pms.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL )
-		cr.set_font_size(pms.seq_font_size)
+		cr.select_font_face(pms.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL )
+		cr.set_font_size(pms.cfg.seq_font_size)
 				
 		if self.trk == None:
 			(x, y, width, height, dx, dy) = cr.text_extents("000")
@@ -99,11 +99,12 @@ class TrackPropView(Gtk.DrawingArea):
 			if w != (width + (self.padding * 2)):
 				self.set_size_request(width + (self.padding * 3) + self.padding, ((height + (self.padding)) * 2) + self.padding)
 			
-				cr.set_source_rgb(0, .5, 0)
+				cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
 				cr.move_to(width + (self.padding * 2) + self.padding, self.padding)
 				cr.line_to(width + (self.padding * 2) + self.padding, ((height + (self.padding)) * 2) - self.padding)
 				cr.stroke()
 
+				cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
 				cr.move_to(self.padding, 2 * (height + self.padding))
 				cr.show_text("***")
 				
@@ -120,8 +121,7 @@ class TrackPropView(Gtk.DrawingArea):
 		if w != self._width or h != self._height:
 			self.set_size_request(self._width, self._height)	
 		
-		cr.set_source_rgb(0, 1, 0)		
-		cr.set_source_rgb(0, .7, 0)
+		cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
 		cr.move_to(self.padding, height + self.padding)
 		cr.show_text("p%02d c%02d" % (self.trk.port, self.trk.channel))
 
@@ -142,7 +142,7 @@ class TrackPropView(Gtk.DrawingArea):
 		self.button_rect.width = width2
 		self.popover.set_pointing_to(self.button_rect)
 	
-		cr.set_source_rgb(0, .5, 0)
+		cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
 		cr.move_to((width + (self.padding * 2)) + self.padding, self.padding)
 		cr.line_to((width + (self.padding * 2)) + self.padding, height - self.padding)
 		cr.line_to(len(self.trk) * (width + (self.padding * 2)) + self.padding, ((height + (self.padding))) - self.padding)
