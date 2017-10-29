@@ -20,11 +20,9 @@ class TrackView(Gtk.Overlay):
 		self.highlight = pms.cfg.highlight
 		self.padding = pms.cfg.padding
 		self.txt_width = 0
-
+		self.txt_height = 0;
 		self.spacing = 1.0
 	
-		self._width = 0
-		self._txt_height = 0
 		self._surface = None
 		self._context = None
 
@@ -68,31 +66,33 @@ class TrackView(Gtk.Overlay):
 		w = self.get_allocated_width()
 		h = self.get_allocated_height()
 
-		cr.select_font_face(pms.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+		cr.select_font_face(pms.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
 		cr.set_font_size(pms.cfg.seq_font_size)
-		(x, y, width, height, dx, dy) = cr.text_extents("000 000")
+		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")
 		
-		self._txt_height = height
-		self.txt_width = width
-		self._width = int(len(self.trk) * (width + (self.padding * 2)) + self.padding * 2)
-		self._height = int(((height + (self.padding)) * (self.trk.nrows * self.spacing)) + self.padding)
+		self.txt_height = height * self.spacing
+		self.txt_width = dx
+		self._height = self.txt_height * self.trk.nrows
+	
+		self.set_size_request(self.txt_width * len(self.trk), self._height)
 		
-		self.set_size_request(self._width, self._height)
-				
 		cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
 		
 		for c in range(len(self.trk)):
+			margin = " "
+			if c == len(self.trk) - 1:
+				margin = "|"
+				
 			for r in range(self.trk.nrows):
 				if (r) % self.highlight == 0:
 					cr.set_source_rgb(*(col * pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))
 				else:
 					cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
 		
-				yy = ((r * self.spacing)+ 1) * (height + self.padding)
-				
-				cr.move_to(self.padding + c * (self.padding * 2 + width), yy)
+				yy = ((r * self.spacing) + 1) * (height)
+				cr.move_to((c * self.txt_width) + x, yy)	
 				
 				rw = self.trk[c][r]
 								
@@ -100,17 +100,18 @@ class TrackView(Gtk.Overlay):
 					cr.show_text("%3s %03d" % (str(rw), rw.velocity))
 					
 				if rw.type == 0: #none
-					cr.show_text("---")
+					cr.show_text("---    ")
+			
+				if len(margin):
+					cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
+					cr.move_to((c * self.txt_width) + x, yy)
+					cr.show_text("       %c" % (margin))
 
-		cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
-		cr.move_to(int(len(self.trk)) * (width + (self.padding * 2)) + self.padding, self.padding)
-		cr.line_to(int(len(self.trk)) * (width + (self.padding * 2)) + self.padding, ((height + (self.padding)) * self.trk.nrows * self.spacing) - self.padding)
-		cr.stroke()
+		self._ptr.height = pms.cfg.pointer_height
 
-	
 	def on_draw(self, widget, cr):
 		w = self.get_allocated_width()
-		if self._width != w:
+		if self.txt_width != w:
 			self.redraw()
 		
 		cr.set_source_surface(self._surface, 0, 0)

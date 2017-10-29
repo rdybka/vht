@@ -60,20 +60,20 @@ if __name__ == "__main__":
 
 	# move this stuff to proper configuration
 	pms.cfg = cfg()
-	pms.cfg.seq_font = "Roboto Mono"
-	pms.cfg.seq_font_size = 12
+	pms.cfg.seq_font = "Ubuntu Mono"
+	pms.cfg.seq_font = "Roboto Mono Medium"
+	pms.cfg.seq_font_size = 24
 	pms.cfg.highlight = 4
 	pms.cfg.padding = 3
-	pms.cfg.colour = (1.0, 1.0, 1.0)
-	pms.cfg.intensity_background = .2
+	pms.cfg.colour = (.7, 1.0, .3)
+	pms.cfg.intensity_background = .3
 	pms.cfg.intensity_txt = .7
 	pms.cfg.intensity_txt_highlight = 1.0
-	pms.cfg.intensity_lines = .5
-	pms.cfg.pointer_height = 8
+	pms.cfg.intensity_lines = .6
+	pms.cfg.pointer_height = .7 * 24
+	pms.cfg.pointer_opacity = .5
 	
 	randomcomposer.muzakize()
-
-	#GLib.log_set_handler("", GLib.LogLevelFlags.LEVEL_MASK, log_func, None)
 
 	try:
 		app = PMSApp()

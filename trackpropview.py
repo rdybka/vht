@@ -57,6 +57,7 @@ class TrackPropView(Gtk.DrawingArea):
 		self.popover.popdown()
 		self.seqview.del_track(self.trk)
 		self.propview.del_track(self.trk)
+		self.seqview.redraw_track(None)
 		self.destroy()
 		
 	def move_left(self):
@@ -90,61 +91,87 @@ class TrackPropView(Gtk.DrawingArea):
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
 
-		cr.select_font_face(pms.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL )
+		cr.select_font_face(pms.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
 		cr.set_font_size(pms.cfg.seq_font_size)
-				
-		if self.trk == None:
-			(x, y, width, height, dx, dy) = cr.text_extents("000")
-		
-			if w != (width + (self.padding * 2)):
-				self.set_size_request(width + (self.padding * 3) + self.padding, ((height + (self.padding)) * 2) + self.padding)
 			
-				cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
-				cr.move_to(width + (self.padding * 2) + self.padding, self.padding)
-				cr.line_to(width + (self.padding * 2) + self.padding, ((height + (self.padding)) * 2) - self.padding)
-				cr.stroke()
-
-				cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
-				cr.move_to(self.padding, 2 * (height + self.padding))
-				cr.show_text("***")
+		if self.trk == None:
+			(x, y, width, height, dx, dy) = cr.text_extents("000|")
+			self._txt_height = dy
+			self.txt_width = dx
+			self._width = dx
+			self._height = int(height * 2)
 				
-				self.button_rect.width = width
-				self.button_rect.height = height + 5
-				self.button_rect.x = self.padding;
-				self.button_rect.y = height + self.padding
-				self.popover.set_pointing_to(self.button_rect)
-				return
+			self.set_size_request(self._width, self._height)
+				
+			cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
+			cr.rectangle(0, 0, w, h)
+			cr.fill()			
+				
+			cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
+			cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))			
+			yy = height
+			cr.move_to(x, yy)	
+			cr.show_text("   |")
+			yy += height
+			cr.move_to(x, yy)	
+			cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
+			cr.show_text("   |")
+			cr.move_to(x, yy)		
+			cr.set_source_rgb(*(col * pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))
+			cr.show_text("***")
+				
+			self.button_rect.width = width
+			self.button_rect.height = height + 5
+			self.button_rect.x = x;
+			self.button_rect.y = height
+			self.popover.set_pointing_to(self.button_rect)
+			return
 
-		(x, y, width, height, dx, dy) = cr.text_extents("000 000")
-		self._width = len(self.trk) * (width + (self.padding * 2)) + self.padding * 2
-		self._height = (height + (self.padding)) * 2 + self.padding
-		if w != self._width or h != self._height:
-			self.set_size_request(self._width, self._height)	
+		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")
 		
+		self._txt_height = dy
+		self.txt_width = dx * len(self.trk)
+		self._height = int(height * 2)
+				
+		self.set_size_request(self.txt_width, self._height)
+				
+		cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
+		cr.rectangle(0, 0, w, h)
+		cr.fill()			
+				
 		cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
-		cr.move_to(self.padding, height + self.padding)
+			
+		yy = height
+		cr.move_to(x, yy)	
 		cr.show_text("p%02d c%02d" % (self.trk.port, self.trk.channel))
-
-		# ## button
-		(x, y, width2, height2, dx, dy) = cr.text_extents("***")
-		cr.move_to(self.padding + len(self.trk) * (self.padding * 2 + width) - (width2 + self.padding), 2 * (height + self.padding))
 		
-		self.button_rect.width = width2
-		self.button_rect.height = height2 + 5
-		self.button_rect.x = self.padding + len(self.trk) * (self.padding * 2 + width) - (width2 + self.padding)
-		self.button_rect.y = 2 * (height + self.padding) - self.button_rect.height
-		
-		cr.move_to(self.button_rect.x, self.button_rect.y + self.button_rect.height)
-		cr.show_text("***")
-		
-		(x, y, width2, height2, dx, dy) = cr.text_extents("***")
-
-		self.button_rect.width = width2
+		self.button_rect.width = (dx / 8.0) * 3.0
+		self.button_rect.height = height
+				
+		self.button_rect.x = x + (dx * (len(self.trk) - 1) + dx / 2)
+		self.button_rect.y = height
 		self.popover.set_pointing_to(self.button_rect)
-	
+		
+		for l in range(len(self.trk) - 2):
+			cr.move_to(x + (dx) * (l + 1), yy)	
+			cr.show_text("--------")
+
+		if len(self.trk) > 1:
+			cr.move_to(x + (dx) * (len(self.trk) -1), yy)	
+			cr.show_text("-------")
+
+		# *** button
 		cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
-		cr.move_to((width + (self.padding * 2)) + self.padding, self.padding)
-		cr.line_to((width + (self.padding * 2)) + self.padding, height - self.padding)
-		cr.line_to(len(self.trk) * (width + (self.padding * 2)) + self.padding, ((height + (self.padding))) - self.padding)
-		cr.line_to(len(self.trk) * (width + (self.padding * 2)) + self.padding, ((height + (self.padding)) * 2) - self.padding)
-		cr.stroke()
+		cr.move_to(x + (dx) * (len(self.trk) - 1), yy)	
+		cr.show_text("       +")
+		yy += height
+		cr.move_to(x + (dx) * (len(self.trk) - 1), yy)	
+		cr.show_text("       |")
+	
+		cr.set_source_rgb(*(col * pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))
+		cr.move_to(x + (dx) * (len(self.trk) - 1), yy)	
+		cr.show_text("    ***")
+		
+		
+		
+

@@ -27,7 +27,7 @@ class TrackViewPointer(Gtk.DrawingArea):
 
 		self._surface = None
 		self._context = None
-		self.set_opacity(.5)
+		self.set_opacity(pms.cfg.pointer_opacity)
 		
 	def __del__(self):
 		if self._surface:
@@ -54,7 +54,7 @@ class TrackViewPointer(Gtk.DrawingArea):
 		
 		self.set_margin_top(0)
 		self.set_margin_bottom(0)
-		y = (pos * self._parent.spacing) * (self._parent._txt_height + self._parent.padding)
+		y = pos * self._parent.txt_height
 		y -= self.height / 2
 			
 		yy = h - (y + self.height)
@@ -83,7 +83,7 @@ class TrackViewPointer(Gtk.DrawingArea):
 
 		cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
 
-		cr.rectangle(0, 0, w, self.height)
+		cr.rectangle(0, 0, w, self.height + 5)
 		cr.fill()
 
 		r = int(self.trk.pos)
@@ -96,7 +96,7 @@ class TrackViewPointer(Gtk.DrawingArea):
 			cr.set_source_rgb(*(col * i for col in pms.cfg.colour))
 		
 			x = 0
-			xx = self._parent.txt_width + self.padding * 2
+			xx = (self._parent.txt_width / 4.0) * 3.2
 			
 			cr.rectangle(x, 0, xx, self.height + 5)
 			cr.fill()
@@ -119,13 +119,9 @@ class TrackViewPointer(Gtk.DrawingArea):
 			
 			cr.set_source_rgb(*(col * i for col in pms.cfg.colour))
 			
-			x = self.padding + c * (self.padding * 2 + self._parent.txt_width)
-			xx = self._parent.txt_width + self.padding
+			x = c * self._parent.txt_width
+			xx = (self._parent.txt_width / 8.0) * 7.2
 			
-			if c == 0:
-				x = 0
-				xx+=self.padding
-							
 			cr.rectangle(x, 0, xx, self.height + 5)
 			cr.fill()
 

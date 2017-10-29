@@ -59,6 +59,7 @@ class MainWin(Gtk.ApplicationWindow):
 		
 		self._sequence_view = SequenceView(pms[0])
 		self._prop_view = PropView(self._sequence_view)
+		self._sequence_view.prop_view = self._prop_view
 
 		self._sequence_view_adj = self._sequence_view.get_hadjustment()
 		self._prop_view_adj = self._prop_view.get_hadjustment()

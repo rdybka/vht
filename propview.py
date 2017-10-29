@@ -97,4 +97,7 @@ class PropView(Gtk.ScrolledWindow):
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
 		
+		for wdg in self._track_box.get_children():
+			wdg.queue_draw()
+		
 		super()

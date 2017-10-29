@@ -30,6 +30,7 @@ class TrackSideView(Gtk.Overlay):
 	
 		self._width = 0
 		self.txt_width = 0
+		self.txt_heigth = 0
 		self._surface = None
 		self._context = None
 
@@ -73,37 +74,36 @@ class TrackSideView(Gtk.Overlay):
 		w = self.get_allocated_width()
 		h = self.get_allocated_height()
 
-		cr.select_font_face(pms.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+		cr.select_font_face(pms.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
 		cr.set_font_size(pms.cfg.seq_font_size)
-		(x, y, width, height, dx, dy) = cr.text_extents("000")
+		(x, y, width, height, dx, dy) = cr.text_extents("000|")
 		
-		self._txt_height = height
-		self.txt_width = width
-		self._width = (width + (self.padding * 2)) + self.padding * 2
-		self._height = int(((height + (self.padding)) * (self.seq.length * self.spacing)) + self.padding)
-		
-		self.set_size_request(self._width, self._height)
+		self.txt_height = height * self.spacing
+		self.txt_width = dx
 				
+		self.set_size_request(dx, (self.txt_height * self.seq.length) + 5)
+		height *= self.spacing
+
 		cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
 		
-
 		for a in range(self.seq.length):
 			if (a) % self.highlight == 0:
 				cr.set_source_rgb(*(col * pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))
 			else:
 				cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
 
-			yy = ((a * self.spacing) + 1) * (height + self.padding)
-			cr.move_to(self.padding, yy)	
+			yy = ((a * self.spacing) + 1) * height
+			cr.move_to(x, yy)
 			cr.show_text("%03d" % a)
 
-		cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
-		cr.move_to((width + (self.padding * 2)) + self.padding, self.padding)
-		cr.line_to((width + (self.padding * 2)) + self.padding, ((height + (self.padding)) * self.seq.length * self.spacing) - self.padding)
-		cr.stroke()
-	
+			cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
+			cr.move_to(x, yy)
+			cr.show_text("   |")
+		
+		self._ptr.height = pms.cfg.pointer_height
+			
 	def on_draw(self, widget, cr):
 		cr.set_source_surface(self._surface, 0, 0)
 		cr.paint()
