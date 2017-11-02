@@ -51,7 +51,7 @@ class PropView(Gtk.ScrolledWindow):
 			i += 1
 		
 		i = 0
-		for wdg in self.seqview._track_box.get_children()[1:]:
+		for wdg in self.seqview.get_tracks()[1:]:
 			wdg.trk.index = i
 			i += 1
 			

@@ -7,6 +7,8 @@ def track_fill(trk, note = "c3", skip = 2, velocity = 100):
 			trk[0][r].velocity = velocity
 	
 def muzakize():
+	pms.bpm = 123
+	
 	seq = pms.add_sequence(32)
 	
 	t1 = seq.add_track()

@@ -8,13 +8,21 @@ import pypms
 from pypms.pmssequence import PMSSequence
 
 class TrackViewPointer(Gtk.DrawingArea):
-	def __init__(self, trk, parent):
+	def __init__(self, trk, seq, parent):
 		Gtk.DrawingArea.__init__(self)
-	
+
+		self.set_events(Gdk.EventMask.ENTER_NOTIFY_MASK)
+
 		self.connect("draw", self.on_draw)
 		self.connect("configure-event", self.on_configure)
+		self.connect("enter-notify-event", self.on_enter)
+				
+		self.stole_mouse = False
 		
 		self.trk = trk
+		if not trk:
+			self.trk = seq
+			
 		self.highlight = pms.cfg.highlight
 		self.padding = pms.cfg.padding
 		self.spacing = 1.0
@@ -28,6 +36,7 @@ class TrackViewPointer(Gtk.DrawingArea):
 		self._surface = None
 		self._context = None
 		self.set_opacity(pms.cfg.pointer_opacity)
+		#self.set_sensitive(False)
 		
 	def __del__(self):
 		if self._surface:
@@ -100,7 +109,6 @@ class TrackViewPointer(Gtk.DrawingArea):
 			
 			cr.rectangle(x, 0, xx, self.height + 5)
 			cr.fill()
-
 			return
 
 		r = int(self.trk.pos)
@@ -115,7 +123,7 @@ class TrackViewPointer(Gtk.DrawingArea):
 			rw = self.trk[c][r]
 			
 			if rw.type == 1:
-				i *= 1.5 + .5 * (self.trk.pos - r)
+				i *= 1.5 + 2.0 * (self.trk.pos - r)
 			
 			cr.set_source_rgb(*(col * i for col in pms.cfg.colour))
 			
@@ -125,8 +133,11 @@ class TrackViewPointer(Gtk.DrawingArea):
 			cr.rectangle(x, 0, xx, self.height + 5)
 			cr.fill()
 
-	
 	def on_draw(self, widget, cr):
 		cr.set_source_surface(self._surface, 0, 0)
 		cr.paint()
 		return False
+
+	def on_enter(self, widget, prm):
+		self.stole_mouse = True
+

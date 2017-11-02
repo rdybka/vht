@@ -3,9 +3,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, Gio
 import cairo
 from trackview import TrackView
-from tracksideview import TrackSideView
 
 from pypms import pms
+from trackviewpointer import TrackViewPointer
 
 class SequenceView(Gtk.ScrolledWindow):
 	def __init__(self, seq):
@@ -16,7 +16,7 @@ class SequenceView(Gtk.ScrolledWindow):
 			Gdk.EventMask.SCROLL_MASK |
 			Gdk.EventMask.KEY_PRESS_MASK |
 			Gdk.EventMask.KEY_RELEASE_MASK)
-
+			
 		self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 				
 		self.connect("draw", self.on_draw);
@@ -39,7 +39,7 @@ class SequenceView(Gtk.ScrolledWindow):
 				
 		self._track_box = Gtk.Box()
 		self._track_box.set_spacing(0)
-		self._track_box.pack_start(TrackSideView(self.seq), False, True, 0)		
+		self.add_track(None)
 		self.build()
 
 		self._track_box.show_all()
@@ -81,37 +81,49 @@ class SequenceView(Gtk.ScrolledWindow):
 
 			self.redraw_track(None)
 			self.prop_view.queue_draw()
-			
 		return False
 
 	def on_motion(self, widget, event):
+		#self.grab_focus()
 		pms.clear_popups()
-		self.grab_focus()
 	
 	def add_track(self, trk):
-		t = TrackView(trk)
-		self._track_box.pack_start(t, False, True, 0)
+		ovl = Gtk.Overlay()
+	
+		t = TrackView(self.seq, trk)
+		t._ptr = TrackViewPointer(trk, self.seq, t)
+		ovl.add(t)
+		ovl.add_overlay(t._ptr)
+		ovl.set_overlay_pass_through(t._ptr, True)
+		t._ptr.show()
+
+		self._track_box.pack_start(ovl, False, True, 0)
 		t.set_size_request(self.def_new_track_width, 10)
 		t.show()
 
 	def del_track(self, trk):
-		for wdg in self._track_box.get_children()[1:]:
+		for wdg in self.get_tracks()[1:]:
 			if wdg.trk.index == trk.index:
 				wdg.destroy()
 				return
 	
 	def redraw_track(self, trk = None):
-		for wdg in self._track_box.get_children()[1:]:
-			if not trk or wdg.trk.index == trk.index:
-				wdg.queue_resize()
+		for wdg in self.get_tracks():
+			rdr = False
+			if not trk:
+				rdr = True
+			else:
+				if wdg.trk:
+					if wdg.trk.index == trk.index:
+						rdr = True
+					 
+			if rdr:
 				wdg.redraw()
+				wdg.queue_resize()
 				wdg.queue_draw()
-		
-		wdg = self._track_box.get_children()[0]
-		wdg.queue_resize()
-		wdg.redraw()
-		wdg.queue_draw()
-		
+				
+		self.queue_draw()
+			
 	def build(self):
 		for trk in self.seq:
 			self.add_track(trk)
@@ -119,29 +131,26 @@ class SequenceView(Gtk.ScrolledWindow):
 	def recalculate_row_spacing(self):
 		minspc = 1.0
 		
-		for wdg in self._track_box.get_children():
-			if isinstance(wdg, TrackSideView):
+		for wdg in self.get_tracks():
+			if wdg.trk == None:
 				spc = 1.0
 			else:
 				spc = wdg.trk.nsrows / wdg.trk.nrows
 			wdg.spacing = spc
+
 			if spc < minspc:
 				minspc = spc
 				
 		if minspc < 1.0:
-			for wdg in self._track_box.get_children():
+			for wdg in self.get_tracks():
 				wdg.spacing /= minspc
-		
-		for wdg in self._track_box.get_children():
-			wdg.redraw()
-		
+
+		self.redraw_track(None)
 		self.queue_draw()
 	
 	def tick(self, wdg, param):
-		#self.recalculate_row_spacing()
-		for wdg in self._track_box.get_children():
-			wdg.tick()
-			wdg.queue_draw()
+		for wdg in self.get_tracks():
+				wdg.tick()
 		return 1
 	
 	def on_draw(self, widget, cr):
@@ -151,5 +160,16 @@ class SequenceView(Gtk.ScrolledWindow):
 		cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
-
 		super()
+
+	def get_tracks(self):
+		ret = []
+		for ovl in self._track_box.get_children():
+			for wdg in ovl.get_children():
+				if isinstance(wdg, TrackView):
+					ret.append(wdg)
+
+		return ret
+	
+	def on_enter(self, wdg, prm):
+		pass
