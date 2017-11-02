@@ -175,9 +175,11 @@ class TrackView(Gtk.DrawingArea):
 		return False
 		
 	def on_button_press(self, widget, event):
+		print("butt down")
 		return False
 
 	def on_button_release(self, widget, event):
+		print("butt up")
 		return False
 
 	def on_leave(self, wdg, prm):
