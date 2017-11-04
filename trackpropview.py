@@ -13,21 +13,21 @@ class TrackPropView(Gtk.DrawingArea):
 	def __init__(self, trk = None, seq = None, seqview = None, propview = None):
 		Gtk.DrawingArea.__init__(self)
 
+		self.set_events(Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK )
+		self.connect("button-press-event", self.on_click)
+		self.connect("motion-notify-event", self.on_mouse_move)
 		self.connect("draw", self.on_draw)
-		self.connect("realize", self.on_realize)
+		self.connect("configure-event", self.on_configure)
 
 		self.seq = seq
 		self.trk = trk
 		self.propview = propview
 		self.seqview = seqview
-		self.padding = 3
+		self.txt_width = 0
+		self.txt_height = 0
 		self.button_rect = Gdk.Rectangle()
-
-		self.clear_popups = pms.clear_popups
-				
-		self.set_events(Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK )
-		self.connect("button-press-event", self.on_click)
-		self.connect("motion-notify-event", self.on_mouse_move)
+		self._surface = None
+		self._context = None
 
 		if trk:
 			self.popover = TrackPropViewPopover(self, trk)
@@ -37,9 +37,23 @@ class TrackPropView(Gtk.DrawingArea):
 		self.popover.set_position(Gtk.PositionType.BOTTOM)
 		self.popover.set_modal(False)
 		self.popover.set_transitions_enabled(False)
+
+		self.clear_popups = pms.clear_popups
 	
-	def on_realize(self, wdg):
-		self.set_size_request(1, 1)
+	def on_configure(self, wdg, event):
+		if self._surface:
+			self._surface.finish()
+
+		self._surface = wdg.get_window().create_similar_surface(cairo.CONTENT_COLOR,
+			wdg.get_allocated_width(),
+			wdg.get_allocated_height())
+
+		self._context = cairo.Context(self._surface)
+		self._context.set_antialias(cairo.ANTIALIAS_NONE)
+		self._context.set_line_width((pms.cfg.seq_font_size / 6.0) * pms.cfg.seq_line_width)
+		
+		self.redraw()
+		return True	
 	
 	def add_track(self):
 		port = 0
@@ -84,9 +98,17 @@ class TrackPropView(Gtk.DrawingArea):
 	def on_click(self, widget, data):
 		pass 
 
-	def on_draw(self, widget, cr):
-		w = widget.get_allocated_width()
-		h = widget.get_allocated_height()
+	def redraw(self):
+		self.queue_draw()
+		
+		cr = self._context
+		
+		self._context.select_font_face(pms.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+		self._context.set_font_size(pms.cfg.seq_font_size)
+				
+		w = self.get_allocated_width()
+		h = self.get_allocated_height()
+		
 		cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
@@ -96,27 +118,16 @@ class TrackPropView(Gtk.DrawingArea):
 			
 		if self.trk == None:
 			(x, y, width, height, dx, dy) = cr.text_extents("000|")
-			self._txt_height = dy
-			self.txt_width = dx
-			self._width = dx
-			self._height = int(height * 2)
-				
-			self.set_size_request(self._width, self._height)
+			self.txt_height = height
+			self.txt_width = int(dx)
+
+			self.set_size_request(self.txt_width, self.txt_height * 2)
 				
 			cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
 			cr.rectangle(0, 0, w, h)
 			cr.fill()			
 				
-			cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
-			cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))			
-			yy = height
-			cr.move_to(x, yy)	
-			cr.show_text("   |")
-			yy += height
-			cr.move_to(x, yy)	
-			cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
-			cr.show_text("   |")
-			cr.move_to(x, yy)		
+			cr.move_to(x, self.txt_height * 2)		
 			cr.set_source_rgb(*(col * pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))
 			cr.show_text("***")
 				
@@ -125,24 +136,34 @@ class TrackPropView(Gtk.DrawingArea):
 			self.button_rect.x = x;
 			self.button_rect.y = height
 			self.popover.set_pointing_to(self.button_rect)
+			
+			cr.set_line_width((pms.cfg.seq_font_size / 6.0) * pms.cfg.seq_line_width)
+			(x, y, width, height, dx, dy) = cr.text_extents("|")
+			cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
+			cr.set_antialias(cairo.ANTIALIAS_NONE)
+			cr.move_to(self.txt_width - (dx / 2), self.txt_height * .3)
+			cr.line_to(self.txt_width - (dx / 2), (self.seq.length) * self.txt_height)
+			cr.stroke()
 			return
 
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")
+
+		self.txt_height = height
+		self.txt_width = int(dx)
+
+		nw = self.txt_width * len(self.trk)
+		nh = self.txt_height * self.trk.nrows
+		self.set_size_request(nw, nh)
 		
-		self._txt_height = dy
-		self.txt_width = dx * len(self.trk)
-		self._height = int(height * 2)
-				
-		self.set_size_request(self.txt_width, self._height)
-				
-		cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
+		cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))	
 		cr.rectangle(0, 0, w, h)
-		cr.fill()			
+		cr.fill()
+		
+		self.set_size_request(self.txt_width * len(self.trk), self.txt_height * 2)
 				
 		cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
 			
-		yy = height
-		cr.move_to(x, yy)	
+		cr.move_to(x, self.txt_height)	
 		cr.show_text("p%02d c%02d" % (self.trk.port, self.trk.channel))
 		
 		self.button_rect.width = (dx / 8.0) * 3.0
@@ -152,26 +173,20 @@ class TrackPropView(Gtk.DrawingArea):
 		self.button_rect.y = height
 		self.popover.set_pointing_to(self.button_rect)
 		
-		for l in range(len(self.trk) - 2):
-			cr.move_to(x + (dx) * (l + 1), yy)	
-			cr.show_text("--------")
-
-		if len(self.trk) > 1:
-			cr.move_to(x + (dx) * (len(self.trk) -1), yy)	
-			cr.show_text("-------")
-
-		# *** button
-		cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
-		cr.move_to(x + (dx) * (len(self.trk) - 1), yy)	
-		cr.show_text("       +")
-		yy += height
-		cr.move_to(x + (dx) * (len(self.trk) - 1), yy)	
-		cr.show_text("       |")
-	
 		cr.set_source_rgb(*(col * pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))
-		cr.move_to(x + (dx) * (len(self.trk) - 1), yy)	
+		cr.move_to(x + (dx) * (len(self.trk) - 1), self.txt_height * 2)	
 		cr.show_text("    ***")
-		
-		
-		
 
+		cr.set_line_width((pms.cfg.seq_font_size / 6.0) * pms.cfg.seq_line_width)
+
+		(x, y, width, height, dx, dy) = cr.text_extents("0")
+		cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
+		
+		cr.move_to(self.txt_width * len(self.trk) - (width / 2), self.txt_height * .3)
+		cr.line_to(self.txt_width * len(self.trk) - (width / 2), 2 * self.txt_height)
+		cr.stroke()
+				
+	def on_draw(self, widget, cr):
+		cr.set_source_surface(self._surface, 0, 0)
+		cr.paint()
+		return False

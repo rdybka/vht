@@ -46,6 +46,7 @@ class PMSApp(Gtk.Application):
 			
 		self.add_window(win)
 		win.show_all()
+		pms.play = True
 
 def log_func(data):
 	raise MemoryError("gotcha!")
@@ -63,18 +64,18 @@ if __name__ == "__main__":
 	#pms.cfg.seq_font = "Ubuntu Mono"
 	pms.cfg.seq_font = "Roboto Mono Medium"
 	#pms.cfg.seq_font = "Monospace"
-	pms.cfg.seq_font_size = 14
+	pms.cfg.seq_font_size = 16
+	pms.cfg.seq_line_width = 1.0
 	pms.cfg.highlight = 4
 	pms.cfg.padding = 3
-	pms.cfg.colour = (.9, 1.0, .2)
+	#pms.cfg.colour = (.9, 1.0, .2)
 	#pms.cfg.colour = (.6, .6, 1.0)
-	#pms.cfg.colour = (.4, .4, 1.0)
+	pms.cfg.colour = (.4, 1.0, .4)
 	pms.cfg.intensity_background = .3
 	pms.cfg.intensity_txt = .7
 	pms.cfg.intensity_txt_highlight = 1.0
 	pms.cfg.intensity_lines = .6
-	pms.cfg.pointer_height = 3
-	pms.cfg.pointer_opacity = .6
+	pms.cfg.pointer_opacity = .8
 	
 	randomcomposer.muzakize()
 

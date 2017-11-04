@@ -13,13 +13,15 @@ class PropView(Gtk.ScrolledWindow):
 		
 		self.seqview = seqview
 		self.seq = seqview.seq;
+
+		self.last_font_size = pms.cfg.seq_font_size
 		
 		self._track_box = Gtk.Box()
 		self._track_box.set_spacing(0)
 		pms.clear_popups = self.clear_popups
+
 		
 		self._track_box.add(TrackPropView(None, self.seq, self.seqview, self))
-
 		self.build()
 		
 		self.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.NEVER)
@@ -98,6 +100,10 @@ class PropView(Gtk.ScrolledWindow):
 		cr.fill()
 		
 		for wdg in self._track_box.get_children():
+			if self.last_font_size != pms.cfg.seq_font_size:
+				wdg.redraw()
+				
 			wdg.queue_draw()
 		
+		self.last_font_size = pms.cfg.seq_font_size
 		super()

@@ -157,20 +157,20 @@ class TrackPropViewPopover(Gtk.Popover):
 	def on_retract_button_clicked(self, switch):
 		self.trk.del_column()
 		self.parent.seqview.redraw_track(self.trk)
-		self.parent.queue_draw()
+		self.parent.redraw()
 			
 	def on_expand_button_clicked(self, switch):
 		self.trk.add_column()
 		self.parent.seqview.redraw_track(self.trk)
-		self.parent.queue_draw()
+		self.parent.redraw()
 			
 	def on_port_changed(self, adj):
 		self.trk.port = int(adj.get_value())
-		self.parent.queue_draw()
+		self.parent.redraw()
 
 	def on_channel_changed(self, adj):
 		self.trk.channel = int(adj.get_value())
-		self.parent.queue_draw()
+		self.parent.redraw()
 
 	def on_nrows_changed(self, adj):
 		self.trk.nrows = int(adj.get_value())
