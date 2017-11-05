@@ -61,21 +61,29 @@ if __name__ == "__main__":
 
 	# move this stuff to proper configuration
 	pms.cfg = cfg()
-	#pms.cfg.seq_font = "Ubuntu Mono"
+
 	pms.cfg.seq_font = "Roboto Mono Medium"
+	#pms.cfg.seq_font = "Ubuntu Mono"
 	#pms.cfg.seq_font = "Monospace"
+	
 	pms.cfg.seq_font_size = 16
 	pms.cfg.seq_line_width = 1.0
+	pms.cfg.seq_spacing = 1.05
+	pms.cfg.octave = 4
+	pms.cfg.velocity = 98
 	pms.cfg.highlight = 4
+	pms.cfg.skip = 1
 	pms.cfg.padding = 3
-	#pms.cfg.colour = (.9, 1.0, .2)
+	pms.cfg.colour = (.9, 1.0, .2)
 	#pms.cfg.colour = (.6, .6, 1.0)
-	pms.cfg.colour = (.4, 1.0, .4)
+	#pms.cfg.colour = (.4, 1.0, .4)
 	pms.cfg.intensity_background = .3
 	pms.cfg.intensity_txt = .7
 	pms.cfg.intensity_txt_highlight = 1.0
 	pms.cfg.intensity_lines = .6
 	pms.cfg.pointer_opacity = .8
+	
+	pms.cfg.auto_scroll_delay = .15
 	
 	randomcomposer.muzakize()
 

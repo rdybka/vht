@@ -10,6 +10,18 @@ class PMSRow():
 		self._delay = pms.row_get_delay(self._rowptr)
 		self.update_strrep()
 		
+	def __eq__(self, other):
+		if self._type != other._type:
+			return False
+		if self._note != other._note:
+			return False
+		if self._velocity != other._velocity:
+			return False
+		if self._delay != other._delay:
+			return False
+			
+		return True
+
 	def update_strrep(self):
 		notes = ['C-', 'C#' , 'D-', 'D#', 'E-', 'F-', 'F#', 'G-', 'G#', 'A-', 'A#', 'B-']
 		note = self._note % 12
@@ -23,14 +35,22 @@ class PMSRow():
 			return
 		
 		self._strrep = "---"
+	
+	def copy(self, row):
+		self._type = row._type
+		self._note = row._note
+		self._velocity = row._velocity
+		self._delay = row._delay
+		self._pms_handle.row_set(self._rowptr, self._type, self._note, self._velocity, self._delay)
+		self.update_strrep()
 		
 	def clear(self):
-		self._type = 0;
-		self._note = 0;
-		self._velocity = 0;
-		self._delay = 0;
+		self._type = 0
+		self._note = 0
+		self._velocity = 0
+		self._delay = 0
 		self._pms_handle.row_set(self._rowptr, 0, 0, 0, 0)
-		self.update_strrep();	
+		self.update_strrep()
 	
 	@property
 	def type(self):

@@ -19,10 +19,9 @@ class PropView(Gtk.ScrolledWindow):
 		self._track_box = Gtk.Box()
 		self._track_box.set_spacing(0)
 		pms.clear_popups = self.clear_popups
-
 		
-		self._track_box.add(TrackPropView(None, self.seq, self.seqview, self))
-		self.build()
+		#self._track_box.add(TrackPropView(None, self.seq, self.seqview, self))
+		#self.build()
 		
 		self.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.NEVER)
 		self.add_with_viewport(self._track_box)
@@ -30,7 +29,7 @@ class PropView(Gtk.ScrolledWindow):
 			
 	def del_track(self, trk):
 		i = 0
-		for wdg in self._track_box.get_children()[1:]:
+		for wdg in self._track_box.get_children():
 			if wdg.trk.index == trk.index:
 				self.seq.del_track(i)
 				return
@@ -48,21 +47,20 @@ class PropView(Gtk.ScrolledWindow):
 
 	def reindex_tracks(self):
 		i = 0
-		for wdg in self._track_box.get_children()[1:]:
+		for wdg in self._track_box.get_children():
 			wdg.trk.index = i
 			i += 1
 		
 		i = 0
-		for wdg in self.seqview.get_tracks()[1:]:
+		for wdg in self.seqview.get_tracks():
 			wdg.trk.index = i
 			i += 1
 			
 	def move_track(self, trk, offs):
-		wdg = self._track_box.get_children()[1:][trk.index]
-		self._track_box.reorder_child(wdg, (trk.index + 1) + offs)
-		wdg = self.seqview._track_box.get_children()[1:][trk.index]
-		self.seqview._track_box.reorder_child(wdg, (trk.index + 1) + offs)
-		
+		wdg = self._track_box.get_children()[trk.index]
+		self._track_box.reorder_child(wdg, (trk.index) + offs)
+		wdg = self.seqview._track_box.get_children()[trk.index]
+		self.seqview._track_box.reorder_child(wdg, (trk.index) + offs)
 		self.seq.swap_track(trk.index, trk.index + offs)
 		self.reindex_tracks()
 
@@ -82,7 +80,7 @@ class PropView(Gtk.ScrolledWindow):
 		self.move_track(trk, trk.index * -1)
 
 	def move_last(self, trk):
-		self.move_track(trk, (len(self.seq) - trk.index) - 1)
+		self.move_track(trk, (len(self.seq) - trk.index))
 
 	def build(self):
 		for trk in self.seq:
@@ -91,6 +89,8 @@ class PropView(Gtk.ScrolledWindow):
 	def clear_popups(self):
 		for wdg in self._track_box.get_children():
 			wdg.popover.popdown()
+		
+		self.seqview._side_prop.popover.popdown()
 
 	def on_draw(self, widget, cr):
 		w = widget.get_allocated_width()
@@ -102,8 +102,6 @@ class PropView(Gtk.ScrolledWindow):
 		for wdg in self._track_box.get_children():
 			if self.last_font_size != pms.cfg.seq_font_size:
 				wdg.redraw()
-				
-			wdg.queue_draw()
-		
+	
 		self.last_font_size = pms.cfg.seq_font_size
 		super()

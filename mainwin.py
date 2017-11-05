@@ -3,8 +3,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
 
 from sequenceview import SequenceView
-from propview import PropView
-
+from modulepropview import ModulePropView
 from pypms import pms
 
 class MainWin(Gtk.ApplicationWindow):
@@ -51,25 +50,17 @@ class MainWin(Gtk.ApplicationWindow):
 		self.vbox = Gtk.Box()
 		self.hbox = Gtk.Box();
 
-		self.seqlab = Gtk.Label("sequence")
+		self.seqlab = Gtk.Label()
 		self.seqlab.props.hexpand = False
 		
 		self.hbox.pack_start(self.seqlab, False, True, 0)
-		self.hbox.pack_start(Gtk.Label("track props"), True, True, 0)
-		
+
 		self._sequence_view = SequenceView(pms[0])
-		self._prop_view = PropView(self._sequence_view)
-		self._sequence_view.prop_view = self._prop_view
-
-		self._sequence_view_adj = self._sequence_view.get_hadjustment()
-		self._prop_view_adj = self._prop_view.get_hadjustment()
-
-		self._sequence_view_adj.connect("value-changed", self.on_seq_view_adj_changed)
-		self._prop_view_adj.connect("value-changed", self.on_prop_view_adj_changed)
-
+		self.hbox.pack_start(ModulePropView(self._sequence_view), True, True, 0)
+		
 		self.vbox.pack_start(self.hbox, False, False, 0)
-		self.vbox.pack_start(self._prop_view, False, True, 0)
 		self.vbox.pack_start(self._sequence_view, True, True, 0)
+			
 		self.vbox.set_orientation(Gtk.Orientation.VERTICAL)
 		
 		self.add(self.vbox)
@@ -102,11 +93,5 @@ class MainWin(Gtk.ApplicationWindow):
 	
 	def on_bpm_changed(self, adj):
 		pms.bpm = int(adj.get_value())
-		
-	def on_seq_view_adj_changed(self, adj):
-		self._prop_view_adj.set_upper(adj.get_upper())
-		self._prop_view_adj.set_value(adj.get_value())
 	
-	def on_prop_view_adj_changed(self, adj):
-		self._sequence_view_adj.set_upper(adj.get_upper())
-		self._sequence_view_adj.set_value(adj.get_value())
+		

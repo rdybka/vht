@@ -64,8 +64,6 @@ class TrackPropView(Gtk.DrawingArea):
 
 		trk = self.seq.add_track(port, channel)
 		self.seqview.add_track(trk)
-		self.propview.add_track(trk)
-		self.seqview.redraw_track(trk)
 	
 	def del_track(self):
 		self.popover.popdown()
@@ -144,6 +142,7 @@ class TrackPropView(Gtk.DrawingArea):
 			cr.move_to(self.txt_width - (dx / 2), self.txt_height * .3)
 			cr.line_to(self.txt_width - (dx / 2), (self.seq.length) * self.txt_height)
 			cr.stroke()
+			self.queue_draw()
 			return
 
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")
@@ -184,6 +183,7 @@ class TrackPropView(Gtk.DrawingArea):
 		
 		cr.move_to(self.txt_width * len(self.trk) - (width / 2), self.txt_height * .3)
 		cr.line_to(self.txt_width * len(self.trk) - (width / 2), 2 * self.txt_height)
+		self.queue_draw()
 		cr.stroke()
 				
 	def on_draw(self, widget, cr):

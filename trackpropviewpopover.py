@@ -3,6 +3,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, Gdk, Gtk, Gio
 import cairo
 
+from trackview import TrackView
+
 class TrackPropViewPopover(Gtk.Popover):
 	def __init__(self, parent, trk):
 		Gtk.Popover.__init__(self)
@@ -156,11 +158,13 @@ class TrackPropViewPopover(Gtk.Popover):
 					
 	def on_retract_button_clicked(self, switch):
 		self.trk.del_column()
+		TrackView.leave_all()
 		self.parent.seqview.redraw_track(self.trk)
 		self.parent.redraw()
 			
 	def on_expand_button_clicked(self, switch):
 		self.trk.add_column()
+		TrackView.leave_all()
 		self.parent.seqview.redraw_track(self.trk)
 		self.parent.redraw()
 			

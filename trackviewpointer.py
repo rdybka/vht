@@ -12,8 +12,6 @@ class trackviewpointer():
 		if not trk:
 			self.trk = seq
 			
-		self.highlight = pms.cfg.highlight
-
 		self.spacing = 1.0
 		self.opacity = pms.cfg.pointer_opacity
 	
@@ -58,7 +56,7 @@ class trackviewpointer():
 		
 		if isinstance(self.trk, PMSSequence):
 			i = .5
-			if (r) % self.highlight == 0:
+			if pms.cfg.highlight > 1 and (r) % pms.cfg.highlight == 0:
 				i *= 2
 			
 			x = 0
@@ -88,7 +86,7 @@ class trackviewpointer():
 
 		for c in range(len(self.trk)):
 			i = .5
-			if (r) % self.highlight == 0:
+			if pms.cfg.highlight > 1 and (r) % pms.cfg.highlight == 0:
 				i *= 1.0
 
 			rw = self.trk[c][r]
