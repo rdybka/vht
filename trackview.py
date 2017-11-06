@@ -230,6 +230,9 @@ class TrackView(Gtk.DrawingArea):
 								
 				if rw.type == 1: #note_on
 					cr.show_text("%3s %03d" % (str(rw), rw.velocity))
+				
+				if rw.type == 2: #note_off
+					cr.show_text("%3s" % (str(rw)))
 					
 				if rw.type == 0: #none
 					cr.show_text("---    ")
@@ -279,6 +282,9 @@ class TrackView(Gtk.DrawingArea):
 		enter_edit = False
 		
 		if not self.trk[col][row].type:	# empty
+			enter_edit = True
+			
+		if self.trk[col][row].type == 2:# note_off
 			enter_edit = True
 		
 		if offs < self.txt_width / 2.0:	# edit note
@@ -363,6 +369,8 @@ class TrackView(Gtk.DrawingArea):
 	def on_key_press(self, widget, event):
 		if not self.trk:
 			return
+		
+		#print("key : %d" % (event.keyval))
 			
 		if event.state & Gdk.ModifierType.CONTROL_MASK:
 			if event.keyval == 122:			# z
@@ -488,6 +496,24 @@ class TrackView(Gtk.DrawingArea):
 
 			self.undo_buff.add_state()
 			return True
+
+		if event.keyval == 92:				# | note_off
+			self.trk[self.edit[0]][self.edit[1]].clear()
+			self.trk[self.edit[0]][self.edit[1]].type = 2
+			
+			old = self.edit[1]
+			self.edit = self.edit[0], self.edit[1] + pms.cfg.skip
+
+			if self.edit[1] >= self.trk.nrows:
+				self.edit = self.edit[0], self.edit[1] - self.trk.nrows
+			
+			while self.edit[1] < 0:
+				self.edit = self.edit[0], self.edit[1] + self.trk.nrows
+					
+			self.redraw(self.edit[1])
+			self.redraw(old)
+			
+			self.undo_buff.add_state()
 
 		if event.keyval == 65379:			# insert
 			self.undo_buff.add_state()

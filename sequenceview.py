@@ -172,8 +172,6 @@ class SequenceView(Gtk.Box):
 			
 			return TrackView.active_track.on_key_press(widget, event)
 
-		#print("key : %d" % (event.keyval))
-
 		return False
 
 	def on_key_release(self, widget, event):

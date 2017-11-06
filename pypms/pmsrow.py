@@ -31,7 +31,7 @@ class PMSRow():
 			return
 			
 		if self._type == 2: #note_off
-			self._strrep = "[ ]"
+			self._strrep = "  ===" 
 			return
 		
 		self._strrep = "---"

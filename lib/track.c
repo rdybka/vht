@@ -142,7 +142,7 @@ void track_trigger(track *trk, int pos, int c, int delay) {
 
     midi_event evt;
 
-    if (r.type == note_on) {
+    if (r.type == note_on || r.type == note_off ) {
         if (trk->ring[c] != -1) {
             evt.time = delay;
             evt.channel = trk->channel;

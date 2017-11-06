@@ -54,6 +54,9 @@ def log_func(data):
 class cfg:
 	pass
 
+def dummy():
+	print("TOOD: add modulepropview")
+
 if __name__ == "__main__":
 	pms.start_error = None
 	if pms.jack_start() != 0:
@@ -85,6 +88,8 @@ if __name__ == "__main__":
 	pms.cfg.pointer_opacity = .8
 	
 	pms.cfg.auto_scroll_delay = .15
+	
+	pms.update_modulepropview = dummy
 	
 	randomcomposer.muzakize()
 
