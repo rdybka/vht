@@ -102,7 +102,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.grid.attach(lbl, 0, 3, 1, 1)
 			self.grid.attach(self.channel_button, 1, 3, 2, 1)
 
-			self.nrows_adj = Gtk.Adjustment(1, 0, 256, 1.0, 1.0)
+			self.nrows_adj = Gtk.Adjustment(1, 1, 256, 1.0, 1.0)
 			self.nrows_button = Gtk.SpinButton()
 			self.nrows_button.set_adjustment(self.nrows_adj)
 			self.nrows_adj.set_value(trk.nrows)
@@ -119,7 +119,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.grid.attach(self.nrows_button, 1, 4, 2, 1)
 			self.grid.attach(self.nrows_check_button, 3, 4, 1, 1)
 			
-			self.nsrows_adj = Gtk.Adjustment(1, 0, self.parent.seq.length, 1.0, 1.0)
+			self.nsrows_adj = Gtk.Adjustment(1, 1, self.parent.seq.length, 1.0, 1.0)
 			self.nsrows_button = Gtk.SpinButton()
 			self.nsrows_button.set_adjustment(self.nsrows_adj)
 			self.nsrows_adj.set_value(trk.nsrows)

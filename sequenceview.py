@@ -211,6 +211,17 @@ class SequenceView(Gtk.Box):
 			
 		if TrackView.active_track:
 			if TrackView.active_track.edit:
+				old = TrackView.active_track.edit[1]
+
+				TrackView.active_track.edit = TrackView.active_track.edit[0], TrackView.active_track.edit[1] + event.delta_y
+				if TrackView.active_track.edit[1] >= TrackView.active_track.trk.nrows:
+					TrackView.active_track.edit = TrackView.active_track.edit[0], TrackView.active_track.trk.nrows - 1
+				
+				if TrackView.active_track.edit[1] < 0:
+					TrackView.active_track.edit = TrackView.active_track.edit[0], 0
+				
+				TrackView.active_track.redraw(old)
+				TrackView.active_track.redraw(TrackView.active_track.edit[1])
 				return True	
 			
 		return False

@@ -56,9 +56,9 @@ class MainWin(Gtk.ApplicationWindow):
 		self.hbox.pack_start(self.seqlab, False, True, 0)
 
 		self._sequence_view = SequenceView(pms[0])
-		self.hbox.pack_start(ModulePropView(self._sequence_view), True, True, 0)
+		#self.hbox.pack_start(ModulePropView(self._sequence_view), True, True, 0)
 		
-		self.vbox.pack_start(self.hbox, False, False, 0)
+		#self.vbox.pack_start(self.hbox, False, False, 0)
 		self.vbox.pack_start(self._sequence_view, True, True, 0)
 			
 		self.vbox.set_orientation(Gtk.Orientation.VERTICAL)

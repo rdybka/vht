@@ -72,6 +72,7 @@ if __name__ == "__main__":
 	pms.cfg.octave = 4
 	pms.cfg.velocity = 98
 	pms.cfg.highlight = 4
+	pms.cfg.page_height = 16
 	pms.cfg.skip = 1
 	pms.cfg.padding = 3
 	pms.cfg.colour = (.9, 1.0, .2)

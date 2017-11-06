@@ -157,7 +157,7 @@ class TrackView(Gtk.DrawingArea):
 					else:
 						cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
 
-				yy = (r + 1) * self.txt_height
+				yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2)
 				cr.move_to(x, yy)
 				cr.show_text("%03d" % r)
 				
@@ -222,7 +222,8 @@ class TrackView(Gtk.DrawingArea):
 					cr.fill()
 					cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
 						
-				yy = int((r + 1) * self.txt_height)
+				yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2)
+				
 				cr.move_to((c * self.txt_width) + x, yy)
 				
 				rw = self.trk[c][r]
@@ -275,7 +276,17 @@ class TrackView(Gtk.DrawingArea):
 		col = int(event.x / self.txt_width)
 		offs = int(event.x) % int(self.txt_width)
 		
-		if offs < self.txt_width / 2:	# edit note
+		enter_edit = False
+		
+		if not self.trk[col][row].type:	# empty
+			enter_edit = True
+		
+		if offs < self.txt_width / 2.0:	# edit note
+			enter_edit = True
+		else: 							# edit velocity
+			pass
+
+		if enter_edit:
 			TrackView.leave_all()
 			TrackView.active_track = self
 			
@@ -284,11 +295,10 @@ class TrackView(Gtk.DrawingArea):
 			self.redraw(row)
 			if olded:
 				self.redraw(olded[1])
-		else: 							# edit velocity
-			pass
+			return True		
 		
-		return False
-
+		return True
+		
 	def on_button_release(self, widget, event):
 		return False
 
@@ -303,7 +313,7 @@ class TrackView(Gtk.DrawingArea):
 
 	# sheer madness :)
 	def go_right(self, skip_track = False, rev = False):
-		old = self.edit[1]
+		old = self.edit[1] 
 		inc = 1
 		if rev:
 			inc *= - 1
@@ -318,7 +328,8 @@ class TrackView(Gtk.DrawingArea):
 			if self.edit[0] < 0:
 				self.go_left(True)
 				if len(TrackView.active_track.trk) > 0:
-					TrackView.active_track.edit = len(TrackView.active_track.trk) - 1, old
+					TrackView.active_track.edit = len(TrackView.active_track.trk) - 1, TrackView.active_track.edit[1]
+					
 					TrackView.active_track.redraw()
 				return
 				
@@ -340,8 +351,8 @@ class TrackView(Gtk.DrawingArea):
 			
 			trk = self.parent.get_tracks()[curr]
 			TrackView.active_track = trk
-			trk.edit = 0, self.edit[1]
-			trk.redraw(self.edit[1])
+			trk.edit = 0, int(round((self.edit[1] * self.spacing) / trk.spacing))
+			trk.redraw(trk.edit[1])
 			
 			self.edit = None					
 			self.redraw(old)

@@ -42,6 +42,7 @@ def muzakize():
 	
 	t2[0][30] = "a#3"
 	
+
 #	for i in range(10):
 #		t = seq.add_track()
 #		t.channel = i + 1
