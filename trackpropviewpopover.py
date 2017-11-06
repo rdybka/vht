@@ -87,8 +87,8 @@ class TrackPropViewPopover(Gtk.Popover):
 			lbl = Gtk.Label("port:")
 			lbl.set_xalign(1.0)
 
-			self.grid.attach(lbl, 0, 2, 1, 1)
-			self.grid.attach(self.port_button, 1, 2, 2, 1)
+			self.grid.attach(lbl, 0, 3, 1, 1)
+			self.grid.attach(self.port_button, 1, 3, 2, 1)
 
 			self.channel_adj = Gtk.Adjustment(1, 1, 16, 1.0, 1.0)
 			self.channel_button = Gtk.SpinButton()
@@ -99,8 +99,8 @@ class TrackPropViewPopover(Gtk.Popover):
 			lbl = Gtk.Label("channel:")
 			lbl.set_xalign(1.0)
 			
-			self.grid.attach(lbl, 0, 3, 1, 1)
-			self.grid.attach(self.channel_button, 1, 3, 2, 1)
+			self.grid.attach(lbl, 0, 2, 1, 1)
+			self.grid.attach(self.channel_button, 1, 2, 2, 1)
 
 			self.nrows_adj = Gtk.Adjustment(1, 1, 256, 1.0, 1.0)
 			self.nrows_button = Gtk.SpinButton()

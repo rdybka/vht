@@ -163,7 +163,7 @@ class TrackPropView(Gtk.DrawingArea):
 		cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
 			
 		cr.move_to(x, self.txt_height)	
-		cr.show_text("p%02d c%02d" % (self.trk.port, self.trk.channel))
+		cr.show_text("c%02d p%02d" % (self.trk.channel, self.trk.port))
 		
 		self.button_rect.width = (dx / 8.0) * 3.0
 		self.button_rect.height = height
