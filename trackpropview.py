@@ -170,12 +170,12 @@ class TrackPropView(Gtk.DrawingArea):
 				
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")	
 		
+		cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
+		
 		if TrackView.active_track:
 			if TrackView.active_track.trk.index == self.trk.index:
 				cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
-			else:
-				cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
-			
+					
 		cr.move_to(x, self.txt_height)	
 		cr.show_text("c%02d p%02d" % (self.trk.channel, self.trk.port))
 		
