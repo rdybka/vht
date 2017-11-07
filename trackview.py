@@ -385,6 +385,7 @@ class TrackView(Gtk.DrawingArea):
 
 		note = self.pmp.key2note(event.keyval)
 		if note:
+			self.undo_buff.add_state()
 			old = self.edit[1]
 			self.trk[self.edit[0]][self.edit[1]] = note
 			self.trk[self.edit[0]][self.edit[1]].velocity = pms.cfg.velocity
@@ -395,8 +396,6 @@ class TrackView(Gtk.DrawingArea):
 			
 			while self.edit[1] < 0:
 				self.edit = self.edit[0], self.edit[1] + self.trk.nrows
-			
-			self.undo_buff.add_state()
 			self.redraw(self.edit[1])
 			self.redraw(old)
 			return True
