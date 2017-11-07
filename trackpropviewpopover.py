@@ -154,6 +154,7 @@ class TrackPropViewPopover(Gtk.Popover):
 				self.entered = True
 
 	def on_remove_button_clicked(self, switch):
+		TrackView.leave_all()
 		self.parent.del_track()
 					
 	def on_retract_button_clicked(self, switch):

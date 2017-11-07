@@ -11,6 +11,8 @@ def muzakize():
 	
 	seq = pms.add_sequence(32)
 	
+	return
+	
 	t1 = seq.add_track()
 	t2 = seq.add_track()
 	t3 = seq.add_track()

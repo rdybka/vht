@@ -68,6 +68,7 @@ if __name__ == "__main__":
 	pms.cfg.seq_font = "Roboto Mono Medium"
 	#pms.cfg.seq_font = "Ubuntu Mono"
 	#pms.cfg.seq_font = "Monospace"
+	#pms.cfg.seq_font = "LCD"
 	
 	pms.cfg.seq_font_size = 16
 	pms.cfg.seq_line_width = 1.0
@@ -78,9 +79,9 @@ if __name__ == "__main__":
 	pms.cfg.page_height = 16
 	pms.cfg.skip = 1
 	pms.cfg.padding = 3
-	pms.cfg.colour = (.9, 1.0, .2)
+	#pms.cfg.colour = (.9, 1.0, .2)
 	#pms.cfg.colour = (.6, .6, 1.0)
-	#pms.cfg.colour = (.4, 1.0, .4)
+	pms.cfg.colour = (0, 1.0, .7)
 	pms.cfg.intensity_background = .3
 	pms.cfg.intensity_txt = .7
 	pms.cfg.intensity_txt_highlight = 1.0

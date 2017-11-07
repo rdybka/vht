@@ -245,6 +245,7 @@ class SequenceView(Gtk.Box):
 		for wdg in self.get_tracks():
 			if wdg.trk.index == trk.index:
 				TrackView.track_views.remove(wdg)
+				self.seq.del_track(trk.index)
 				wdg.destroy()
 				return
 	
