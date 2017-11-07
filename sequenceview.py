@@ -21,7 +21,7 @@ class SequenceView(Gtk.Box):
 			Gdk.EventMask.KEY_RELEASE_MASK)
 			
 		self._sv.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-				
+		
 		self._sv.connect("draw", self.on_draw)
 		self._sv.connect("motion-notify-event", self.on_motion)
 		self._sv.connect("scroll-event", self.on_scroll)
@@ -238,6 +238,7 @@ class SequenceView(Gtk.Box):
 
 		if trk:
 			self._prop_view.add_track(trk)
+		
 		t.show()
 
 	def del_track(self, trk):

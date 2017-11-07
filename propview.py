@@ -20,21 +20,13 @@ class PropView(Gtk.ScrolledWindow):
 		self._track_box.set_spacing(0)
 		pms.clear_popups = self.clear_popups
 		
-		#self._track_box.add(TrackPropView(None, self.seq, self.seqview, self))
-		#self.build()
-		
 		self.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.NEVER)
 		self.add_with_viewport(self._track_box)
 		self._track_box.show_all()
 			
 	def del_track(self, trk):
-		i = 0
-		for wdg in self._track_box.get_children():
-			if wdg.trk.index == trk.index:
-				self.seq.del_track(i)
-				return
-				
-			i += 1
+		# moved to trackpropview
+		self.reindex_tracks()
 
 	def on_leave(self, wdg, prm):
 		if prm.detail == Gdk.NotifyType.NONLINEAR:
@@ -46,11 +38,6 @@ class PropView(Gtk.ScrolledWindow):
 		t.show()
 
 	def reindex_tracks(self):
-		i = 0
-		for wdg in self._track_box.get_children():
-			wdg.trk.index = i
-			i += 1
-		
 		i = 0
 		for wdg in self.seqview.get_tracks():
 			wdg.trk.index = i
@@ -80,7 +67,7 @@ class PropView(Gtk.ScrolledWindow):
 		self.move_track(trk, trk.index * -1)
 
 	def move_last(self, trk):
-		self.move_track(trk, (len(self.seq) - trk.index))
+		self.move_track(trk, (len(self.seq) - 1)- trk.index)
 
 	def build(self):
 		for trk in self.seq:
