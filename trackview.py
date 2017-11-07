@@ -271,10 +271,21 @@ class TrackView(Gtk.DrawingArea):
 				
 			self.redraw(self.hover[1])
 		
-		#TrackView.active_track = self
+		if not self.trk:
+			return False
+		
+		if TrackView.active_track:
+			if not TrackView.active_track.edit:
+				self.parent.change_active_track(self)
+		else:
+			self.parent.change_active_track(self)
+			
 		return False
 		
 	def on_button_press(self, widget, event):
+		if not self.trk:
+			return
+		
 		row = int(event.y / self.txt_height)
 		col = int(event.x / self.txt_width)
 		offs = int(event.x) % int(self.txt_width)
@@ -294,7 +305,7 @@ class TrackView(Gtk.DrawingArea):
 
 		if enter_edit:
 			TrackView.leave_all()
-			TrackView.active_track = self
+			self.parent.change_active_track(self)
 			
 			olded = self.edit
 			self.edit = col, row
@@ -335,7 +346,6 @@ class TrackView(Gtk.DrawingArea):
 				self.go_left(True)
 				if len(TrackView.active_track.trk) > 0:
 					TrackView.active_track.edit = len(TrackView.active_track.trk) - 1, TrackView.active_track.edit[1]
-					
 					TrackView.active_track.redraw()
 				return
 				
@@ -356,7 +366,8 @@ class TrackView(Gtk.DrawingArea):
 				curr = len(self.seq) - 1
 			
 			trk = self.parent.get_tracks()[curr]
-			TrackView.active_track = trk
+			self.parent.change_active_track(trk)
+					
 			trk.edit = 0, int(round((self.edit[1] * self.spacing) / trk.spacing))
 			trk.redraw(trk.edit[1])
 			

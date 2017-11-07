@@ -195,8 +195,8 @@ class SequenceView(Gtk.Box):
 		pms.cfg.pointer_height = .7 * pms.cfg.seq_font_size
 		self.redraw_track(None)
 		self._side_prop.redraw()
-		self._prop_view.queue_draw()
-			
+		self._prop_view.redraw()
+	
 	def on_scroll(self, widget, event):
 		if event.state & Gdk.ModifierType.CONTROL_MASK: # we're zooming!
 			if event.delta_y > 0:
@@ -247,6 +247,15 @@ class SequenceView(Gtk.Box):
 				TrackView.track_views.remove(wdg)
 				wdg.destroy()
 				return
+	
+	def change_active_track(self, trk):
+		ac = TrackView.active_track
+		
+		TrackView.active_track = trk
+		if ac != trk:
+			if ac:
+				self._prop_view.redraw(ac.trk.index)
+			self._prop_view.redraw(trk.trk.index)
 	
 	def redraw_track(self, trk = None):
 		for wdg in self.get_tracks(True):
@@ -341,7 +350,6 @@ class SequenceView(Gtk.Box):
 		cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
-		super()
 
 	def get_tracks(self, with_side_view = False):
 		ret = []

@@ -8,6 +8,7 @@ from threading import Lock
 from trackpropviewpopover import TrackPropViewPopover
 from sequencepropviewpopover import SequencePropViewPopover
 from pypms import pms
+from trackview import TrackView
 
 class TrackPropView(Gtk.DrawingArea):
 	def __init__(self, trk = None, seq = None, seqview = None, propview = None):
@@ -150,17 +151,30 @@ class TrackPropView(Gtk.DrawingArea):
 		self.txt_height = height
 		self.txt_width = int(dx)
 
-		nw = self.txt_width * len(self.trk)
-		nh = self.txt_height * self.trk.nrows
-		self.set_size_request(nw, nh)
 		
-		cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))	
-		cr.rectangle(0, 0, w, h)
-		cr.fill()
+		if TrackView.active_track:
+			if TrackView.active_track.trk.index == self.trk.index:
+				gradient = cairo.LinearGradient(0, 0, 0, h)
+				gradient.add_color_stop_rgb(0.0, *(col *  pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))
+				gradient.add_color_stop_rgb(1.0, *(col * pms.cfg.intensity_background for col in pms.cfg.colour))
+				cr.set_source(gradient)
+			else:
+				cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))	
 		
 		self.set_size_request(self.txt_width * len(self.trk), self.txt_height * 2)
+		
+		(x, y, width, height, dx, dy) = cr.text_extents("0")
+			
+		cr.rectangle(0, 0, self.txt_width * len(self.trk) - width, h)
+		cr.fill()
 				
-		cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
+		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")	
+		
+		if TrackView.active_track:
+			if TrackView.active_track.trk.index == self.trk.index:
+				cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
+			else:
+				cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
 			
 		cr.move_to(x, self.txt_height)	
 		cr.show_text("c%02d p%02d" % (self.trk.channel, self.trk.port))
@@ -183,9 +197,9 @@ class TrackPropView(Gtk.DrawingArea):
 		
 		cr.move_to(self.txt_width * len(self.trk) - (width / 2), self.txt_height * .3)
 		cr.line_to(self.txt_width * len(self.trk) - (width / 2), 2 * self.txt_height)
-		self.queue_draw()
 		cr.stroke()
-				
+		self.queue_draw()
+						
 	def on_draw(self, widget, cr):
 		cr.set_source_surface(self._surface, 0, 0)
 		cr.paint()
