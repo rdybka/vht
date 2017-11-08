@@ -1,1 +1,1 @@
-Poor Man's Sequencer by Remigiusz Dybka
+##Poor Man's Sequencer by Remigiusz Dybka
