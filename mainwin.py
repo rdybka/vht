@@ -10,12 +10,13 @@ class MainWin(Gtk.ApplicationWindow):
 	def __init__(self, app):
 		Gtk.ApplicationWindow.__init__(self, application = app)
 		self.pms = pms
+		self.fs = False
 
+		pms.mainwin = self
+				
 		# fucking gui
 		hb = Gtk.HeaderBar()
 		hb.set_show_close_button(True)
-		hb.props.title = "PMS"
-		hb.props.subtitle = "poor man's sequencer"
 		self.set_titlebar(hb)
 		
 		button = Gtk.Button()
@@ -24,8 +25,7 @@ class MainWin(Gtk.ApplicationWindow):
 		button.add(image)
 		button.connect("clicked", self.on_stop_button_activate)
 		hb.pack_start(button)
-		
-		
+				
 		button = Gtk.Button()
 		icon = Gio.ThemedIcon(name="media-playback-start")
 		image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)

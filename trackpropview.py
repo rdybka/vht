@@ -125,9 +125,12 @@ class TrackPropView(Gtk.DrawingArea):
 			cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
 			cr.rectangle(0, 0, w, h)
 			cr.fill()			
-				
-			cr.move_to(x, self.txt_height * 2)		
-			cr.set_source_rgb(*(col * pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))
+			
+			cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
+			cr.move_to(x, self.txt_height)
+			cr.show_text("pms")
+			cr.set_source_rgb(*(col * pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))				
+			cr.move_to(x, self.txt_height * 2)
 			cr.show_text("***")
 				
 			self.button_rect.width = width

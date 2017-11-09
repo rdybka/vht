@@ -115,6 +115,17 @@ class SequenceView(Gtk.Box):
 		dest_adj.set_value(adj.get_value())
 
 	def on_key_press(self, widget, event):
+		#print(event.keyval, event.state)
+	
+		if event.keyval == 65293:		# enter
+			if event.state & Gdk.ModifierType.MOD2_MASK: # alt-enter
+				if pms.mainwin.fs:
+					pms.mainwin.unfullscreen()
+					pms.mainwin.fs = False
+				else:
+					pms.mainwin.fullscreen()
+					pms.mainwin.fs = True
+	
 		if event.keyval == 122:			# z
 			if event.state & Gdk.ModifierType.CONTROL_MASK:
 				if TrackView.active_track:
@@ -139,6 +150,11 @@ class SequenceView(Gtk.Box):
 			pms.cfg.skip -= 1
 			pms.update_modulepropview()
 			return True
+		
+		if event.keyval == 113:		# q
+			if event.state & Gdk.ModifierType.CONTROL_MASK:
+				pms.mainwin.close()
+				return True
 		
 		if event.keyval == 65450:		# *
 			pms.cfg.octave += 1
