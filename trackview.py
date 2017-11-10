@@ -340,13 +340,14 @@ class TrackView(Gtk.DrawingArea):
 			
 			if self.edit[0] >= len(self.trk):
 				self.go_right(True)
+				TrackView.active_track.edit = 0, TrackView.active_track.edit[1]
+				TrackView.active_track.redraw()
 				return
 				
 			if self.edit[0] < 0:
 				self.go_left(True)
-				if len(TrackView.active_track.trk) > 0:
-					TrackView.active_track.edit = len(TrackView.active_track.trk) - 1, TrackView.active_track.edit[1]
-					TrackView.active_track.redraw()
+				TrackView.active_track.edit = len(TrackView.active_track.trk) - 1, TrackView.active_track.edit[1]
+				TrackView.active_track.redraw()
 				return
 				
 			self.redraw(old)
@@ -364,14 +365,18 @@ class TrackView(Gtk.DrawingArea):
 			
 			if curr < 0:
 				curr = len(self.seq) - 1
-			
+
 			trk = self.parent.get_tracks()[curr]
+			
+			if trk == self:
+				return
+
+			old = self.edit[1]
 			self.parent.change_active_track(trk)
-					
+			
 			trk.edit = 0, int(round((self.edit[1] * self.spacing) / trk.spacing))
 			trk.redraw(trk.edit[1])
 			
-			self.edit = None					
 			self.redraw(old)
 			
 	def go_left(self, skip_track = False, rev = True):
