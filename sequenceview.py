@@ -20,6 +20,8 @@ class SequenceView(Gtk.Box):
 			Gdk.EventMask.ENTER_NOTIFY_MASK |
 			Gdk.EventMask.KEY_PRESS_MASK |
 			Gdk.EventMask.KEY_RELEASE_MASK)
+		
+		pms.cfg.on_highlight.append(self.redraw_track)
 			
 		self._sv.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 		

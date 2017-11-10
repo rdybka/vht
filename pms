@@ -32,6 +32,7 @@ from gi.repository import GLib, Gtk, Gio
 
 from mainwin import *
 import randomcomposer
+import pmscfg
 
 class PMSApp(Gtk.Application):
 	def __init__(self):
@@ -51,42 +52,14 @@ class PMSApp(Gtk.Application):
 def log_func(data):
 	raise MemoryError("gotcha!")
 
-class cfg:
-	pass
-
 if __name__ == "__main__":
 	pms.start_error = None
 	if pms.jack_start() != 0:
 		pms.start_error = "you will need JACK for this"
 
 	# move this stuff to proper configuration
-	pms.cfg = cfg()
+	pms.cfg = pmscfg.cfg()
 
-	pms.cfg.seq_font = "Roboto Mono Medium"
-	#pms.cfg.seq_font = "Ubuntu Mono"
-	#pms.cfg.seq_font = "Monospace"
-	#pms.cfg.seq_font = "LCD"
-	
-	pms.cfg.seq_font_size = 16
-	pms.cfg.seq_line_width = 1.0
-	pms.cfg.seq_spacing = 1.05
-	pms.cfg.octave = 4
-	pms.cfg.velocity = 98
-	pms.cfg.highlight = 4
-	pms.cfg.page_height = 16
-	pms.cfg.skip = 1
-	pms.cfg.padding = 3
-	pms.cfg.colour = (.9, 1.0, .2)
-	#ms.cfg.colour = (.6, .6, 1.0)
-	#pms.cfg.colour = (.3, 1.0, .3)
-	pms.cfg.intensity_background = .3
-	pms.cfg.intensity_txt = .7
-	pms.cfg.intensity_txt_highlight = 1.0
-	pms.cfg.intensity_lines = .6
-	pms.cfg.pointer_opacity = .8
-	
-	pms.cfg.auto_scroll_delay = .15
-	
 	randomcomposer.muzakize()
 
 	try:
