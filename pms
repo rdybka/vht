@@ -54,9 +54,6 @@ def log_func(data):
 class cfg:
 	pass
 
-def dummy():
-	print("TOOD: add modulepropview")
-
 if __name__ == "__main__":
 	pms.start_error = None
 	if pms.jack_start() != 0:
@@ -65,9 +62,9 @@ if __name__ == "__main__":
 	# move this stuff to proper configuration
 	pms.cfg = cfg()
 
-	#pms.cfg.seq_font = "Roboto Mono Medium"
+	pms.cfg.seq_font = "Roboto Mono Medium"
 	#pms.cfg.seq_font = "Ubuntu Mono"
-	pms.cfg.seq_font = "Monospace"
+	#pms.cfg.seq_font = "Monospace"
 	#pms.cfg.seq_font = "LCD"
 	
 	pms.cfg.seq_font_size = 16
@@ -79,9 +76,9 @@ if __name__ == "__main__":
 	pms.cfg.page_height = 16
 	pms.cfg.skip = 1
 	pms.cfg.padding = 3
-	#pms.cfg.colour = (.9, 1.0, .2)
-	#pms.cfg.colour = (.6, .6, 1.0)
-	pms.cfg.colour = (.3, 1.0, .3)
+	pms.cfg.colour = (.9, 1.0, .2)
+	#ms.cfg.colour = (.6, .6, 1.0)
+	#pms.cfg.colour = (.3, 1.0, .3)
 	pms.cfg.intensity_background = .3
 	pms.cfg.intensity_txt = .7
 	pms.cfg.intensity_txt_highlight = 1.0
@@ -89,8 +86,6 @@ if __name__ == "__main__":
 	pms.cfg.pointer_opacity = .8
 	
 	pms.cfg.auto_scroll_delay = .15
-	
-	pms.update_modulepropview = dummy
 	
 	randomcomposer.muzakize()
 

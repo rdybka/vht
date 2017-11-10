@@ -99,6 +99,11 @@ class PMSModule(Iterable):
 	def play(self):
 		return libpms.module_is_playing()
 		
+	@property
+	def curr_seq(self):
+		return libpms.module_get_curr_seq()
+	
+		
 	@play.setter
 	def play(self, value):
 		if value:

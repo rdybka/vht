@@ -126,7 +126,7 @@ class TrackView(Gtk.DrawingArea):
 			self.txt_width = int(dx)
 
 			nw = dx
-			nh = (self.txt_height * self.seq.length) + 5
+			nh = (self.txt_height * self.seq.length) + 10
 			self.set_size_request(nw, nh)
 				
 			if complete:
@@ -185,7 +185,7 @@ class TrackView(Gtk.DrawingArea):
 		self.txt_width = int(dx)
 
 		nw = self.txt_width * len(self.trk)
-		nh = self.txt_height * self.trk.nrows
+		nh = (self.txt_height * self.trk.nrows) + 5
 		self.set_size_request(nw, nh)
 		
 		if complete:
@@ -371,13 +371,14 @@ class TrackView(Gtk.DrawingArea):
 			if trk == self:
 				return
 
-			old = self.edit[1]
+			old = self.edit
+			self.edit = None
 			self.parent.change_active_track(trk)
 			
-			trk.edit = 0, int(round((self.edit[1] * self.spacing) / trk.spacing))
+			trk.edit = 0, int(round((old[1] * self.spacing) / trk.spacing))
 			trk.redraw(trk.edit[1])
 			
-			self.redraw(old)
+			self.redraw(old[1])
 			
 	def go_left(self, skip_track = False, rev = True):
 		self.go_right(skip_track, rev)
@@ -414,6 +415,7 @@ class TrackView(Gtk.DrawingArea):
 				self.edit = self.edit[0], self.edit[1] + self.trk.nrows
 			self.redraw(self.edit[1])
 			self.redraw(old)
+			self.undo_buff.add_state()
 			return True
 				
 		if event.keyval == 65307:			# esc

@@ -52,7 +52,7 @@ extern sequence *module_get_seq(int);
 extern void module_add_sequence(sequence *seq);
 extern void module_del_sequence(int s);
 extern void module_swap_sequence(int s1, int s2);
-
+extern int module_get_curr_seq();
 extern void module_dump_notes(int);
 
 // sequence

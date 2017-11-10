@@ -7,7 +7,7 @@ from trackview import TrackView
 
 class TrackPropViewPopover(Gtk.Popover):
 	def __init__(self, parent, trk):
-		Gtk.Popover.__init__(self)
+		super(TrackPropViewPopover, self).__init__()
 		self.set_relative_to(parent)
 
 		self.set_events(Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.ENTER_NOTIFY_MASK)
@@ -102,46 +102,50 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.grid.attach(lbl, 0, 2, 1, 1)
 			self.grid.attach(self.channel_button, 1, 2, 2, 1)
 
-			self.nrows_adj = Gtk.Adjustment(1, 1, 256, 1.0, 1.0)
-			self.nrows_button = Gtk.SpinButton()
-			self.nrows_button.set_adjustment(self.nrows_adj)
-			self.nrows_adj.set_value(trk.nrows)
-			self.nrows_adj.connect("value-changed", self.on_nrows_changed)
-
-			lbl = Gtk.Label("rows")
-			lbl.set_xalign(1.0)
-			
-			self.nrows_check_button = Gtk.CheckButton()
-			self.nrows_check_button.connect("toggled", self.on_nrows_toggled)
-
-			
-			self.grid.attach(lbl, 0, 4, 1, 1)
-			self.grid.attach(self.nrows_button, 1, 4, 2, 1)
-			self.grid.attach(self.nrows_check_button, 3, 4, 1, 1)
-			
 			self.nsrows_adj = Gtk.Adjustment(1, 1, self.parent.seq.length, 1.0, 1.0)
 			self.nsrows_button = Gtk.SpinButton()
 			self.nsrows_button.set_adjustment(self.nsrows_adj)
 			self.nsrows_adj.set_value(trk.nsrows)
 			self.nsrows_adj.connect("value-changed", self.on_nsrows_changed)
 
-			lbl = Gtk.Label("over")
+			lbl = Gtk.Label("rows:")
 			lbl.set_xalign(1.0)
 			
 			self.nsrows_check_button = Gtk.CheckButton()
 			self.nsrows_check_button.connect("toggled", self.on_nsrows_toggled)
+
+			
+			self.grid.attach(lbl, 0, 4, 1, 1)
+			self.grid.attach(self.nsrows_button, 1, 4, 2, 1)
+			self.grid.attach(self.nsrows_check_button, 3, 4, 1, 1)
+			
+			self.nrows_adj = Gtk.Adjustment(1, 1, 256, 1.0, 1.0)
+			self.nrows_button = Gtk.SpinButton()
+			self.nrows_button.set_adjustment(self.nrows_adj)
+			self.nrows_adj.set_value(trk.nsrows)
+			self.nrows_adj.connect("value-changed", self.on_nrows_changed)
+
+			lbl = Gtk.Label("funk:")
+			lbl.set_xalign(1.0)
+			
+			self.nrows_check_button = Gtk.CheckButton()
+			self.nrows_check_button.connect("toggled", self.on_nrows_toggled)
 			
 			self.grid.attach(lbl, 0, 5, 1, 1)
-			self.grid.attach(self.nsrows_button, 1, 5, 2, 1)
-			self.grid.attach(self.nsrows_check_button, 3, 5, 1, 1)
+			self.grid.attach(self.nrows_button, 1, 5, 2, 1)
+			self.grid.attach(self.nrows_check_button, 3, 5, 1, 1)
 
 			self.nrows_button.set_sensitive(False)
 			self.nsrows_button.set_sensitive(False)
-			self.nsrows_check_button.set_sensitive(False)
+			self.nrows_check_button.set_sensitive(False)
 			
-
 			self.grid.show_all()
 			self.add(self.grid)
+
+	def popup(self):
+		self.nrows_adj.set_value(self.trk.nrows)
+		self.nsrows_adj.set_value(self.trk.nsrows)
+		super().popup()
 
 	def on_leave(self, wdg, prm):
 		if prm.detail == Gdk.NotifyType.NONLINEAR:
@@ -183,6 +187,11 @@ class TrackPropViewPopover(Gtk.Popover):
 
 	def on_nsrows_changed(self, adj):
 		self.trk.nsrows = int(adj.get_value())
+		
+		if not self.nrows_check_button.get_active():
+			self.trk.nrows = int(adj.get_value())
+			self.nrows_adj.set_value(adj.get_value())
+		
 		self.parent.seqview.recalculate_row_spacing()
 		
 	def on_nrows_toggled(self, wdg):
@@ -191,17 +200,20 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.nsrows_check_button.set_sensitive(True)		
 		else:
 			self.nrows_button.set_sensitive(False)
-			self.nsrows_button.set_sensitive(False)
-			self.nsrows_check_button.set_sensitive(False)
-			self.nsrows_check_button.set_active(False)
-			self.nrows_adj.set_value(self.parent.seq.length)
-			self.nsrows_adj.set_value(self.parent.seq.length)
-		
+			self.nrows_check_button.set_active(False)
+			self.nrows_adj.set_value(self.nsrows_adj.get_value())
+								
 	def on_nsrows_toggled(self, wdg):
 		if (wdg.get_active()):
 			self.nsrows_button.set_sensitive(True)
+			self.nrows_check_button.set_sensitive(True)
 		else:
 			self.nsrows_button.set_sensitive(False)
+			self.nrows_button.set_sensitive(False)
+			self.nrows_check_button.set_active(False)
+			self.nrows_check_button.set_sensitive(False)
+			
+			self.nrows_adj.set_value(self.parent.seq.length)
 			self.nsrows_adj.set_value(self.parent.seq.length)
 
 	def on_move_left_button_clicked(self, switch):

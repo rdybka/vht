@@ -6,6 +6,7 @@ import cairo
 from trackview import TrackView
 from propview import PropView
 from trackpropview import TrackPropView
+from statusbar import StatusBar
 
 from pypms import pms
 
@@ -70,13 +71,21 @@ class SequenceView(Gtk.Box):
 		hbox.pack_start(self._side_prop, False, True, 0)
 
 		self.pack_start(hbox, False, True, 0)
+		
+		vbox = Gtk.Box()
+		vbox.set_orientation(Gtk.Orientation.VERTICAL)
+		
+		self._status_bar = StatusBar()
 				
 		hbox = Gtk.Box()
 		hbox.pack_start(self._side, False, True, 0)
 		hbox.pack_end(self._sv, True, True, 0)
 
-		self.pack_end(hbox, True, True, 0)
-
+		vbox.pack_start(hbox, True, True, 0)
+		vbox.pack_end(self._status_bar, False, True, 0)
+				
+		self.pack_end(vbox, True, True, 0)
+		
 		self._sv_vadj = self._sv.get_vadjustment()
 		self._sv_hadj = self._sv.get_hadjustment()
 		
@@ -118,13 +127,33 @@ class SequenceView(Gtk.Box):
 		#print(event.keyval, event.state)
 	
 		if event.keyval == 65293:		# enter
-			if event.state & Gdk.ModifierType.MOD2_MASK: # alt-enter
+			if event.state & Gdk.ModifierType.MOD1_MASK: # alt-enter
 				if pms.mainwin.fs:
 					pms.mainwin.unfullscreen()
 					pms.mainwin.fs = False
 				else:
 					pms.mainwin.fullscreen()
 					pms.mainwin.fs = True
+			
+				return True
+			
+			# play/stop
+			if pms.play:
+				pms.play = 0
+			else:
+				pms.play = 1
+			
+		if event.keyval == 65307:			# esc
+			if TrackView.active_track:
+				if TrackView.active_track.edit:
+					return TrackView.active_track.on_key_press(widget, event)
+			
+			if not pms.play:
+				pms.reset()
+			else:
+				pms.play = 0
+				
+			return True
 	
 		if event.keyval == 122:			# z
 			if event.state & Gdk.ModifierType.CONTROL_MASK:
@@ -138,7 +167,6 @@ class SequenceView(Gtk.Box):
 
 		if event.keyval == 65451:		# +
 			pms.cfg.skip += 1
-			pms.update_modulepropview()
 			return True
 		
 		if event.keyval == 65453:		# -
@@ -148,7 +176,6 @@ class SequenceView(Gtk.Box):
 				
 		if event.keyval == 65453:		# -
 			pms.cfg.skip -= 1
-			pms.update_modulepropview()
 			return True
 		
 		if event.keyval == 113:		# q
@@ -160,14 +187,13 @@ class SequenceView(Gtk.Box):
 			pms.cfg.octave += 1
 			if pms.cfg.octave > 8:
 				pms.cfg.octave = 8
-			pms.update_modulepropview()
+			
 			return True
 		
 		if event.keyval == 65455:		# /
 			pms.cfg.octave -= 1
 			if pms.cfg.octave < 0:
 				pms.cfg.octave = 0
-			pms.update_modulepropview()
 			return True
 		
 		if not TrackView.active_track:
@@ -263,6 +289,7 @@ class SequenceView(Gtk.Box):
 				TrackView.track_views.remove(wdg)
 				self.seq.del_track(trk.index)
 				wdg.destroy()
+				self.recalculate_row_spacing()
 				return
 	
 	def change_active_track(self, trk):
@@ -347,7 +374,7 @@ class SequenceView(Gtk.Box):
 			htarget = self._track_box.get_allocated_width() - w
 		
 		htarget = hadj.get_value() + ((htarget - hadj.get_value()) * pms.cfg.auto_scroll_delay)
-			
+
 		hadj.set_value(htarget)
 		
 		self._sv.set_hadjustment(hadj)

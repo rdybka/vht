@@ -40,6 +40,10 @@ class SequencePropViewPopover(Gtk.Popover):
 
 	def on_length_changed(self, adj):
 		self.seq.length = int(adj.get_value())
+		for trk in self.seq:
+			if trk.nsrows > self.seq.length:
+				trk.nsrows  = self.seq.length
+		
 		self.parent.seqview.recalculate_row_spacing()
 		self.parent.seqview.redraw_track()
 		self.parent.seqview.queue_draw()
@@ -56,4 +60,5 @@ class SequencePropViewPopover(Gtk.Popover):
 
 	def on_add_button_clicked(self, switch):
 		self.parent.add_track()
+		self.parent.seqview.recalculate_row_spacing()
 	

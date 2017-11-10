@@ -56,6 +56,10 @@ sequence *module_get_seq(int n) {
     return module.seq[n];
 }
 
+int module_get_curr_seq() {
+	return module.curr_seq;
+}
+
 int sequence_get_ntrk(sequence *seq) {
     return seq->ntrk;
 }
