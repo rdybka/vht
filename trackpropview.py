@@ -155,8 +155,8 @@ class TrackPropView(Gtk.DrawingArea):
 		self.txt_width = int(dx)
 
 		
-		if TrackView.active_track:
-			if TrackView.active_track.trk.index == self.trk.index:
+		if pms.active_track:
+			if pms.active_track.trk.index == self.trk.index:
 				gradient = cairo.LinearGradient(0, 0, 0, h)
 				gradient.add_color_stop_rgb(0.0, *(col *  pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))
 				gradient.add_color_stop_rgb(1.0, *(col * pms.cfg.intensity_background for col in pms.cfg.colour))
@@ -175,8 +175,8 @@ class TrackPropView(Gtk.DrawingArea):
 		
 		cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
 		
-		if TrackView.active_track:
-			if TrackView.active_track.trk.index == self.trk.index:
+		if pms.active_track:
+			if pms.active_track.trk.index == self.trk.index:
 				cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
 					
 		cr.move_to(x, self.txt_height)	

@@ -55,6 +55,10 @@ extern void module_swap_sequence(int s1, int s2);
 extern int module_get_curr_seq();
 extern void module_dump_notes(int);
 
+extern void queue_midi_note_on(int port, int chn, int note, int velocity);
+extern void queue_midi_note_off(int port, int chn, int note);
+
+
 // sequence
 extern sequence *sequence_new(int length);
 extern int sequence_get_ntrk(sequence *seq);

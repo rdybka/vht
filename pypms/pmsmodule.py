@@ -24,6 +24,7 @@ class PMSModule(Iterable):
 	# see pypmsapitest.py for general usage
 	def __init__(self):
 		self._seq = None
+		self.active_track = None
 		libpms.module_new();
 		super()
 	
@@ -87,6 +88,12 @@ class PMSModule(Iterable):
 			ret = ret + "%d : %d\n" % (len(itm), itm.length)
 		return ret
 
+	def sneakily_queue_midi_note_on(self, port, chn, note, velocity):
+		libpms.queue_midi_note_on(port, chn, note, velocity)
+		
+	def sneakily_queue_midi_note_off(self, port, chn, note):
+		libpms.queue_midi_note_off(port, chn, note)
+	
 	@property
 	def jack_error(self):
 		return libpms.get_jack_error()

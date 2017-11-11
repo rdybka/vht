@@ -46,6 +46,8 @@ char *midi_describe_event(midi_event evt, char *output, int len);
 char *i2n(unsigned char i);
 int parse_note(char *);
 
+void queue_midi_note_on(int port, int chn, int note, int velocity);
+void queue_midi_note_off(int port, int chn, int note);
 void midi_buffer_clear();
 void midi_buffer_flush();
 void midi_buffer_add(int port, midi_event evt);

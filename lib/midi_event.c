@@ -26,8 +26,10 @@
 #include "module.h"
 
 midi_event midi_buffer[JACK_CLIENT_MAX_PORTS][EVT_BUFFER_LENGTH];
+midi_event midi_queue_buffer[JACK_CLIENT_MAX_PORTS][EVT_BUFFER_LENGTH];
 
 int curr_midi_event[JACK_CLIENT_MAX_PORTS];
+int curr_midi_queue_event[JACK_CLIENT_MAX_PORTS];
 
 int midi_encode_event(midi_event evt, unsigned char *buff) {
     if (evt.type == none)
@@ -155,6 +157,22 @@ void midi_buffer_add(int port, midi_event evt) {
     }
 }
 
+void midi_queue_buffer_add(int port, midi_event evt) {
+    if (curr_midi_queue_event[port] == EVT_BUFFER_LENGTH)
+        return;
+
+    if ((port >= jack_n_output_ports) || (port < 0))
+        return;
+
+    midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
+
+    if (module.dump_notes) {
+        char desc[256];
+        midi_describe_event(evt, desc, 256);
+        printf("%02d:%02d:%03d %s\n", module.min, module.sec, module.ms, desc);
+    }
+}
+
 int midi_buffer_compare(const void *a, const void *b) {
     return ((midi_event *)a)->time - ((midi_event *)b)->time;
 }
@@ -162,6 +180,13 @@ int midi_buffer_compare(const void *a, const void *b) {
 void midi_buffer_flush_port(int port) {
     void *outp = jack_port_get_buffer(jack_output_ports[port], jack_buffer_size);
     jack_midi_clear_buffer(outp);
+
+	for (int f = 0; f < curr_midi_queue_event[port]; f++) {
+		midi_buffer_add(port, midi_queue_buffer[port][f]);
+	}
+
+    for (int i = 0; i < JACK_CLIENT_MAX_PORTS; i++)
+        curr_midi_queue_event[i] = 0;
 
     if (curr_midi_event[port] == 0)
         return;
@@ -215,4 +240,26 @@ int parse_note(char *buff) {
     }
 
     return note + octave * 12;
+}
+
+void queue_midi_note_on(int port, int chn, int note, int velocity){
+	midi_event evt;
+	evt.type = note_on;
+	evt.channel = chn;
+	evt.note = note;
+	evt.velocity = velocity;
+	evt.time = 0;
+	
+	midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
+}
+
+void queue_midi_note_off(int port, int chn, int note) {
+	midi_event evt;
+	evt.type = note_off;
+	evt.channel = chn;
+	evt.note = note;
+	evt.velocity = 0;
+	evt.time = 0;
+	
+	midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
 }

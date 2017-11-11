@@ -146,9 +146,9 @@ class SequenceView(Gtk.Box):
 				pms.play = 1
 			
 		if event.keyval == 65307:			# esc
-			if TrackView.active_track:
-				if TrackView.active_track.edit:
-					return TrackView.active_track.on_key_press(widget, event)
+			if pms.active_track:
+				if pms.active_track.edit:
+					return pms.active_track.on_key_press(widget, event)
 			
 			if not pms.play:
 				pms.reset()
@@ -159,8 +159,8 @@ class SequenceView(Gtk.Box):
 	
 		if event.keyval == 122:			# z
 			if event.state & Gdk.ModifierType.CONTROL_MASK:
-				if TrackView.active_track:
-					return TrackView.active_track.on_key_press(widget, event)
+				if pms.active_track:
+					return pms.active_track.on_key_press(widget, event)
 				
 		if event.keyval == 65451:		# +
 			if event.state & Gdk.ModifierType.CONTROL_MASK:
@@ -198,29 +198,29 @@ class SequenceView(Gtk.Box):
 				pms.cfg.octave = 0
 			return True
 		
-		if not TrackView.active_track:
+		if not pms.active_track:
 			vals = [65364, 65362, 65363, 65361, 65366, 65365, 65360, 65367]
 				
 			for v in vals:
 				if event.keyval == v:
-					TrackView.active_track = self.get_tracks()[0]
-					TrackView.active_track.edit = 0, 0
+					pms.active_track = self.get_tracks()[0]
+					pms.active_track.edit = 0, 0
 					
-		if TrackView.active_track:
-			if not TrackView.active_track.edit:
+		if pms.active_track:
+			if not pms.active_track.edit:
 				vals = [65364, 65362, 65363, 65361, 65366, 65365, 65360, 65367]
 			
 				for v in vals:
 					if event.keyval == v:
-						TrackView.active_track.edit = 0, 0
+						pms.active_track.edit = 0, 0
 			
-			return TrackView.active_track.on_key_press(widget, event)
+			return pms.active_track.on_key_press(widget, event)
 
 		return False
 
 	def on_key_release(self, widget, event):
-		if TrackView.active_track:
-			return TrackView.active_track.on_key_release(widget, event)
+		if pms.active_track:
+			return pms.active_track.on_key_release(widget, event)
 			
 		return False
 
@@ -251,19 +251,19 @@ class SequenceView(Gtk.Box):
 			
 			return True
 			
-		if TrackView.active_track:
-			if TrackView.active_track.edit:
-				old = TrackView.active_track.edit[1]
+		if pms.active_track:
+			if pms.active_track.edit:
+				old = pms.active_track.edit[1]
 
-				TrackView.active_track.edit = int(TrackView.active_track.edit[0]), int(TrackView.active_track.edit[1] + event.delta_y)
-				if TrackView.active_track.edit[1] >= TrackView.active_track.trk.nrows:
-					TrackView.active_track.edit = TrackView.active_track.edit[0], TrackView.active_track.trk.nrows - 1
+				pms.active_track.edit = int(pms.active_track.edit[0]), int(pms.active_track.edit[1] + event.delta_y)
+				if pms.active_track.edit[1] >= pms.active_track.trk.nrows:
+					pms.active_track.edit = pms.active_track.edit[0], pms.active_track.trk.nrows - 1
 				
-				if TrackView.active_track.edit[1] < 0:
-					TrackView.active_track.edit = TrackView.active_track.edit[0], 0
+				if pms.active_track.edit[1] < 0:
+					pms.active_track.edit = pms.active_track.edit[0], 0
 				
-				TrackView.active_track.redraw(old)
-				TrackView.active_track.redraw(TrackView.active_track.edit[1])
+				pms.active_track.redraw(old)
+				pms.active_track.redraw(pms.active_track.edit[1])
 				return True	
 			
 		return False
@@ -295,9 +295,9 @@ class SequenceView(Gtk.Box):
 				return
 	
 	def change_active_track(self, trk):
-		ac = TrackView.active_track
+		ac = pms.active_track
 		
-		TrackView.active_track = trk
+		pms.active_track = trk
 		if ac != trk:
 			if ac:
 				self._prop_view.redraw(ac.trk.index)

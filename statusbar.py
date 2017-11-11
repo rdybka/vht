@@ -59,7 +59,7 @@ class StatusBar(Gtk.DrawingArea):
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
 
-		trk = TrackView.active_track
+		trk = pms.active_track
 				
 		t = 0
 		r = 0

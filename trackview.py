@@ -9,7 +9,6 @@ from poormanspiano import PoorMansPiano
 
 class TrackView(Gtk.DrawingArea):
 	track_views = []
-	active_track = None
 	
 	def leave_all():
 		for wdg in TrackView.track_views:
@@ -274,8 +273,8 @@ class TrackView(Gtk.DrawingArea):
 		if not self.trk:
 			return False
 		
-		if TrackView.active_track:
-			if not TrackView.active_track.edit:
+		if pms.active_track:
+			if not pms.active_track.edit:
 				self.parent.change_active_track(self)
 		else:
 			self.parent.change_active_track(self)
@@ -340,14 +339,14 @@ class TrackView(Gtk.DrawingArea):
 			
 			if self.edit[0] >= len(self.trk):
 				self.go_right(True)
-				TrackView.active_track.edit = 0, TrackView.active_track.edit[1]
-				TrackView.active_track.redraw()
+				pms.active_track.edit = 0, pms.active_track.edit[1]
+				pms.active_track.redraw()
 				return
 				
 			if self.edit[0] < 0:
 				self.go_left(True)
-				TrackView.active_track.edit = len(TrackView.active_track.trk) - 1, TrackView.active_track.edit[1]
-				TrackView.active_track.redraw()
+				pms.active_track.edit = len(pms.active_track.trk) - 1, pms.active_track.edit[1]
+				pms.active_track.redraw()
 				return
 				
 			self.redraw(old)
@@ -384,6 +383,8 @@ class TrackView(Gtk.DrawingArea):
 		self.go_right(skip_track, rev)
 
 	def on_key_press(self, widget, event):
+		note = self.pmp.key2note(event.keyval)
+		
 		if not self.trk:
 			return
 		
@@ -565,4 +566,10 @@ class TrackView(Gtk.DrawingArea):
 		return False
 
 	def on_key_release(self, widget, event):
+		if not self.trk:
+			return
+		
+		#print("key : %d" % (event.keyval))
+			
+		note = self.pmp.key2note(event.keyval, True)
 		return False
