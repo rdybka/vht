@@ -383,8 +383,6 @@ class TrackView(Gtk.DrawingArea):
 		self.go_right(skip_track, rev)
 
 	def on_key_press(self, widget, event):
-		note = self.pmp.key2note(event.keyval)
-		
 		if not self.trk:
 			return
 		
@@ -394,14 +392,15 @@ class TrackView(Gtk.DrawingArea):
 			if event.keyval == 122:			# z
 				self.undo_buff.restore()
 				self.parent.redraw_track(self.trk)
-				for wdg in self.parent._prop_view._track_box.get_children():
-					wdg.redraw()
+				#for wdg in self.parent._prop_view._track_box.get_children():
+				#	wdg.redraw()
 				return True
+
+		note = self.pmp.key2note(event.keyval)
 				
 		if not self.edit:
 			return False
 
-		note = self.pmp.key2note(event.keyval)
 		if note:
 			self.undo_buff.add_state()
 			old = self.edit[1]
