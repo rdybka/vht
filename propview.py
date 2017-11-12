@@ -29,8 +29,9 @@ class PropView(Gtk.ScrolledWindow):
 		self.reindex_tracks()
 
 	def on_leave(self, wdg, prm):
-		if prm.detail == Gdk.NotifyType.NONLINEAR:
-			self.clear_popups()
+		pass
+		#if prm.detail == Gdk.NotifyType.NONLINEAR:
+		#	self.clear_popups()
 
 	def add_track(self, trk):
 		t = TrackPropView(trk, self.seq, self.seqview, self)

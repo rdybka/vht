@@ -269,7 +269,7 @@ class SequenceView(Gtk.Box):
 		return False
 
 	def on_motion(self, widget, event):
-		pms.clear_popups()
+		#pms.clear_popups()
 		self._sv.grab_focus()
 	
 	def add_track(self, trk):

@@ -148,7 +148,8 @@ class TrackPropViewPopover(Gtk.Popover):
 		super().popup()
 
 	def on_leave(self, wdg, prm):
-		if prm.detail == Gdk.NotifyType.NONLINEAR:
+		if self.entered:
+			if prm.detail == Gdk.NotifyType.NONLINEAR:
 				wdg.popdown()
 				self.entered = False
 

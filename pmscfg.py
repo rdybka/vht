@@ -2,7 +2,7 @@
 class cfg():
 	def __init__(self):
 		self._highlight = 4
-		self.on_highlight = []
+		self.on_highlight = []			# add callbacks here
 
 		self.seq_font = "Roboto Mono Medium"
 		#self.seq_font = "Ubuntu Mono"
