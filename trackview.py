@@ -259,6 +259,9 @@ class TrackView(Gtk.DrawingArea):
 
 	def on_motion(self, widget, event):
 		oh = self.hover
+		
+		if event.y > 50:
+			pms.clear_popups()
 				
 		new_hover_row = int(event.y / self.txt_height)
 		new_hover_column = int(event.x / self.txt_width)
@@ -288,7 +291,18 @@ class TrackView(Gtk.DrawingArea):
 		row = int(event.y / self.txt_height)
 		col = int(event.x / self.txt_width)
 		offs = int(event.x) % int(self.txt_width)
-		
+
+		if event.button == 3:			# right click
+			if self.trk[col][row].type == 0:
+				self.edit = None
+				self.redraw()
+				return True
+						
+			self.trk[col][row].clear()
+			self.redraw(row)
+			self.undo_buff.add_state()
+			return True
+					
 		enter_edit = False
 		
 		if not self.trk[col][row].type:	# empty

@@ -41,7 +41,7 @@ void sequence_add_track(sequence *seq, track *trk) {
     }
 
     seq->trk = realloc(seq->trk, sizeof(track *) * (seq->ntrk + 1));
-
+	track_wind(trk, seq->pos);
     seq->trk[seq->ntrk++] = trk;
     module_excl_out();
     return;
