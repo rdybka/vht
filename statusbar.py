@@ -35,19 +35,7 @@ class StatusBar(Gtk.DrawingArea):
 		w = self.get_allocated_width()
 		h = self.get_allocated_height()
 		
-		self._context.select_font_face(pms.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)	
-		fs = pms.cfg.seq_font_size
-		
 		(x, y, width, height, dx, dy) = cr.text_extents("PMS" * self.min_char_width)
-		
-		fits = False
-		while not fits:
-			self._context.set_font_size(fs)
-			(x, y, width, height, dx, dy) = cr.text_extents("X" * self.min_char_width)
-			if w > width:
-				fits = True
-			else:
-				fs -= 1
 
 		self.set_size_request(1, height * 1.5)
 
@@ -171,13 +159,27 @@ class StatusBar(Gtk.DrawingArea):
 		if self._surface:
 			self._surface.finish()
 
-		self._surface = wdg.get_window().create_similar_surface(cairo.CONTENT_COLOR,
-			wdg.get_allocated_width(),
-			wdg.get_allocated_height())
+		w = wdg.get_allocated_width()
+		h = wdg.get_allocated_width()
+		
+		self._surface = wdg.get_window().create_similar_surface(cairo.CONTENT_COLOR, w, h)
 
 		self._context = cairo.Context(self._surface)
 		self._context.set_antialias(cairo.ANTIALIAS_NONE)
 		self._context.set_line_width((pms.cfg.seq_font_size / 6.0) * pms.cfg.seq_line_width)
+
+		self._context.select_font_face(pms.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)	
+		
+		fs = pms.cfg.seq_font_size	
+		fits = False
+		while not fits:
+			self._context.set_font_size(fs)
+			(x, y, width, height, dx, dy) = self._context.text_extents("X" * self.min_char_width)
+			if w > width:
+				fits = True
+			else:
+				fs -= 1
+
 		self.redraw()
 		return True
 
