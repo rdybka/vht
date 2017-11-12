@@ -18,8 +18,10 @@ class trackviewpointer():
 		self._parent = parent
 		
 		self.height = pms.cfg.seq_font_size
-		self.y = 0
-		self.yy = 0
+		#self.y = 0
+		#self.yy = 0
+
+		self.lpos = None
 
 		self.stopped = False
 
@@ -27,8 +29,7 @@ class trackviewpointer():
 		if not pms.playing and pos == 0:
 			if self.stopped:
 				return
-		
-	
+			
 			self._parent.redraw()
 			self.stopped = True
 			return
@@ -45,7 +46,11 @@ class trackviewpointer():
 		if y < 0:
 			y = 0
 		
+		if self.lpos:
+			self._parent.redraw(self.lpos - 2, self.lpos + 2)
+			
 		self._parent.redraw(pos - 2, pos + 2)
+		self.lpos = pos
 
 		y = pos * self._parent.txt_height
 		y -= self.height / 2.0
@@ -108,7 +113,6 @@ class trackviewpointer():
 
 		if int(pos) == 0:
 			self._parent.redraw(self.trk.nrows -1)
-			
 			cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))	
 			cr.rectangle(0, self.trk.nrows * self._parent.txt_height, w, self._parent.txt_height)
 			cr.fill()
