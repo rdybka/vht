@@ -52,6 +52,8 @@ class TrackView(Gtk.DrawingArea):
 		self.spacing = 1.0
 		self.pmp = PoorMansPiano()
 	
+		self.drag = False
+	
 		if trk:
 			self.undo_buff = TrackUndoBuffer(trk)
 			
@@ -257,14 +259,37 @@ class TrackView(Gtk.DrawingArea):
 		cr.paint()
 		return False
 
+	def swap_row(self, col, row, col2, row2):
+		rw = self.trk[col][row]
+		rw2 = self.trk[col2][row2]
+		rw3 = self.trk[col][row]
+		rw.copy(rw2)
+		rw2.copy(rw3)
+		
 	def on_motion(self, widget, event):
-		oh = self.hover
+		if not self.trk:
+			return False
+		
+		new_hover_row = min(int(event.y / self.txt_height), self.trk.nrows - 1)
+		new_hover_column = min(int(event.x / self.txt_width), len(self.trk) -1)
+
+		new_hover_row = max(new_hover_row, 0)
+		new_hover_column = max(new_hover_column, 0)
 		
 		if event.y > 50:
 			pms.clear_popups()
-				
-		new_hover_row = int(event.y / self.txt_height)
-		new_hover_column = int(event.x / self.txt_width)
+
+		if self.drag:
+			if self.trk[new_hover_column][new_hover_row].type == 0:
+				if self.edit[1] != new_hover_row or self.edit[0] != new_hover_column:
+					old_row = self.edit[1]
+					self.swap_row(self.edit[0], self.edit[1], new_hover_column, new_hover_row)
+					self.edit = new_hover_column, new_hover_row
+					
+					self.redraw(new_hover_row)
+					self.redraw(old_row)
+
+		oh = self.hover
 		self.hover = new_hover_column, new_hover_row
 		
 		if (self.hover != oh):
@@ -272,9 +297,6 @@ class TrackView(Gtk.DrawingArea):
 				self.redraw(oh[1])
 				
 			self.redraw(self.hover[1])
-		
-		if not self.trk:
-			return False
 		
 		if pms.active_track:
 			if not pms.active_track.edit:
@@ -307,14 +329,19 @@ class TrackView(Gtk.DrawingArea):
 		
 		if not self.trk[col][row].type:	# empty
 			enter_edit = True
+
+		if self.trk[col][row].type == 1:# note_ob
+			enter_edit = True
+			self.drag = True
 			
 		if self.trk[col][row].type == 2:# note_off
 			enter_edit = True
+			self.drag = True
 		
 		if offs < self.txt_width / 2.0:	# edit note
 			enter_edit = True
 		else: 							# edit velocity
-			pass
+			enter_edit = True
 
 		if enter_edit:
 			TrackView.leave_all()
@@ -330,6 +357,11 @@ class TrackView(Gtk.DrawingArea):
 		return True
 		
 	def on_button_release(self, widget, event):
+		if event.button == 1:	
+			if self.drag:
+				self.drag = False
+				self.undo_buff.add_state()
+			
 		return False
 
 	def on_leave(self, wdg, prm):
