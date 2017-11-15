@@ -25,8 +25,13 @@ class cfg():
 		self.intensity_txt = .7
 		self.intensity_txt_highlight = 1.0
 		self.intensity_lines = .6
+		self.intensity_select = .8
 		self.pointer_opacity = .8
-	
+		
+		self.select_button = 1
+		self.delete_button = 3
+		self.drag_button = 8
+		
 		self.auto_scroll_delay = .15
 
 	@property

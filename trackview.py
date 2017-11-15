@@ -1,6 +1,6 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gdk, Gtk, Gio
+from gi.repository import GLib, Gdk, Gtk, Gio
 import cairo
 from pypms import pms
 from trackviewpointer import trackviewpointer
@@ -9,15 +9,18 @@ from poormanspiano import PoorMansPiano
 
 class TrackView(Gtk.DrawingArea):
 	track_views = []
+	clipboard = {}
 	
 	def leave_all():
 		for wdg in TrackView.track_views:
 			redr = False
-			if wdg.hover or wdg.edit:
+			if wdg.hover or wdg.edit or wdg.select_start:
 				redr = True
 				
 			wdg.hover = None
 			wdg.edit = None
+			wdg.select_start = None
+			wdg.select_end = None
 			
 			if redr:
 				wdg.redraw()
@@ -53,6 +56,9 @@ class TrackView(Gtk.DrawingArea):
 		self.pmp = PoorMansPiano()
 	
 		self.drag = False
+		self.select = False
+		self.select_start = None
+		self.select_end = None
 	
 		if trk:
 			self.undo_buff = TrackUndoBuffer(trk)
@@ -217,11 +223,37 @@ class TrackView(Gtk.DrawingArea):
 						cr.set_source_rgb(*(col * pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))
 					else:
 						cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
-		
-				if self.edit and r == self.edit[1] and c == self.edit[0]:
-					cr.rectangle(c * self.txt_width, (r * self.txt_height) + self.txt_height * .1, (self.txt_width / 8.0) * 7.2, self.txt_height * .9)
-					cr.fill()
-					cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
+	
+				if self.select_start and self.select_end:
+					ssx = self.select_start[0]
+					ssy = self.select_start[1]
+					sex = self.select_end[0]
+					sey = self.select_end[1]
+				
+					if sex < ssx:
+						xxx = sex
+						sex	= ssx
+						ssx = xxx
+				
+					if sey < ssy:
+						yyy = sey
+						sey = ssy
+						ssy = yyy
+					
+					if c >= ssx and c <= sex and r >= ssy and r <= sey:
+						cr.set_source_rgb(*(col * pms.cfg.intensity_select for col in pms.cfg.colour))
+						if c == len(self.trk) - 1:
+							cr.rectangle(c * self.txt_width, r * self.txt_height, (self.txt_width / 8.0) * 7.2, self.txt_height)
+						else:
+							cr.rectangle(c * self.txt_width, r * self.txt_height, self.txt_width, self.txt_height)
+						cr.fill()
+						cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
+
+				if not self.select_start and not self.select_end:
+					if self.edit and r == self.edit[1] and c == self.edit[0]:
+						cr.rectangle(c * self.txt_width, (r * self.txt_height) + self.txt_height * .1, (self.txt_width / 8.0) * 7.2, self.txt_height * .9)
+						cr.fill()
+						cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
 						
 				yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2)
 				
@@ -279,8 +311,17 @@ class TrackView(Gtk.DrawingArea):
 		if event.y > 50:
 			pms.clear_popups()
 
+		if self.select:
+			if not self.select_start:
+				self.select_start = self.edit
+				self.select_end = self.select_start
+			
+			if self.select_end[1] != new_hover_row or self.select_end[0] != new_hover_column:
+				self.select_end = new_hover_column, new_hover_row
+				self.redraw()
+
 		if self.drag:
-			if self.trk[new_hover_column][new_hover_row].type == 0:
+			if self.trk[new_hover_column][new_hover_row].type == 0:		# dragging
 				if self.edit[1] != new_hover_row or self.edit[0] != new_hover_column:
 					old_row = self.edit[1]
 					self.swap_row(self.edit[0], self.edit[1], new_hover_column, new_hover_row)
@@ -314,7 +355,7 @@ class TrackView(Gtk.DrawingArea):
 		col = int(event.x / self.txt_width)
 		offs = int(event.x) % int(self.txt_width)
 
-		if event.button == 3:			# right click
+		if event.button == pms.cfg.delete_button:
 			if self.trk[col][row].type == 0:
 				self.edit = None
 				self.redraw()
@@ -327,16 +368,23 @@ class TrackView(Gtk.DrawingArea):
 					
 		enter_edit = False
 		
+		if event.button == pms.cfg.select_button:
+			self.select = True
+			self.select_start = None
+			self.select_end = None
+		
 		if not self.trk[col][row].type:	# empty
 			enter_edit = True
 
 		if self.trk[col][row].type == 1:# note_ob
 			enter_edit = True
-			self.drag = True
+			if event.button == pms.cfg.drag_button:
+				self.drag = True
 			
 		if self.trk[col][row].type == 2:# note_off
 			enter_edit = True
-			self.drag = True
+			if event.button == pms.cfg.drag_button:
+				self.drag = True
 		
 		if offs < self.txt_width / 2.0:	# edit note
 			enter_edit = True
@@ -357,7 +405,10 @@ class TrackView(Gtk.DrawingArea):
 		return True
 		
 	def on_button_release(self, widget, event):
-		if event.button == 1:	
+		if event.button == pms.cfg.select_button:
+			self.select = False
+		
+		if event.button == pms.cfg.drag_button:
 			if self.drag:
 				self.drag = False
 				self.undo_buff.add_state()
@@ -428,6 +479,64 @@ class TrackView(Gtk.DrawingArea):
 	def go_left(self, skip_track = False, rev = True):
 		self.go_right(skip_track, rev)
 
+	def copy_selection(self, cut = False):
+		if not self.select_start or not self.select_end:
+			return
+			
+		ssx = self.select_start[0]
+		ssy = self.select_start[1]
+		sex = self.select_end[0]
+		sey = self.select_end[1]
+				
+		if sex < ssx:
+			xxx = sex
+			sex	= ssx
+			ssx = xxx
+				
+		if sey < ssy:
+			yyy = sey
+			sey = ssy
+			ssy = yyy
+		
+		d = TrackView.clipboard
+		d.clear()
+		
+		for x in range(ssx, sex + 1):
+			for y in range(ssy, sey + 1):
+				r = self.trk[x][y]
+				if r.type:
+					d[(x - ssx, y - ssy)] = (r.type, r.note, r.velocity, r.delay)
+				
+				if cut:
+					self.trk[x][y].clear()
+		
+	def paste(self):
+		if not self.edit:
+			return
+			
+		d = TrackView.clipboard
+		dx = 0
+		dy = 0
+		
+		for v in d.keys():
+			dx = max(dx, v[0])
+			dy = max(dy, v[1])
+
+		while len(self.trk) - self.edit[0] < (dx + 1):
+			self.trk.add_column()
+
+		for k in d.keys():
+			dx = self.edit[0] + k[0]
+			dy = self.edit[1] + k[1]
+			if (dy < self.trk.nrows):
+				r = d[k]
+				self.trk[dx][dy].type = r[0]
+				self.trk[dx][dy].note = r[1]
+				self.trk[dx][dy].velocity = r[2]
+				self.trk[dx][dy].delay = r[3]
+		
+		self.redraw()
+
 	def on_key_press(self, widget, event):
 		if not self.trk:
 			return
@@ -435,11 +544,30 @@ class TrackView(Gtk.DrawingArea):
 		#print("key : %d" % (event.keyval))
 			
 		if event.state & Gdk.ModifierType.CONTROL_MASK:
-			if event.keyval == 122:			# z
+			if event.keyval == 122:			# ctrl-z
 				self.undo_buff.restore()
 				self.parent.redraw_track(self.trk)
-				#for wdg in self.parent._prop_view._track_box.get_children():
-				#	wdg.redraw()
+				return True
+
+		if event.state & Gdk.ModifierType.CONTROL_MASK:
+			if event.keyval == 99:			# ctrl-c
+				self.copy_selection()
+				return True
+
+		if event.state & Gdk.ModifierType.CONTROL_MASK:
+			if event.keyval == 120:			# ctrl-x
+				self.undo_buff.add_state()
+				self.copy_selection(True)
+				self.redraw()
+				return True
+
+		if event.state & Gdk.ModifierType.CONTROL_MASK:
+			if event.keyval == 118:			# ctrl-v
+				self.undo_buff.add_state()	
+				self.paste()
+				self.redraw()
+				self.undo_buff.add_state()
+				self.parent._prop_view.redraw(self.trk.index)
 				return True
 
 		note = self.pmp.key2note(event.keyval)
@@ -615,6 +743,5 @@ class TrackView(Gtk.DrawingArea):
 			return
 		
 		#print("key : %d" % (event.keyval))
-			
 		note = self.pmp.key2note(event.keyval, True)
 		return False
