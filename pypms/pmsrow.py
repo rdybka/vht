@@ -27,7 +27,10 @@ class PMSRow():
 		note = self._note % 12
 		octave = self._note // 12
 		if self._type == 1: #note_on
-			self._strrep = notes[note]+str(octave)
+			if octave < 10:
+				self._strrep = notes[note]+str(octave)
+			else:
+				self._strrep = notes[note]+'A'
 			return
 			
 		if self._type == 2: #note_off
