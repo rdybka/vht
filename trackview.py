@@ -424,10 +424,14 @@ class TrackView(Gtk.DrawingArea):
 
 		if event.button == pms.cfg.delete_button:
 			if self.trk[col][row].type == 0:
-				self.edit = None
-				self.select_start = None
-				self.select_end = None
-				self.redraw()
+				trk = pms.active_track
+				if trk:
+					trk.edit = None
+					trk.select_start = None
+					trk.select_end = None
+					trk.redraw()
+					
+				self.parent.change_active_track(self)
 				return True
 						
 			self.trk[col][row].clear()
@@ -767,10 +771,11 @@ class TrackView(Gtk.DrawingArea):
 					self.select_end = self.edit[0], self.trk.nrows - 1
 					self.edit = None
 					self.redraw()
-				elif self.select_start[1] == 0 and self.select_end[1] == self.trk.nrows -1:
-					self.select_start = 0, 0
-					self.select_end = len(self.trk) - 1, self.trk.nrows - 1
-					self.redraw()
+				elif self.select_start: 
+					if self.select_start[1] == 0 and self.select_end[1] == self.trk.nrows -1:
+						self.select_start = 0, 0
+						self.select_end = len(self.trk) - 1, self.trk.nrows - 1
+						self.redraw()
 				
 				return True
 
