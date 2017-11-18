@@ -185,8 +185,7 @@ void midi_buffer_flush_port(int port) {
 		midi_buffer_add(port, midi_queue_buffer[port][f]);
 	}
 
-    for (int i = 0; i < JACK_CLIENT_MAX_PORTS; i++)
-        curr_midi_queue_event[i] = 0;
+    curr_midi_queue_event[port] = 0;
 
     if (curr_midi_event[port] == 0)
         return;

@@ -59,7 +59,8 @@ if __name__ == "__main__":
 
 	# move this stuff to proper configuration
 	pms.cfg = pmscfg.cfg()
-
+	pms.nports = 3
+	
 	randomcomposer.muzakize()
 
 	try:
