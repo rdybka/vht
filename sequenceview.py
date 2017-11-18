@@ -152,8 +152,6 @@ class SequenceView(Gtk.Box):
 			
 			if not pms.play:
 				pms.reset()
-			else:
-				pms.play = 0
 				
 			return True
 	
@@ -204,7 +202,10 @@ class SequenceView(Gtk.Box):
 			for v in vals:
 				if event.keyval == v:
 					pms.active_track = self.get_tracks()[0]
-					pms.active_track.edit = 0, 0
+					if not pms.active_track.select_start:
+						pms.active_track.edit = 0, 0
+						pms.active_track.redraw(0)
+						return True
 					
 		if pms.active_track:
 			if not pms.active_track.edit:
@@ -212,7 +213,10 @@ class SequenceView(Gtk.Box):
 			
 				for v in vals:
 					if event.keyval == v:
-						pms.active_track.edit = 0, 0
+						if not pms.active_track.select_start:
+							pms.active_track.edit = 0, 0
+							pms.active_track.redraw(0)
+							return True
 			
 			return pms.active_track.on_key_press(widget, event)
 
@@ -256,6 +260,7 @@ class SequenceView(Gtk.Box):
 				old = pms.active_track.edit[1]
 
 				pms.active_track.edit = int(pms.active_track.edit[0]), int(pms.active_track.edit[1] + event.delta_y)
+				
 				if pms.active_track.edit[1] >= pms.active_track.trk.nrows:
 					pms.active_track.edit = pms.active_track.edit[0], pms.active_track.trk.nrows - 1
 				

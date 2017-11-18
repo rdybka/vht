@@ -3,7 +3,7 @@ class PMSRow():
 	def __init__(self, pms, rowptr):
 		self._pms_handle = pms
 		self._rowptr = rowptr
-		
+
 		self._type = pms.row_get_type(self._rowptr)
 		self._note = pms.row_get_note(self._rowptr)
 		self._velocity = pms.row_get_velocity(self._rowptr)		

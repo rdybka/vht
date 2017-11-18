@@ -251,6 +251,8 @@ class TrackView(Gtk.DrawingArea):
 
 				if not self.select_start and not self.select_end:
 					if self.edit and r == self.edit[1] and c == self.edit[0]:
+						cr.set_source_rgb(*(pms.cfg.colour_record))
+						
 						cr.rectangle(c * self.txt_width, (r * self.txt_height) + self.txt_height * .1, (self.txt_width / 8.0) * 7.2, self.txt_height * .9)
 						cr.fill()
 						cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
@@ -350,6 +352,10 @@ class TrackView(Gtk.DrawingArea):
 	def on_button_press(self, widget, event):
 		if not self.trk:
 			return
+	
+		shift = False
+		if event.state & Gdk.ModifierType.SHIFT_MASK:
+			shift = True	
 		
 		row = int(event.y / self.txt_height)
 		col = int(event.x / self.txt_width)
@@ -368,23 +374,23 @@ class TrackView(Gtk.DrawingArea):
 					
 		enter_edit = False
 		
-		if event.button == pms.cfg.select_button:
-			self.select = True
-			self.select_start = None
-			self.select_end = None
+		if event.button != pms.cfg.select_button:
+			return False
 		
 		if not self.trk[col][row].type:	# empty
 			enter_edit = True
+			if not shift:
+				self.select = True
+				self.select_start = None
+				self.select_end = None
 
 		if self.trk[col][row].type == 1:# note_ob
 			enter_edit = True
-			if event.button == pms.cfg.drag_button:
-				self.drag = True
+			self.drag = True
 			
 		if self.trk[col][row].type == 2:# note_off
 			enter_edit = True
-			if event.button == pms.cfg.drag_button:
-				self.drag = True
+			self.drag = True
 		
 		if offs < self.txt_width / 2.0:	# edit note
 			enter_edit = True
@@ -392,12 +398,26 @@ class TrackView(Gtk.DrawingArea):
 			enter_edit = True
 
 		if enter_edit:
+			if shift:
+				self.select_end = col, row
+				if self.select_start:
+					self.select = True
+					
+				if self.edit: # new selection
+					self.select = True
+					self.select_start = self.edit
+					self.select_end = col, row
+				
+				self.redraw()
+				return True
+			
 			TrackView.leave_all()
 			self.parent.change_active_track(self)
 			
 			olded = self.edit
 			self.edit = col, row
 			self.redraw(row)
+
 			if olded:
 				self.redraw(olded[1])
 			return True		
@@ -406,13 +426,21 @@ class TrackView(Gtk.DrawingArea):
 		
 	def on_button_release(self, widget, event):
 		if event.button == pms.cfg.select_button:
-			self.select = False
+			self.select = None
+			if self.select_start == self.select_end:
+				self.select_start = None
+				self.select_end = None
+				if self.edit:
+					self.redraw(self.edit[1])
+			
+			if self.select_start:
+				self.edit = None
 		
-		if event.button == pms.cfg.drag_button:
+		if event.button == pms.cfg.select_button:
 			if self.drag:
 				self.drag = False
 				self.undo_buff.add_state()
-			
+				
 		return False
 
 	def on_leave(self, wdg, prm):
@@ -479,6 +507,31 @@ class TrackView(Gtk.DrawingArea):
 	def go_left(self, skip_track = False, rev = True):
 		self.go_right(skip_track, rev)
 
+	def selection(self):
+		if not self.select_start or not self.select_end:
+			return None
+			
+		ssx = self.select_start[0]
+		ssy = self.select_start[1]
+		sex = self.select_end[0]
+		sey = self.select_end[1]
+				
+		if sex < ssx:
+			xxx = sex
+			sex	= ssx
+			ssx = xxx
+				
+		if sey < ssy:
+			yyy = sey
+			sey = ssy
+			ssy = yyy
+		
+		ret = []
+		for x in range(ssx, sex + 1):
+			for y in range(ssy, sey + 1):
+				ret.append(self.trk[x][y])
+		return ret
+
 	def copy_selection(self, cut = False):
 		if not self.select_start or not self.select_end:
 			return
@@ -540,28 +593,37 @@ class TrackView(Gtk.DrawingArea):
 	def on_key_press(self, widget, event):
 		if not self.trk:
 			return
-		
-		#print("key : %d" % (event.keyval))
-			
+
+		shift = False
+		if event.state & Gdk.ModifierType.SHIFT_MASK:
+			shift = True
+
+		ctrl = False
 		if event.state & Gdk.ModifierType.CONTROL_MASK:
+			ctrl = True
+
+		alt = False
+		if event.state & Gdk.ModifierType.MOD1_MASK:
+			alt = True
+
+		#print("key : %d %s" % (event.keyval, event.state))
+			
+		if ctrl:
 			if event.keyval == 122:			# ctrl-z
 				self.undo_buff.restore()
 				self.parent.redraw_track(self.trk)
 				return True
 
-		if event.state & Gdk.ModifierType.CONTROL_MASK:
 			if event.keyval == 99:			# ctrl-c
 				self.copy_selection()
 				return True
 
-		if event.state & Gdk.ModifierType.CONTROL_MASK:
 			if event.keyval == 120:			# ctrl-x
 				self.undo_buff.add_state()
 				self.copy_selection(True)
 				self.redraw()
 				return True
 
-		if event.state & Gdk.ModifierType.CONTROL_MASK:
 			if event.keyval == 118:			# ctrl-v
 				self.undo_buff.add_state()	
 				self.paste()
@@ -569,13 +631,23 @@ class TrackView(Gtk.DrawingArea):
 				self.undo_buff.add_state()
 				self.parent._prop_view.redraw(self.trk.index)
 				return True
+			
+			if event.keyval == 97:			# ctrl-a
+				if self.edit:
+					self.select_start = self.edit[0], 0
+					self.select_end = self.edit[0], self.trk.nrows - 1
+					self.edit = None
+					self.redraw()
+				elif self.select_start[1] == 0 and self.select_end[1] == self.trk.nrows -1:
+					self.select_start = 0, 0
+					self.select_end = len(self.trk) - 1, self.trk.nrows - 1
+					self.redraw()
+				
+				return True
 
 		note = self.pmp.key2note(event.keyval)
 				
-		if not self.edit:
-			return False
-
-		if note:
+		if self.edit and note:
 			self.undo_buff.add_state()
 			old = self.edit[1]
 			self.trk[self.edit[0]][self.edit[1]] = note
@@ -591,78 +663,403 @@ class TrackView(Gtk.DrawingArea):
 			self.redraw(old)
 			self.undo_buff.add_state()
 			return True
-				
-		if event.keyval == 65307:			# esc
-			old = self.edit[1]
-			self.edit = None
-			self.redraw(old)
-			return True
-			
-		if event.keyval == 65364:			# down
-			old = self.edit[1]
-			self.edit = self.edit[0], self.edit[1] + 1
-			if self.edit[1] >= self.trk.nrows:
-				self.edit = self.edit[0], 0
-			
-			self.redraw(old)
-			self.redraw(self.edit[1])
-			return True
 		
-		if event.keyval == 65362:			# up
-			old = self.edit[1]
-			self.edit = self.edit[0], self.edit[1] - 1
-			if self.edit[1] < 0:
-				self.edit = self.edit[0], self.trk.nrows - 1
-			self.redraw(old)
-			self.redraw(self.edit[1])
+		redr = False
+		old = self.edit
+				
+		if self.edit and event.keyval == 65307:			# esc
+			self.edit = None
+			redr = True
+
+		sel = self.selection()
+		if self.edit:
+			sel = []
+			sel.append(self.trk[self.edit[0]][self.edit[1]])
+			
+		if sel and ctrl and event.keyval == 65362:	# ctrl+up on selection
+			for r in sel:
+				if r.type:
+					r.note = min(r.note + 1, 127)
+			
+			self.undo_buff.add_state()
+			if self.edit:
+				self.redraw(self.edit[1])
+			else:
+				self.redraw(self.select_start[1], self.select_end[1])
 			return True
+
+		if sel and ctrl and event.keyval == 65365:	# ctrl+page up on selection
+			for r in sel:
+				if r.type:
+					r.note = min(r.note + 12, 127)
+
+			self.undo_buff.add_state()
+			if self.edit:
+				self.redraw(self.edit[1])
+			else:
+				self.redraw(self.select_start[1], self.select_end[1])
+			return True
+			
+		if sel and ctrl and event.keyval == 65364:	# ctrl+down on selection
+			for r in sel:
+				if r.type:
+					r.note = max(r.note - 1, 0)
+			
+			self.undo_buff.add_state()
+			if self.edit:
+				self.redraw(self.edit[1])
+			else:
+				self.redraw(self.select_start[1], self.select_end[1])
+			return True
+			
+		if sel and ctrl and event.keyval == 65366:	# ctrl+page down on selection
+			for r in sel:
+				if r.type:
+					r.note = max(r.note - 12, 0)
+			
+			self.undo_buff.add_state()
+			if self.edit:
+				self.redraw(self.edit[1])
+			else:
+				self.redraw(self.select_start[1], self.select_end[1])
+			return True
+			
+		if sel and alt and event.keyval == 65362:	# alt+up on selection
+			for r in sel:
+				if r.type:
+					r.velocity = min(r.velocity + 1, 127)
+					pms.cfg.velocity = r.velocity
+			
+			self.undo_buff.add_state()
+			if self.edit:
+				self.redraw(self.edit[1])
+			else:
+				self.redraw(self.select_start[1], self.select_end[1])
+			return True
+
+		if sel and alt and event.keyval == 65365:	# alt+page up on selection
+			for r in sel:
+				if r.type:
+					r.velocity = min(r.velocity + 10, 127)
+					pms.cfg.velocity = r.velocity
+
+			self.undo_buff.add_state()
+			if self.edit:
+				self.redraw(self.edit[1])
+			else:
+				self.redraw(self.select_start[1], self.select_end[1])
+			return True
+			
+		if sel and alt and event.keyval == 65364:	# alt+down on selection
+			for r in sel:
+				if r.type:
+					r.velocity = max(r.velocity - 1, 0)
+					pms.cfg.velocity = r.velocity
+			
+			self.undo_buff.add_state()
+			if self.edit:
+				self.redraw(self.edit[1])
+			else:
+				self.redraw(self.select_start[1], self.select_end[1])
+			return True
+			
+		if sel and alt and event.keyval == 65366:	# alt+page down on selection
+			for r in sel:
+				if r.type:
+					r.velocity = max(r.velocity - 10, 0)
+					pms.cfg.velocity = r.velocity
+			
+			self.undo_buff.add_state()
+			if self.edit:
+				self.redraw(self.edit[1])
+			else:
+				self.redraw(self.select_start[1], self.select_end[1])
+			return True			
+			
+		if event.keyval == 65364:						# down
+			if self.edit:
+				if shift:
+					self.select_start = self.edit
+					self.select_end = self.edit[0], min(self.edit[1] + 1, self.trk.nrows -1)
+					self.edit = None
+					self.redraw(self.select_start[1], self.select_end[1])
+					return True
+				else:
+					self.edit = self.edit[0], self.edit[1] + 1
+					if self.edit[1] >= self.trk.nrows:
+						self.edit = self.edit[0], 0
+
+					self.redraw(self.edit[1])
+					redr = True
+			else:
+				if shift:
+					oldy = self.select_start[1]
+					oldyy = self.select_end[1]
+					self.select_end = self.select_end[0], min(self.select_end[1] + 1, self.trk.nrows - 1)
+					self.redraw(oldy, oldyy)
+					self.redraw(self.select_start[1], self.select_end[1])
+					return True
+				else:
+					if self.select_start:
+						old = self.select_start[1], self.select_end[1]
+						self.edit = self.select_end[0], min(self.select_end[1] + 1, self.trk.nrows - 1)
+						self.select_start = None
+						self.select_end = None
+						self.redraw(*(old))
+						self.redraw(self.edit[1])
+					return True
+			
+		if event.keyval == 65362:			# up
+			if self.edit:
+				if shift:
+					self.select_start = self.edit
+					self.select_end = self.edit[0], max(self.edit[1] - 1, 0)
+					self.edit = None
+					self.redraw(self.select_start[1], self.select_end[1])
+					return True
+				else:
+					self.edit = self.edit[0], self.edit[1] - 1
+					if self.edit[1] < 0:
+						self.edit = self.edit[0], self.trk.nrows - 1
+
+					self.redraw(self.edit[1])
+					redr = True
+			else:
+				if shift:
+					oldy = self.select_start[1]
+					oldyy = self.select_end[1]
+					self.select_end = self.select_end[0], max(self.select_end[1] - 1, 0)
+					self.redraw(oldy, oldyy)
+					self.redraw(self.select_start[1], self.select_end[1])
+					return True
+				else:
+					if self.select_start:
+						old = self.select_start[1], self.select_end[1]
+						self.edit = self.select_end[0], max(self.select_end[1] - 1, 0)
+						self.select_start = None
+						self.select_end = None
+						self.redraw(*(old))
+						self.redraw(self.edit[1])
+					return True
 		
 		if event.keyval == 65363:			# right
-			self.go_right()
-			return True
-		
+			if not shift:
+				if self.select_start:
+					old = self.select_start[1], self.select_end[1]
+					self.edit = self.select_end
+					self.select_start = None
+					self.select_end = None
+					self.redraw(*(old))
+				
+				if self.edit:
+					self.go_right()
+				return True
+
+			if shift:
+				if self.edit:
+					self.select_start = self.edit
+					self.select_end = min(self.edit[0] + 1, len(self.trk) - 1), self.edit[1]
+					self.edit = None
+					self.redraw(self.select_start[1], self.select_end[1])
+					return True
+				
+				if self.select_end:
+					self.select_end = min(self.select_end[0] + 1, len(self.trk) - 1), self.select_end[1]
+					self.redraw(self.select_start[1], self.select_end[1])
+					return True
+			
 		if event.keyval == 65361:			# left
-			self.go_left()
-			return True
+			if not shift:
+				if self.select_start:
+					old = self.select_start[1], self.select_end[1]
+					self.edit = self.select_end
+					self.select_start = None
+					self.select_end = None
+					self.redraw(*(old))
+				
+				if self.edit:
+					self.go_left()
+				return True
+
+			if shift:
+				if self.edit:
+					self.select_start = self.edit
+					self.select_end = max(self.edit[0] - 1, 0), self.edit[1]
+					self.edit = None
+					self.redraw(self.select_start[1], self.select_end[1])
+					return True
+				
+				if self.select_end:
+					self.select_end = max(self.select_end[0] - 1, 0), self.select_end[1]
+					self.redraw(self.select_start[1], self.select_end[1])
+					return True
 
 		if event.keyval == 65366:			# page-down
-			old = self.edit[1]
+			if not shift:
+				old = None
+				if self.edit:
+					old = self.edit[1], self.edit[1]
+					self.edit = self.edit[0], self.edit[1] + 1
+					
+				elif self.select_end:
+					old = self.select_start[1], self.select_end[1]
+					self.edit = self.select_end[0], self.select_end[1] + 1
+					self.select_end = None
+					self.select_start = None
+
+				if not self.edit:
+					return True
+					
+				while not self.edit[1] % pms.cfg.highlight == 0:
+					self.edit = self.edit[0], self.edit[1] + 1
 			
-			self.edit = self.edit[0], self.edit[1] + 1
-			while not self.edit[1] % pms.cfg.highlight == 0:
-				self.edit = self.edit[0], self.edit[1] + 1
+				if self.edit[1] >= self.trk.nrows:
+					self.edit = self.edit[0], self.trk.nrows - 1
 			
-			if self.edit[1] >= self.trk.nrows:
-				self.edit = self.edit[0], self.trk.nrows - 1
+				if old:
+					self.redraw(*(old))
+					
+				self.redraw(self.edit[1])
+				return True
+
+			if shift:
+				if self.edit:
+					self.select_start = self.edit
+					self.select_end = self.edit[0], self.edit[1]
+					self.edit = None
 			
-			self.redraw(old)
-			self.redraw(self.edit[1])
-			return True
-		
+				if self.select_end:
+					old = self.select_start[1], self.select_end[1]
+					self.select_end = self.select_end[0], self.select_end[1] + 1
+					
+					while not self.select_end[1] % pms.cfg.highlight == 0:
+						self.select_end = self.select_end[0], self.select_end[1] + 1
+					
+					self.select_end = self.select_end[0], min(self.select_end[1], self.trk.nrows - 1)
+					
+					self.redraw(*(old))
+					self.redraw(self.select_start[1], self.select_end[1])
+				return True
+				
 		if event.keyval == 65365:			# page-up
-			old = self.edit[1]
+			if not shift:
+				old = None
+				if self.edit:
+					old = self.edit[1], self.edit[1]
+					self.edit = self.edit[0], self.edit[1] - 1
+					
+				elif self.select_end:
+					old = self.select_start[1], self.select_end[1]
+					self.edit = self.select_end[0], self.select_end[1] - 1
+					self.select_end = None
+					self.select_start = None
+
+				if not self.edit:
+					return True
+					
+				while not self.edit[1] % pms.cfg.highlight == 0:
+					self.edit = self.edit[0], self.edit[1] - 1
 			
-			self.edit = self.edit[0], self.edit[1] - 1
-			while not self.edit[1] % pms.cfg.highlight == 0:
-				self.edit = self.edit[0], self.edit[1] - 1
-				if self.edit[1] < 0:
-					self.edit = self.edit[0], 0
+				self.edit = self.edit[0], max(self.edit[1], 0)
 			
-			if self.edit[1] < 0:
-				self.edit = self.edit[0], self.trk.nrows - 1
-			self.redraw(old)
-			self.redraw(self.edit[1])
-			return True
+				if old:
+					self.redraw(*(old))
+					
+				self.redraw(self.edit[1])
+				return True
+
+			if shift:
+				if self.edit:
+					self.select_start = self.edit
+					self.select_end = self.edit[0], self.edit[1]
+					self.edit = None
+			
+				if self.select_end:
+					old = self.select_start[1], self.select_end[1]
+					self.select_end = self.select_end[0], self.select_end[1] - 1
+					
+					while not self.select_end[1] % pms.cfg.highlight == 0:
+						self.select_end = self.select_end[0], self.select_end[1] - 1
+					
+					self.select_end = self.select_end[0], max(self.select_end[1], 0)
+					self.redraw(*(old))
+					self.redraw(self.select_start[1], self.select_end[1])
+				return True
 		
-		if event.keyval == 65056:			# shift-tab
-			self.go_left(True)
+		if event.keyval == 65360:			# home
+			if not shift:
+				if self.edit:
+					old = self.edit[1], self.edit[1]
+					
+				if self.select_start:
+					old = self.select_start[1], self.select_end[1]
+					self.edit = self.select_end
+					self.select_start = None
+					self.select_end = None
+				
+				self.edit = self.edit[0], 0
+				self.redraw(*(old))
+				self.redraw(self.edit[1])
+				return True
+			
+			if shift:
+				if self.edit:
+					self.select_start = self.edit
+					self.select_end = self.edit[0], 0
+					self.edit = None
+				
+				if self.select_end:
+					old = self.select_start[1], self.select_end[1]
+					self.select_end = self.select_end[0], 0
+					self.redraw(*(old))
+					self.redraw(self.select_start[1], self.select_end[1])
+				return True
+		
+		if event.keyval == 65367:			# end
+			if not shift:
+				if self.edit:
+					old = self.edit[1], self.edit[1]
+					
+				if self.select_start:
+					old = self.select_start[1], self.select_end[1]
+					self.edit = self.select_end
+					self.select_start = None
+					self.select_end = None
+				
+				self.edit = self.edit[0], self.trk.nrows - 1
+				self.redraw(*(old))
+				self.redraw(self.edit[1])
+				return True
+			
+			if shift:
+				if self.edit:
+					self.select_start = self.edit
+					self.select_end = self.edit[0], self.trk.nrows - 1
+					self.edit = None
+				
+				if self.select_end:
+					old = self.select_start[1], self.select_end[1]
+					self.select_end = self.select_end[0], self.trk.nrows - 1
+					self.redraw(*(old))
+					self.redraw(self.select_start[1], self.select_end[1])
+				return True
+			
+		if redr and old:
+			self.redraw(old[1])
 			return True
 
-		if event.keyval == 65289:			# tab
-			self.go_right(True)
-			return True
-		
 		if event.keyval == 65535:			# del
+			sel = self.selection()
+			if sel:
+				for r in sel:
+					r.clear()
+			
+				self.redraw()
+				return True
+
+			if not self.edit:
+				return True
+			
 			self.trk[self.edit[0]][self.edit[1]].clear()
 			self.redraw(self.edit[1])
 			
@@ -687,24 +1084,9 @@ class TrackView(Gtk.DrawingArea):
 
 			self.undo_buff.add_state()
 			return True
-
-		if event.keyval == 92:				# | note_off
-			self.trk[self.edit[0]][self.edit[1]].clear()
-			self.trk[self.edit[0]][self.edit[1]].type = 2
-			
-			old = self.edit[1]
-			self.edit = self.edit[0], self.edit[1] + pms.cfg.skip
-
-			if self.edit[1] >= self.trk.nrows:
-				self.edit = self.edit[0], self.edit[1] - self.trk.nrows
-			
-			while self.edit[1] < 0:
-				self.edit = self.edit[0], self.edit[1] + self.trk.nrows
-					
-			self.redraw(self.edit[1])
-			self.redraw(old)
-			
-			self.undo_buff.add_state()
+		
+		if not self.edit:
+			return False
 
 		if event.keyval == 65379:			# insert
 			self.undo_buff.add_state()
@@ -722,19 +1104,31 @@ class TrackView(Gtk.DrawingArea):
 				self.undo_buff.add_state()
 			return True
 		
-		if event.keyval == 65360:			# home
-			old = self.edit[1]
-			self.edit = self.edit[0], 0 
-			self.redraw(self.edit[1])
-			self.redraw(old)
+		if event.keyval == 65056:			# shift-tab
+			self.go_left(True)
+			return True
+
+		if event.keyval == 65289:			# tab
+			self.go_right(True)
 			return True
 		
-		if event.keyval == 65367:			# end
+		if event.keyval == 92:				# | note_off
+			self.trk[self.edit[0]][self.edit[1]].clear()
+			self.trk[self.edit[0]][self.edit[1]].type = 2
+			
 			old = self.edit[1]
-			self.edit = self.edit[0], self.trk.nrows - 1
+			self.edit = self.edit[0], self.edit[1] + pms.cfg.skip
+
+			if self.edit[1] >= self.trk.nrows:
+				self.edit = self.edit[0], self.edit[1] - self.trk.nrows
+			
+			while self.edit[1] < 0:
+				self.edit = self.edit[0], self.edit[1] + self.trk.nrows
+					
 			self.redraw(self.edit[1])
 			self.redraw(old)
-			return True
+			
+			self.undo_buff.add_state()
 		
 		return False
 

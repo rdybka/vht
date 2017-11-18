@@ -13,24 +13,25 @@ class cfg():
 		self.seq_line_width = 1.0
 		self.seq_spacing = 1.05
 		self.octave = 4
-		self.velocity = 98
+		self.velocity = 100
 		
 		self.page_height = 16
 		self.skip = 1
 		self.padding = 3
+		#self.colour = (1.0, 1.0, 1.0)
 		self.colour = (.9, 1.0, .2)
-		#self.colour = (.6, .6, 1.0)
+		#self.colour = (.8, .8, 1.0)
 		#self.colour = (.3, 1.0, .3)
 		self.intensity_background = .3
 		self.intensity_txt = .7
 		self.intensity_txt_highlight = 1.0
 		self.intensity_lines = .6
-		self.intensity_select = .8
+		self.colour_record = (1.0, 0, 0)
+		self.intensity_select = .7
 		self.pointer_opacity = .8
 		
 		self.select_button = 1
 		self.delete_button = 3
-		self.drag_button = 8
 		
 		self.auto_scroll_delay = .15
 
