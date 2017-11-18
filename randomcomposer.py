@@ -10,8 +10,8 @@ def muzakize():
 	pms.bpm = 123
 	
 	seq = pms.add_sequence(32)
-	t1 = seq.add_track()
-	t1.add_column()
+	#t1 = seq.add_track()
+	#t1.add_column()
 	#t1.add_column()
 	return
 	
