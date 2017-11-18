@@ -56,6 +56,11 @@ class TrackView(Gtk.DrawingArea):
 		self.pmp = PoorMansPiano()
 	
 		self.drag = False
+		self.sel_drag = False
+		self.sel_dragged = False
+		self.sel_drag_prev = None
+		self.sel_drag_back = None
+		self.sel_drag_front = None
 		self.select = False
 		self.select_start = None
 		self.select_end = None
@@ -332,6 +337,62 @@ class TrackView(Gtk.DrawingArea):
 					self.redraw(new_hover_row)
 					self.redraw(old_row)
 
+		if self.sel_drag:
+			dx = new_hover_column - self.sel_drag_prev[0]
+			dy = new_hover_row - self.sel_drag_prev[1]
+			sw = self.select_end[0] - self.select_start[0]
+			sh = self.select_end[1] - self.select_start[1]
+			
+			if dx or dy:
+				self.sel_dragged = True
+				nx = self.select_start[0] + dx
+				ny = self.select_start[1] + dy
+								
+				self.sel_drag_prev = new_hover_column, new_hover_row
+				old = self.select_start[1], self.select_end[1]
+				
+				for r in self.sel_drag_front:
+					nc = r[0] + self.select_start[0], r[1] + self.select_start[1]
+					if self.select_start[1] > self.select_end[1]:
+						nc = r[0] + self.select_end[0], r[1] + self.select_end[1]
+					
+					inbounds = True
+					if nc[0] < 0 or nc[0] > len(self.trk) -1 or nc[1] < 0 or nc[1] > self.trk.nrows - 1:
+						inbounds = False
+						
+					if inbounds:
+						if nc in self.sel_drag_back:
+							rr = self.sel_drag_back[nc]
+							self.trk[nc[0]][nc[1]].type = rr[0]
+							self.trk[nc[0]][nc[1]].note = rr[1]
+							self.trk[nc[0]][nc[1]].velocity = rr[2]
+							self.trk[nc[0]][nc[1]].delay = rr[3]
+						else:
+							self.trk[nc[0]][nc[1]].clear()
+				
+				self.select_start = nx, ny
+				self.select_end = nx + sw, ny + sh
+				
+				for r in self.sel_drag_front:
+					nc = r[0] + nx, r[1] + ny
+					if self.select_end[1] < self.select_start[1]:
+						nc = r[0] + self.select_end[0], r[1] + self.select_end[1]
+
+					inbounds = True
+
+					if nc[0] < 0 or nc[0] > len(self.trk) -1 or nc[1] < 0 or nc[1] > self.trk.nrows - 1:
+						inbounds = False
+					
+					if inbounds:
+						rr = self.sel_drag_front[r]
+						self.trk[nc[0]][nc[1]].type = rr[0]
+						self.trk[nc[0]][nc[1]].note = rr[1]
+						self.trk[nc[0]][nc[1]].velocity = rr[2]
+						self.trk[nc[0]][nc[1]].delay = rr[3]
+				
+				self.redraw(*(old))
+				self.redraw(self.select_start[1], self.select_end[1])
+				
 		oh = self.hover
 		self.hover = new_hover_column, new_hover_row
 		
@@ -364,6 +425,8 @@ class TrackView(Gtk.DrawingArea):
 		if event.button == pms.cfg.delete_button:
 			if self.trk[col][row].type == 0:
 				self.edit = None
+				self.select_start = None
+				self.select_end = None
 				self.redraw()
 				return True
 						
@@ -377,6 +440,37 @@ class TrackView(Gtk.DrawingArea):
 		if event.button != pms.cfg.select_button:
 			return False
 		
+		self.sel_drag = False
+		self.sel_dragged = False
+		if self.select_start:
+			ssx = self.select_start[0]
+			ssy = self.select_start[1]
+			sex = self.select_end[0]
+			sey = self.select_end[1]
+				
+			if sex < ssx:
+				xxx = sex
+				sex	= ssx
+				ssx = xxx
+				
+			if sey < ssy:
+				yyy = sey
+				sey = ssy
+				ssy = yyy
+		
+			if col >= ssx and col <= sex:
+				if row >= ssy and row <= sey:
+					self.sel_drag = True
+					self.sel_drag_prev = col, row
+					
+					self.sel_drag_front = self.to_dict(True)
+					self.sel_drag_back = self.to_dict()
+					
+					for r in self.sel_drag_front:
+						del self.sel_drag_back[(r[0] + ssx, r[1] + ssy)]
+				
+					return True
+				
 		if not self.trk[col][row].type:	# empty
 			enter_edit = True
 			if not shift:
@@ -425,6 +519,22 @@ class TrackView(Gtk.DrawingArea):
 		return True
 		
 	def on_button_release(self, widget, event):
+		if self.sel_drag and event.button == pms.cfg.select_button:
+			if self.sel_dragged:
+				self.sel_drag = False
+				self.undo_buff.add_state()
+			else:
+				row = int(event.y / self.txt_height)
+				col = int(event.x / self.txt_width)
+				self.sel_drag = False
+				old = self.select_start[1], self.select_end[1]
+				self.select_start = None
+				self.select_end = None
+				self.edit = col, row
+				self.redraw(*(old))
+				self.redraw(self.edit[1])
+				return True
+		
 		if event.button == pms.cfg.select_button:
 			self.select = None
 			if self.select_start == self.select_end:
@@ -532,7 +642,21 @@ class TrackView(Gtk.DrawingArea):
 				ret.append(self.trk[x][y])
 		return ret
 
-	def copy_selection(self, cut = False):
+	def to_dict(self, sel_only = False):
+		ret = {}
+		if sel_only:
+			ret = self.copy_selection(dest = ret)
+			return ret
+		
+		for x in range(len(self.trk)):
+			for y in range(self.trk.nrows):
+				r = self.trk[x][y]
+				if r.type:
+					ret[(x, y)] = (r.type, r.note, r.velocity, r.delay)
+		
+		return ret
+
+	def copy_selection(self, cut = False, dest = None):
 		if not self.select_start or not self.select_end:
 			return
 			
@@ -551,7 +675,10 @@ class TrackView(Gtk.DrawingArea):
 			sey = ssy
 			ssy = yyy
 		
-		d = TrackView.clipboard
+		d = dest
+		if not d:
+			d = TrackView.clipboard
+			
 		d.clear()
 		
 		for x in range(ssx, sex + 1):
@@ -562,6 +689,8 @@ class TrackView(Gtk.DrawingArea):
 				
 				if cut:
 					self.trk[x][y].clear()
+		
+		return d
 		
 	def paste(self):
 		if not self.edit:
