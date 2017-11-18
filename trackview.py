@@ -527,6 +527,20 @@ class TrackView(Gtk.DrawingArea):
 			if self.sel_dragged:
 				self.sel_drag = False
 				self.undo_buff.add_state()
+				# cap selection
+				if self.select_start:
+					ssx = max(self.select_start[0], 0)
+					sex = max(self.select_end[0], 0)
+					ssy = max(self.select_start[1], 0)
+					sey = max(self.select_end[1], 0)
+					
+					ssx = min(ssx, len(self.trk) - 1)
+					sex = min(sex, len(self.trk) - 1)
+										
+					ssy = min(ssy, self.trk.nrows - 1)
+					sey = min(sey, self.trk.nrows - 1)
+					self.select_start = ssx, ssy
+					self.select_end = sex, sey
 			else:
 				row = int(event.y / self.txt_height)
 				col = int(event.x / self.txt_width)
@@ -549,8 +563,25 @@ class TrackView(Gtk.DrawingArea):
 			
 			if self.select_start:
 				self.edit = None
+				# normalise selection
+				ssx = self.select_start[0]
+				ssy = self.select_start[1]
+				sex = self.select_end[0]
+				sey = self.select_end[1]
+				
+				if sex < ssx:
+					xxx = sex
+					sex	= ssx
+					ssx = xxx
+				
+				if sey < ssy:
+					yyy = sey
+					sey = ssy
+					ssy = yyy
+			
+				self.select_start = ssx, ssy
+				self.select_end = sex, sey
 		
-		if event.button == pms.cfg.select_button:
 			if self.drag:
 				self.drag = False
 				self.undo_buff.add_state()
