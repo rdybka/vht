@@ -17,6 +17,8 @@ class MainWin(Gtk.ApplicationWindow):
 		# fucking gui
 		hb = Gtk.HeaderBar()
 		hb.set_show_close_button(True)
+		hb.set_title("PMSeq")
+		hb.set_subtitle("poor man's sequencer")
 		self.set_titlebar(hb)
 		
 		button = Gtk.Button()

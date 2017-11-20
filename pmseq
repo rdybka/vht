@@ -36,7 +36,7 @@ import pmscfg
 
 class PMSApp(Gtk.Application):
 	def __init__(self):
-		Gtk.Application.__init__(self, application_id = "com.github.rdybka.pms", 
+		Gtk.Application.__init__(self, application_id = "com.github.rdybka.pmseq", 
 			flags = Gio.ApplicationFlags.NON_UNIQUE)
 		
 	def do_activate(self):
@@ -48,9 +48,6 @@ class PMSApp(Gtk.Application):
 		self.add_window(win)
 		win.show_all()
 		pms.play = True
-
-def log_func(data):
-	raise MemoryError("gotcha!")
 
 if __name__ == "__main__":
 	pms.start_error = None

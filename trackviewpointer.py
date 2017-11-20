@@ -18,8 +18,6 @@ class trackviewpointer():
 		self._parent = parent
 		
 		self.height = pms.cfg.seq_font_size
-		#self.y = 0
-		#self.yy = 0
 
 		self.lpos = None
 
