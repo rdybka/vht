@@ -807,6 +807,10 @@ class TrackView(Gtk.DrawingArea):
 						self.select_start = 0, 0
 						self.select_end = len(self.trk) - 1, self.trk.nrows - 1
 						self.redraw()
+					else:
+						self.select_start = self.select_start[0], 0
+						self.select_end = self.select_start[0], self.trk.nrows - 1
+						self.redraw()
 				
 				return True
 
