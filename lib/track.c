@@ -155,12 +155,14 @@ void track_trigger(track *trk, int pos, int c, int delay) {
         }
     }
 
-    evt.time = delay;
-    evt.channel = trk->channel;
-    evt.type = r.type;
-    evt.note = r.note;
-    evt.velocity = r.velocity;
-    midi_buffer_add(trk->port, evt);
+	if (r.type != note_off) {
+		evt.time = delay;
+		evt.channel = trk->channel;
+		evt.type = r.type;
+		evt.note = r.note;
+		evt.velocity = r.velocity;
+		midi_buffer_add(trk->port, evt);
+	}
 
     if (r.type == note_on) {
         trk->ring[c] = r.note;
