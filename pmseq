@@ -22,7 +22,7 @@ import sys, os
 try:
 	from pypms import pms
 except ImportError:
-	sys.path.append(__file__.replace("/bin/pms", "/share/pms"))
+	sys.path.append(__file__.replace("/bin/pmseq", "/share/pmseq"))
 
 from pypms import pms
 

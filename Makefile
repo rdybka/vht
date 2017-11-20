@@ -43,11 +43,11 @@ pypms/_libpms.so: $(OBJ) lib/libpms_wrap.o pypms/libpms.py
 	ld -shared $(OBJ) lib/libpms_wrap.o -o $@ $(LIBS)
 
 install: pypms/_libpms.so
-	mkdir -p $(INST_DIR)/share/pms/pypms 
+	mkdir -p $(INST_DIR)/share/pmseq/pypms 
 	cp -r dist/* $(INST_DIR)
-	cp pms $(INST_DIR)/bin
-	cp -r pypms/* $(INST_DIR)/share/pms/pypms
-	cp -r *.py $(INST_DIR)/share/pms
+	cp pmseq $(INST_DIR)/bin
+	cp -r pypms/* $(INST_DIR)/share/pmseq/pypms
+	cp -r *.py $(INST_DIR)/share/pmseq
 		
 clean:
 	rm -f *.so *.o lib/libpms.py pypms/libpms.py pypms/*.so
