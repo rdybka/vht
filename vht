@@ -26,7 +26,6 @@ try:
 except ImportError:
 	sys.path.append(__file__.replace("/bin/vht", "/share/vht"))
 	
-
 from libvht import vht
 
 import gi

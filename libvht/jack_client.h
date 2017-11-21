@@ -21,7 +21,7 @@
 
 #include <jack/jack.h>
 
-#define JACK_CLIENT_NAME 		"pms"
+#define JACK_CLIENT_NAME 		"valhalla"
 #define JACK_CLIENT_MAX_PORTS	16
 
 jack_client_t *jack_client;
