@@ -55,8 +55,8 @@ clean:
 	rm -rf src/__pycache__
 	rm -rf libvht/__pycache__
 	rm -rf build
-	rm dist/*.gz
-	rm MANIFEST
+	rm -f dist/*.gz
+	rm -f MANIFEST
 	rm -rf libvht/*.pyc
 	rm -rf src/*.pyc
 	
