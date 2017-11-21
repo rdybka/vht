@@ -46,12 +46,20 @@ install: libvht/_libcvht.so
 	cp -r libvht/* $(INST_DIR)/share/vht/libvht
 	cp -r src/*.py $(INST_DIR)/share/vht
 		
+megaclean:
+	rm libvht/libvht_wrap.c
+	
 clean:
 	rm -f *.so *.o libvht/libvht.py libvht/*.so
-	rm -f libvht/*.o libvht/libvht_wrap.c
+	rm -f libvht/*.o
 	rm -rf src/__pycache__
 	rm -rf libvht/__pycache__
+	rm -rf build
+	rm dist/*.gz
+	rm MANIFEST
 	rm -rf libvht/*.pyc
 	rm -rf src/*.pyc
+	
+	
 	
 	

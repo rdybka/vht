@@ -36,8 +36,10 @@ int jack_process(jack_nframes_t nframes, void *arg) {
 
 int jack_sample_rate_changed(jack_nframes_t srate, void *arg) {
     jack_sample_rate = srate;
+    return 0;
 }
 
 int jack_buffer_size_changed(jack_nframes_t size, void *arg) {
     jack_buffer_size = size;
+    return 0;
 }

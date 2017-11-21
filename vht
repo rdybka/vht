@@ -21,11 +21,6 @@ import sys, os
 
 sys.path.append("src")
 
-try:
-	from libvht import vht
-except ImportError:
-	sys.path.append(__file__.replace("/bin/vht", "/share/vht"))
-	
 from libvht import vht
 
 import gi
@@ -51,7 +46,7 @@ class VHTApp(Gtk.Application):
 		win.show_all()
 		vht.play = True
 
-if __name__ == "__main__":
+def main():
 	vht.start_error = None
 	if vht.jack_start() != 0:
 		vht.start_error = "you will need JACK for this"
@@ -74,3 +69,6 @@ if __name__ == "__main__":
 	vht.play = False
 	
 	vht.jack_stop()
+	
+if __name__ == "__main__":
+	main()
