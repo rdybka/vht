@@ -2,7 +2,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, Gio
 from trackpropview import TrackPropView
-from pypms import pms
+from libvht import vht
 import cairo
 
 class PropView(Gtk.ScrolledWindow):
@@ -14,11 +14,11 @@ class PropView(Gtk.ScrolledWindow):
 		self.seqview = seqview
 		self.seq = seqview.seq;
 
-		self.last_font_size = pms.cfg.seq_font_size
+		self.last_font_size = vht.cfg.seq_font_size
 		
 		self._track_box = Gtk.Box()
 		self._track_box.set_spacing(0)
-		pms.clear_popups = self.clear_popups
+		vht.clear_popups = self.clear_popups
 		
 		self.set_policy(Gtk.PolicyType.EXTERNAL, Gtk.PolicyType.NEVER)
 		self.add_with_viewport(self._track_box)
@@ -88,13 +88,13 @@ class PropView(Gtk.ScrolledWindow):
 	def on_draw(self, widget, cr):
 		w = widget.get_allocated_width()
 		h = widget.get_allocated_height()
-		cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
+		cr.set_source_rgb(*(col * vht.cfg.intensity_background for col in vht.cfg.colour))
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
 		
 		for wdg in self._track_box.get_children():
-			if self.last_font_size != pms.cfg.seq_font_size:
+			if self.last_font_size != vht.cfg.seq_font_size:
 				wdg.redraw()
 	
-		self.last_font_size = pms.cfg.seq_font_size
+		self.last_font_size = vht.cfg.seq_font_size
 		super()

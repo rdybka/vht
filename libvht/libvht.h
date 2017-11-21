@@ -16,13 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIBPMS_H__
-#define __LIBPMS_H__
+#ifndef __LIBVHT_H__
+#define __LIBVHT_H__
 
 #ifdef SWIG
-%module libpms
+%module libcvht
 %{
-#include "libpms.h"
+#include "libvht.h"
 %}
 #endif
 
@@ -107,4 +107,4 @@ extern void row_set_delay(row *rw, int delay);
 extern void row_set(row *rw, int type, int note, int velocity, int delay);
 
 extern int parse_note(char *);
-#endif //__LIBPMS_H__
+#endif //__LIBVHT_H__

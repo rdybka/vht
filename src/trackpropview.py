@@ -7,7 +7,7 @@ from threading import Lock
 
 from trackpropviewpopover import TrackPropViewPopover
 from sequencepropviewpopover import SequencePropViewPopover
-from pypms import pms
+from libvht import vht
 from trackview import TrackView
 
 class TrackPropView(Gtk.DrawingArea):
@@ -39,7 +39,7 @@ class TrackPropView(Gtk.DrawingArea):
 		self.popover.set_modal(False)
 		self.popover.set_transitions_enabled(False)
 
-		self.clear_popups = pms.clear_popups
+		self.clear_popups = vht.clear_popups
 	
 	def on_configure(self, wdg, event):
 		if self._surface:
@@ -51,7 +51,7 @@ class TrackPropView(Gtk.DrawingArea):
 
 		self._context = cairo.Context(self._surface)
 		self._context.set_antialias(cairo.ANTIALIAS_NONE)
-		self._context.set_line_width((pms.cfg.seq_font_size / 6.0) * pms.cfg.seq_line_width)
+		self._context.set_line_width((vht.cfg.seq_font_size / 6.0) * vht.cfg.seq_line_width)
 		
 		self.redraw()
 		return True	
@@ -102,18 +102,18 @@ class TrackPropView(Gtk.DrawingArea):
 		
 		cr = self._context
 		
-		self._context.select_font_face(pms.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-		self._context.set_font_size(pms.cfg.seq_font_size)
+		self._context.select_font_face(vht.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+		self._context.set_font_size(vht.cfg.seq_font_size)
 				
 		w = self.get_allocated_width()
 		h = self.get_allocated_height()
 		
-		cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
+		cr.set_source_rgb(*(col * vht.cfg.intensity_background for col in vht.cfg.colour))
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
 
-		cr.select_font_face(pms.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-		cr.set_font_size(pms.cfg.seq_font_size)
+		cr.select_font_face(vht.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+		cr.set_font_size(vht.cfg.seq_font_size)
 			
 		if self.trk == None:
 			(x, y, width, height, dx, dy) = cr.text_extents("000|")
@@ -122,11 +122,13 @@ class TrackPropView(Gtk.DrawingArea):
 
 			self.set_size_request(self.txt_width, self.txt_height * 2)
 				
-			cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
+			cr.set_source_rgb(*(col * vht.cfg.intensity_background for col in vht.cfg.colour))
 			cr.rectangle(0, 0, w, h)
 			cr.fill()			
 			
-			cr.set_source_rgb(*(col * pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))				
+			cr.set_source_rgb(*(col * vht.cfg.intensity_txt_highlight for col in vht.cfg.colour))				
+			cr.move_to(x, self.txt_height)
+			cr.show_text("vht")
 			cr.move_to(x, self.txt_height * 2)
 			cr.show_text("***")
 				
@@ -136,9 +138,9 @@ class TrackPropView(Gtk.DrawingArea):
 			self.button_rect.y = height
 			self.popover.set_pointing_to(self.button_rect)
 			
-			cr.set_line_width((pms.cfg.seq_font_size / 6.0) * pms.cfg.seq_line_width)
+			cr.set_line_width((vht.cfg.seq_font_size / 6.0) * vht.cfg.seq_line_width)
 			(x, y, width, height, dx, dy) = cr.text_extents("|")
-			cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
+			cr.set_source_rgb(*(col * vht.cfg.intensity_lines for col in vht.cfg.colour))
 			cr.set_antialias(cairo.ANTIALIAS_NONE)
 			cr.move_to(self.txt_width - (dx / 2), self.txt_height * .3)
 			cr.line_to(self.txt_width - (dx / 2), (self.seq.length) * self.txt_height)
@@ -152,14 +154,14 @@ class TrackPropView(Gtk.DrawingArea):
 		self.txt_width = int(dx)
 
 		
-		if pms.active_track:
-			if pms.active_track.trk.index == self.trk.index:
+		if vht.active_track:
+			if vht.active_track.trk.index == self.trk.index:
 				gradient = cairo.LinearGradient(0, 0, 0, h)
-				gradient.add_color_stop_rgb(0.0, *(col *  pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))
-				gradient.add_color_stop_rgb(1.0, *(col * pms.cfg.intensity_background for col in pms.cfg.colour))
+				gradient.add_color_stop_rgb(0.0, *(col *  vht.cfg.intensity_txt_highlight for col in vht.cfg.colour))
+				gradient.add_color_stop_rgb(1.0, *(col * vht.cfg.intensity_background for col in vht.cfg.colour))
 				cr.set_source(gradient)
 			else:
-				cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))	
+				cr.set_source_rgb(*(col * vht.cfg.intensity_background for col in vht.cfg.colour))	
 		
 		self.set_size_request(self.txt_width * len(self.trk), self.txt_height * 2)
 		
@@ -170,11 +172,11 @@ class TrackPropView(Gtk.DrawingArea):
 				
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")	
 		
-		cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
+		cr.set_source_rgb(*(col * vht.cfg.intensity_txt for col in vht.cfg.colour))
 		
-		if pms.active_track:
-			if pms.active_track.trk.index == self.trk.index:
-				cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
+		if vht.active_track:
+			if vht.active_track.trk.index == self.trk.index:
+				cr.set_source_rgb(*(col * vht.cfg.intensity_background for col in vht.cfg.colour))
 					
 		cr.move_to(x, self.txt_height)	
 		cr.show_text("c%02d p%02d" % (self.trk.channel, self.trk.port))
@@ -186,14 +188,14 @@ class TrackPropView(Gtk.DrawingArea):
 		self.button_rect.y = height
 		self.popover.set_pointing_to(self.button_rect)
 		
-		cr.set_source_rgb(*(col * pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))
+		cr.set_source_rgb(*(col * vht.cfg.intensity_txt_highlight for col in vht.cfg.colour))
 		cr.move_to(x + (dx) * (len(self.trk) - 1), self.txt_height * 2)	
 		cr.show_text("    ***")
 
-		cr.set_line_width((pms.cfg.seq_font_size / 6.0) * pms.cfg.seq_line_width)
+		cr.set_line_width((vht.cfg.seq_font_size / 6.0) * vht.cfg.seq_line_width)
 
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
-		cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
+		cr.set_source_rgb(*(col * vht.cfg.intensity_lines for col in vht.cfg.colour))
 		
 		cr.move_to(self.txt_width * len(self.trk) - (width / 2), self.txt_height * .3)
 		cr.line_to(self.txt_width * len(self.trk) - (width / 2), 2 * self.txt_height)

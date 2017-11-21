@@ -1,1 +1,1 @@
-Poor Man's Sequencer by Remigiusz Dybka
+Valhalla Tracker by Remigiusz Dybka

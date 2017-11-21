@@ -19,12 +19,15 @@
 
 import sys, os
 
-try:
-	from pypms import pms
-except ImportError:
-	sys.path.append(__file__.replace("/bin/pmseq", "/share/pmseq"))
+sys.path.append("src")
 
-from pypms import pms
+try:
+	from libvht import vht
+except ImportError:
+	sys.path.append(__file__.replace("/bin/vht", "/share/vht"))
+	
+
+from libvht import vht
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -32,43 +35,43 @@ from gi.repository import GLib, Gtk, Gio
 
 from mainwin import *
 import randomcomposer
-import pmscfg
+import vhtcfg
 
-class PMSApp(Gtk.Application):
+class VHTApp(Gtk.Application):
 	def __init__(self):
-		Gtk.Application.__init__(self, application_id = "com.github.rdybka.pmseq", 
+		Gtk.Application.__init__(self, application_id = "com.github.rdybka.vht", 
 			flags = Gio.ApplicationFlags.NON_UNIQUE)
 		
 	def do_activate(self):
 		win = MainWin(self)
 		
-		if pms.start_error:
+		if vht.start_error:
 			self.quit()
 			
 		self.add_window(win)
 		win.show_all()
-		pms.play = True
+		vht.play = True
 
 if __name__ == "__main__":
-	pms.start_error = None
-	if pms.jack_start() != 0:
-		pms.start_error = "you will need JACK for this"
+	vht.start_error = None
+	if vht.jack_start() != 0:
+		vht.start_error = "you will need JACK for this"
 
 	# move this stuff to proper configuration
-	pms.cfg = pmscfg.cfg()
-	pms.nports = 3
+	vht.cfg = vhtcfg.cfg()
+	vht.nports = 3
 	
 	randomcomposer.muzakize()
 
 	try:
-		app = PMSApp()
+		app = VHTApp()
 
 		app.run(sys.argv)
 	except:
-		pms.jack_stop()	
+		vht.jack_stop()	
 		sys.exit()
 
 	# is this reliable? should we wait for module.mute == 0?
-	pms.play = False
+	vht.play = False
 	
-	pms.jack_stop()
+	vht.jack_stop()

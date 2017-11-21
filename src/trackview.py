@@ -2,7 +2,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, Gdk, Gtk, Gio
 import cairo
-from pypms import pms
+from libvht import vht
 from trackviewpointer import trackviewpointer
 from trackundobuffer import TrackUndoBuffer
 from poormanspiano import PoorMansPiano
@@ -100,7 +100,7 @@ class TrackView(Gtk.DrawingArea):
 
 		self._context = cairo.Context(self._surface)
 		self._context.set_antialias(cairo.ANTIALIAS_NONE)
-		self._context.set_line_width((pms.cfg.seq_font_size / 6.0) * pms.cfg.seq_line_width)
+		self._context.set_line_width((vht.cfg.seq_font_size / 6.0) * vht.cfg.seq_line_width)
 		
 		self.tick()
 		self.redraw()
@@ -109,8 +109,8 @@ class TrackView(Gtk.DrawingArea):
 	def redraw(self, from_row = -666, to_row = -666):
 		cr = self._context
 
-		self._context.select_font_face(pms.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-		self._context.set_font_size(pms.cfg.seq_font_size)
+		self._context.select_font_face(vht.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+		self._context.set_font_size(vht.cfg.seq_font_size)
 				
 		w = self.get_allocated_width()
 		h = self.get_allocated_height()
@@ -134,7 +134,7 @@ class TrackView(Gtk.DrawingArea):
 		if not self.trk:
 			(x, y, width, height, dx, dy) = cr.text_extents("000|")
 		
-			self.txt_height = float(height) * self.spacing * pms.cfg.seq_spacing
+			self.txt_height = float(height) * self.spacing * vht.cfg.seq_spacing
 			self.txt_width = int(dx)
 
 			nw = dx
@@ -142,7 +142,7 @@ class TrackView(Gtk.DrawingArea):
 			self.set_size_request(nw, nh)
 				
 			if complete:
-				cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))	
+				cr.set_source_rgb(*(col * vht.cfg.intensity_background for col in vht.cfg.colour))	
 				cr.rectangle(0, 0, w, h)
 				cr.fill()
 		
@@ -157,17 +157,17 @@ class TrackView(Gtk.DrawingArea):
 		
 			for r in rows_to_draw:
 				if not complete: # redraw background
-					cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))	
+					cr.set_source_rgb(*(col * vht.cfg.intensity_background for col in vht.cfg.colour))	
 					cr.rectangle(0, r * self.txt_height, w, self.txt_height)
 					cr.fill()
 
 				if self.hover and r == self.hover[1]:
-					cr.set_source_rgb(*(col * pms.cfg.intensity_txt_highlight * 1.2 for col in pms.cfg.colour))
+					cr.set_source_rgb(*(col * vht.cfg.intensity_txt_highlight * 1.2 for col in vht.cfg.colour))
 				else:
-					if pms.cfg.highlight > 1 and (r) % pms.cfg.highlight == 0:
-						cr.set_source_rgb(*(col * pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))
+					if vht.cfg.highlight > 1 and (r) % vht.cfg.highlight == 0:
+						cr.set_source_rgb(*(col * vht.cfg.intensity_txt_highlight for col in vht.cfg.colour))
 					else:
-						cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
+						cr.set_source_rgb(*(col * vht.cfg.intensity_txt for col in vht.cfg.colour))
 
 				yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2)
 				cr.move_to(x, yy)
@@ -181,7 +181,7 @@ class TrackView(Gtk.DrawingArea):
 					wnd.invalidate_rect(ir, False)
 
 			(x, y, width, height, dx, dy) = cr.text_extents("|")
-			cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
+			cr.set_source_rgb(*(col * vht.cfg.intensity_lines for col in vht.cfg.colour))
 			cr.set_antialias(cairo.ANTIALIAS_NONE)
 			cr.move_to(self.txt_width - (dx / 2), 0)
 			cr.line_to(self.txt_width - (dx / 2), (self.seq.length) * self.txt_height)
@@ -193,7 +193,7 @@ class TrackView(Gtk.DrawingArea):
 			
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")
 
-		self.txt_height = float(height) * self.spacing * pms.cfg.seq_spacing
+		self.txt_height = float(height) * self.spacing * vht.cfg.seq_spacing
 		self.txt_width = int(dx)
 
 		nw = self.txt_width * len(self.trk)
@@ -201,7 +201,7 @@ class TrackView(Gtk.DrawingArea):
 		self.set_size_request(nw, nh)
 		
 		if complete:
-			cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))	
+			cr.set_source_rgb(*(col * vht.cfg.intensity_background for col in vht.cfg.colour))	
 			cr.rectangle(0, 0, w, h)
 			cr.fill()
 		
@@ -217,17 +217,17 @@ class TrackView(Gtk.DrawingArea):
 	
 			for r in rows_to_draw:
 				if not complete: # redraw background
-					cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))	
+					cr.set_source_rgb(*(col * vht.cfg.intensity_background for col in vht.cfg.colour))	
 					cr.rectangle(c * self.txt_width, r * self.txt_height, self.txt_width + 5, self.txt_height)
 					cr.fill()
 				
 				if self.hover and r == self.hover[1] and c == self.hover[0]:
-					cr.set_source_rgb(*(col * pms.cfg.intensity_txt_highlight * 1.2 for col in pms.cfg.colour))
+					cr.set_source_rgb(*(col * vht.cfg.intensity_txt_highlight * 1.2 for col in vht.cfg.colour))
 				else:
-					if pms.cfg.highlight > 1 and (r) % pms.cfg.highlight == 0:
-						cr.set_source_rgb(*(col * pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))
+					if vht.cfg.highlight > 1 and (r) % vht.cfg.highlight == 0:
+						cr.set_source_rgb(*(col * vht.cfg.intensity_txt_highlight for col in vht.cfg.colour))
 					else:
-						cr.set_source_rgb(*(col * pms.cfg.intensity_txt for col in pms.cfg.colour))
+						cr.set_source_rgb(*(col * vht.cfg.intensity_txt for col in vht.cfg.colour))
 	
 				if self.select_start and self.select_end:
 					ssx = self.select_start[0]
@@ -246,21 +246,21 @@ class TrackView(Gtk.DrawingArea):
 						ssy = yyy
 					
 					if c >= ssx and c <= sex and r >= ssy and r <= sey:
-						cr.set_source_rgb(*(col * pms.cfg.intensity_select for col in pms.cfg.colour))
+						cr.set_source_rgb(*(col * vht.cfg.intensity_select for col in vht.cfg.colour))
 						if c == len(self.trk) - 1:
 							cr.rectangle(c * self.txt_width, r * self.txt_height, (self.txt_width / 8.0) * 7.2, self.txt_height)
 						else:
 							cr.rectangle(c * self.txt_width, r * self.txt_height, self.txt_width, self.txt_height)
 						cr.fill()
-						cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
+						cr.set_source_rgb(*(col * vht.cfg.intensity_background for col in vht.cfg.colour))
 
 				if not self.select_start and not self.select_end:
 					if self.edit and r == self.edit[1] and c == self.edit[0]:
-						cr.set_source_rgb(*(pms.cfg.colour_record))
+						cr.set_source_rgb(*(vht.cfg.colour_record))
 						
 						cr.rectangle(c * self.txt_width, (r * self.txt_height) + self.txt_height * .1, (self.txt_width / 8.0) * 7.2, self.txt_height * .9)
 						cr.fill()
-						cr.set_source_rgb(*(col * pms.cfg.intensity_background for col in pms.cfg.colour))
+						cr.set_source_rgb(*(col * vht.cfg.intensity_background for col in vht.cfg.colour))
 						
 				yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2)
 				
@@ -285,7 +285,7 @@ class TrackView(Gtk.DrawingArea):
 					wnd.invalidate_rect(ir, False)
 
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
-		cr.set_source_rgb(*(col * pms.cfg.intensity_lines for col in pms.cfg.colour))
+		cr.set_source_rgb(*(col * vht.cfg.intensity_lines for col in vht.cfg.colour))
 		cr.move_to(self.txt_width * len(self.trk) - (width / 2), 0)
 		cr.line_to(self.txt_width * len(self.trk) - (width / 2), (self.trk.nrows) * self.txt_height)
 		cr.stroke()
@@ -316,7 +316,7 @@ class TrackView(Gtk.DrawingArea):
 		new_hover_column = max(new_hover_column, 0)
 		
 		if event.y > 50:
-			pms.clear_popups()
+			vht.clear_popups()
 
 		if self.select:
 			if not self.select_start:
@@ -402,8 +402,8 @@ class TrackView(Gtk.DrawingArea):
 				
 			self.redraw(self.hover[1])
 		
-		if pms.active_track:
-			if not pms.active_track.edit:
+		if vht.active_track:
+			if not vht.active_track.edit:
 				self.parent.change_active_track(self)
 		else:
 			self.parent.change_active_track(self)
@@ -422,9 +422,9 @@ class TrackView(Gtk.DrawingArea):
 		col = int(event.x / self.txt_width)
 		offs = int(event.x) % int(self.txt_width)
 
-		if event.button == pms.cfg.delete_button:
+		if event.button == vht.cfg.delete_button:
 			if self.trk[col][row].type == 0:
-				trk = pms.active_track
+				trk = vht.active_track
 				if trk:
 					trk.edit = None
 					trk.select_start = None
@@ -441,7 +441,7 @@ class TrackView(Gtk.DrawingArea):
 					
 		enter_edit = False
 		
-		if event.button != pms.cfg.select_button:
+		if event.button != vht.cfg.select_button:
 			return False
 		
 		self.sel_drag = False
@@ -523,7 +523,7 @@ class TrackView(Gtk.DrawingArea):
 		return True
 		
 	def on_button_release(self, widget, event):
-		if self.sel_drag and event.button == pms.cfg.select_button:
+		if self.sel_drag and event.button == vht.cfg.select_button:
 			if self.sel_dragged:
 				self.sel_drag = False
 				self.undo_buff.add_state()
@@ -553,7 +553,7 @@ class TrackView(Gtk.DrawingArea):
 				self.redraw(self.edit[1])
 				return True
 		
-		if event.button == pms.cfg.select_button:
+		if event.button == vht.cfg.select_button:
 			self.select = None
 			if self.select_start == self.select_end:
 				self.select_start = None
@@ -609,14 +609,14 @@ class TrackView(Gtk.DrawingArea):
 			
 			if self.edit[0] >= len(self.trk):
 				self.go_right(True)
-				pms.active_track.edit = 0, pms.active_track.edit[1]
-				pms.active_track.redraw()
+				vht.active_track.edit = 0, vht.active_track.edit[1]
+				vht.active_track.redraw()
 				return
 				
 			if self.edit[0] < 0:
 				self.go_left(True)
-				pms.active_track.edit = len(pms.active_track.trk) - 1, pms.active_track.edit[1]
-				pms.active_track.redraw()
+				vht.active_track.edit = len(vht.active_track.trk) - 1, vht.active_track.edit[1]
+				vht.active_track.redraw()
 				return
 				
 			self.redraw(old)
@@ -820,9 +820,9 @@ class TrackView(Gtk.DrawingArea):
 			self.undo_buff.add_state()
 			old = self.edit[1]
 			self.trk[self.edit[0]][self.edit[1]] = note
-			self.trk[self.edit[0]][self.edit[1]].velocity = pms.cfg.velocity
+			self.trk[self.edit[0]][self.edit[1]].velocity = vht.cfg.velocity
 			
-			self.edit = self.edit[0], self.edit[1] + pms.cfg.skip
+			self.edit = self.edit[0], self.edit[1] + vht.cfg.skip
 			if self.edit[1] >= self.trk.nrows:
 				self.edit = self.edit[0], self.edit[1] - self.trk.nrows
 			
@@ -897,7 +897,7 @@ class TrackView(Gtk.DrawingArea):
 			for r in sel:
 				if r.type:
 					r.velocity = min(r.velocity + 1, 127)
-					pms.cfg.velocity = r.velocity
+					vht.cfg.velocity = r.velocity
 			
 			self.undo_buff.add_state()
 			if self.edit:
@@ -910,7 +910,7 @@ class TrackView(Gtk.DrawingArea):
 			for r in sel:
 				if r.type:
 					r.velocity = min(r.velocity + 10, 127)
-					pms.cfg.velocity = r.velocity
+					vht.cfg.velocity = r.velocity
 
 			self.undo_buff.add_state()
 			if self.edit:
@@ -923,7 +923,7 @@ class TrackView(Gtk.DrawingArea):
 			for r in sel:
 				if r.type:
 					r.velocity = max(r.velocity - 1, 0)
-					pms.cfg.velocity = r.velocity
+					vht.cfg.velocity = r.velocity
 			
 			self.undo_buff.add_state()
 			if self.edit:
@@ -936,7 +936,7 @@ class TrackView(Gtk.DrawingArea):
 			for r in sel:
 				if r.type:
 					r.velocity = max(r.velocity - 10, 0)
-					pms.cfg.velocity = r.velocity
+					vht.cfg.velocity = r.velocity
 			
 			self.undo_buff.add_state()
 			if self.edit:
@@ -1079,7 +1079,7 @@ class TrackView(Gtk.DrawingArea):
 				if not self.edit:
 					return True
 					
-				while not self.edit[1] % pms.cfg.highlight == 0:
+				while not self.edit[1] % vht.cfg.highlight == 0:
 					self.edit = self.edit[0], self.edit[1] + 1
 			
 				if self.edit[1] >= self.trk.nrows:
@@ -1101,7 +1101,7 @@ class TrackView(Gtk.DrawingArea):
 					old = self.select_start[1], self.select_end[1]
 					self.select_end = self.select_end[0], self.select_end[1] + 1
 					
-					while not self.select_end[1] % pms.cfg.highlight == 0:
+					while not self.select_end[1] % vht.cfg.highlight == 0:
 						self.select_end = self.select_end[0], self.select_end[1] + 1
 					
 					self.select_end = self.select_end[0], min(self.select_end[1], self.trk.nrows - 1)
@@ -1126,7 +1126,7 @@ class TrackView(Gtk.DrawingArea):
 				if not self.edit:
 					return True
 					
-				while not self.edit[1] % pms.cfg.highlight == 0:
+				while not self.edit[1] % vht.cfg.highlight == 0:
 					self.edit = self.edit[0], self.edit[1] - 1
 			
 				self.edit = self.edit[0], max(self.edit[1], 0)
@@ -1147,7 +1147,7 @@ class TrackView(Gtk.DrawingArea):
 					old = self.select_start[1], self.select_end[1]
 					self.select_end = self.select_end[0], self.select_end[1] - 1
 					
-					while not self.select_end[1] % pms.cfg.highlight == 0:
+					while not self.select_end[1] % vht.cfg.highlight == 0:
 						self.select_end = self.select_end[0], self.select_end[1] - 1
 					
 					self.select_end = self.select_end[0], max(self.select_end[1], 0)
@@ -1244,7 +1244,7 @@ class TrackView(Gtk.DrawingArea):
 				self.redraw(self.trk.nrows -1)
 			else:
 				old = self.edit[1]
-				self.edit = self.edit[0], self.edit[1] + pms.cfg.skip
+				self.edit = self.edit[0], self.edit[1] + vht.cfg.skip
 				if self.edit[1] >= self.trk.nrows:
 					self.edit = self.edit[0], self.trk.nrows - 1
 					
@@ -1286,7 +1286,7 @@ class TrackView(Gtk.DrawingArea):
 			self.trk[self.edit[0]][self.edit[1]].type = 2
 			
 			old = self.edit[1]
-			self.edit = self.edit[0], self.edit[1] + pms.cfg.skip
+			self.edit = self.edit[0], self.edit[1] + vht.cfg.skip
 
 			if self.edit[1] >= self.trk.nrows:
 				self.edit = self.edit[0], self.edit[1] - self.trk.nrows

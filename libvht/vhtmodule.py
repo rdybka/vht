@@ -16,28 +16,28 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections.abc import Iterable
-from pypms import libpms
-from pypms.pmssequence import PMSSequence
+from libvht import libcvht
+from libvht.vhtsequence import VHTSequence
 
-class PMSModule(Iterable):
+class VHTModule(Iterable):
 	# a somewhat pythonic interface to the pms magic
 	# see pypmsapitest.py for general usage
 	def __init__(self):
 		self._seq = None
 		self.active_track = None
-		libpms.module_new();
+		libcvht.module_new();
 		super()
 	
 	def __del__(self):   
-		libpms.module_free();
+		libcvht.module_free();
 	
 	# this will connect and initialise an empty module
 	def jack_start(self, name = None):
-		return libpms.start(name)
+		return libcvht.start(name)
 	
 	# disconnect from jack
 	def jack_stop(self):
-		libpms.stop()
+		libcvht.stop()
 
 	def __str__(self):
 		r = {}
@@ -49,18 +49,18 @@ class PMSModule(Iterable):
 		return r.__str__()
 
 	def reset(self):
-		libpms.module_reset()
+		libcvht.module_reset()
 
 	def new(self):
 		self._seq = None
-		libpms.module_new();
+		libcvht.module_new();
 
 	def __len__(self):
-		return libpms.module_get_nseq()
+		return libcvht.module_get_nseq()
 
 	def __iter__(self):
 		for itm in range(self.__len__()):
-			yield PMSSequence(libpms, libpms.module_get_seq(itm))
+			yield PMSSequence(libcvht, libcvht.module_get_seq(itm))
 		
 	def __getitem__(self, itm):
 		if itm >= self.__len__():
@@ -69,18 +69,18 @@ class PMSModule(Iterable):
 		if itm < 0:
 			raise IndexError()
 			
-		return PMSSequence(libpms, libpms.module_get_seq(itm))
+		return VHTSequence(libcvht, libcvht.module_get_seq(itm))
     
 	def add_sequence(self, length = -1):
-		seq = libpms.sequence_new(length)
-		libpms.module_add_sequence(seq)
-		return PMSSequence(libpms, seq)
+		seq = libcvht.sequence_new(length)
+		libcvht.module_add_sequence(seq)
+		return VHTSequence(libcvht, seq)
     
 	def swap_sequence(self, s1, s2):
-		libpms.module_swap_sequence(s1, s2)
+		libcvht.module_swap_sequence(s1, s2)
 
 	def del_sequence(self, s = -1):
-		libpms.module_del_sequence(s)
+		libcvht.module_del_sequence(s)
     
 	def __str__(self):
 		ret = "seq: %d\n" % self.__len__()
@@ -89,34 +89,34 @@ class PMSModule(Iterable):
 		return ret
 
 	def sneakily_queue_midi_note_on(self, port, chn, note, velocity):
-		libpms.queue_midi_note_on(port, chn, note, velocity)
+		libcvht.queue_midi_note_on(port, chn, note, velocity)
 		
 	def sneakily_queue_midi_note_off(self, port, chn, note):
-		libpms.queue_midi_note_off(port, chn, note)
+		libcvht.queue_midi_note_off(port, chn, note)
 	
 	@property
 	def jack_error(self):
-		return libpms.get_jack_error()
+		return libcvht.get_jack_error()
 	
 	@property
 	def playing(self):
-		return libpms.module_is_playing()
+		return libcvht.module_is_playing()
 	
 	@property
 	def play(self):
-		return libpms.module_is_playing()
+		return libcvht.module_is_playing()
 		
 	@property
 	def curr_seq(self):
-		return libpms.module_get_curr_seq()
+		return libcvht.module_get_curr_seq()
 	
 		
 	@play.setter
 	def play(self, value):
 		if value:
-			libpms.module_play(1)
+			libcvht.module_play(1)
 		else:
-			libpms.module_play(0)
+			libcvht.module_play(0)
 
 	@property
 	def dump_notes(self):
@@ -124,25 +124,25 @@ class PMSModule(Iterable):
 		
 	@dump_notes.setter
 	def dump_notes(self, n):
-		libpms.module_dump_notes(n)
+		libcvht.module_dump_notes(n)
 
 
 	@property
 	def bpm(self):
-		return libpms.module_get_bpm()
+		return libcvht.module_get_bpm()
 	
 	@bpm.setter
 	def bpm(self, value):
-		libpms.module_set_bpm(value)
+		libcvht.module_set_bpm(value)
 
 	@property
 	def nports(self):
-		return libpms.module_get_nports()
+		return libcvht.module_get_nports()
 	
 	@nports.setter
 	def nports(self, value):
-		libpms.module_set_nports(value)
+		libcvht.module_set_nports(value)
 		
 	@property
 	def time(self):
-		return libpms.module_get_time()
+		return libcvht.module_get_time()

@@ -1,4 +1,4 @@
-from pypms import pms
+from libvht import vht
 
 class PoorMansPiano():
 	def __init__(self):
@@ -25,27 +25,27 @@ class PoorMansPiano():
 		if mnt == -23:
 			return None
 			
-		mnt += pms.cfg.octave * 12
+		mnt += vht.cfg.octave * 12
 		while mnt > 127:
 			mnt -= 12
 
-		trk = pms.active_track
+		trk = vht.active_track
 			
 		if not note_off:
 			if not self.note_on == mnt:
 				if trk:
-					pms.sneakily_queue_midi_note_on(trk.trk.port, trk.trk.channel, mnt, pms.cfg.velocity)
+					vht.sneakily_queue_midi_note_on(trk.trk.port, trk.trk.channel, mnt, vht.cfg.velocity)
 				self.note_on = mnt
 		else:
 			self.note_on = None
 			if trk:
-				pms.sneakily_queue_midi_note_off(trk.trk.port, trk.trk.channel, mnt)
+				vht.sneakily_queue_midi_note_off(trk.trk.port, trk.trk.channel, mnt)
 		
-		octave = pms.cfg.octave
+		octave = vht.cfg.octave
 		if key in self.notes:
 			return "%s%d" % (self.notes[key], octave)
 		
-		octave = pms.cfg.octave
+		octave = vht.cfg.octave
 		octave += 1
 		if octave > 8:
 			octave = 8	

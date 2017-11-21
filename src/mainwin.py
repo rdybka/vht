@@ -4,21 +4,21 @@ from gi.repository import Gtk, Gio
 
 from sequenceview import SequenceView
 from modulepropview import ModulePropView
-from pypms import pms
+from libvht import vht
 
 class MainWin(Gtk.ApplicationWindow):
 	def __init__(self, app):
 		Gtk.ApplicationWindow.__init__(self, application = app)
-		self.pms = pms
+		self.vht = vht
 		self.fs = False
 
-		pms.mainwin = self
+		vht.mainwin = self
 				
 		# fucking gui
 		hb = Gtk.HeaderBar()
 		hb.set_show_close_button(True)
-		hb.set_title("PMSeq")
-		hb.set_subtitle("poor man's sequencer")
+		#hb.set_title("vht")
+		#hb.set_subtitle("")
 		self.set_titlebar(hb)
 		
 		button = Gtk.Button()
@@ -42,7 +42,7 @@ class MainWin(Gtk.ApplicationWindow):
 		self.bpmbutton = Gtk.SpinButton()
 		self.bpmbutton.set_adjustment(self.adj)
 		hb.pack_start(self.bpmbutton)
-		self.adj.set_value(pms.bpm)
+		self.adj.set_value(vht.bpm)
 		self.adj.connect("value-changed", self.on_bpm_changed)
 
 		self.time_display = Gtk.Label()
@@ -57,7 +57,7 @@ class MainWin(Gtk.ApplicationWindow):
 		
 		self.hbox.pack_start(self.seqlab, False, True, 0)
 
-		self._sequence_view = SequenceView(pms[0])
+		self._sequence_view = SequenceView(vht[0])
 		#self.hbox.pack_start(ModulePropView(self._sequence_view), True, True, 0)
 		
 		#self.vbox.pack_start(self.hbox, False, False, 0)
@@ -69,9 +69,9 @@ class MainWin(Gtk.ApplicationWindow):
 		self.set_default_size(800, 600)
 		self.show_all()
 
-		if pms.start_error:
+		if vht.start_error:
 			dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
-				Gtk.ButtonsType.CANCEL, pms.start_error)
+				Gtk.ButtonsType.CANCEL, vht.start_error)
 
 			dialog.run()
 			dialog.destroy()
@@ -79,21 +79,21 @@ class MainWin(Gtk.ApplicationWindow):
 		self.add_tick_callback(self.tick)
 	
 	def tick(self, wdg, param):
-		self.time_display.set_markup("""<span font_desc="Roboto bold" font_family="monospace" size="x-large">%s</span>""" % self.pms.time)
+		self.time_display.set_markup("""<span font_desc="Roboto bold" font_family="monospace" size="x-large">%s</span>""" % self.vht.time)
 		return 1
 
 	def on_start_button_activate(self, switch):
-		pms.play = 1
+		vht.play = 1
 		
 	def on_stop_button_activate(self, switch):
-		if not pms.play:
-			pms.reset()
+		if not vht.play:
+			vht.reset()
 		else:
 			pass
 
-		pms.play = False
+		vht.play = False
 	
 	def on_bpm_changed(self, adj):
-		pms.bpm = int(adj.get_value())
+		vht.bpm = int(adj.get_value())
 	
 		

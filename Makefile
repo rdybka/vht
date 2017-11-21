@@ -7,52 +7,51 @@ INST_DIR=$(HOME)/.local
 CC=gcc
 CFLAGS=-I$(PYTHON_INCLUDE) -fPIC
 LIBS=-lm -ljack
-DEPS=lib/libpms.h \
-	lib/jack_client.h \
-	lib/jack_process.h \
-	lib/midi_event.h \
-	lib/row.h \
-	lib/track.h \
-	lib/module.h \
-	lib/sequence.h 
+DEPS=libvht/libvht.h \
+	libvht/jack_client.h \
+	libvht/jack_process.h \
+	libvht/midi_event.h \
+	libvht/row.h \
+	libvht/track.h \
+	libvht/module.h \
+	libvht/sequence.h 
 	
-OBJ=lib/jack_client.o \
-	lib/jack_process.o \
-	lib/midi_event.o \
-	lib/libpms.o \
-	lib/module.o \
-	lib/sequence.o \
-	lib/track.o \
-	lib/row.o 
+OBJ=libvht/jack_client.o \
+	libvht/jack_process.o \
+	libvht/midi_event.o \
+	libvht/libvht.o \
+	libvht/module.o \
+	libvht/sequence.o \
+	libvht/track.o \
+	libvht/row.o 
 
-all: pypms/_libpms.so
+all: libvht/_libcvht.so
 
 %.o: %c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-lib/libpms_wrap.c: $(DEPS) $(OBJ)
-	swig -python lib/libpms.h
+libvht/libvht_wrap.c: $(DEPS) $(OBJ)
+	swig -python libvht/libvht.h
 
-lib/pms_wrap.o: lib/libpms_wrap.c
+libvht/vht_wrap.o: libvht/libvht_wrap.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-pypms/libpms.py: lib/libpms_wrap.c
-	cp lib/libpms.py pypms
+libvht/_libcvht.so: $(OBJ) libvht/libvht_wrap.o libvht/libcvht.py
+	ld -shared $(OBJ) libvht/libvht_wrap.o -o $@ $(LIBS)
 
-pypms/_libpms.so: $(OBJ) lib/libpms_wrap.o pypms/libpms.py
-	ld -shared $(OBJ) lib/libpms_wrap.o -o $@ $(LIBS)
-
-install: pypms/_libpms.so
-	mkdir -p $(INST_DIR)/share/pmseq/pypms 
+install: libvht/_libcvht.so
+	mkdir -p $(INST_DIR)/share/vht/libvht 
 	cp -r dist/* $(INST_DIR)
-	cp pmseq $(INST_DIR)/bin
-	cp -r pypms/* $(INST_DIR)/share/pmseq/pypms
-	cp -r *.py $(INST_DIR)/share/pmseq
+	cp vht $(INST_DIR)/bin
+	cp -r libvht/* $(INST_DIR)/share/vht/libvht
+	cp -r src/*.py $(INST_DIR)/share/vht
 		
 clean:
-	rm -f *.so *.o lib/libpms.py pypms/libpms.py pypms/*.so
-	rm -f lib/*.so lib/*.o lib/libpms_wrap.c
-	rm -rf __pycache__
-	rm -rf pypms/__pycache__
-	rm -rf pypms/*.pyc
+	rm -f *.so *.o libvht/libvht.py libvht/*.so
+	rm -f libvht/*.o libvht/libvht_wrap.c
+	rm -rf src/__pycache__
+	rm -rf libvht/__pycache__
+	rm -rf libvht/*.pyc
+	rm -rf src/*.pyc
+	
 	

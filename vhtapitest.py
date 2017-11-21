@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Poor Man's Sequencer
+# Valhalla Tracker
 #
 # Copyright (C) 2017 Remigiusz Dybka
 #
@@ -18,17 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-from pypms import pms
+from libvht import vht
 
-if pms.jack_start():
+if vht.jack_start():
 	sys.exit(-1)
 
-seq = pms.add_sequence(8)
+seq = vht.add_sequence(8)
 trk1 = seq.add_track()
 trk2 = seq.add_track()
 
-pms.dump_notes = 1
-pms.play = 0
+vht.dump_notes = 1
+vht.play = 0
 
 input("dupa")
 
@@ -39,4 +39,4 @@ print(seq)
 seq.length = 8
 print(seq)
 
-pms.jack_stop()
+vht.jack_stop()

@@ -2,7 +2,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, Gio
 import cairo
-from pypms import pms
+from libvht import vht
 from trackview import TrackView
 class StatusBar(Gtk.DrawingArea):
 	def __init__(self):
@@ -35,24 +35,24 @@ class StatusBar(Gtk.DrawingArea):
 		w = self.get_allocated_width()
 		h = self.get_allocated_height()
 		
-		(x, y, width, height, dx, dy) = cr.text_extents("PMS" * self.min_char_width)
+		(x, y, width, height, dx, dy) = cr.text_extents("vht" * self.min_char_width)
 
 		self.set_size_request(1, height * 1.5)
 
 		gradient = cairo.LinearGradient(0, 0, 0, h)
-		gradient.add_color_stop_rgb(0.0, *(col *  pms.cfg.intensity_txt_highlight for col in pms.cfg.colour))
-		gradient.add_color_stop_rgb(1.0, *(col * pms.cfg.intensity_background for col in pms.cfg.colour))
+		gradient.add_color_stop_rgb(0.0, *(col *  vht.cfg.intensity_txt_highlight for col in vht.cfg.colour))
+		gradient.add_color_stop_rgb(1.0, *(col * vht.cfg.intensity_background for col in vht.cfg.colour))
 		cr.set_source(gradient)
 		
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
 
-		trk = pms.active_track
+		trk = vht.active_track
 				
 		t = 0
 		r = 0
 		c = 0
-		cs = pms.curr_seq
+		cs = vht.curr_seq
 		
 		self.pos = []
 		
@@ -69,7 +69,7 @@ class StatusBar(Gtk.DrawingArea):
 		txt = "%02d:%02d:%02d:%03d" % (cs, t, c, r)
 		h = height * 1.2
 
-		cr.set_source_rgb(*(col * 0 for col in pms.cfg.colour))
+		cr.set_source_rgb(*(col * 0 for col in vht.cfg.colour))
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(self.pos[-1], h)
 		cr.show_text(txt)
@@ -77,11 +77,11 @@ class StatusBar(Gtk.DrawingArea):
 		self.pos.append(xx)
 
 		if self.active_field == 1:
-			cr.set_source_rgb(*(col * 1.0 for col in pms.cfg.colour))
+			cr.set_source_rgb(*(col * 1.0 for col in vht.cfg.colour))
 		else:
-			cr.set_source_rgb(*(col * 0 for col in pms.cfg.colour))
+			cr.set_source_rgb(*(col * 0 for col in vht.cfg.colour))
 		
-		txt = " oct:%d" % pms.cfg.octave
+		txt = " oct:%d" % vht.cfg.octave
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(self.pos[-1], h)
 		cr.show_text(txt)	
@@ -90,11 +90,11 @@ class StatusBar(Gtk.DrawingArea):
 
 
 		if self.active_field == 2:
-			cr.set_source_rgb(*(col * 1.0 for col in pms.cfg.colour))
+			cr.set_source_rgb(*(col * 1.0 for col in vht.cfg.colour))
 		else:
-			cr.set_source_rgb(*(col * 0 for col in pms.cfg.colour))
+			cr.set_source_rgb(*(col * 0 for col in vht.cfg.colour))
 				
-		txt = " vel:%d" % pms.cfg.velocity
+		txt = " vel:%d" % vht.cfg.velocity
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(self.pos[-1], h)
 		cr.show_text(txt)	
@@ -103,11 +103,11 @@ class StatusBar(Gtk.DrawingArea):
 				
 
 		if self.active_field == 3:
-			cr.set_source_rgb(*(col * 1.0 for col in pms.cfg.colour))
+			cr.set_source_rgb(*(col * 1.0 for col in vht.cfg.colour))
 		else:
-			cr.set_source_rgb(*(col * 0 for col in pms.cfg.colour))
+			cr.set_source_rgb(*(col * 0 for col in vht.cfg.colour))
 						
-		txt = " skp:%d" % pms.cfg.skip
+		txt = " skp:%d" % vht.cfg.skip
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(self.pos[-1], h)
 		cr.show_text(txt)	
@@ -116,11 +116,11 @@ class StatusBar(Gtk.DrawingArea):
 				
 				
 		if self.active_field == 4:
-			cr.set_source_rgb(*(col * 1.0 for col in pms.cfg.colour))
+			cr.set_source_rgb(*(col * 1.0 for col in vht.cfg.colour))
 		else:
-			cr.set_source_rgb(*(col * 0 for col in pms.cfg.colour))
+			cr.set_source_rgb(*(col * 0 for col in vht.cfg.colour))
 						
-		txt = " hig:%d" % pms.cfg.highlight
+		txt = " hig:%d" % vht.cfg.highlight
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(self.pos[-1], h)
 		cr.show_text(txt)	
@@ -128,19 +128,19 @@ class StatusBar(Gtk.DrawingArea):
 		self.pos.append(xx)
 				
 		if self.active_field == 5:
-			cr.set_source_rgb(*(col * 1.0 for col in pms.cfg.colour))
+			cr.set_source_rgb(*(col * 1.0 for col in vht.cfg.colour))
 		else:
-			cr.set_source_rgb(*(col * 0 for col in pms.cfg.colour))
+			cr.set_source_rgb(*(col * 0 for col in vht.cfg.colour))
 		
-		txt = " bpm:%d" % pms.bpm
+		txt = " bpm:%d" % vht.bpm
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(self.pos[-1], h)
 		cr.show_text(txt)	
 		xx += dx
 		self.pos.append(xx)
 		
-		cr.set_source_rgb(*(col * 0 for col in pms.cfg.colour))		
-		txt = "%02d:%03d.%03d ***" % (cs, int(pms[cs].pos), (pms[cs].pos - int(pms[cs].pos)) * 1000)
+		cr.set_source_rgb(*(col * 0 for col in vht.cfg.colour))		
+		txt = "%02d:%03d.%03d ***" % (cs, int(vht[cs].pos), (vht[cs].pos - int(vht[cs].pos)) * 1000)
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(w - dx, h)
 		cr.show_text(txt)			
@@ -166,11 +166,11 @@ class StatusBar(Gtk.DrawingArea):
 
 		self._context = cairo.Context(self._surface)
 		self._context.set_antialias(cairo.ANTIALIAS_NONE)
-		self._context.set_line_width((pms.cfg.seq_font_size / 6.0) * pms.cfg.seq_line_width)
+		self._context.set_line_width((vht.cfg.seq_font_size / 6.0) * vht.cfg.seq_line_width)
 
-		self._context.select_font_face(pms.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)	
+		self._context.select_font_face(vht.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)	
 		
-		fs = pms.cfg.seq_font_size	
+		fs = vht.cfg.seq_font_size	
 		fits = False
 		while not fits:
 			self._context.set_font_size(fs)
@@ -209,33 +209,33 @@ class StatusBar(Gtk.DrawingArea):
 				
 		if self.active_field == 1:
 			if up:
-				pms.cfg.octave	= min(pms.cfg.octave + 1, 8)
+				vht.cfg.octave	= min(vht.cfg.octave + 1, 8)
 			if down:
-				pms.cfg.octave	= max(pms.cfg.octave - 1, 0)
+				vht.cfg.octave	= max(vht.cfg.octave - 1, 0)
 
 		if self.active_field == 2:
 			if up:
-				pms.cfg.velocity = min(pms.cfg.velocity + 1, 127)
+				vht.cfg.velocity = min(vht.cfg.velocity + 1, 127)
 			if down:
-				pms.cfg.velocity = max(pms.cfg.velocity - 1, 0)
+				vht.cfg.velocity = max(vht.cfg.velocity - 1, 0)
 		
 		if self.active_field == 3:
 			if up:
-				pms.cfg.skip = min(pms.cfg.skip + 1, 16)
+				vht.cfg.skip = min(vht.cfg.skip + 1, 16)
 			if down:
-				pms.cfg.skip = max(pms.cfg.skip - 1, -16)
+				vht.cfg.skip = max(vht.cfg.skip - 1, -16)
 		
 		if self.active_field == 4:
 			if up:
-				pms.cfg.highlight = min(pms.cfg.highlight + 1, 32)
+				vht.cfg.highlight = min(vht.cfg.highlight + 1, 32)
 			if down:
-				pms.cfg.highlight = max(pms.cfg.highlight - 1, 1)
+				vht.cfg.highlight = max(vht.cfg.highlight - 1, 1)
 		
 		if self.active_field == 5:
 			if up:
-				pms.bpm = min(pms.bpm + 1, 400)
+				vht.bpm = min(vht.bpm + 1, 400)
 			if down:
-				pms.bpm = max(pms.bpm - 1, 30)
+				vht.bpm = max(vht.bpm - 1, 30)
 		
 		return True		
 		
@@ -256,31 +256,31 @@ class StatusBar(Gtk.DrawingArea):
 		
 		if self.active_field == 1:
 			if up:
-				pms.cfg.octave	= min(pms.cfg.octave + 1, 8)
+				vht.cfg.octave	= min(vht.cfg.octave + 1, 8)
 			if down:
-				pms.cfg.octave	= max(pms.cfg.octave - 1, 0)
+				vht.cfg.octave	= max(vht.cfg.octave - 1, 0)
 
 		if self.active_field == 2:
 			if up:
-				pms.cfg.velocity = min(pms.cfg.velocity + 1, 127)
+				vht.cfg.velocity = min(vht.cfg.velocity + 1, 127)
 			if down:
-				pms.cfg.velocity = max(pms.cfg.velocity - 1, 0)
+				vht.cfg.velocity = max(vht.cfg.velocity - 1, 0)
 		
 		if self.active_field == 3:
 			if up:
-				pms.cfg.skip = min(pms.cfg.skip + 1, 16)
+				vht.cfg.skip = min(vht.cfg.skip + 1, 16)
 			if down:
-				pms.cfg.skip = max(pms.cfg.skip - 1, -16)
+				vht.cfg.skip = max(vht.cfg.skip - 1, -16)
 		
 		if self.active_field == 4:
 			if up:
-				pms.cfg.highlight = min(pms.cfg.highlight + 1, 32)
+				vht.cfg.highlight = min(vht.cfg.highlight + 1, 32)
 			if down:
-				pms.cfg.highlight = max(pms.cfg.highlight - 1, 1)
+				vht.cfg.highlight = max(vht.cfg.highlight - 1, 1)
 		
 		if self.active_field == 5:
 			if up:
-				pms.bpm = min(pms.bpm + 1, 400)
+				vht.bpm = min(vht.bpm + 1, 400)
 			if down:
-				pms.bpm = max(pms.bpm - 1, 30)
+				vht.bpm = max(vht.bpm - 1, 30)
 		

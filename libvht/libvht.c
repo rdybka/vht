@@ -2,7 +2,7 @@
 #include "jack_client.h"
 #include "jack_process.h"
 
-#include "libpms.h"
+#include "libvht.h"
 #include "module.h"
 
 // all wrappers and getters/setters go here
