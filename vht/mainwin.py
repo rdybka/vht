@@ -16,8 +16,8 @@ class MainWin(Gtk.ApplicationWindow):
 		# fucking gui
 		hb = Gtk.HeaderBar()
 		hb.set_show_close_button(True)
-		hb.set_title("vht")
-		hb.set_subtitle("valhalla tracker")
+		#hb.set_title("")
+		#hb.set_subtitle("")
 		self.set_titlebar(hb)
 		
 		button = Gtk.Button()
