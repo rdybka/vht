@@ -1,4 +1,4 @@
-from libvht import vht
+from libvht import mod
 
 def track_fill(trk, note = "c3", skip = 2, velocity = 100):
 	for r in range(len(trk[0])):
@@ -7,9 +7,9 @@ def track_fill(trk, note = "c3", skip = 2, velocity = 100):
 			trk[0][r].velocity = velocity
 	
 def muzakize():
-	vht.bpm = 123
+	mod.bpm = 123
 	
-	seq = vht.add_sequence(32)
+	seq = mod.add_sequence(32)
 	t1 = seq.add_track()
 	#t1.add_column()
 	#t1.add_column()

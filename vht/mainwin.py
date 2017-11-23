@@ -2,17 +2,16 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
 
-from sequenceview import SequenceView
-from modulepropview import ModulePropView
-from libvht import vht
+from vht.sequenceview import SequenceView
+from vht.modulepropview import ModulePropView
+from libvht import mod
 
 class MainWin(Gtk.ApplicationWindow):
 	def __init__(self, app):
 		Gtk.ApplicationWindow.__init__(self, application = app)
-		self.vht = vht
 		self.fs = False
 
-		vht.mainwin = self
+		mod.mainwin = self
 				
 		# fucking gui
 		hb = Gtk.HeaderBar()
@@ -42,7 +41,7 @@ class MainWin(Gtk.ApplicationWindow):
 		self.bpmbutton = Gtk.SpinButton()
 		self.bpmbutton.set_adjustment(self.adj)
 		hb.pack_start(self.bpmbutton)
-		self.adj.set_value(vht.bpm)
+		self.adj.set_value(mod.bpm)
 		self.adj.connect("value-changed", self.on_bpm_changed)
 
 		self.time_display = Gtk.Label()
@@ -57,7 +56,7 @@ class MainWin(Gtk.ApplicationWindow):
 		
 		self.hbox.pack_start(self.seqlab, False, True, 0)
 
-		self._sequence_view = SequenceView(vht[0])
+		self._sequence_view = SequenceView(mod[0])
 		#self.hbox.pack_start(ModulePropView(self._sequence_view), True, True, 0)
 		
 		#self.vbox.pack_start(self.hbox, False, False, 0)
@@ -69,9 +68,9 @@ class MainWin(Gtk.ApplicationWindow):
 		self.set_default_size(800, 600)
 		self.show_all()
 
-		if vht.start_error:
+		if mod.start_error:
 			dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
-				Gtk.ButtonsType.CANCEL, vht.start_error)
+				Gtk.ButtonsType.CANCEL, mod.start_error)
 
 			dialog.run()
 			dialog.destroy()
@@ -79,21 +78,21 @@ class MainWin(Gtk.ApplicationWindow):
 		self.add_tick_callback(self.tick)
 	
 	def tick(self, wdg, param):
-		self.time_display.set_markup("""<span font_desc="Roboto bold" font_family="monospace" size="x-large">%s</span>""" % self.vht.time)
+		self.time_display.set_markup("""<span font_desc="Roboto bold" font_family="monospace" size="x-large">%s</span>""" % self.mod.time)
 		return 1
 
 	def on_start_button_activate(self, switch):
-		vht.play = 1
+		mod.play = 1
 		
 	def on_stop_button_activate(self, switch):
-		if not vht.play:
-			vht.reset()
+		if not mod.play:
+			mod.reset()
 		else:
 			pass
 
-		vht.play = False
+		mod.play = False
 	
 	def on_bpm_changed(self, adj):
-		vht.bpm = int(adj.get_value())
+		mod.bpm = int(adj.get_value())
 	
 		

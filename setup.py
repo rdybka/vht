@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-from distutils.core import setup, Extension
+#from setuptools import setup, Extension
+from setuptools import setup, Extension
 
 setup(name = "vht",
 	version = "0.1.3",
-	description = "Valhalla JACK MIDI Tracker",
+	description = "Valhalla MIDI Tracker",
 	author = "Remigiusz Dybka",
 	author_email = "remigiusz.dybka@gmail.com",
 	url = "https://github.com/rdybka/vht",
@@ -19,5 +21,26 @@ setup(name = "vht",
 			"libvht/sequence.c",
 			"libvht/track.c"], 
 			libraries = ["jack"])],
-	packages = ["libvht"]
+	
+	packages = ["vht", "libvht"],
+	entry_points={
+        'console_scripts': [
+            'vht = vht.main:run',
+        ]},
+	
+	data_files = [
+		('share/applications', ['data/com.github.rdybka.vht.desktop']),
+		('share/icons', ['data/vht.png'])
+	],
+	
+	classifiers=[
+        'Environment :: X11 Applications :: GNOME',
+        'Development Status :: 2 - Pre-Alpha',
+        'Intended Audience :: End Users/Desktop',
+		'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+		'Programming Language :: Python :: 3',
+        'Programming Language :: C',
+		'Topic :: Multimedia :: Sound/Audio :: MIDI'
+	]
 )
+

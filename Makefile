@@ -7,7 +7,7 @@ INST_DIR=$(HOME)/.local
 CC=gcc
 CFLAGS=-I$(PYTHON_INCLUDE) -fPIC
 LIBS=-lm -ljack
-DEPS=libvht/libvht.h \
+DEPS=libvht/libmod.h \
 	libvht/jack_client.h \
 	libvht/jack_process.h \
 	libvht/midi_event.h \
@@ -19,46 +19,49 @@ DEPS=libvht/libvht.h \
 OBJ=libvht/jack_client.o \
 	libvht/jack_process.o \
 	libvht/midi_event.o \
-	libvht/libvht.o \
+	libvht/libmod.o \
 	libvht/module.o \
 	libvht/sequence.o \
 	libvht/track.o \
 	libvht/row.o 
 
-all: libvht/_libcvht.so
+all: libvht/_libcmod.so
 
 %.o: %c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 libvht/libvht_wrap.c: $(DEPS) $(OBJ)
-	swig -python libvht/libvht.h
+	swig -python libvht/libmod.h
 
 libvht/vht_wrap.o: libvht/libvht_wrap.c
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-libvht/_libcvht.so: $(OBJ) libvht/libvht_wrap.o libvht/libcvht.py
+libvht/_libcmod.so: $(OBJ) libvht/libvht_wrap.o libvht/libcmod.py
 	ld -shared $(OBJ) libvht/libvht_wrap.o -o $@ $(LIBS)
 
-install: libvht/_libcvht.so
+install: libvht/_libcmod.so
 	mkdir -p $(INST_DIR)/share/vht/libvht 
 	cp -r dist/* $(INST_DIR)
 	cp vht $(INST_DIR)/bin
 	cp -r libvht/* $(INST_DIR)/share/vht/libvht
-	cp -r src/*.py $(INST_DIR)/share/vht
+	cp -r vht/*.py $(INST_DIR)/share/vht
 		
 megaclean:
 	rm libvht/libvht_wrap.c
 	
 clean:
-	rm -f *.so *.o libvht/libvht.py libvht/*.so
+	rm -f *.so *.o libvht/libmod.py libvht/*.so
 	rm -f libvht/*.o
-	rm -rf src/__pycache__
+	rm -rf vht/__pycache__
 	rm -rf libvht/__pycache__
 	rm -rf build
 	rm -f dist/*.gz
 	rm -f MANIFEST
 	rm -rf libvht/*.pyc
-	rm -rf src/*.pyc
+	rm -rf vht/*.pyc
+	rm -rf dist
+	rm -rf vht.egg-info
+	
 	
 	
 	

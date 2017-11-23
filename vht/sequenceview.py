@@ -3,12 +3,12 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, Gio
 import cairo
 
-from trackview import TrackView
-from propview import PropView
-from trackpropview import TrackPropView
-from statusbar import StatusBar
+from vht.trackview import TrackView
+from vht.propview import PropView
+from vht.trackpropview import TrackPropView
+from vht.statusbar import StatusBar
 
-from libvht import vht
+from libvht import mod
 
 class SequenceView(Gtk.Box):
 	def __init__(self, seq):
@@ -21,7 +21,7 @@ class SequenceView(Gtk.Box):
 			Gdk.EventMask.KEY_PRESS_MASK |
 			Gdk.EventMask.KEY_RELEASE_MASK)
 		
-		vht.cfg.on_highlight.append(self.redraw_track)
+		mod.cfg.on_highlight.append(self.redraw_track)
 			
 		self._sv.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 		
@@ -130,35 +130,35 @@ class SequenceView(Gtk.Box):
 	
 		if event.keyval == 65293:		# enter
 			if event.state & Gdk.ModifierType.MOD1_MASK: # alt-enter
-				if vht.mainwin.fs:
-					vht.mainwin.unfullscreen()
-					vht.mainwin.fs = False
+				if mod.mainwin.fs:
+					mod.mainwin.unfullscreen()
+					mod.mainwin.fs = False
 				else:
-					vht.mainwin.fullscreen()
-					vht.mainwin.fs = True
+					mod.mainwin.fullscreen()
+					mod.mainwin.fs = True
 			
 				return True
 			
 			# play/stop
-			if vht.play:
-				vht.play = 0
+			if mod.play:
+				mod.play = 0
 			else:
-				vht.play = 1
+				mod.play = 1
 			
 		if event.keyval == 65307:			# esc
-			if vht.active_track:
-				if vht.active_track.edit:
-					return vht.active_track.on_key_press(widget, event)
+			if mod.active_track:
+				if mod.active_track.edit:
+					return mod.active_track.on_key_press(widget, event)
 			
-			if not vht.play:
-				vht.reset()
+			if not mod.play:
+				mod.reset()
 				
 			return True
 	
 		if event.keyval == 122:			# z
 			if event.state & Gdk.ModifierType.CONTROL_MASK:
-				if vht.active_track:
-					return vht.active_track.on_key_press(widget, event)
+				if mod.active_track:
+					return mod.active_track.on_key_press(widget, event)
 				
 		if event.keyval == 65451:		# +
 			if event.state & Gdk.ModifierType.CONTROL_MASK:
@@ -166,7 +166,7 @@ class SequenceView(Gtk.Box):
 				return True
 
 		if event.keyval == 65451:		# +
-			vht.cfg.skip += 1
+			mod.cfg.skip += 1
 			return True
 		
 		if event.keyval == 65453:		# -
@@ -175,56 +175,56 @@ class SequenceView(Gtk.Box):
 				return True
 				
 		if event.keyval == 65453:		# -
-			vht.cfg.skip -= 1
+			mod.cfg.skip -= 1
 			return True
 		
 		if event.keyval == 113:		# q
 			if event.state & Gdk.ModifierType.CONTROL_MASK:
-				vht.mainwin.close()
+				mod.mainwin.close()
 				return True
 		
 		if event.keyval == 65450:		# *
-			vht.cfg.octave += 1
-			if vht.cfg.octave > 8:
-				vht.cfg.octave = 8
+			mod.cfg.octave += 1
+			if mod.cfg.octave > 8:
+				mod.cfg.octave = 8
 			
 			return True
 		
 		if event.keyval == 65455:		# /
-			vht.cfg.octave -= 1
-			if vht.cfg.octave < 0:
-				vht.cfg.octave = 0
+			mod.cfg.octave -= 1
+			if mod.cfg.octave < 0:
+				mod.cfg.octave = 0
 			return True
 		
-		if not vht.active_track:
+		if not mod.active_track:
 			vals = [65364, 65362, 65363, 65361, 65366, 65365, 65360, 65367]
 				
 			for v in vals:
 				if event.keyval == v:
-					vht.active_track = self.get_tracks()[0]
-					if not vht.active_track.select_start:
-						vht.active_track.edit = 0, 0
-						vht.active_track.redraw(0)
+					mod.active_track = self.get_tracks()[0]
+					if not mod.active_track.select_start:
+						mod.active_track.edit = 0, 0
+						mod.active_track.redraw(0)
 						return True
 					
-		if vht.active_track:
-			if not vht.active_track.edit:
+		if mod.active_track:
+			if not mod.active_track.edit:
 				vals = [65364, 65362, 65363, 65361, 65366, 65365, 65360, 65367]
 			
 				for v in vals:
 					if event.keyval == v:
-						if not vht.active_track.select_start:
-							vht.active_track.edit = 0, 0
-							vht.active_track.redraw(0)
+						if not mod.active_track.select_start:
+							mod.active_track.edit = 0, 0
+							mod.active_track.redraw(0)
 							return True
 			
-			return vht.active_track.on_key_press(widget, event)
+			return mod.active_track.on_key_press(widget, event)
 
 		return False
 
 	def on_key_release(self, widget, event):
-		if vht.active_track:
-			return vht.active_track.on_key_release(widget, event)
+		if mod.active_track:
+			return mod.active_track.on_key_release(widget, event)
 			
 		return False
 
@@ -235,12 +235,12 @@ class SequenceView(Gtk.Box):
 		pass
 
 	def zoom(self, i):
-		vht.cfg.seq_font_size += i 
+		mod.cfg.seq_font_size += i 
 			
-		if vht.cfg.seq_font_size < 1:
-			vht.cfg.seq_font_size = 1
+		if mod.cfg.seq_font_size < 1:
+			mod.cfg.seq_font_size = 1
 
-		vht.cfg.pointer_height = .7 * vht.cfg.seq_font_size
+		mod.cfg.pointer_height = .7 * mod.cfg.seq_font_size
 		self.redraw_track(None)
 		self._side_prop.redraw()
 		self._prop_view.redraw()
@@ -255,26 +255,26 @@ class SequenceView(Gtk.Box):
 			
 			return True
 			
-		if vht.active_track:
-			if vht.active_track.edit:
-				old = vht.active_track.edit[1]
+		if mod.active_track:
+			if mod.active_track.edit:
+				old = mod.active_track.edit[1]
 
-				vht.active_track.edit = int(vht.active_track.edit[0]), int(vht.active_track.edit[1] + event.delta_y)
+				mod.active_track.edit = int(mod.active_track.edit[0]), int(mod.active_track.edit[1] + event.delta_y)
 				
-				if vht.active_track.edit[1] >= vht.active_track.trk.nrows:
-					vht.active_track.edit = vht.active_track.edit[0], vht.active_track.trk.nrows - 1
+				if mod.active_track.edit[1] >= mod.active_track.trk.nrows:
+					mod.active_track.edit = mod.active_track.edit[0], mod.active_track.trk.nrows - 1
 				
-				if vht.active_track.edit[1] < 0:
-					vht.active_track.edit = vht.active_track.edit[0], 0
+				if mod.active_track.edit[1] < 0:
+					mod.active_track.edit = mod.active_track.edit[0], 0
 				
-				vht.active_track.redraw(old)
-				vht.active_track.redraw(vht.active_track.edit[1])
+				mod.active_track.redraw(old)
+				mod.active_track.redraw(mod.active_track.edit[1])
 				return True	
 			
 		return False
 
 	def on_motion(self, widget, event):
-		#vht.clear_popups()
+		#mod.clear_popups()
 		self._sv.grab_focus()
 	
 	def add_track(self, trk):
@@ -300,9 +300,9 @@ class SequenceView(Gtk.Box):
 				return
 	
 	def change_active_track(self, trk):
-		ac = vht.active_track
+		ac = mod.active_track
 		
-		vht.active_track = trk
+		mod.active_track = trk
 		if ac != trk:
 			if ac:
 				self._prop_view.redraw(ac.trk.index)
@@ -363,7 +363,7 @@ class SequenceView(Gtk.Box):
 		if vtarget > trk_height - h:
 			vtarget = trk_height - h
 		
-		vtarget = vadj.get_value() + ((vtarget - vadj.get_value()) * vht.cfg.auto_scroll_delay)
+		vtarget = vadj.get_value() + ((vtarget - vadj.get_value()) * mod.cfg.auto_scroll_delay)
 		
 		vadj.set_value(vtarget)
 		
@@ -380,7 +380,7 @@ class SequenceView(Gtk.Box):
 		if htarget > self._track_box.get_allocated_width() - w:
 			htarget = self._track_box.get_allocated_width() - w
 		
-		htarget = hadj.get_value() + ((htarget - hadj.get_value()) * vht.cfg.auto_scroll_delay)
+		htarget = hadj.get_value() + ((htarget - hadj.get_value()) * mod.cfg.auto_scroll_delay)
 
 		hadj.set_value(htarget)
 		
@@ -398,7 +398,7 @@ class SequenceView(Gtk.Box):
 		w = widget.get_allocated_width()
 		h = widget.get_allocated_height()
 		
-		cr.set_source_rgb(*(col * vht.cfg.intensity_background for col in vht.cfg.colour))
+		cr.set_source_rgb(*(col * mod.cfg.intensity_background for col in mod.cfg.colour))
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
 

@@ -3,7 +3,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, Gdk, Gtk, Gio
 import cairo
 
-from trackview import TrackView
+from vht.trackview import TrackView
 
 class TrackPropViewPopover(Gtk.Popover):
 	def __init__(self, parent, trk):

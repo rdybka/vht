@@ -19,17 +19,15 @@
 
 import sys, os
 
-sys.path.append("src")
-
-from libvht import vht
+from libvht import mod
 
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, Gtk, Gio
 
-from mainwin import *
-import randomcomposer
-import vhtcfg
+from vht.mainwin import *
+import vht.randomcomposer
+from vht.vhtcfg import cfg
 
 class VHTApp(Gtk.Application):
 	def __init__(self):
@@ -39,36 +37,36 @@ class VHTApp(Gtk.Application):
 	def do_activate(self):
 		win = MainWin(self)
 		
-		if vht.start_error:
+		if mod.start_error:
 			self.quit()
 			
 		self.add_window(win)
 		win.show_all()
-		vht.play = True
+		mod.play = True
 
-def main():
-	vht.start_error = None
-	if vht.jack_start() != 0:
-		vht.start_error = "you will need JACK for this"
+def run():
+	mod.start_error = None
+	if mod.jack_start() != 0:
+		mod.start_error = "you will need JACK for this"
 
 	# move this stuff to proper configuration
-	vht.cfg = vhtcfg.cfg()
-	vht.nports = 3
+	mod.cfg = cfg()
+	mod.nports = 3
 	
-	randomcomposer.muzakize()
+	vht.randomcomposer.muzakize()
 
 	try:
 		app = VHTApp()
 
 		app.run(sys.argv)
 	except:
-		vht.jack_stop()	
+		mod.jack_stop()	
 		sys.exit()
 
 	# is this reliable? should we wait for module.mute == 0?
-	vht.play = False
+	mod.play = False
 	
-	vht.jack_stop()
+	mod.jack_stop()
 	
 if __name__ == "__main__":
-	main()
+	run()
