@@ -16,8 +16,8 @@ class MainWin(Gtk.ApplicationWindow):
 		# fucking gui
 		hb = Gtk.HeaderBar()
 		hb.set_show_close_button(True)
-		#hb.set_title("vht")
-		#hb.set_subtitle("")
+		hb.set_title("vht")
+		hb.set_subtitle("valhalla tracker")
 		self.set_titlebar(hb)
 		
 		button = Gtk.Button()
@@ -78,7 +78,7 @@ class MainWin(Gtk.ApplicationWindow):
 		self.add_tick_callback(self.tick)
 	
 	def tick(self, wdg, param):
-		self.time_display.set_markup("""<span font_desc="Roboto bold" font_family="monospace" size="x-large">%s</span>""" % self.mod.time)
+		self.time_display.set_markup("""<span font_desc="Roboto bold" font_family="monospace" size="x-large">%s</span>""" % mod.time)
 		return 1
 
 	def on_start_button_activate(self, switch):
