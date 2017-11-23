@@ -5,7 +5,7 @@
 from setuptools import setup, Extension
 
 setup(name = "vht",
-	version = "0.1.3",
+	version = "0.1.4",
 	description = "Valhalla MIDI Tracker",
 	author = "Remigiusz Dybka",
 	author_email = "remigiusz.dybka@gmail.com",
@@ -34,7 +34,7 @@ setup(name = "vht",
 	],
 	
 	classifiers=[
-        'Environment :: X11 Applications :: GNOME',
+        'Environment :: X11 Applications :: Gnome',
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: End Users/Desktop',
 		'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
