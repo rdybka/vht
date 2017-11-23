@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#from setuptools import setup, Extension
 from setuptools import setup, Extension
 
 setup(name = "vht",
@@ -43,4 +42,3 @@ setup(name = "vht",
 		'Topic :: Multimedia :: Sound/Audio :: MIDI'
 	]
 )
-
