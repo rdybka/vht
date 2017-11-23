@@ -9,6 +9,7 @@ setup(name = "vht",
 	author = "Remigiusz Dybka",
 	author_email = "remigiusz.dybka@gmail.com",
 	url = "https://github.com/rdybka/vht",
+	license = 'GPLv3+',
 	ext_modules = [Extension("_libcvht", ["libvht/libvht.c",
 			"libvht/libvht_wrap.c",
 			"libvht/jack_client.c",
@@ -29,7 +30,8 @@ setup(name = "vht",
 	
 	data_files = [
 		('share/applications', ['data/com.github.rdybka.vht.desktop']),
-		('share/icons', ['data/vht.png'])
+		('share/icons', ['data/vht.png']),
+		('share/vht', ['COPYING.txt', 'README.md'])
 	],
 	
 	classifiers=[
