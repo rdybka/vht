@@ -1,6 +1,7 @@
 #!/bin/sh
-# clears the tree so we can do "git add ." (I know, I know)
-# and regenerates the wrapper for libvht
+# - clears the tree so we can do "git add ." (I know, I know)
+# - regenerates the wrapper for libvht
+# don't run if you don't have swig installed
 
 rm -f *.so *.o libvht/libmod.py libvht/*.so
 rm -f libvht/*.o
