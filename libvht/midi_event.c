@@ -245,7 +245,7 @@ void queue_midi_note_on(int port, int chn, int note, int velocity) {
 	evt.note = note;
 	evt.velocity = velocity;
 	evt.time = 0;
-	
+
 	midi_buff_excl_in();
 	midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
 	midi_buff_excl_out();
