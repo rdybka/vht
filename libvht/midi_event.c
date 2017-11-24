@@ -34,16 +34,10 @@ int curr_midi_queue_event[JACK_CLIENT_MAX_PORTS];
 pthread_mutex_t midi_buff_exl;
 
 void midi_buff_excl_in() {
-	if (!module.jack_running)
-		return;
-
 	pthread_mutex_lock(&midi_buff_exl);
 }
 
 void midi_buff_excl_out() {
-	if (!module.jack_running)
-		return;
-
 	pthread_mutex_unlock(&midi_buff_exl);
 }
 
@@ -164,27 +158,7 @@ void midi_buffer_add(int port, midi_event evt) {
 	if ((port >= jack_n_output_ports) || (port < 0))
 		return;
 
-	midi_buff_excl_in();
 	midi_buffer[port][curr_midi_event[port]++] = evt;
-	midi_buff_excl_out();
-
-	if (module.dump_notes) {
-		char desc[256];
-		midi_describe_event(evt, desc, 256);
-		printf("%02d:%02d:%03d %s\n", module.min, module.sec, module.ms, desc);
-	}
-}
-
-void midi_queue_buffer_add(int port, midi_event evt) {
-	if (curr_midi_queue_event[port] == EVT_BUFFER_LENGTH)
-		return;
-
-	if ((port >= jack_n_output_ports) || (port < 0))
-		return;
-
-	midi_buff_excl_in();
-	midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
-	midi_buff_excl_out();
 
 	if (module.dump_notes) {
 		char desc[256];
@@ -201,11 +175,13 @@ void midi_buffer_flush_port(int port) {
 	void *outp = jack_port_get_buffer(jack_output_ports[port], jack_buffer_size);
 	jack_midi_clear_buffer(outp);
 
+	midi_buff_excl_in();
 	for (int f = 0; f < curr_midi_queue_event[port]; f++) {
 		midi_buffer_add(port, midi_queue_buffer[port][f]);
 	}
 
 	curr_midi_queue_event[port] = 0;
+	midi_buff_excl_out();
 
 	if (curr_midi_event[port] == 0)
 		return;
@@ -220,13 +196,9 @@ void midi_buffer_flush_port(int port) {
 }
 
 void midi_buffer_flush() {
-	midi_buff_excl_in();
-
 	for (int p = 0; p < module.nports; p++) {
 		midi_buffer_flush_port(p);
 	}
-
-	midi_buff_excl_out();
 }
 
 int parse_note(char *buff) {
@@ -273,8 +245,10 @@ void queue_midi_note_on(int port, int chn, int note, int velocity) {
 	evt.note = note;
 	evt.velocity = velocity;
 	evt.time = 0;
-
+	
+	midi_buff_excl_in();
 	midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
+	midi_buff_excl_out();
 }
 
 void queue_midi_note_off(int port, int chn, int note) {
@@ -285,5 +259,7 @@ void queue_midi_note_off(int port, int chn, int note) {
 	evt.velocity = 0;
 	evt.time = 0;
 
+	midi_buff_excl_in();
 	midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
+	midi_buff_excl_out();
 }
