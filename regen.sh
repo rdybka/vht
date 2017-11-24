@@ -16,4 +16,7 @@ rm -rf dist
 rm -rf vht.egg-info
 rm -f libvht/libvht_wrap.c
 
+cd libvht
+./beautify.sh
+cd ..
 swig -python libvht/libvht.h
