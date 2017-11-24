@@ -20,25 +20,27 @@
 #define __MIDI_EVENT_H__
 
 #include <jack/jack.h>
+#include <pthread.h>
 
 #define EVT_BUFFER_LENGTH 1024
 
 enum MIDI_EVENT_TYPE {none, note_on, note_off, pitch_wheel, control_change};
+extern pthread_mutex_t midi_buff_exl; // initialised from jack_start()
 
 typedef struct midi_event_t {
-    jack_nframes_t time;
-    int type;
-    unsigned char channel;
-    union {
-        unsigned char note;
-        unsigned char control;
-        unsigned char lsb;
-    };
-    union {
-        unsigned char velocity;
-        unsigned char data;
-        unsigned char msb;
-    };
+	jack_nframes_t time;
+	int type;
+	unsigned char channel;
+	union {
+		unsigned char note;
+		unsigned char control;
+		unsigned char lsb;
+	};
+	union {
+		unsigned char velocity;
+		unsigned char data;
+		unsigned char msb;
+	};
 } midi_event;
 
 midi_event midi_decode_event(unsigned char *data, int len);
