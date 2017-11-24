@@ -26,23 +26,23 @@
 #define TRIGGER_HOLD	2
 
 typedef struct track_t {
-    int port;
-    int channel;
-    int nrows; // actual rows
-    int nsrows; // song rows
-    int playing;
-    double pos;
+	int port;
+	int channel;
+	int nrows; // actual rows
+	int nsrows; // song rows
+	int playing;
+	double pos;
 
-    int ncols;
-    row **rows;
-    int arows; // allocated rows
-    int *ring;
-    int trigger_channel;
-    int trigger_note;
-    int loop;
+	int ncols;
+	row **rows;
+	int arows; // allocated rows
+	int *ring;
+	int trigger_channel;
+	int trigger_note;
+	int loop;
 
-    unsigned char trigger_type;
-    pthread_mutex_t excl; // for atomic row access
+	unsigned char trigger_type;
+	pthread_mutex_t excl; // for atomic row access
 } track;
 
 track *track_new(int port, int channel, int len, int songlen);

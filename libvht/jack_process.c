@@ -21,25 +21,25 @@
 #include "module.h"
 
 int jack_process(jack_nframes_t nframes, void *arg) {
-    jack_nframes_t curr_frames;
-    jack_time_t curr_usecs;
-    jack_time_t next_usecs;
-    float period_usecs;
+	jack_nframes_t curr_frames;
+	jack_time_t curr_usecs;
+	jack_time_t next_usecs;
+	float period_usecs;
 
-    //void *outp = jack_port_get_buffer(jack_output_ports[0], nframes);
-    //void *inp = jack_port_get_buffer(jack_input_port, nframes);
+	//void *outp = jack_port_get_buffer(jack_output_ports[0], nframes);
+	//void *inp = jack_port_get_buffer(jack_input_port, nframes);
 
-    jack_get_cycle_times(jack_client, &curr_frames, &curr_usecs, &next_usecs, &period_usecs);
-    module_advance(curr_frames);
-    return 0;
+	jack_get_cycle_times(jack_client, &curr_frames, &curr_usecs, &next_usecs, &period_usecs);
+	module_advance(curr_frames);
+	return 0;
 }
 
 int jack_sample_rate_changed(jack_nframes_t srate, void *arg) {
-    jack_sample_rate = srate;
-    return 0;
+	jack_sample_rate = srate;
+	return 0;
 }
 
 int jack_buffer_size_changed(jack_nframes_t size, void *arg) {
-    jack_buffer_size = size;
-    return 0;
+	jack_buffer_size = size;
+	return 0;
 }

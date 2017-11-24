@@ -22,10 +22,10 @@
 #include "track.h"
 
 typedef struct sequence_t {
-    track **trk;
-    int ntrk;
-    int length;
-    double pos;
+	track **trk;
+	int ntrk;
+	int length;
+	double pos;
 } sequence;
 
 sequence *sequence_new(int length);

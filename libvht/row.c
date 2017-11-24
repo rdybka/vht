@@ -20,40 +20,40 @@
 #include "row.h"
 
 int row_get_type(row *rw) {
-    return rw->type;
+	return rw->type;
 }
 
 int row_get_note(row *rw) {
-    return rw->note;
+	return rw->note;
 }
 
 int row_get_velocity(row *rw) {
-    return rw->velocity;
+	return rw->velocity;
 }
 
 int row_get_delay(row *rw) {
-    return rw->delay;
+	return rw->delay;
 }
 
 void row_set_type(row *rw, int type) {
-    rw->type = type;
+	rw->type = type;
 }
 
 void row_set_note(row *rw, int note) {
-    rw->note = note;
+	rw->note = note;
 }
 
 void row_set_velocity(row *rw, int velocity) {
-    rw->velocity = velocity;
+	rw->velocity = velocity;
 }
 
 void row_set_delay(row *rw, int delay) {
-    rw->delay = delay;
+	rw->delay = delay;
 }
 
 void row_set(row *rw, int type, int note, int velocity, int delay) {
-    rw->type = type;
-    rw->note = note;
-    rw->velocity = velocity;
-    rw->delay = delay;
+	rw->type = type;
+	rw->note = note;
+	rw->velocity = velocity;
+	rw->delay = delay;
 }

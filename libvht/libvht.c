@@ -8,52 +8,52 @@
 // all wrappers and getters/setters go here
 
 int start(char *name) {
-    return jack_start(name);
+	return jack_start(name);
 }
 
 void stop() {
-    jack_stop();
+	jack_stop();
 }
 
 int module_get_bpm() {
-    return module.bpm;
+	return module.bpm;
 }
 
 void module_set_bpm(int bpm) {
-    module.bpm = bpm;
+	module.bpm = bpm;
 }
 
 int get_nseq(void) {
-    return module.nseq;
+	return module.nseq;
 }
 
 void module_play(int play) {
-    module.playing = play;
-    if (play == 0)
-        module_mute();
+	module.playing = play;
+	if (play == 0)
+		module_mute();
 }
 
 int module_is_playing() {
-    return module.playing;
+	return module.playing;
 }
 
 void module_reset() {
-    module.seq[0]->pos = 0;
-    module.zero_time = 0;
-    for (int t = 0; t < module.seq[0]->ntrk; t++)
-        track_reset(module.seq[0]->trk[t]);
+	module.seq[0]->pos = 0;
+	module.zero_time = 0;
+	for (int t = 0; t < module.seq[0]->ntrk; t++)
+		track_reset(module.seq[0]->trk[t]);
 }
 
 struct module_t *get_module() {
-    return &module;
+	return &module;
 }
 
 int module_get_nseq(void) {
-    return module.nseq;
+	return module.nseq;
 }
 
 sequence *module_get_seq(int n) {
-    return module.seq[n];
+	return module.seq[n];
 }
 
 int module_get_curr_seq() {
@@ -61,99 +61,99 @@ int module_get_curr_seq() {
 }
 
 int sequence_get_ntrk(sequence *seq) {
-    return seq->ntrk;
+	return seq->ntrk;
 }
 
 int sequence_get_length(sequence *seq) {
-    return seq->length;
+	return seq->length;
 }
 
 
 track *sequence_get_trk(sequence *seq, int n) {
-    return seq->trk[n];
+	return seq->trk[n];
 }
 
 row *track_get_row_ptr(track *trk, int c, int r) {
-    return &trk->rows[c][r];
+	return &trk->rows[c][r];
 }
 
 int track_get_length(track *trk) {
-    return trk->nrows;
+	return trk->nrows;
 }
 
 int track_get_ncols(track *trk) {
-    return trk->ncols;
+	return trk->ncols;
 }
 
 int track_get_port(track *trk) {
-    return trk->port;
+	return trk->port;
 }
 
 int track_get_channel(track *trk) {
-    return trk->channel;
+	return trk->channel;
 }
 
 int track_get_nrows(track *trk) {
-    return trk->nrows;
+	return trk->nrows;
 }
 
 int track_get_nsrows(track *trk) {
-    return trk->nsrows;
+	return trk->nsrows;
 }
 
 int track_get_playing(track *trk) {
-    return trk->playing;
+	return trk->playing;
 }
 
 double track_get_pos(track *trk) {
-    return trk->pos;
+	return trk->pos;
 }
 
 void track_set_port(track *trk, int n) {
-    trk->port = n;
+	trk->port = n;
 }
 
 void track_set_channel(track *trk, int n) {
-    trk->channel = n;
+	trk->channel = n;
 }
 
 void track_set_nrows(track *trk, int n) {
-    track_resize(trk, n);
+	track_resize(trk, n);
 }
 
 void track_set_nsrows(track *trk, int n) {
-    trk->nsrows = n;
+	trk->nsrows = n;
 }
 
 int module_get_nports() {
-    return module.nports;
+	return module.nports;
 }
 
 void module_set_nports(int np) {
-    if (np > JACK_CLIENT_MAX_PORTS)
-        np = JACK_CLIENT_MAX_PORTS;
+	if (np > JACK_CLIENT_MAX_PORTS)
+		np = JACK_CLIENT_MAX_PORTS;
 
-    //if (np > 0) {
-    module.nports = np;
-    jack_synch_n_output_ports();
-    //}
+	//if (np > 0) {
+	module.nports = np;
+	jack_synch_n_output_ports();
+	//}
 }
 
 void sequence_set_length(sequence *seq, int length) {
-    for (int t = 0; t < seq->ntrk; t++){
-        if((seq->trk[t]->nrows == seq->trk[t]->nsrows) && (seq->trk[t]->nrows == seq->length)) {
+	for (int t = 0; t < seq->ntrk; t++) {
+		if((seq->trk[t]->nrows == seq->trk[t]->nsrows) && (seq->trk[t]->nrows == seq->length)) {
 			track_resize(seq->trk[t], length);
 			seq->trk[t]->nsrows = length;
 		}
 	}
-        
-    seq->length = length;
+
+	seq->length = length;
 }
 
 char *get_jack_error() {
 	return jack_error;
 }
 
-double sequence_get_pos(sequence *seq){
+double sequence_get_pos(sequence *seq) {
 	return seq->pos;
 }

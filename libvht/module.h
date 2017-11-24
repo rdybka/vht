@@ -26,24 +26,24 @@
 #include "sequence.h"
 
 struct module_t {
-    int playing;
-    jack_nframes_t zero_time;
-    double song_pos;
-    int min, sec, ms;
+	int playing;
+	jack_nframes_t zero_time;
+	double song_pos;
+	int min, sec, ms;
 
-    int bpm;
-    int rpb; // rows per beat
+	int bpm;
+	int rpb; // rows per beat
 
-    int def_nrows;
-    sequence **seq;
-    int nseq;
-    int curr_seq;
-    int mute;
+	int def_nrows;
+	sequence **seq;
+	int nseq;
+	int curr_seq;
+	int mute;
 
-    int jack_running;
-    int dump_notes;
-    int nports;
-    pthread_mutex_t excl; // to block structural changes when jack thread advances module
+	int jack_running;
+	int dump_notes;
+	int nports;
+	pthread_mutex_t excl; // to block structural changes when jack thread advances module
 };
 
 extern struct module_t module;

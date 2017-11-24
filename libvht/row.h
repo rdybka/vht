@@ -20,10 +20,10 @@
 #define __ROW_H__
 
 typedef struct row_t {
-    int type;
-    int note;
-    int velocity;
-    int delay; // +/- 1-999
+	int type;
+	int note;
+	int velocity;
+	int delay; // +/- 1-999
 } row;
 
 int row_get_type(row *rw);
