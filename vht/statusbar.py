@@ -2,7 +2,8 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, Gio
 import cairo
-from libvht import mod
+
+from vht import *
 from vht.trackview import TrackView
 
 class StatusBar(Gtk.DrawingArea):
@@ -41,8 +42,8 @@ class StatusBar(Gtk.DrawingArea):
 		self.set_size_request(1, height * 1.5)
 
 		gradient = cairo.LinearGradient(0, 0, 0, h)
-		gradient.add_color_stop_rgb(0.0, *(col *  mod.cfg.intensity_txt_highlight for col in mod.cfg.colour))
-		gradient.add_color_stop_rgb(1.0, *(col * mod.cfg.intensity_background for col in mod.cfg.colour))
+		gradient.add_color_stop_rgb(0.0, *(col *  cfg.intensity_txt_highlight for col in cfg.colour))
+		gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_background for col in cfg.colour))
 		cr.set_source(gradient)
 		
 		cr.rectangle(0, 0, w, h)
@@ -70,7 +71,7 @@ class StatusBar(Gtk.DrawingArea):
 		txt = "%02d:%02d:%02d:%03d" % (cs, t, c, r)
 		h = height * 1.2
 
-		cr.set_source_rgb(*(col * 0 for col in mod.cfg.colour))
+		cr.set_source_rgb(*(col * 0 for col in cfg.colour))
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(self.pos[-1], h)
 		cr.show_text(txt)
@@ -78,11 +79,11 @@ class StatusBar(Gtk.DrawingArea):
 		self.pos.append(xx)
 
 		if self.active_field == 1:
-			cr.set_source_rgb(*(col * 1.0 for col in mod.cfg.colour))
+			cr.set_source_rgb(*(col * 1.0 for col in cfg.colour))
 		else:
-			cr.set_source_rgb(*(col * 0 for col in mod.cfg.colour))
+			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
 		
-		txt = " oct:%d" % mod.cfg.octave
+		txt = " oct:%d" % cfg.octave
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(self.pos[-1], h)
 		cr.show_text(txt)	
@@ -91,11 +92,11 @@ class StatusBar(Gtk.DrawingArea):
 
 
 		if self.active_field == 2:
-			cr.set_source_rgb(*(col * 1.0 for col in mod.cfg.colour))
+			cr.set_source_rgb(*(col * 1.0 for col in cfg.colour))
 		else:
-			cr.set_source_rgb(*(col * 0 for col in mod.cfg.colour))
+			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
 				
-		txt = " vel:%d" % mod.cfg.velocity
+		txt = " vel:%d" % cfg.velocity
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(self.pos[-1], h)
 		cr.show_text(txt)	
@@ -104,11 +105,11 @@ class StatusBar(Gtk.DrawingArea):
 				
 
 		if self.active_field == 3:
-			cr.set_source_rgb(*(col * 1.0 for col in mod.cfg.colour))
+			cr.set_source_rgb(*(col * 1.0 for col in cfg.colour))
 		else:
-			cr.set_source_rgb(*(col * 0 for col in mod.cfg.colour))
+			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
 						
-		txt = " skp:%d" % mod.cfg.skip
+		txt = " skp:%d" % cfg.skip
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(self.pos[-1], h)
 		cr.show_text(txt)	
@@ -117,11 +118,11 @@ class StatusBar(Gtk.DrawingArea):
 				
 				
 		if self.active_field == 4:
-			cr.set_source_rgb(*(col * 1.0 for col in mod.cfg.colour))
+			cr.set_source_rgb(*(col * 1.0 for col in cfg.colour))
 		else:
-			cr.set_source_rgb(*(col * 0 for col in mod.cfg.colour))
+			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
 						
-		txt = " hig:%d" % mod.cfg.highlight
+		txt = " hig:%d" % cfg.highlight
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(self.pos[-1], h)
 		cr.show_text(txt)	
@@ -129,9 +130,9 @@ class StatusBar(Gtk.DrawingArea):
 		self.pos.append(xx)
 				
 		if self.active_field == 5:
-			cr.set_source_rgb(*(col * 1.0 for col in mod.cfg.colour))
+			cr.set_source_rgb(*(col * 1.0 for col in cfg.colour))
 		else:
-			cr.set_source_rgb(*(col * 0 for col in mod.cfg.colour))
+			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
 		
 		txt = " bpm:%d" % mod.bpm
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
@@ -140,7 +141,7 @@ class StatusBar(Gtk.DrawingArea):
 		xx += dx
 		self.pos.append(xx)
 		
-		cr.set_source_rgb(*(col * 0 for col in mod.cfg.colour))		
+		cr.set_source_rgb(*(col * 0 for col in cfg.colour))		
 		txt = "%02d:%03d.%03d ***" % (cs, int(mod[cs].pos), (mod[cs].pos - int(mod[cs].pos)) * 1000)
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(w - dx, h)
@@ -167,11 +168,11 @@ class StatusBar(Gtk.DrawingArea):
 
 		self._context = cairo.Context(self._surface)
 		self._context.set_antialias(cairo.ANTIALIAS_NONE)
-		self._context.set_line_width((mod.cfg.seq_font_size / 6.0) * mod.cfg.seq_line_width)
+		self._context.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
 
-		self._context.select_font_face(mod.cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)	
+		self._context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)	
 		
-		fs = mod.cfg.seq_font_size	
+		fs = cfg.seq_font_size	
 		fits = False
 		while not fits:
 			self._context.set_font_size(fs)
@@ -210,27 +211,27 @@ class StatusBar(Gtk.DrawingArea):
 				
 		if self.active_field == 1:
 			if up:
-				mod.cfg.octave	= min(mod.cfg.octave + 1, 8)
+				cfg.octave	= min(cfg.octave + 1, 8)
 			if down:
-				mod.cfg.octave	= max(mod.cfg.octave - 1, 0)
+				cfg.octave	= max(cfg.octave - 1, 0)
 
 		if self.active_field == 2:
 			if up:
-				mod.cfg.velocity = min(mod.cfg.velocity + 1, 127)
+				cfg.velocity = min(cfg.velocity + 1, 127)
 			if down:
-				mod.cfg.velocity = max(mod.cfg.velocity - 1, 0)
+				cfg.velocity = max(cfg.velocity - 1, 0)
 		
 		if self.active_field == 3:
 			if up:
-				mod.cfg.skip = min(mod.cfg.skip + 1, 16)
+				cfg.skip = min(cfg.skip + 1, 16)
 			if down:
-				mod.cfg.skip = max(mod.cfg.skip - 1, -16)
+				cfg.skip = max(cfg.skip - 1, -16)
 		
 		if self.active_field == 4:
 			if up:
-				mod.cfg.highlight = min(mod.cfg.highlight + 1, 32)
+				cfg.highlight = min(cfg.highlight + 1, 32)
 			if down:
-				mod.cfg.highlight = max(mod.cfg.highlight - 1, 1)
+				cfg.highlight = max(cfg.highlight - 1, 1)
 		
 		if self.active_field == 5:
 			if up:
@@ -257,27 +258,27 @@ class StatusBar(Gtk.DrawingArea):
 		
 		if self.active_field == 1:
 			if up:
-				mod.cfg.octave	= min(mod.cfg.octave + 1, 8)
+				cfg.octave	= min(cfg.octave + 1, 8)
 			if down:
-				mod.cfg.octave	= max(mod.cfg.octave - 1, 0)
+				cfg.octave	= max(cfg.octave - 1, 0)
 
 		if self.active_field == 2:
 			if up:
-				mod.cfg.velocity = min(mod.cfg.velocity + 1, 127)
+				cfg.velocity = min(cfg.velocity + 1, 127)
 			if down:
-				mod.cfg.velocity = max(mod.cfg.velocity - 1, 0)
+				cfg.velocity = max(cfg.velocity - 1, 0)
 		
 		if self.active_field == 3:
 			if up:
-				mod.cfg.skip = min(mod.cfg.skip + 1, 16)
+				cfg.skip = min(cfg.skip + 1, 16)
 			if down:
-				mod.cfg.skip = max(mod.cfg.skip - 1, -16)
+				cfg.skip = max(cfg.skip - 1, -16)
 		
 		if self.active_field == 4:
 			if up:
-				mod.cfg.highlight = min(mod.cfg.highlight + 1, 32)
+				cfg.highlight = min(cfg.highlight + 1, 32)
 			if down:
-				mod.cfg.highlight = max(mod.cfg.highlight - 1, 1)
+				cfg.highlight = max(cfg.highlight - 1, 1)
 		
 		if self.active_field == 5:
 			if up:

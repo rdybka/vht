@@ -3,12 +3,11 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, Gio
 import cairo
 
+from vht import *
 from vht.trackview import TrackView
 from vht.propview import PropView
 from vht.trackpropview import TrackPropView
 from vht.statusbar import StatusBar
-
-from libvht import mod
 
 class SequenceView(Gtk.Box):
 	def __init__(self, seq):
@@ -21,7 +20,7 @@ class SequenceView(Gtk.Box):
 			Gdk.EventMask.KEY_PRESS_MASK |
 			Gdk.EventMask.KEY_RELEASE_MASK)
 		
-		mod.cfg.on_highlight.append(self.redraw_track)
+		cfg.on_highlight.append(self.redraw_track)
 			
 		self._sv.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 		
@@ -166,7 +165,7 @@ class SequenceView(Gtk.Box):
 				return True
 
 		if event.keyval == 65451:		# +
-			mod.cfg.skip += 1
+			cfg.skip += 1
 			return True
 		
 		if event.keyval == 65453:		# -
@@ -175,7 +174,7 @@ class SequenceView(Gtk.Box):
 				return True
 				
 		if event.keyval == 65453:		# -
-			mod.cfg.skip -= 1
+			cfg.skip -= 1
 			return True
 		
 		if event.keyval == 113:		# q
@@ -184,16 +183,16 @@ class SequenceView(Gtk.Box):
 				return True
 		
 		if event.keyval == 65450:		# *
-			mod.cfg.octave += 1
-			if mod.cfg.octave > 8:
-				mod.cfg.octave = 8
+			cfg.octave += 1
+			if cfg.octave > 8:
+				cfg.octave = 8
 			
 			return True
 		
 		if event.keyval == 65455:		# /
-			mod.cfg.octave -= 1
-			if mod.cfg.octave < 0:
-				mod.cfg.octave = 0
+			cfg.octave -= 1
+			if cfg.octave < 0:
+				cfg.octave = 0
 			return True
 		
 		if not mod.active_track:
@@ -235,12 +234,12 @@ class SequenceView(Gtk.Box):
 		pass
 
 	def zoom(self, i):
-		mod.cfg.seq_font_size += i 
+		cfg.seq_font_size += i 
 			
-		if mod.cfg.seq_font_size < 1:
-			mod.cfg.seq_font_size = 1
+		if cfg.seq_font_size < 1:
+			cfg.seq_font_size = 1
 
-		mod.cfg.pointer_height = .7 * mod.cfg.seq_font_size
+		cfg.pointer_height = .7 * cfg.seq_font_size
 		self.redraw_track(None)
 		self._side_prop.redraw()
 		self._prop_view.redraw()
@@ -363,7 +362,7 @@ class SequenceView(Gtk.Box):
 		if vtarget > trk_height - h:
 			vtarget = trk_height - h
 		
-		vtarget = vadj.get_value() + ((vtarget - vadj.get_value()) * mod.cfg.auto_scroll_delay)
+		vtarget = vadj.get_value() + ((vtarget - vadj.get_value()) * cfg.auto_scroll_delay)
 		
 		vadj.set_value(vtarget)
 		
@@ -380,7 +379,7 @@ class SequenceView(Gtk.Box):
 		if htarget > self._track_box.get_allocated_width() - w:
 			htarget = self._track_box.get_allocated_width() - w
 		
-		htarget = hadj.get_value() + ((htarget - hadj.get_value()) * mod.cfg.auto_scroll_delay)
+		htarget = hadj.get_value() + ((htarget - hadj.get_value()) * cfg.auto_scroll_delay)
 
 		hadj.set_value(htarget)
 		
@@ -398,7 +397,7 @@ class SequenceView(Gtk.Box):
 		w = widget.get_allocated_width()
 		h = widget.get_allocated_height()
 		
-		cr.set_source_rgb(*(col * mod.cfg.intensity_background for col in mod.cfg.colour))
+		cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
 

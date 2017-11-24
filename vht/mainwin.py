@@ -2,9 +2,9 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
 
+from vht import *
 from vht.sequenceview import SequenceView
 from vht.modulepropview import ModulePropView
-from libvht import mod
 
 class MainWin(Gtk.ApplicationWindow):
 	def __init__(self, app):

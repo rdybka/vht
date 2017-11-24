@@ -1,9 +1,10 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, Gio
-from vht.trackpropview import TrackPropView
-from libvht import mod
 import cairo
+
+from vht import *
+from vht.trackpropview import TrackPropView
 
 class PropView(Gtk.ScrolledWindow):
 	def __init__(self, seqview):
@@ -14,7 +15,7 @@ class PropView(Gtk.ScrolledWindow):
 		self.seqview = seqview
 		self.seq = seqview.seq;
 
-		self.last_font_size = mod.cfg.seq_font_size
+		self.last_font_size = cfg.seq_font_size
 		
 		self._track_box = Gtk.Box()
 		self._track_box.set_spacing(0)
@@ -88,13 +89,13 @@ class PropView(Gtk.ScrolledWindow):
 	def on_draw(self, widget, cr):
 		w = widget.get_allocated_width()
 		h = widget.get_allocated_height()
-		cr.set_source_rgb(*(col * mod.cfg.intensity_background for col in mod.cfg.colour))
+		cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
 		
 		for wdg in self._track_box.get_children():
-			if self.last_font_size != mod.cfg.seq_font_size:
+			if self.last_font_size != cfg.seq_font_size:
 				wdg.redraw()
 	
-		self.last_font_size = mod.cfg.seq_font_size
+		self.last_font_size = cfg.seq_font_size
 		super()

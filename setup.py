@@ -35,12 +35,12 @@ setup(name = "vht",
 	],
 	
 	classifiers=[
-        'Environment :: X11 Applications :: Gnome',
-        'Development Status :: 2 - Pre-Alpha',
-        'Intended Audience :: End Users/Desktop',
+		'Environment :: X11 Applications :: Gnome',
+		'Development Status :: 2 - Pre-Alpha',
+		'Intended Audience :: End Users/Desktop',
 		'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
 		'Programming Language :: Python :: 3',
-        'Programming Language :: C',
+		'Programming Language :: C',
 		'Topic :: Multimedia :: Sound/Audio :: MIDI'
 	]
 )

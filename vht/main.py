@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 # Poor Man's Sequencer
 #
 # Copyright (C) 2017 Remigiusz Dybka
@@ -18,16 +17,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys, os
-
-from libvht import mod
-
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, Gtk, Gio
 
-from vht.mainwin import *
-import vht.randomcomposer
-from vht.vhtcfg import cfg
+from vht import *
+from vht import randomcomposer
+from vht.mainwin import MainWin
 
 class VHTApp(Gtk.Application):
 	def __init__(self):
@@ -49,11 +45,9 @@ def run():
 	if mod.jack_start() != 0:
 		mod.start_error = "you will need JACK for this"
 
-	# move this stuff to proper configuration
-	mod.cfg = cfg()
 	mod.nports = 3
 	
-	vht.randomcomposer.muzakize()
+	randomcomposer.muzakize()
 
 	try:
 		app = VHTApp()

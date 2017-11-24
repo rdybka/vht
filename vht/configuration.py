@@ -1,5 +1,4 @@
-
-class cfg():
+class Configuration():
 	def __init__(self):
 		self._highlight = 4
 		self.on_highlight = []			# add callbacks here

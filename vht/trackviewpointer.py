@@ -3,7 +3,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, Gio
 import cairo
 
-from libvht import mod
+from vht import *
 from libvht.vhtsequence import VHTSequence
 
 class trackviewpointer():
@@ -13,11 +13,11 @@ class trackviewpointer():
 			self.trk = seq
 			
 		self.spacing = 1.0
-		self.opacity = mod.cfg.pointer_opacity
+		self.opacity = cfg.pointer_opacity
 	
 		self._parent = parent
 		
-		self.height = mod.cfg.seq_font_size
+		self.height = cfg.seq_font_size
 
 		self.lpos = None
 
@@ -36,7 +36,7 @@ class trackviewpointer():
 
 		h = self._parent.get_allocated_height()
 		w = self._parent.get_allocated_width()
-		self.height = mod.cfg.seq_font_size
+		self.height = cfg.seq_font_size
 		cr = self._parent._context
 		
 		y = pos - 1
@@ -59,16 +59,16 @@ class trackviewpointer():
 		
 		if isinstance(self.trk, VHTSequence):
 			i = .5
-			if mod.cfg.highlight > 1 and (r) % mod.cfg.highlight == 0:
+			if cfg.highlight > 1 and (r) % cfg.highlight == 0:
 				i *= 2
 			
 			x = 0
 			xx = (self._parent.txt_width / 4.0) * 3.1
 
 			gradient = cairo.LinearGradient(x, y, x, y + self.height)
-			gradient.add_color_stop_rgba(0.0, *(col * i for col in mod.cfg.colour), 0)
-			gradient.add_color_stop_rgba(0.5, *(col * i for col in mod.cfg.colour), self.opacity)
-			gradient.add_color_stop_rgba(1.0, *(col * i for col in mod.cfg.colour), 0)
+			gradient.add_color_stop_rgba(0.0, *(col * i for col in cfg.colour), 0)
+			gradient.add_color_stop_rgba(0.5, *(col * i for col in cfg.colour), self.opacity)
+			gradient.add_color_stop_rgba(1.0, *(col * i for col in cfg.colour), 0)
 			cr.set_source(gradient)
 			
 			cr.rectangle(x, y, xx, self.height)
@@ -77,7 +77,7 @@ class trackviewpointer():
 			if int(pos) == 0:
 				self._parent.redraw(self._parent.seq.length -1)
 				
-				cr.set_source_rgb(*(col * mod.cfg.intensity_background for col in mod.cfg.colour))	
+				cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))	
 				cr.rectangle(0, self._parent.seq.length * self._parent.txt_height, w, self._parent.txt_height)
 				cr.fill()
 				
@@ -89,7 +89,7 @@ class trackviewpointer():
 
 		for c in range(len(self.trk)):
 			i = .5
-			if mod.cfg.highlight > 1 and (r) % mod.cfg.highlight == 0:
+			if cfg.highlight > 1 and (r) % cfg.highlight == 0:
 				i *= 1.0
 
 			rw = self.trk[c][r]
@@ -101,9 +101,9 @@ class trackviewpointer():
 			xx = (self._parent.txt_width / 8.0) * 7.2
 
 			gradient = cairo.LinearGradient(x, y, x, y + self.height)
-			gradient.add_color_stop_rgba(0.0, *(col * i for col in mod.cfg.colour), 0)
-			gradient.add_color_stop_rgba(0.5, *(col * i for col in mod.cfg.colour), self.opacity)
-			gradient.add_color_stop_rgba(1.0, *(col * i for col in mod.cfg.colour), 0)
+			gradient.add_color_stop_rgba(0.0, *(col * i for col in cfg.colour), 0)
+			gradient.add_color_stop_rgba(0.5, *(col * i for col in cfg.colour), self.opacity)
+			gradient.add_color_stop_rgba(1.0, *(col * i for col in cfg.colour), 0)
 			cr.set_source(gradient)
 						
 			cr.rectangle(x, y, xx, self.height)
@@ -111,7 +111,7 @@ class trackviewpointer():
 
 		if int(pos) == 0:
 			self._parent.redraw(self.trk.nrows -1)
-			cr.set_source_rgb(*(col * mod.cfg.intensity_background for col in mod.cfg.colour))	
+			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))	
 			cr.rectangle(0, self.trk.nrows * self._parent.txt_height, w, self._parent.txt_height)
 			cr.fill()
 				
