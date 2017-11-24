@@ -1,7 +1,7 @@
 class Configuration():
 	def __init__(self):
 		self._highlight = 4
-		self.on_highlight = []			# add callbacks here
+		self.on_highlight = []				# add callbacks here
 
 		self.seq_font = "Roboto Mono Medium"
 		#self.seq_font = "Ubuntu Mono"
@@ -17,10 +17,10 @@ class Configuration():
 		self.page_height = 16
 		self.skip = 1
 		self.padding = 3
-		#self.colour = (1.0, 1.0, 1.0)
-		self.colour = (.9, 1.0, .2)
-		#self.colour = (.8, .8, 1.0)
-		#self.colour = (.3, 1.0, .3)
+		#self.colour = (1.0, 1.0, 1.0)		# bw
+		self.colour = (.9, 1.0, .2)			# old_term
+		#self.colour = (.9, .9, 1.0)		# bluish
+		#self.colour = (.3, 1.0, .3)		# green
 		self.intensity_background = .3
 		self.intensity_txt = .7
 		self.intensity_txt_highlight = 1.0
