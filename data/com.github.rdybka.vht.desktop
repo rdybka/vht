@@ -1,11 +1,11 @@
 [Desktop Entry]
 Name=Valhalla Tracker
-Comment=Sequence MIDI 
+Comment=Sequence MIDI like never before
 GenericName=MIDI sequencer
 Encoding=UTF-8
 Version=1.0
 Type=Application
-Categories=Application;AudioVideo;Audio;Qt;;Midi;X-Jack;AudioVideoEditing;
+Categories=Application;Audio;;Midi;X-Jack;AudioVideoEditing;
 Keywords=audio;sound;jackd;sequencer;midi;tracker
 Terminal=false
 StartupNotify=false
