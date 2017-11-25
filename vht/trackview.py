@@ -1284,7 +1284,7 @@ class TrackView(Gtk.DrawingArea):
 			return True
 
 		if cfg.key["push"].matches(event):
-			if not seft.edit:
+			if not self.edit:
 				return False
 				
 			self.undo_buff.add_state()
