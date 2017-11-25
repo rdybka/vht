@@ -13,7 +13,7 @@ class Configuration():
 		#self.seq_font = "LCD"
 	
 		self.seq_font_size = 16
-		self.max_statusbar_font_size = 20
+		self.max_statusbar_font_size = 16
 		self.seq_line_width = 1.0
 		self.seq_spacing = 1.05
 		self.octave = 4
@@ -21,7 +21,6 @@ class Configuration():
 		
 		self.page_height = 16
 		self.skip = 1
-		self.padding = 3
 		#self.colour = (1.0, 1.0, 1.0)		# bw
 		self.colour = (.9, 1.0, .2)			# old_term
 		#self.colour = (.9, .9, 1.0)		# bluish
@@ -39,7 +38,7 @@ class Configuration():
 		
 		self.auto_scroll_delay = .15
 	
-		self.tooltip_markup = """<span font_family="monospace" size="large">%s</span>"""
+		self.tooltip_markup = """<span font_family="monospace" size="x-large">%s</span>"""
 	
 		self.key = {
 			# sequenceview
