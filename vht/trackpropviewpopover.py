@@ -81,7 +81,7 @@ class TrackPropViewPopover(Gtk.Popover):
 
 			button = Gtk.Button()
 			icon = Gio.ThemedIcon(name="media-seek-forward")
-			icon = Gio.ThemedIcon(name="media-seek-backward")
+			#icon = Gio.ThemedIcon(name="media-seek-backward")
 			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
 			button.add(image)
 			#button.connect("clicked", self.on_move_first_button_clicked)
