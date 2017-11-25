@@ -270,9 +270,11 @@ class StatusBar(Gtk.DrawingArea):
 		
 		if self.active_field == 5:
 			if up:
-				mod.bpm = min(mod.bpm + 1, 400)
+				mod.bpm = mod.bpm + 1
+				mod.mainwin.adj.set_value(mod.bpm)
 			if down:
-				mod.bpm = max(mod.bpm - 1, 30)
+				mod.bpm = mod.bpm - 1
+				mod.mainwin.adj.set_value(mod.bpm)
 		
 		return True		
 		
