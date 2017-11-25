@@ -3410,6 +3410,19 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_get_jack_max_ports(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)":get_jack_max_ports")) SWIG_fail;
+  result = (int)get_jack_max_ports();
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_module_new(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   
@@ -4825,6 +4838,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"stop", _wrap_stop, METH_VARARGS, NULL},
 	 { (char *)"get_jack_error", _wrap_get_jack_error, METH_VARARGS, NULL},
 	 { (char *)"module_get_time", _wrap_module_get_time, METH_VARARGS, NULL},
+	 { (char *)"get_jack_max_ports", _wrap_get_jack_max_ports, METH_VARARGS, NULL},
 	 { (char *)"module_new", _wrap_module_new, METH_VARARGS, NULL},
 	 { (char *)"module_free", _wrap_module_free, METH_VARARGS, NULL},
 	 { (char *)"module_play", _wrap_module_play, METH_VARARGS, NULL},

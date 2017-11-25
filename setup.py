@@ -4,7 +4,7 @@
 from setuptools import setup, Extension
 
 setup(name = "vht",
-	version = "0.1.4",
+	version = "0.1.5",
 	description = "Valhalla MIDI Tracker",
 	author = "Remigiusz Dybka",
 	author_email = "remigiusz.dybka@gmail.com",

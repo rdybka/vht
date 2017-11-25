@@ -20,8 +20,7 @@ from libvht import libcvht
 from libvht.vhtsequence import VHTSequence
 
 class VHTModule(Iterable):
-	# a somewhat pythonic interface to the pms magic
-	# see pypmsapitest.py for general usage
+	# a somewhat pythonic interface to the vht magic
 	def __init__(self):
 		self._seq = None
 		self.active_track = None
@@ -109,7 +108,6 @@ class VHTModule(Iterable):
 	@property
 	def curr_seq(self):
 		return libcvht.module_get_curr_seq()
-	
 		
 	@play.setter
 	def play(self, value):
@@ -126,13 +124,13 @@ class VHTModule(Iterable):
 	def dump_notes(self, n):
 		libcvht.module_dump_notes(n)
 
-
 	@property
 	def bpm(self):
 		return libcvht.module_get_bpm()
 	
 	@bpm.setter
 	def bpm(self, value):
+		value = min(max(value, self.min_bpm), self.max_bpm)
 		libcvht.module_set_bpm(value)
 
 	@property
@@ -146,3 +144,16 @@ class VHTModule(Iterable):
 	@property
 	def time(self):
 		return libcvht.module_get_time()
+
+	@property
+	def max_ports(self):
+		return libcvht.get_jack_max_ports()
+
+	@property
+	def min_bpm(self):
+		return 1
+		
+	@property
+	def max_bpm(self):
+		return 1000
+		

@@ -771,51 +771,66 @@ class TrackView(Gtk.DrawingArea):
 		if event.state & Gdk.ModifierType.MOD1_MASK:
 			alt = True
 
-		#print("key : %d %s" % (event.keyval, event.state))
+		if cfg.key["undo"].matches(event):
+			self.undo_buff.restore()
+			self.parent.redraw_track(self.trk)
+			return True
 			
-		if ctrl:
-			if event.keyval == 122:			# ctrl-z
-				self.undo_buff.restore()
-				self.parent.redraw_track(self.trk)
-				return True
+		if cfg.key["copy"].matches(event):
+			self.copy_selection()
+			return True
 
-			if event.keyval == 99:			# ctrl-c
-				self.copy_selection()
-				return True
+		if cfg.key["cut"].matches(event):
+			self.undo_buff.add_state()
+			self.copy_selection(True)
+			self.redraw()
+			return True
 
-			if event.keyval == 120:			# ctrl-x
-				self.undo_buff.add_state()
-				self.copy_selection(True)
-				self.redraw()
-				return True
-
-			if event.keyval == 118:			# ctrl-v
-				self.undo_buff.add_state()	
-				self.paste()
-				self.redraw()
-				self.undo_buff.add_state()
-				self.parent._prop_view.redraw(self.trk.index)
-				return True
+		if cfg.key["paste"].matches(event):
+			self.undo_buff.add_state()	
+			self.paste()
+			self.redraw()
+			self.undo_buff.add_state()
+			self.parent._prop_view.redraw(self.trk.index)
+			return True
 			
-			if event.keyval == 97:			# ctrl-a
-				if self.edit:
-					self.select_start = self.edit[0], 0
-					self.select_end = self.edit[0], self.trk.nrows - 1
-					self.edit = None
+		if cfg.key["select_all"].matches(event):
+			if self.edit:
+				self.select_start = self.edit[0], 0
+				self.select_end = self.edit[0], self.trk.nrows - 1
+				self.edit = None
+				self.redraw()
+			elif self.select_start: 
+				if self.select_start[1] == 0 and self.select_end[1] == self.trk.nrows -1:
+					self.select_start = 0, 0
+					self.select_end = len(self.trk) - 1, self.trk.nrows - 1
 					self.redraw()
-				elif self.select_start: 
-					if self.select_start[1] == 0 and self.select_end[1] == self.trk.nrows -1:
-						self.select_start = 0, 0
-						self.select_end = len(self.trk) - 1, self.trk.nrows - 1
-						self.redraw()
-					else:
-						self.select_start = self.select_start[0], 0
-						self.select_end = self.select_start[0], self.trk.nrows - 1
-						self.redraw()
+				else:
+					self.select_start = self.select_start[0], 0
+					self.select_end = self.select_start[0], self.trk.nrows - 1
+					self.redraw()
 				
-				return True
+			return True
 
-		note = self.pmp.key2note(event.keyval)
+		if cfg.key["note_off"].matches(event):				#  note_off
+			self.trk[self.edit[0]][self.edit[1]].clear()
+			self.trk[self.edit[0]][self.edit[1]].type = 2
+			
+			old = self.edit[1]
+			self.edit = self.edit[0], self.edit[1] + cfg.skip
+
+			if self.edit[1] >= self.trk.nrows:
+				self.edit = self.edit[0], self.edit[1] - self.trk.nrows
+			
+			while self.edit[1] < 0:
+				self.edit = self.edit[0], self.edit[1] + self.trk.nrows
+					
+			self.redraw(self.edit[1])
+			self.redraw(old)
+			
+			self.undo_buff.add_state()
+
+		note = self.pmp.key2note(Gdk.keyval_to_lower(event.keyval))
 				
 		if self.edit and note:
 			self.undo_buff.add_state()
@@ -837,7 +852,7 @@ class TrackView(Gtk.DrawingArea):
 		redr = False
 		old = self.edit
 				
-		if self.edit and event.keyval == 65307:			# esc
+		if self.edit and cfg.key["exit_edit"].matches(event):
 			self.edit = None
 			redr = True
 
@@ -846,7 +861,7 @@ class TrackView(Gtk.DrawingArea):
 			sel = []
 			sel.append(self.trk[self.edit[0]][self.edit[1]])
 			
-		if sel and ctrl and event.keyval == 65362:	# ctrl+up on selection
+		if cfg.key["transp_up"].matches(event):
 			for r in sel:
 				if r.type:
 					r.note = min(r.note + 1, 127)
@@ -858,7 +873,7 @@ class TrackView(Gtk.DrawingArea):
 				self.redraw(self.select_start[1], self.select_end[1])
 			return True
 
-		if sel and ctrl and event.keyval == 65365:	# ctrl+page up on selection
+		if cfg.key["transp_12_up"].matches(event):
 			for r in sel:
 				if r.type:
 					r.note = min(r.note + 12, 127)
@@ -870,7 +885,7 @@ class TrackView(Gtk.DrawingArea):
 				self.redraw(self.select_start[1], self.select_end[1])
 			return True
 			
-		if sel and ctrl and event.keyval == 65364:	# ctrl+down on selection
+		if cfg.key["transp_down"].matches(event):
 			for r in sel:
 				if r.type:
 					r.note = max(r.note - 1, 0)
@@ -882,7 +897,7 @@ class TrackView(Gtk.DrawingArea):
 				self.redraw(self.select_start[1], self.select_end[1])
 			return True
 			
-		if sel and ctrl and event.keyval == 65366:	# ctrl+page down on selection
+		if cfg.key["transp_12_down"].matches(event):
 			for r in sel:
 				if r.type:
 					r.note = max(r.note - 12, 0)
@@ -894,7 +909,7 @@ class TrackView(Gtk.DrawingArea):
 				self.redraw(self.select_start[1], self.select_end[1])
 			return True
 			
-		if sel and alt and event.keyval == 65362:	# alt+up on selection
+		if cfg.key["velocity_up"].matches(event):
 			for r in sel:
 				if r.type:
 					r.velocity = min(r.velocity + 1, 127)
@@ -904,10 +919,10 @@ class TrackView(Gtk.DrawingArea):
 			if self.edit:
 				self.redraw(self.edit[1])
 			else:
-				self.redraw(self.select_start[1], self.select_end[1])
+				self.redraw(self.select_start[1], self.select_end[1])			
 			return True
 
-		if sel and alt and event.keyval == 65365:	# alt+page up on selection
+		if cfg.key["velocity_10_up"].matches(event):
 			for r in sel:
 				if r.type:
 					r.velocity = min(r.velocity + 10, 127)
@@ -920,7 +935,7 @@ class TrackView(Gtk.DrawingArea):
 				self.redraw(self.select_start[1], self.select_end[1])
 			return True
 			
-		if sel and alt and event.keyval == 65364:	# alt+down on selection
+		if cfg.key["velocity_down"].matches(event):
 			for r in sel:
 				if r.type:
 					r.velocity = max(r.velocity - 1, 0)
@@ -933,7 +948,7 @@ class TrackView(Gtk.DrawingArea):
 				self.redraw(self.select_start[1], self.select_end[1])
 			return True
 			
-		if sel and alt and event.keyval == 65366:	# alt+page down on selection
+		if cfg.key["velocity_10_down"].matches(event):
 			for r in sel:
 				if r.type:
 					r.velocity = max(r.velocity - 10, 0)
@@ -1218,7 +1233,7 @@ class TrackView(Gtk.DrawingArea):
 			self.redraw(old[1])
 			return True
 
-		if event.keyval == 65535:			# del
+		if cfg.key["delete"].matches(event):
 			sel = self.selection()
 			if sel:
 				for r in sel:
@@ -1233,47 +1248,33 @@ class TrackView(Gtk.DrawingArea):
 			self.trk[self.edit[0]][self.edit[1]].clear()
 			self.redraw(self.edit[1])
 			
-			if event.state & Gdk.ModifierType.CONTROL_MASK:
-				x = self.edit[0]
-				y = self.edit[1]
-				
-				for y in range(self.edit[1], self.trk.nrows - 1):
-					self.trk[x][y].copy(self.trk[x][y + 1])
-					self.redraw(y)
-		
-				self.trk[x][self.trk.nrows -1].clear()
-				self.redraw(self.trk.nrows -1)
-			else:
-				old = self.edit[1]
-				self.edit = self.edit[0], self.edit[1] + cfg.skip
-				if self.edit[1] >= self.trk.nrows:
-					self.edit = self.edit[0], self.trk.nrows - 1
+			old = self.edit[1]
+			self.edit = self.edit[0], self.edit[1] + cfg.skip
+			if self.edit[1] >= self.trk.nrows:
+				self.edit = self.edit[0], self.trk.nrows - 1
 					
-				self.redraw(self.edit[1])
-				self.redraw(old)
+			self.redraw(self.edit[1])
+			self.redraw(old)
 
 			self.undo_buff.add_state()
 			return True
 		
-		if not self.edit:
-			return False
+		if cfg.key["pull"].matches(event):
+			if not self.edit:
+				return True
 
-		if event.keyval == 65379:			# insert
-			self.undo_buff.add_state()
-			if event.state & Gdk.ModifierType.CONTROL_MASK:
-				self.undo_buff.add_state()
-				x = self.edit[0]
-				y = self.edit[1]
+			x = self.edit[0]
+			y = self.edit[1]
 				
-				for y in reversed(range(self.edit[1], self.trk.nrows - 1)):
-					self.trk[x][y + 1].copy(self.trk[x][y])
-					self.redraw(y + 1)
-		
-				self.trk[x][y].clear()
+			for y in range(self.edit[1], self.trk.nrows - 1):
+				self.trk[x][y].copy(self.trk[x][y + 1])
 				self.redraw(y)
-				self.undo_buff.add_state()
-			return True
 		
+			self.trk[x][self.trk.nrows -1].clear()
+			self.redraw(self.trk.nrows -1)
+			self.undo_buff.add_state()
+			return True
+			
 		if event.keyval == 65056:			# shift-tab
 			self.go_left(True)
 			return True
@@ -1281,24 +1282,23 @@ class TrackView(Gtk.DrawingArea):
 		if event.keyval == 65289:			# tab
 			self.go_right(True)
 			return True
-		
-		if event.keyval == 92:				# | note_off
-			self.trk[self.edit[0]][self.edit[1]].clear()
-			self.trk[self.edit[0]][self.edit[1]].type = 2
-			
-			old = self.edit[1]
-			self.edit = self.edit[0], self.edit[1] + cfg.skip
 
-			if self.edit[1] >= self.trk.nrows:
-				self.edit = self.edit[0], self.edit[1] - self.trk.nrows
-			
-			while self.edit[1] < 0:
-				self.edit = self.edit[0], self.edit[1] + self.trk.nrows
-					
-			self.redraw(self.edit[1])
-			self.redraw(old)
-			
+		if cfg.key["push"].matches(event):
+			if not seft.edit:
+				return False
+				
 			self.undo_buff.add_state()
+			x = self.edit[0]
+			y = self.edit[1]
+				
+			for y in reversed(range(self.edit[1], self.trk.nrows - 1)):
+				self.trk[x][y + 1].copy(self.trk[x][y])
+				self.redraw(y + 1)
+		
+			self.trk[x][y].clear()
+			self.redraw(y)
+			self.undo_buff.add_state()
+		return True
 		
 		return False
 

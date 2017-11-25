@@ -3,6 +3,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, Gio
 import cairo
 
+from vht import *
+
 class SequencePropViewPopover(Gtk.Popover):
 	def __init__(self, parent, seq):
 		super(Gtk.Popover, self).__init__()
@@ -24,7 +26,7 @@ class SequencePropViewPopover(Gtk.Popover):
 		image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
 		button.add(image)
 		button.connect("clicked", self.on_add_button_clicked)
-		button.set_tooltip_text("CTRL + T")
+		button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_add"]))
 		self.grid.attach(button, 0, 0, 1, 1)
 
 		self.length_adj = Gtk.Adjustment(0, 0, 256, 1.0, 1.0)

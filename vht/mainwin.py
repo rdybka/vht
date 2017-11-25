@@ -37,7 +37,7 @@ class MainWin(Gtk.ApplicationWindow):
 		label = Gtk.Label("BPM:")
 		hb.pack_start(label)
 		
-		self.adj = Gtk.Adjustment(120.0, 30.0, 400.0, 1.0, 10.0)
+		self.adj = Gtk.Adjustment(120.0, mod.min_bpm, mod.max_bpm, 1.0, 10.0)
 		self.bpmbutton = Gtk.SpinButton()
 		self.bpmbutton.set_adjustment(self.adj)
 		hb.pack_start(self.bpmbutton)

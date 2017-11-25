@@ -46,7 +46,7 @@ def run():
 		mod.start_error = "you will need JACK for this"
 
 	mod.nports = 3
-	
+	#mod.dump_notes = True
 	randomcomposer.muzakize()
 
 	try:

@@ -28,7 +28,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
 			button.add(image)
 			button.connect("clicked", self.on_remove_button_clicked)
-			button.set_tooltip_text("ctrl r")
+			button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_del"]))
 			self.grid.attach(button, 3, 0, 1, 1)
 
 			button = Gtk.Button()
@@ -36,7 +36,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
 			button.add(image)
 			button.connect("clicked", self.on_retract_button_clicked)
-			button.set_tooltip_text("ctrl -")
+			button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_shrink"]))
 			self.grid.attach(button, 0, 0, 1, 1)
 
 			button = Gtk.Button()
@@ -44,7 +44,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
 			button.add(image)
 			button.connect("clicked", self.on_expand_button_clicked)
-			button.set_tooltip_text("ctrl +")
+			button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_expand"]))
 			self.grid.attach(button, 1, 0, 2, 1)
 
 			button = Gtk.Button()
@@ -52,7 +52,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
 			button.add(image)
 			button.connect("clicked", self.on_move_left_button_clicked)
-			button.set_tooltip_text("ctrl left")
+			button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_move_left"]))
 			self.grid.attach(button, 1, 1, 1, 1)
 
 			button = Gtk.Button()
@@ -60,7 +60,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
 			button.add(image)
 			button.connect("clicked", self.on_move_right_button_clicked)
-			button.set_tooltip_text("ctrl right")
+			button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_move_right"]))
 			self.grid.attach(button, 2, 1, 1, 1)
 
 			button = Gtk.Button()
@@ -68,7 +68,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
 			button.add(image)
 			button.connect("clicked", self.on_move_first_button_clicked)
-			button.set_tooltip_text("ctrl left")
+			button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_move_first"]))
 			self.grid.attach(button, 0, 1, 1, 1)
 
 			button = Gtk.Button()
@@ -76,8 +76,18 @@ class TrackPropViewPopover(Gtk.Popover):
 			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
 			button.add(image)
 			button.connect("clicked", self.on_move_last_button_clicked)
-			button.set_tooltip_text("ctrl right")
+			button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_move_last"]))
 			self.grid.attach(button, 3, 1, 1, 1)
+
+			button = Gtk.Button()
+			icon = Gio.ThemedIcon(name="media-seek-forward")
+			icon = Gio.ThemedIcon(name="media-seek-backward")
+			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+			button.add(image)
+			#button.connect("clicked", self.on_move_first_button_clicked)
+			#button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_move_first"]))
+			self.grid.attach(button, 3, 2, 1, 2)
+
 
 			self.port_adj = Gtk.Adjustment(0, 0, 15, 1.0, 1.0)
 			self.port_button = Gtk.SpinButton()
@@ -140,12 +150,15 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.nsrows_button.set_sensitive(False)
 			self.nrows_check_button.set_sensitive(False)
 			
+			
+			
 			self.grid.show_all()
 			self.add(self.grid)
 
 	def popup(self):
 		self.nrows_adj.set_value(self.trk.nrows)
 		self.nsrows_adj.set_value(self.trk.nsrows)
+		self.port_adj.set_upper(mod.nports - 1)
 		super().popup()
 
 	def on_leave(self, wdg, prm):
@@ -160,20 +173,13 @@ class TrackPropViewPopover(Gtk.Popover):
 				self.entered = True
 
 	def on_remove_button_clicked(self, switch):
-		TrackView.leave_all()
 		self.parent.del_track()
 					
 	def on_retract_button_clicked(self, switch):
-		self.trk.del_column()
-		TrackView.leave_all()
-		self.parent.seqview.redraw_track(self.trk)
-		self.parent.redraw()
+		self.parent.seqview.shrink_track(self.trk)
 			
 	def on_expand_button_clicked(self, switch):
-		self.trk.add_column()
-		TrackView.leave_all()
-		self.parent.seqview.redraw_track(self.trk)
-		self.parent.redraw()
+		self.parent.seqview.expand_track(self.trk)
 			
 	def on_port_changed(self, adj):
 		self.trk.port = int(adj.get_value())

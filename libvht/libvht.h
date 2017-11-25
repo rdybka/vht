@@ -33,6 +33,7 @@ extern void stop();
 
 extern char *get_jack_error();
 extern char *module_get_time();
+extern int get_jack_max_ports();
 
 // module
 extern void module_new();

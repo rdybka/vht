@@ -65,11 +65,7 @@ class TrackPropView(Gtk.DrawingArea):
 		self.seqview.add_track(trk)
 	
 	def del_track(self):
-		self.popover.popdown()
 		self.seqview.del_track(self.trk)
-		self.propview.del_track(self.trk)
-		self.seqview.redraw_track(None)
-		self.destroy()
 		
 	def move_left(self):
 		self.propview.move_left(self.trk)

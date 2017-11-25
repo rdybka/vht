@@ -125,76 +125,189 @@ class SequenceView(Gtk.Box):
 		dest_adj.set_value(adj.get_value())
 
 	def on_key_press(self, widget, event):
-		#print(event.keyval, event.state)
-	
-		if event.keyval == 65293:		# enter
-			if event.state & Gdk.ModifierType.MOD1_MASK: # alt-enter
-				if mod.mainwin.fs:
-					mod.mainwin.unfullscreen()
-					mod.mainwin.fs = False
-				else:
-					mod.mainwin.fullscreen()
-					mod.mainwin.fs = True
-			
-				return True
-			
+		#print(Gdk.keyval_name(Gdk.keyval_to_lower(event.keyval)))
+		if cfg.key["play"].matches(event):
 			# play/stop
 			if mod.play:
 				mod.play = 0
 			else:
 				mod.play = 1
+
+		if cfg.key["fullscreen"].matches(event):
+			if mod.mainwin.fs:
+				mod.mainwin.unfullscreen()
+				mod.mainwin.fs = False
+			else:
+				mod.mainwin.fullscreen()
+				mod.mainwin.fs = True
+			return True
 			
-		if event.keyval == 65307:			# esc
+		if cfg.key["exit_edit"].matches(event):
 			if mod.active_track:
 				if mod.active_track.edit:
 					return mod.active_track.on_key_press(widget, event)
-			
+	
+		if cfg.key["reset"].matches(event):	
 			if not mod.play:
 				mod.reset()
-				
+
 			return True
 	
-		if event.keyval == 122:			# z
-			if event.state & Gdk.ModifierType.CONTROL_MASK:
-				if mod.active_track:
-					return mod.active_track.on_key_press(widget, event)
+		if cfg.key["undo"].matches(event):
+			if mod.active_track:
+				return mod.active_track.on_key_press(widget, event)
 				
-		if event.keyval == 65451:		# +
-			if event.state & Gdk.ModifierType.CONTROL_MASK:
-				self.zoom(1)
-				return True
+		if cfg.key["zoom_in"].matches(event):
+			self.zoom(1)
+			return True
 
-		if event.keyval == 65451:		# +
+		if cfg.key["zoom_out"].matches(event):
+			self.zoom(-1)
+			return True
+
+		if cfg.key["channel_up"].matches(event):
+			if mod.active_track:
+				mod.active_track.trk.channel = min(mod.active_track.trk.channel + 1, 16)
+				self._prop_view.redraw()
+			return True
+
+		if cfg.key["channel_down"].matches(event):
+			if mod.active_track:
+				mod.active_track.trk.channel = max(mod.active_track.trk.channel - 1, 1)
+				self._prop_view.redraw()
+			return True
+
+		if cfg.key["port_up"].matches(event):
+			if mod.active_track:
+				mod.active_track.trk.port = min(mod.active_track.trk.port + 1, mod.nports - 1)
+				self._prop_view.redraw()
+			return True
+
+		if cfg.key["port_down"].matches(event):
+			if mod.active_track:
+				mod.active_track.trk.port = max(mod.active_track.trk.port - 1, 0)
+				self._prop_view.redraw()
+			return True
+
+		if cfg.key["track_add"].matches(event):
+			self._side_prop.add_track()
+			return True
+			
+		if cfg.key["track_del"].matches(event):
+			if mod.active_track:
+				self.del_track(mod.active_track.trk)
+			return True
+			
+		if cfg.key["track_expand"].matches(event):
+			if mod.active_track:
+				self.expand_track(mod.active_track.trk)
+			return True
+		
+		if cfg.key["track_shrink"].matches(event):
+			if mod.active_track:
+				self.shrink_track(mod.active_track.trk)
+			return True
+			
+		if cfg.key["track_move_left"].matches(event):
+			if mod.active_track:
+				self._prop_view.move_left(mod.active_track.trk)
+			return True
+			
+		if cfg.key["track_move_right"].matches(event):
+			if mod.active_track:
+				self._prop_view.move_right(mod.active_track.trk)
+			return True
+
+		if cfg.key["track_move_first"].matches(event):
+			if mod.active_track:
+				self._prop_view.move_first(mod.active_track.trk)
+			return True
+			
+		if cfg.key["track_move_last"].matches(event):
+			if mod.active_track:
+				self._prop_view.move_last(mod.active_track.trk)
+			return True
+			
+		if cfg.key["skip_up"].matches(event):
 			cfg.skip += 1
 			return True
 		
-		if event.keyval == 65453:		# -
-			if event.state & Gdk.ModifierType.CONTROL_MASK:
-				self.zoom(-1)
-				return True
-				
-		if event.keyval == 65453:		# -
+		if cfg.key["skip_down"].matches(event):
 			cfg.skip -= 1
 			return True
 		
-		if event.keyval == 113:		# q
-			if event.state & Gdk.ModifierType.CONTROL_MASK:
+		if cfg.key["quit"].matches(event):
 				mod.mainwin.close()
 				return True
 		
-		if event.keyval == 65450:		# *
+		if cfg.key["octave_up"].matches(event):
 			cfg.octave += 1
 			if cfg.octave > 8:
 				cfg.octave = 8
-			
 			return True
 		
-		if event.keyval == 65455:		# /
+		if cfg.key["octave_down"].matches(event):
 			cfg.octave -= 1
 			if cfg.octave < 0:
 				cfg.octave = 0
 			return True
 		
+		if cfg.key["bpm_up"].matches(event):
+			mod.bpm = mod.bpm + 1
+			mod.mainwin.adj.set_value(mod.bpm)
+			return True
+			
+		if cfg.key["bpm_down"].matches(event):
+			mod.bpm = mod.bpm - 1
+			mod.mainwin.adj.set_value(mod.bpm)
+			return True
+
+		if cfg.key["bpm_10_up"].matches(event):
+			mod.bpm = mod.bpm + 10
+			mod.mainwin.adj.set_value(mod.bpm)
+			return True
+			
+		if cfg.key["bpm_10_down"].matches(event):
+			mod.bpm = mod.bpm - 10
+			mod.mainwin.adj.set_value(mod.bpm)
+			return True
+
+		if cfg.key["highlight_up"].matches(event):
+			cfg.highlight = min(cfg.highlight + 1, 32)
+			return True
+			
+		if cfg.key["highlight_down"].matches(event):
+			cfg.highlight = max(cfg.highlight - 1, 1)
+			return True
+
+		# velocities fall through if not in edit mode
+		
+		ed = False
+		if mod.active_track:
+			if mod.active_track.edit:
+				if mod.active_track.trk[mod.active_track.edit[0]][mod.active_track.edit[1]].type == 1:
+					ed = True
+			if mod.active_track.select_end:
+				ed = True
+		
+		if not ed:		
+			if cfg.key["velocity_up"].matches(event):
+				cfg.velocity = min(cfg.velocity + 1, 127)
+				return True
+
+			if cfg.key["velocity_10_up"].matches(event):
+				cfg.velocity = min(cfg.velocity + 10, 127)
+				return True
+
+			if cfg.key["velocity_down"].matches(event):
+				cfg.velocity = max(cfg.velocity - 1, 0)
+				return True
+
+			if cfg.key["velocity_10_down"].matches(event):
+				cfg.velocity = max(cfg.velocity - 10, 0)
+				return True
+
+		# do we enter editing mode?
 		if not mod.active_track:
 			vals = [65364, 65362, 65363, 65361, 65366, 65365, 65360, 65367]
 				
@@ -289,15 +402,57 @@ class SequenceView(Gtk.Box):
 		
 		t.show()
 
-	def del_track(self, trk):
+	def expand_track(self, trk):
+		trk.add_column()
+		self.redraw_track(trk)
+		self._prop_view.redraw()
+
+	def shrink_track(self, trk):
+		trk.del_column()
+		
 		for wdg in self.get_tracks():
 			if wdg.trk.index == trk.index:
-				TrackView.track_views.remove(wdg)
-				self.seq.del_track(trk.index)
-				wdg.destroy()
-				self.recalculate_row_spacing()
-				return
-	
+				if wdg.edit:
+					wdg.edit = min(wdg.edit[0], len(trk) -1), wdg.edit[1]
+		
+		self.redraw_track(trk)
+		self._prop_view.redraw()
+
+	def del_track(self, trk):
+		restore_track_index = None
+		restore_edit = None
+		if mod.active_track.edit:
+			restore_edit = mod.active_track.edit
+			
+		if mod.active_track:
+			restore_track_index = mod.active_track.trk.index
+				
+		TrackView.leave_all()
+		mod.active_track = None
+		self._prop_view.del_track(trk)
+		
+		w = None
+		for wdg in self.get_tracks():
+			if wdg.trk.index == trk.index:
+				w = wdg
+				
+		if w:
+			TrackView.track_views.remove(w)
+			self.seq.del_track(trk.index)
+			w.destroy()
+		
+			for i, wdg in enumerate(self.get_tracks()):
+				wdg.trk.index = i
+		
+		if restore_track_index:
+			restore_track_index = min(restore_track_index, len(self.seq) - 1)
+			mod.active_track = self.get_tracks()[restore_track_index]
+			if restore_edit:
+				mod.active_track.edit = min(restore_edit[0], len(mod.active_track.trk) - 1), min(restore_edit[1], mod.active_track.trk.nrows - 1)
+
+
+		self.recalculate_row_spacing()				
+		
 	def change_active_track(self, trk):
 		ac = mod.active_track
 		

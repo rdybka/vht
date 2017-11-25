@@ -5,6 +5,7 @@ import cairo
 
 from vht import *
 from vht.trackpropview import TrackPropView
+from vht.trackview import TrackView
 
 class PropView(Gtk.ScrolledWindow):
 	def __init__(self, seqview):
@@ -26,13 +27,12 @@ class PropView(Gtk.ScrolledWindow):
 		self._track_box.show_all()
 			
 	def del_track(self, trk):
-		# moved to trackpropview
-		self.reindex_tracks()
+		track_pv = self._track_box.get_children()[trk.index]
+		track_pv.popover.popdown()
+		track_pv.destroy()
 
 	def on_leave(self, wdg, prm):
 		pass
-		#if prm.detail == Gdk.NotifyType.NONLINEAR:
-		#	self.clear_popups()
 
 	def add_track(self, trk):
 		t = TrackPropView(trk, self.seq, self.seqview, self)

@@ -112,6 +112,10 @@ def module_get_time():
     return _libcvht.module_get_time()
 module_get_time = _libcvht.module_get_time
 
+def get_jack_max_ports():
+    return _libcvht.get_jack_max_ports()
+get_jack_max_ports = _libcvht.get_jack_max_ports
+
 def module_new():
     return _libcvht.module_new()
 module_new = _libcvht.module_new

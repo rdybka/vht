@@ -22,7 +22,8 @@ class StatusBar(Gtk.DrawingArea):
 		self.connect("scroll-event", self.on_scroll)
 		self.connect("leave-notify-event", self.on_leave)
 		self.connect("button-press-event", self.on_button_press)
-		self.connect("button-release-event", self.on_button_release)		
+		self.connect("button-release-event", self.on_button_release)
+		self.connect("query-tooltip", self.on_tooltip)
 				
 		self._surface = None
 		self._context = None
@@ -30,7 +31,11 @@ class StatusBar(Gtk.DrawingArea):
 		
 		self.pos = []
 		self.active_field = None
+		self.last_active_field = None
 		self.add_tick_callback(self.tick)
+		self.set_has_tooltip(True)
+		self.tt_rect = Gdk.Rectangle()
+		self.tt_txt = None
 
 	def redraw(self):
 		cr = self._context
@@ -121,8 +126,12 @@ class StatusBar(Gtk.DrawingArea):
 			cr.set_source_rgb(*(col * 1.0 for col in cfg.colour))
 		else:
 			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
-						
+		
 		txt = " hig:%d" % cfg.highlight
+		
+		if cfg.highlight == 1:
+			txt = " hig:0"
+		
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(self.pos[-1], h)
 		cr.show_text(txt)	
@@ -163,6 +172,8 @@ class StatusBar(Gtk.DrawingArea):
 
 		w = wdg.get_allocated_width()
 		h = wdg.get_allocated_width()
+
+		self.tt_rect.height = h
 		
 		self._surface = wdg.get_window().create_similar_surface(cairo.CONTENT_COLOR, w, h)
 
@@ -172,7 +183,7 @@ class StatusBar(Gtk.DrawingArea):
 
 		self._context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)	
 		
-		fs = cfg.seq_font_size	
+		fs = cfg.max_statusbar_font_size
 		fits = False
 		while not fits:
 			self._context.set_font_size(fs)
@@ -198,9 +209,33 @@ class StatusBar(Gtk.DrawingArea):
 		for pos in self.pos:
 			if event.x > xx and event.x < pos:
 				self.active_field = af
+				self.tt_rect.x = xx
+				self.tt_rect.y = 0
+				self.tt_rect.width = pos - xx
 				
 			xx = pos
 			af += 1
+
+		if self.last_active_field != self.active_field:
+			if not self.active_field:
+				self.tt_txt = None
+
+			if self.active_field == 1:	# octave
+				self.tt_txt = "<big>↑</big> %s\n<big>↓</big> %s" % (cfg.key["octave_up"], cfg.key["octave_down"])
+
+			if self.active_field == 2:	# velocity
+				self.tt_txt = "<big>⇑</big> %s\n<big>↑</big> %s\n<big>↓</big> %s\n<big>⇓</big> %s" % (cfg.key["velocity_10_up"], cfg.key["velocity_up"], cfg.key["velocity_down"], cfg.key["velocity_10_down"])
+
+			if self.active_field == 3:	# skip
+				self.tt_txt = "<big>↑</big> %s\n<big>↓</big> %s" % (cfg.key["skip_up"], cfg.key["skip_down"])
+
+			if self.active_field == 4:	# highlight
+				self.tt_txt = "<big>↑</big> %s\n<big>↓</big> %s" % (cfg.key["highlight_up"], cfg.key["highlight_down"])
+
+			if self.active_field == 5:	# bpm
+				self.tt_txt = "<big>⇑</big> %s\n<big>↑</big> %s\n<big>↓</big> %s\n<big>⇓</big> %s" % (cfg.key["bpm_10_up"], cfg.key["bpm_up"], cfg.key["bpm_down"], cfg.key["bpm_10_down"])
+		
+			self.last_active_field = self.active_field
 
 	def on_scroll(self, widget, event):
 		if not self.active_field:
@@ -282,7 +317,20 @@ class StatusBar(Gtk.DrawingArea):
 		
 		if self.active_field == 5:
 			if up:
-				mod.bpm = min(mod.bpm + 1, 400)
+				mod.bpm = mod.bpm + 1
+				mod.mainwin.adj.set_value(mod.bpm)
 			if down:
-				mod.bpm = max(mod.bpm - 1, 30)
+				mod.bpm = mod.bpm - 1
+				mod.mainwin.adj.set_value(mod.bpm)
 		
+	def on_tooltip(self, wdg, x, y, kbd, tt):
+		if not self.active_field:
+			return False
+		
+		if not self.tt_txt:
+			return False
+			
+		tt.set_markup(cfg.tooltip_markup % (self.tt_txt))
+		
+		tt.set_tip_area(self.tt_rect)
+		return True

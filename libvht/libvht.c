@@ -19,6 +19,10 @@ int module_get_bpm() {
 	return module.bpm;
 }
 
+int get_jack_max_ports() {
+	return JACK_CLIENT_MAX_PORTS;
+}
+
 void module_set_bpm(int bpm) {
 	module.bpm = bpm;
 }
