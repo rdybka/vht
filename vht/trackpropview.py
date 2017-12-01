@@ -25,6 +25,7 @@ class TrackPropView(Gtk.DrawingArea):
 		self.txt_width = 0
 		self.txt_height = 0
 		self.button_rect = Gdk.Rectangle()
+		self.button_highlight = False
 		self._surface = None
 		self._context = None
 
@@ -38,6 +39,7 @@ class TrackPropView(Gtk.DrawingArea):
 		self.popover.set_transitions_enabled(False)
 
 		self.clear_popups = mod.clear_popups
+		self.popped = False
 	
 	def on_configure(self, wdg, event):
 		if self._surface:
@@ -84,13 +86,35 @@ class TrackPropView(Gtk.DrawingArea):
 			if data.x <= self.button_rect.x + self.button_rect.width:
 				if data.y >= self.button_rect.y:
 					if data.y <= self.button_rect.y + self.button_rect.height:		
-						self.clear_popups()
-						self.popover.popup()
+						self.button_highlight = True
+						self.redraw()
 						return
 		
+		self.button_highlight = False
+		self.redraw()
+		
 	def on_click(self, widget, data):
-		pass 
-
+		if data.x >= self.button_rect.x:
+			if data.x <= self.button_rect.x + self.button_rect.width:
+				if data.y >= self.button_rect.y:
+					if data.y <= self.button_rect.y + self.button_rect.height:		
+						if self.popped:
+							self.popover.popdown()
+							self.popped = False
+							return
+						else:
+							self.clear_popups()
+							self.popover.popup()
+							self.popped = True
+							return
+		
+		if self.trk.playing:
+			self.trk.playing = 0
+		else:
+			self.trk.playing = 1
+		
+		self.redraw()	
+		
 	def redraw(self):
 		self.queue_draw()
 		
@@ -114,30 +138,34 @@ class TrackPropView(Gtk.DrawingArea):
 			self.txt_height = height
 			self.txt_width = int(dx)
 
-			self.set_size_request(self.txt_width, self.txt_height * 2)
+			self.set_size_request(self.txt_width, self.txt_height * 2 * cfg.seq_spacing)
 				
 			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 			cr.rectangle(0, 0, w, h)
 			cr.fill()			
-			
-			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))				
-			cr.move_to(x, self.txt_height)
+		
+			if self.button_highlight:
+				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
+			else:
+				cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
+
+			cr.move_to(x, self.txt_height * cfg.seq_spacing)
 			cr.show_text("vht")
-			cr.move_to(x, self.txt_height * 2)
+			cr.move_to(x, self.txt_height * 2 * cfg.seq_spacing)
 			cr.show_text("***")
 				
 			self.button_rect.width = width
-			self.button_rect.height = height + 5
+			self.button_rect.height = height * cfg.seq_spacing
 			self.button_rect.x = x;
-			self.button_rect.y = height
+			self.button_rect.y = height * cfg.seq_spacing
 			self.popover.set_pointing_to(self.button_rect)
 			
 			cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
 			(x, y, width, height, dx, dy) = cr.text_extents("|")
 			cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
 			cr.set_antialias(cairo.ANTIALIAS_NONE)
-			cr.move_to(self.txt_width - (dx / 2), self.txt_height * .3)
-			cr.line_to(self.txt_width - (dx / 2), (self.seq.length) * self.txt_height)
+			cr.move_to(self.txt_width - (dx / 2), self.txt_height * .3 * cfg.seq_spacing)
+			cr.line_to(self.txt_width - (dx / 2), (self.seq.length) * self.txt_height * cfg.seq_spacing)
 			cr.stroke()
 			self.queue_draw()
 			return
@@ -147,17 +175,18 @@ class TrackPropView(Gtk.DrawingArea):
 		self.txt_height = height
 		self.txt_width = int(dx)
 
-		
-		if mod.active_track:
-			if mod.active_track.trk.index == self.trk.index:
-				gradient = cairo.LinearGradient(0, 0, 0, h)
-				gradient.add_color_stop_rgb(0.0, *(col *  cfg.intensity_txt_highlight for col in cfg.colour))
-				gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_background for col in cfg.colour))
-				cr.set_source(gradient)
-			else:
-				cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))	
-		
-		self.set_size_request(self.txt_width * len(self.trk), self.txt_height * 2)
+		gradient = cairo.LinearGradient(0, 0, 0, h)
+				
+		gradient.add_color_stop_rgb(0.0, *(col * cfg.intensity_background for col in cfg.colour))
+		if self.trk.playing:
+			gradient.add_color_stop_rgb(0.1, *(col *  cfg.intensity_txt_highlight for col in cfg.colour))
+		else:
+			gradient.add_color_stop_rgb(0.1, *(col *  cfg.intensity_txt for col in cfg.colour))
+				
+		gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_background for col in cfg.colour))
+		cr.set_source(gradient)
+
+		self.set_size_request(self.txt_width * len(self.trk), self.txt_height * 2 * cfg.seq_spacing)
 		
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
 			
@@ -168,22 +197,27 @@ class TrackPropView(Gtk.DrawingArea):
 		
 		cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
 		
+		cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 		if mod.active_track:
 			if mod.active_track.trk.index == self.trk.index:
-				cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
-					
-		cr.move_to(x, self.txt_height)	
+				cr.set_source_rgb(0, 0, 0)					
+				
+		cr.move_to(x, self.txt_height * cfg.seq_spacing)	
 		cr.show_text("c%02d p%02d" % (self.trk.channel, self.trk.port))
 		
 		self.button_rect.width = (dx / 8.0) * 3.0
-		self.button_rect.height = height
+		self.button_rect.height = height * cfg.seq_spacing
 				
 		self.button_rect.x = x + (dx * (len(self.trk) - 1) + dx / 2)
-		self.button_rect.y = height
+		self.button_rect.y = height * cfg.seq_spacing
 		self.popover.set_pointing_to(self.button_rect)
 		
-		cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
-		cr.move_to(x + (dx) * (len(self.trk) - 1), self.txt_height * 2)	
+		if self.button_highlight:
+			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
+		else:
+			cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
+
+		cr.move_to(x + (dx) * (len(self.trk) - 1), self.txt_height * 2 * cfg.seq_spacing)	
 		cr.show_text("    ***")
 
 		cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
@@ -191,8 +225,8 @@ class TrackPropView(Gtk.DrawingArea):
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
 		cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
 		
-		cr.move_to(self.txt_width * len(self.trk) - (width / 2), self.txt_height * .3)
-		cr.line_to(self.txt_width * len(self.trk) - (width / 2), 2 * self.txt_height)
+		cr.move_to(self.txt_width * len(self.trk) - (width / 2), self.txt_height * cfg.seq_spacing * .3)
+		cr.line_to(self.txt_width * len(self.trk) - (width / 2), 2 * self.txt_height * cfg.seq_spacing)
 		cr.stroke()
 		self.queue_draw()
 						

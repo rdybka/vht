@@ -54,6 +54,8 @@ class SequencePropViewPopover(Gtk.Popover):
 		if prm.detail == Gdk.NotifyType.NONLINEAR:
 			wdg.popdown()
 			self.entered = False
+			self.parent.popped = False
+			self.parent.redraw()
 
 	def on_enter(self, wdg, prm):
 		if prm.detail == Gdk.NotifyType.NONLINEAR:

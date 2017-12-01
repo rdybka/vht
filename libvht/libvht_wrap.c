@@ -4373,6 +4373,36 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_track_set_playing(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:track_set_playing",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_set_playing" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "track_set_playing" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  track_set_playing(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_track_add_col(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   track *arg1 = (track *) 0 ;
@@ -4879,6 +4909,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"track_set_channel", _wrap_track_set_channel, METH_VARARGS, NULL},
 	 { (char *)"track_set_nrows", _wrap_track_set_nrows, METH_VARARGS, NULL},
 	 { (char *)"track_set_nsrows", _wrap_track_set_nsrows, METH_VARARGS, NULL},
+	 { (char *)"track_set_playing", _wrap_track_set_playing, METH_VARARGS, NULL},
 	 { (char *)"track_add_col", _wrap_track_add_col, METH_VARARGS, NULL},
 	 { (char *)"track_del_col", _wrap_track_del_col, METH_VARARGS, NULL},
 	 { (char *)"track_swap_col", _wrap_track_swap_col, METH_VARARGS, NULL},

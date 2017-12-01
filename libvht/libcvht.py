@@ -276,6 +276,10 @@ def track_set_nsrows(trk, n):
     return _libcvht.track_set_nsrows(trk, n)
 track_set_nsrows = _libcvht.track_set_nsrows
 
+def track_set_playing(trk, p):
+    return _libcvht.track_set_playing(trk, p)
+track_set_playing = _libcvht.track_set_playing
+
 def track_add_col(trk):
     return _libcvht.track_add_col(trk)
 track_add_col = _libcvht.track_add_col

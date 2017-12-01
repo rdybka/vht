@@ -78,6 +78,7 @@ class PropView(Gtk.ScrolledWindow):
 	def clear_popups(self):
 		for wdg in self._track_box.get_children():
 			wdg.popover.popdown()
+			wdg.popped = False
 		
 		self.seqview._side_prop.popover.popdown()
 

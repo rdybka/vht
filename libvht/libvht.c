@@ -161,3 +161,10 @@ char *get_jack_error() {
 double sequence_get_pos(sequence *seq) {
 	return seq->pos;
 }
+
+void track_set_playing(track *trk, int p) {
+	trk->playing = p;
+	if (p == 0) {
+		track_kill_notes(trk);
+	}
+}

@@ -82,6 +82,10 @@ class VHTTrack(Iterable):
 	@property
 	def playing(self):
 		return self._vht_handle.track_get_playing(self._trk_handle)
+	
+	@playing.setter
+	def playing(self, value):
+		self._vht_handle.track_set_playing(self._trk_handle, value)
 		
 	@property
 	def pos(self):

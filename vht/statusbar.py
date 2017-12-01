@@ -44,11 +44,15 @@ class StatusBar(Gtk.DrawingArea):
 		
 		(x, y, width, height, dx, dy) = cr.text_extents("vht" * self.min_char_width)
 
-		self.set_size_request(1, height * 1.5)
+		self.set_size_request(1, height * 1.5 * cfg.seq_spacing)
 
 		gradient = cairo.LinearGradient(0, 0, 0, h)
-		gradient.add_color_stop_rgb(0.0, *(col *  cfg.intensity_txt_highlight for col in cfg.colour))
+		gradient.add_color_stop_rgb(0, *(col * cfg.intensity_background for col in cfg.colour))
+		gradient.add_color_stop_rgb(.3, *(col *  cfg.intensity_txt for col in cfg.colour))
+		gradient.add_color_stop_rgb(.7, *(col *  cfg.intensity_txt for col in cfg.colour))
+		
 		gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_background for col in cfg.colour))
+		
 		cr.set_source(gradient)
 		
 		cr.rectangle(0, 0, w, h)
@@ -74,7 +78,7 @@ class StatusBar(Gtk.DrawingArea):
 
 
 		txt = "%02d:%02d:%02d:%03d" % (cs, t, c, r)
-		h = height * 1.2
+		h = height * cfg.seq_spacing
 
 		cr.set_source_rgb(*(col * 0 for col in cfg.colour))
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)

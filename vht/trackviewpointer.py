@@ -67,7 +67,9 @@ class trackviewpointer():
 
 			gradient = cairo.LinearGradient(x, y, x, y + self.height)
 			gradient.add_color_stop_rgba(0.0, *(col * i for col in cfg.colour), 0)
+			gradient.add_color_stop_rgba(.5 - cfg.pointer_width / 2, *(col * i for col in cfg.colour), 0)
 			gradient.add_color_stop_rgba(0.5, *(col * i for col in cfg.colour), self.opacity)
+			gradient.add_color_stop_rgba(.5 + cfg.pointer_width / 2, *(col * i for col in cfg.colour), 0)
 			gradient.add_color_stop_rgba(1.0, *(col * i for col in cfg.colour), 0)
 			cr.set_source(gradient)
 			
@@ -102,7 +104,9 @@ class trackviewpointer():
 
 			gradient = cairo.LinearGradient(x, y, x, y + self.height)
 			gradient.add_color_stop_rgba(0.0, *(col * i for col in cfg.colour), 0)
+			gradient.add_color_stop_rgba(.5 - cfg.pointer_width / 2, *(col * i for col in cfg.colour), 0)
 			gradient.add_color_stop_rgba(0.5, *(col * i for col in cfg.colour), self.opacity)
+			gradient.add_color_stop_rgba(.5 + cfg.pointer_width / 2, *(col * i for col in cfg.colour), 0)
 			gradient.add_color_stop_rgba(1.0, *(col * i for col in cfg.colour), 0)
 			cr.set_source(gradient)
 						

@@ -86,6 +86,7 @@ extern void track_set_port(track *trk, int n);
 extern void track_set_channel(track *trk, int n);
 extern void track_set_nrows(track *trk, int n);
 extern void track_set_nsrows(track *trk, int n);
+extern void track_set_playing(track *trk, int p);
 
 extern void track_add_col(track *trk);
 extern void track_del_col(track *trk, int c);

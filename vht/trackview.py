@@ -174,6 +174,11 @@ class TrackView(Gtk.DrawingArea):
 				cr.move_to(x, yy)
 				cr.show_text("%03d" % r)
 				
+				if r == int(self.seq.pos):
+					cr.set_source_rgba(*(col * cfg.intensity_txt_highlight for col in cfg.colour), cfg.current_highlight_opacity)	
+					cr.rectangle(0, r * self.txt_height, (self.txt_width / 4.0) * 3.1, self.txt_height)
+					cr.fill()
+				
 				if not complete:
 					ir.x = 0
 					ir.width = w
@@ -277,6 +282,11 @@ class TrackView(Gtk.DrawingArea):
 					
 				if rw.type == 0: #none
 					cr.show_text("---    ")
+
+				if r == int(self.trk.pos):
+					cr.set_source_rgba(*(col * cfg.intensity_txt_highlight for col in cfg.colour), cfg.current_highlight_opacity)
+					cr.rectangle(c * self.txt_width, r * self.txt_height, (self.txt_width / 8.0) * 7.2, self.txt_height)
+					cr.fill()
 
 				if not complete:
 					ir.x = 0

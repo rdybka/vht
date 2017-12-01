@@ -40,7 +40,7 @@ track *track_new(int port, int channel, int len, int songlen) {
 	trk->nsrows = songlen;
 	trk->trigger_channel = 0;
 	trk->trigger_note = 0;
-	trk->loop = 0;
+	trk->loop = 1;
 	trk->trigger_type = TRIGGER_NORMAL;
 	trk->ncols = 1;
 	trk->playing = 0;

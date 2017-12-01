@@ -7,39 +7,33 @@ class Configuration():
 		self._highlight = 4
 		self.on_highlight = []				# add callbacks here
 
-		self.seq_font = "Roboto Mono Medium"
-		#self.seq_font = "Ubuntu Mono"
+		self.seq_font = "Topaz-8"
 		#self.seq_font = "Monospace"
-		#self.seq_font = "LCD"
-	
 		self.seq_font_size = 16
 		self.max_statusbar_font_size = 16
 		self.seq_line_width = 1.0
-		self.seq_spacing = 1.05
-		self.octave = 4
-		self.velocity = 100
-		
-		self.page_height = 16
-		self.skip = 1
-		#self.colour = (1.0, 1.0, 1.0)		# bw
-		self.colour = (.9, 1.0, .2)			# old_term
-		#self.colour = (.9, .9, 1.0)		# bluish
-		#self.colour = (.3, 1.0, .3)		# green
-		self.intensity_background = .3
+		self.seq_spacing = 1.7
+		self.colour = (.9, 1.0, .2)			
+		self.intensity_background = 0.3
 		self.intensity_txt = .7
 		self.intensity_txt_highlight = 1.0
 		self.intensity_lines = .6
 		self.colour_record = (1.0, 0, 0)
 		self.intensity_select = .7
-		self.pointer_opacity = .8
+		self.pointer_opacity = .7
+		self.pointer_width = 1
+		self.current_highlight_opacity = 0.0
+		self.auto_scroll_delay = .15
+		self.tooltip_markup = """<span font_family="Monospace" size="large">%s</span>"""
+		
+		self.octave = 4
+		self.velocity = 100
+		self.page_height = 16
+		self.skip = 1
 		
 		self.select_button = 1
 		self.delete_button = 3
 		
-		self.auto_scroll_delay = .15
-	
-		self.tooltip_markup = """<span font_family="monospace" size="x-large">%s</span>"""
-	
 		self.key = {
 			# sequenceview
 			"quit": 			cfgkey("q", 			False, True, False),
