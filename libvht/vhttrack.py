@@ -91,6 +91,9 @@ class VHTTrack(Iterable):
 	def pos(self):
 		return self._vht_handle.track_get_pos(self._trk_handle)
 
+	def trigger(self):
+		self._vht_handle.track_trigger(self._trk_handle)
+
 	def __str__(self):
 		ret = ""
 		for r in range(self.nrows):

@@ -296,6 +296,10 @@ def track_resize(trk, size):
     return _libcvht.track_resize(trk, size)
 track_resize = _libcvht.track_resize
 
+def track_trigger(trk):
+    return _libcvht.track_trigger(trk)
+track_trigger = _libcvht.track_trigger
+
 def track_new(port, channel, len, songlen):
     return _libcvht.track_new(port, channel, len, songlen)
 track_new = _libcvht.track_new

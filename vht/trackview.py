@@ -1317,5 +1317,5 @@ class TrackView(Gtk.DrawingArea):
 			return
 		
 		#print("key : %d" % (event.keyval))
-		note = self.pmp.key2note(event.keyval, True)
+		note = self.pmp.key2note(Gdk.keyval_to_lower(event.keyval), True)
 		return False

@@ -57,6 +57,7 @@ void track_add_col(track *trk);
 void track_del_col(track *trk, int c);
 void track_swap_col(track *trk, int c, int c2);
 void track_resize(track *trk, int size);
+void track_trigger(track *trk);
 
 // don't touch those from python
 void track_reset(track *trk);

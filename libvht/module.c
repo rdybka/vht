@@ -50,6 +50,8 @@ void module_advance(jack_nframes_t curr_frames) {
 
 	module_excl_in();
 
+
+
 	midi_buffer_clear();
 
 	if (!module.playing) {

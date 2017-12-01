@@ -94,6 +94,9 @@ class TrackPropView(Gtk.DrawingArea):
 		self.redraw()
 		
 	def on_click(self, widget, data):
+		if data.type != Gdk.EventType.BUTTON_PRESS:
+			return
+		
 		if data.x >= self.button_rect.x:
 			if data.x <= self.button_rect.x + self.button_rect.width:
 				if data.y >= self.button_rect.y:
@@ -107,12 +110,8 @@ class TrackPropView(Gtk.DrawingArea):
 							self.popover.popup()
 							self.popped = True
 							return
-		
-		if self.trk.playing:
-			self.trk.playing = 0
-		else:
-			self.trk.playing = 1
-		
+
+		self.trk.trigger()
 		self.redraw()	
 		
 	def redraw(self):

@@ -82,9 +82,9 @@ class PropView(Gtk.ScrolledWindow):
 		
 		self.seqview._side_prop.popover.popdown()
 
-	def redraw(self, index = 0):
+	def redraw(self, index = -1):
 		for wdg in self._track_box.get_children():
-			if wdg.trk.index == index or not index:
+			if wdg.trk.index == index or index == -1:
 				wdg.redraw()
 		
 	def on_draw(self, widget, cr):

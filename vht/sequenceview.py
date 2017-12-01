@@ -125,7 +125,7 @@ class SequenceView(Gtk.Box):
 		dest_adj.set_value(adj.get_value())
 
 	def on_key_press(self, widget, event):
-		#print(Gdk.keyval_name(Gdk.keyval_to_lower(event.keyval)))
+		#print(Gdk.keyval_name(Gdk.keyval_to_lower(event.keyval)), event.keyval)
 		if cfg.key["play"].matches(event):
 			# play/stop
 			if mod.play:
@@ -307,6 +307,12 @@ class SequenceView(Gtk.Box):
 				cfg.velocity = max(cfg.velocity - 10, 0)
 				return True
 
+		if event.keyval >= 65470 and event.keyval <= 65477:
+			t = event.keyval - 65470
+			if t < len(self.seq):
+				self.seq[t].trigger()
+				self._prop_view.redraw()
+
 		# do we enter editing mode?
 		if not mod.active_track:
 			vals = [65364, 65362, 65363, 65361, 65366, 65365, 65360, 65367]
@@ -331,6 +337,7 @@ class SequenceView(Gtk.Box):
 							return True
 			
 			return mod.active_track.on_key_press(widget, event)
+
 
 		return False
 

@@ -133,7 +133,7 @@ track *track_clone(track *src) {
 }
 
 // yooohoooo!!!
-void track_trigger(track *trk, int pos, int c, int delay) {
+void track_play_row(track *trk, int pos, int c, int delay) {
 	row r;
 	track_get_row(trk, c, pos, &r);
 
@@ -193,7 +193,7 @@ void track_advance(track *trk, double speriod) {
 				double delay = trigger_time - trk->pos;
 				if ((delay >= 0) & (delay < tperiod)) {
 					if (trk->playing)
-						track_trigger(trk, nn, c, delay * tmul);
+						track_play_row(trk, nn, c, delay * tmul);
 				}
 			}
 		}
@@ -212,16 +212,9 @@ void track_wind(track *trk, double period) {
 }
 
 void track_kill_notes(track *trk) {
-	midi_event evt;
-
 	for (int c = 0; c < trk->ncols; c++) {
 		if (trk->ring[c] != -1) {
-			evt.time = 0;
-			evt.channel = trk->channel;
-			evt.type = note_off;
-			evt.note = trk->ring[c];
-			evt.velocity = 0;
-			midi_buffer_add(trk->port, evt);
+			queue_midi_note_off(trk->port, trk->channel, trk->ring[c]);
 
 			trk->ring[c] = -1;
 		}
@@ -300,4 +293,13 @@ void track_resize(track *trk, int size) {
 	trk->nrows = size;
 
 	module_excl_out();
+}
+
+void track_trigger(track *trk) {
+	if (trk->playing) {
+		trk->playing = 0;
+		track_kill_notes(trk);
+	} else {
+		trk->playing = 1;
+	}
 }
