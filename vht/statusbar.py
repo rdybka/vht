@@ -42,7 +42,7 @@ class StatusBar(Gtk.DrawingArea):
 		w = self.get_allocated_width()
 		h = self.get_allocated_height()
 		
-		(x, y, width, height, dx, dy) = cr.text_extents("vht" * self.min_char_width)
+		(x, y, width, height, dx, dy) = cr.text_extents("000" * self.min_char_width)
 
 		self.set_size_request(1, height * 1.5 * cfg.seq_spacing)
 
@@ -76,9 +76,8 @@ class StatusBar(Gtk.DrawingArea):
 				c = trk.edit[0]
 				r = trk.edit[1]
 
-
 		txt = "%02d:%02d:%02d:%03d" % (cs, t, c, r)
-		h = height * cfg.seq_spacing
+		h = ((height * 1.5 * cfg.seq_spacing) / 2.0) + (height / 2.0)
 
 		cr.set_source_rgb(*(col * 0 for col in cfg.colour))
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
@@ -99,7 +98,6 @@ class StatusBar(Gtk.DrawingArea):
 		xx += dx
 		self.pos.append(xx)
 
-
 		if self.active_field == 2:
 			cr.set_source_rgb(*(col * 1.0 for col in cfg.colour))
 		else:
@@ -111,7 +109,6 @@ class StatusBar(Gtk.DrawingArea):
 		cr.show_text(txt)	
 		xx += dx
 		self.pos.append(xx)
-				
 
 		if self.active_field == 3:
 			cr.set_source_rgb(*(col * 1.0 for col in cfg.colour))
@@ -124,7 +121,6 @@ class StatusBar(Gtk.DrawingArea):
 		cr.show_text(txt)	
 		xx += dx
 		self.pos.append(xx)
-				
 				
 		if self.active_field == 4:
 			cr.set_source_rgb(*(col * 1.0 for col in cfg.colour))
@@ -187,7 +183,7 @@ class StatusBar(Gtk.DrawingArea):
 
 		self._context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)	
 		
-		fs = cfg.max_statusbar_font_size
+		fs = cfg.seq_font_size
 		fits = False
 		while not fits:
 			self._context.set_font_size(fs)

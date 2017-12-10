@@ -150,14 +150,13 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.nsrows_button.set_sensitive(False)
 			self.nrows_check_button.set_sensitive(False)
 			
-			
-			
 			self.grid.show_all()
 			self.add(self.grid)
 
 	def popup(self):
-		self.nrows_adj.set_value(self.trk.nrows)
+		self.nsrows_adj.set_upper(self.parent.seq.length)
 		self.nsrows_adj.set_value(self.trk.nsrows)
+		self.nrows_adj.set_value(self.trk.nrows)
 		self.port_adj.set_upper(mod.nports - 1)
 		super().popup()
 
@@ -167,12 +166,15 @@ class TrackPropViewPopover(Gtk.Popover):
 				wdg.popdown()
 				self.entered = False
 				self.parent.popped = False
+				self.parent.button_highlight = False
 				self.parent.redraw()
 
 	def on_enter(self, wdg, prm):
 		if prm.detail == Gdk.NotifyType.NONLINEAR:
 			if self.entered == 0:
 				self.entered = True
+				self.parent.button_highlight = True
+				self.parent.redraw()
 
 	def on_remove_button_clicked(self, switch):
 		self.parent.del_track()

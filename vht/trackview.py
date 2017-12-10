@@ -429,7 +429,7 @@ class TrackView(Gtk.DrawingArea):
 		if event.state & Gdk.ModifierType.SHIFT_MASK:
 			shift = True	
 		
-		row = int(event.y / self.txt_height)
+		row = min(int(event.y / self.txt_height), self.trk.nsrows - 1)
 		col = int(event.x / self.txt_width)
 		offs = int(event.x) % int(self.txt_width)
 
@@ -703,14 +703,23 @@ class TrackView(Gtk.DrawingArea):
 		return ret
 
 	def copy_selection(self, cut = False, dest = None):
-		if not self.select_start or not self.select_end:
-			return
-			
-		ssx = self.select_start[0]
-		ssy = self.select_start[1]
-		sex = self.select_end[0]
-		sey = self.select_end[1]
+		ssx = 0
+		ssy = 0
+		sex = 0
+		sey = 0
+		
+		if self.edit:
+			ssx = self.edit[0]
+			ssy = self.edit[1]
+			sex = self.edit[0]
+			sey = self.edit[1]
 				
+		if self.select_start and self.select_end:
+			ssx = self.select_start[0]
+			ssy = self.select_start[1]
+			sex = self.select_end[0]
+			sey = self.select_end[1]
+		
 		if sex < ssx:
 			xxx = sex
 			sex	= ssx
@@ -753,16 +762,20 @@ class TrackView(Gtk.DrawingArea):
 		while len(self.trk) - self.edit[0] < (dx + 1):
 			self.trk.add_column()
 
+		new_y = None
 		for k in d.keys():
 			dx = self.edit[0] + k[0]
 			dy = self.edit[1] + k[1]
+			new_y = min(dy + cfg.skip, self.trk.nrows - 1)
 			if (dy < self.trk.nrows):
 				r = d[k]
 				self.trk[dx][dy].type = r[0]
 				self.trk[dx][dy].note = r[1]
 				self.trk[dx][dy].velocity = r[2]
 				self.trk[dx][dy].delay = r[3]
-		
+								
+		if new_y:
+			self.edit = self.edit[0], new_y
 		self.redraw()
 
 	def on_key_press(self, widget, event):
@@ -822,7 +835,7 @@ class TrackView(Gtk.DrawingArea):
 				
 			return True
 
-		if cfg.key["note_off"].matches(event):				#  note_off
+		if self.edit and cfg.key["note_off"].matches(event):				#  note_off
 			self.trk[self.edit[0]][self.edit[1]].clear()
 			self.trk[self.edit[0]][self.edit[1]].type = 2
 			
@@ -921,7 +934,7 @@ class TrackView(Gtk.DrawingArea):
 			
 		if cfg.key["velocity_up"].matches(event):
 			for r in sel:
-				if r.type:
+				if r.type == 1:
 					r.velocity = min(r.velocity + 1, 127)
 					cfg.velocity = r.velocity
 			
@@ -934,7 +947,7 @@ class TrackView(Gtk.DrawingArea):
 
 		if cfg.key["velocity_10_up"].matches(event):
 			for r in sel:
-				if r.type:
+				if r.type == 1:
 					r.velocity = min(r.velocity + 10, 127)
 					cfg.velocity = r.velocity
 
@@ -947,7 +960,7 @@ class TrackView(Gtk.DrawingArea):
 			
 		if cfg.key["velocity_down"].matches(event):
 			for r in sel:
-				if r.type:
+				if r.type == 1:
 					r.velocity = max(r.velocity - 1, 0)
 					cfg.velocity = r.velocity
 			
@@ -960,7 +973,7 @@ class TrackView(Gtk.DrawingArea):
 			
 		if cfg.key["velocity_10_down"].matches(event):
 			for r in sel:
-				if r.type:
+				if r.type == 1:
 					r.velocity = max(r.velocity - 10, 0)
 					cfg.velocity = r.velocity
 			

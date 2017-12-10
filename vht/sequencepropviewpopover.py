@@ -55,12 +55,15 @@ class SequencePropViewPopover(Gtk.Popover):
 			wdg.popdown()
 			self.entered = False
 			self.parent.popped = False
+			self.parent.button_highlight = False
 			self.parent.redraw()
 
 	def on_enter(self, wdg, prm):
 		if prm.detail == Gdk.NotifyType.NONLINEAR:
 			if self.entered == 0:
 				self.entered = True
+				self.parent.button_highlight = True
+				self.parent.redraw()
 
 	def on_add_button_clicked(self, switch):
 		self.parent.add_track()

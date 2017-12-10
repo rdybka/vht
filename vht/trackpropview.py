@@ -12,9 +12,19 @@ class TrackPropView(Gtk.DrawingArea):
 	def __init__(self, trk = None, seq = None, seqview = None, propview = None):
 		Gtk.DrawingArea.__init__(self)
 
-		self.set_events(Gdk.EventMask.POINTER_MOTION_MASK | Gdk.EventMask.BUTTON_PRESS_MASK )
+		self.set_events(Gdk.EventMask.POINTER_MOTION_MASK |
+			Gdk.EventMask.SCROLL_MASK |
+			Gdk.EventMask.BUTTON_PRESS_MASK |
+			Gdk.EventMask.BUTTON_RELEASE_MASK |
+			Gdk.EventMask.LEAVE_NOTIFY_MASK | 
+			Gdk.EventMask.ENTER_NOTIFY_MASK |
+			Gdk.EventMask.KEY_PRESS_MASK |
+			Gdk.EventMask.KEY_RELEASE_MASK)
+
 		self.connect("button-press-event", self.on_click)
 		self.connect("motion-notify-event", self.on_mouse_move)
+		self.connect("leave-notify-event", self.on_leave)
+		self.connect("enter-notify-event", self.on_enter)
 		self.connect("draw", self.on_draw)
 		self.connect("configure-event", self.on_configure)
 
@@ -38,7 +48,6 @@ class TrackPropView(Gtk.DrawingArea):
 		self.popover.set_modal(False)
 		self.popover.set_transitions_enabled(False)
 
-		self.clear_popups = mod.clear_popups
 		self.popped = False
 	
 	def on_configure(self, wdg, event):
@@ -86,6 +95,7 @@ class TrackPropView(Gtk.DrawingArea):
 			if data.x <= self.button_rect.x + self.button_rect.width:
 				if data.y >= self.button_rect.y:
 					if data.y <= self.button_rect.y + self.button_rect.height:		
+						
 						self.button_highlight = True
 						self.redraw()
 						return
@@ -106,13 +116,14 @@ class TrackPropView(Gtk.DrawingArea):
 							self.popped = False
 							return
 						else:
-							self.clear_popups()
+							mod.clear_popups()
 							self.popover.popup()
 							self.popped = True
 							return
 
-		self.trk.trigger()
-		self.redraw()	
+		if self.trk:
+			self.trk.trigger()
+			self.redraw()	
 		
 	def redraw(self):
 		self.queue_draw()
@@ -159,6 +170,9 @@ class TrackPropView(Gtk.DrawingArea):
 			self.button_rect.y = height * cfg.seq_spacing
 			self.popover.set_pointing_to(self.button_rect)
 			
+			self.button_rect.y = 0
+			self.button_rect.height = height * cfg.seq_spacing * 2
+						
 			cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
 			(x, y, width, height, dx, dy) = cr.text_extents("|")
 			cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
@@ -199,7 +213,7 @@ class TrackPropView(Gtk.DrawingArea):
 		cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 		if mod.active_track:
 			if mod.active_track.trk.index == self.trk.index:
-				cr.set_source_rgb(0, 0, 0)					
+				cr.set_source_rgb(0, 0, 0)
 				
 		cr.move_to(x, self.txt_height * cfg.seq_spacing)	
 		cr.show_text("c%02d p%02d" % (self.trk.channel, self.trk.port))
@@ -228,6 +242,16 @@ class TrackPropView(Gtk.DrawingArea):
 		cr.line_to(self.txt_width * len(self.trk) - (width / 2), 2 * self.txt_height * cfg.seq_spacing)
 		cr.stroke()
 		self.queue_draw()
+
+	def on_enter(self, wdg, prm):
+		if self.trk:
+			if mod.active_track:
+				if not mod.active_track.edit:
+					self.seqview.change_active_track(self.seqview.get_track_view(self.trk))
+			
+	def on_leave(self, wdg, prm):
+		self.button_highlight = False
+		self.redraw()
 						
 	def on_draw(self, widget, cr):
 		cr.set_source_surface(self._surface, 0, 0)

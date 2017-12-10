@@ -7,12 +7,12 @@ class Configuration():
 		self._highlight = 4
 		self.on_highlight = []				# add callbacks here
 
-		self.seq_font = "Topaz-8"
-		#self.seq_font = "Monospace"
+		#self.seq_font = "Topaz-8"
+		self.seq_font = "Monospace"
+		#self.seq_font = "Press Start 2P"
 		self.seq_font_size = 16
-		self.max_statusbar_font_size = 16
 		self.seq_line_width = 1.0
-		self.seq_spacing = 1.7
+		self.seq_spacing = 1.05
 		self.colour = (.9, 1.0, .2)			
 		self.intensity_background = 0.3
 		self.intensity_txt = .7

@@ -4,7 +4,6 @@ from gi.repository import Gtk, Gio
 
 from vht import *
 from vht.sequenceview import SequenceView
-from vht.modulepropview import ModulePropView
 
 class MainWin(Gtk.ApplicationWindow):
 	def __init__(self, app):

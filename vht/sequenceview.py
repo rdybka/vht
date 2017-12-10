@@ -363,6 +363,7 @@ class SequenceView(Gtk.Box):
 		self.redraw_track(None)
 		self._side_prop.redraw()
 		self._prop_view.redraw()
+		self._status_bar.queue_resize()
 	
 	def on_scroll(self, widget, event):
 		if event.state & Gdk.ModifierType.CONTROL_MASK: # we're zooming!
@@ -459,7 +460,12 @@ class SequenceView(Gtk.Box):
 
 
 		self.recalculate_row_spacing()				
-		
+	
+	def get_track_view(self, trk):
+		for wdg in self.get_tracks():
+			if wdg.trk.index == trk.index:
+				return wdg
+			
 	def change_active_track(self, trk):
 		ac = mod.active_track
 		
