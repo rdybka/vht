@@ -96,7 +96,7 @@ class trackviewpointer():
 
 			rw = self.trk[c][r]
 			
-			if rw.type == 1:
+			if rw.type == 1 and self.trk.playing:
 				i *= 1.5 + 2.0 * (self.trk.pos - r)
 			
 			x = c * self._parent.txt_width
