@@ -54,7 +54,7 @@ class TrackView(Gtk.DrawingArea):
 		self.txt_width = 0
 		self.txt_height = 0
 		self.spacing = 1.0
-		self.pmp = PoorMansPiano()
+		self.pmp = PoorMansPiano(self.trk)
 	
 		self.drag = False
 		self.sel_drag = False

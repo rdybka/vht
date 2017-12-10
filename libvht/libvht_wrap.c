@@ -4544,6 +4544,27 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_track_kill_notes(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:track_kill_notes",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_kill_notes" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  track_kill_notes(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_track_new(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int arg1 ;
@@ -4936,6 +4957,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"track_swap_col", _wrap_track_swap_col, METH_VARARGS, NULL},
 	 { (char *)"track_resize", _wrap_track_resize, METH_VARARGS, NULL},
 	 { (char *)"track_trigger", _wrap_track_trigger, METH_VARARGS, NULL},
+	 { (char *)"track_kill_notes", _wrap_track_kill_notes, METH_VARARGS, NULL},
 	 { (char *)"track_new", _wrap_track_new, METH_VARARGS, NULL},
 	 { (char *)"row_get_type", _wrap_row_get_type, METH_VARARGS, NULL},
 	 { (char *)"row_get_note", _wrap_row_get_note, METH_VARARGS, NULL},

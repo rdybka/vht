@@ -300,6 +300,10 @@ def track_trigger(trk):
     return _libcvht.track_trigger(trk)
 track_trigger = _libcvht.track_trigger
 
+def track_kill_notes(trk):
+    return _libcvht.track_kill_notes(trk)
+track_kill_notes = _libcvht.track_kill_notes
+
 def track_new(port, channel, len, songlen):
     return _libcvht.track_new(port, channel, len, songlen)
 track_new = _libcvht.track_new

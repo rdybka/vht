@@ -473,6 +473,8 @@ class SequenceView(Gtk.Box):
 		if ac != trk:
 			if ac:
 				self._prop_view.redraw(ac.trk.index)
+				ac.pmp.silence()
+				
 			self._prop_view.redraw(trk.trk.index)
 	
 	def redraw_track(self, trk = None):

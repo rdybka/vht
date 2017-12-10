@@ -46,7 +46,10 @@ class VHTTrack(Iterable):
 			self._vht_handle.track_del_col(self._trk_handle, self.__len__() - 1)
 		else:
 			self._vht_handle.track_del_col(self._trk_handle, c)
-			
+
+	def kill_notes(self):
+		self._vht_handle.track_kill_notes(self._trk_handle)
+
 	@property
 	def port(self):
 		return self._vht_handle.track_get_port(self._trk_handle)

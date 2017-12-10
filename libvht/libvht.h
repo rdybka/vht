@@ -93,6 +93,7 @@ extern void track_del_col(track *trk, int c);
 extern void track_swap_col(track *trk, int c, int c2);
 extern void track_resize(track *trk, int size);
 extern void track_trigger(track *trk);
+extern void track_kill_notes(track *trk);
 
 extern track *track_new(int port, int channel, int len, int songlen);
 
