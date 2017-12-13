@@ -154,6 +154,8 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.add(self.grid)
 
 	def popup(self):
+		self.channel_adj.set_value(self.trk.channel)
+		self.port_adj.set_value(self.trk.port)
 		self.nsrows_adj.set_upper(self.parent.seq.length)
 		self.nsrows_adj.set_value(self.trk.nsrows)
 		self.nrows_adj.set_value(self.trk.nrows)
