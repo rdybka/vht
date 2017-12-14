@@ -45,7 +45,6 @@ def run():
 	if mod.jack_start() != 0:
 		mod.start_error = "you will need JACK for this"
 
-	#mod.nports = 3
 	#mod.dump_notes = True
 	randomcomposer.muzakize()
 

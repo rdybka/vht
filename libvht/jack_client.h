@@ -27,7 +27,6 @@
 jack_client_t *jack_client;
 jack_port_t *jack_input_port;
 extern jack_port_t *jack_output_ports[];
-int jack_n_output_ports;
 jack_status_t jack_status;
 jack_nframes_t jack_sample_rate;
 jack_nframes_t jack_buffer_size;

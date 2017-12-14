@@ -28,7 +28,6 @@ jack_port_t *jack_output_ports[JACK_CLIENT_MAX_PORTS];
 jack_port_t *jack_input_port;
 jack_nframes_t jack_sample_rate;
 jack_nframes_t jack_buffer_size;
-int jack_n_output_ports;
 char *jack_error;
 
 int jack_start(char *clt_name) {
@@ -78,7 +77,6 @@ void jack_synch_output_ports() {
 			port_state[module.seq[s]->trk[t]->port] = 1;
 
 	for (int p = 0; p < JACK_CLIENT_MAX_PORTS; p++) {
-
 		if ((port_state[p] == 0) && (jack_output_ports[p])) {
 			jack_port_unregister(jack_client, jack_output_ports[p]);
 			jack_output_ports[p] = 0;

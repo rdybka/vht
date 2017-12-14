@@ -155,9 +155,6 @@ void midi_buffer_add(int port, midi_event evt) {
 	if (curr_midi_event[port] == EVT_BUFFER_LENGTH)
 		return;
 
-	if ((port >= jack_n_output_ports) || (port < 0))
-		return;
-
 	midi_buffer[port][curr_midi_event[port]++] = evt;
 
 	if (module.dump_notes) {
