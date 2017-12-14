@@ -148,10 +148,6 @@ def module_get_nports():
     return _libcvht.module_get_nports()
 module_get_nports = _libcvht.module_get_nports
 
-def module_set_nports(arg1):
-    return _libcvht.module_set_nports(arg1)
-module_set_nports = _libcvht.module_set_nports
-
 def module_get_nseq():
     return _libcvht.module_get_nseq()
 module_get_nseq = _libcvht.module_get_nseq

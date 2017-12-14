@@ -35,6 +35,6 @@ extern char *jack_error;
 
 int jack_start(char *clt_name);
 void jack_stop();
-void jack_synch_n_output_ports();
+void jack_synch_output_ports();
 
 #endif //__JACK_CLIENT_H__

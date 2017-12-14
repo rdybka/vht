@@ -196,8 +196,9 @@ void midi_buffer_flush_port(int port) {
 }
 
 void midi_buffer_flush() {
-	for (int p = 0; p < module.nports; p++) {
-		midi_buffer_flush_port(p);
+	for (int p = 0; p < JACK_CLIENT_MAX_PORTS; p++) {
+		if (jack_output_ports[p])
+			midi_buffer_flush_port(p);
 	}
 }
 

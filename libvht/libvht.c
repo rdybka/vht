@@ -130,17 +130,7 @@ void track_set_nsrows(track *trk, int n) {
 }
 
 int module_get_nports() {
-	return module.nports;
-}
-
-void module_set_nports(int np) {
-	if (np > JACK_CLIENT_MAX_PORTS)
-		np = JACK_CLIENT_MAX_PORTS;
-
-	//if (np > 0) {
-	module.nports = np;
-	jack_synch_n_output_ports();
-	//}
+	return JACK_CLIENT_MAX_PORTS;
 }
 
 void sequence_set_length(sequence *seq, int length) {

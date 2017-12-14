@@ -132,7 +132,6 @@ void module_new() {
 	module.song_pos = 0.0;
 	module.mute = 0;
 	module.dump_notes = 0;
-	module.nports = 1;
 
 	module_excl_out();
 }

@@ -3540,27 +3540,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_module_set_nports(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  int arg1 ;
-  int val1 ;
-  int ecode1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:module_set_nports",&obj0)) SWIG_fail;
-  ecode1 = SWIG_AsVal_int(obj0, &val1);
-  if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "module_set_nports" "', argument " "1"" of type '" "int""'");
-  } 
-  arg1 = (int)(val1);
-  module_set_nports(arg1);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_module_get_nseq(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int result;
@@ -4919,7 +4898,6 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"module_get_bpm", _wrap_module_get_bpm, METH_VARARGS, NULL},
 	 { (char *)"module_set_bpm", _wrap_module_set_bpm, METH_VARARGS, NULL},
 	 { (char *)"module_get_nports", _wrap_module_get_nports, METH_VARARGS, NULL},
-	 { (char *)"module_set_nports", _wrap_module_set_nports, METH_VARARGS, NULL},
 	 { (char *)"module_get_nseq", _wrap_module_get_nseq, METH_VARARGS, NULL},
 	 { (char *)"module_get_seq", _wrap_module_get_seq, METH_VARARGS, NULL},
 	 { (char *)"module_add_sequence", _wrap_module_add_sequence, METH_VARARGS, NULL},

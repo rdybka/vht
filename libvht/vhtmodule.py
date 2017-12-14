@@ -137,10 +137,6 @@ class VHTModule(Iterable):
 	def nports(self):
 		return libcvht.module_get_nports()
 	
-	@nports.setter
-	def nports(self, value):
-		libcvht.module_set_nports(value)
-		
 	@property
 	def time(self):
 		return libcvht.module_get_time()

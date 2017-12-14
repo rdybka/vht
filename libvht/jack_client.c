@@ -56,8 +56,8 @@ int jack_start(char *clt_name) {
 	jack_set_sample_rate_callback(jack_client, jack_sample_rate_changed, 0);
 	jack_set_buffer_size_callback(jack_client, jack_buffer_size_changed, 0);
 
-	jack_n_output_ports = 0;
-	jack_synch_n_output_ports();
+	for (int p = 0; p < JACK_CLIENT_MAX_PORTS; p++)
+		jack_output_ports[p] = 0;
 
 	jack_input_port = jack_port_register (jack_client, "in", JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0);
 
@@ -66,22 +66,30 @@ int jack_start(char *clt_name) {
 	return 0;
 }
 
-void jack_synch_n_output_ports() {
-	if (jack_n_output_ports == module.nports) {
-		return;
+void jack_synch_output_ports() {
+	int port_state[JACK_CLIENT_MAX_PORTS];
+
+	for (int p = 0; p < JACK_CLIENT_MAX_PORTS; p++) {
+		port_state[p] = 0;
 	}
 
-	if (!module.jack_running)
-		return;
+	for (int s = 0; s < module.nseq; s++)
+		for (int t = 0; t < module.seq[s]->ntrk; t++)
+			port_state[module.seq[s]->trk[t]->port] = 1;
 
-	while(module.nports > jack_n_output_ports) {
-		char pname[256];
-		sprintf(pname, "out_%02d", jack_n_output_ports);
-		jack_output_ports[jack_n_output_ports++] = jack_port_register (jack_client, pname, JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
+	for (int p = 0; p < JACK_CLIENT_MAX_PORTS; p++) {
+
+		if ((port_state[p] == 0) && (jack_output_ports[p])) {
+			jack_port_unregister(jack_client, jack_output_ports[p]);
+			jack_output_ports[p] = 0;
+		}
+
+		if ((port_state[p] == 1) && (jack_output_ports[p] == 0)) {
+			char pname[256];
+			sprintf(pname, "out_%02d", p);
+			jack_output_ports[p] = jack_port_register (jack_client, pname, JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
+		}
 	}
-
-	while(module.nports < jack_n_output_ports)
-		jack_port_unregister(jack_client, jack_output_ports[--jack_n_output_ports]);
 }
 
 void jack_stop() {

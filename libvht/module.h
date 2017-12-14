@@ -42,7 +42,6 @@ struct module_t {
 
 	int jack_running;
 	int dump_notes;
-	int nports;
 	pthread_mutex_t excl; // to block structural changes when jack thread advances module
 };
 
