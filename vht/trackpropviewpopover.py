@@ -175,7 +175,7 @@ class TrackPropViewPopover(Gtk.Popover):
 		if prm.detail == Gdk.NotifyType.NONLINEAR:
 			if self.entered == 0:
 				self.entered = True
-				self.parent.button_highlight = True
+				self.parent.button_highlight = False
 				self.parent.redraw()
 
 	def on_remove_button_clicked(self, switch):
