@@ -75,7 +75,7 @@ class MainWin(Gtk.ApplicationWindow):
 			dialog.destroy()
 
 		self.add_tick_callback(self.tick)
-	
+
 	def tick(self, wdg, param):
 		self.time_display.set_markup("""<span font_desc="Roboto bold" font_family="monospace" size="x-large">%s</span>""" % mod.time)
 		return 1
@@ -93,5 +93,3 @@ class MainWin(Gtk.ApplicationWindow):
 	
 	def on_bpm_changed(self, adj):
 		mod.bpm = int(adj.get_value())
-	
-		

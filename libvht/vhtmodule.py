@@ -18,6 +18,7 @@
 from collections.abc import Iterable
 from libvht import libcvht
 from libvht.vhtsequence import VHTSequence
+import xml.etree.ElementTree as etree
 
 class VHTModule(Iterable):
 	# a somewhat pythonic interface to the vht magic
@@ -43,7 +44,6 @@ class VHTModule(Iterable):
 		r["bpm"] = self.bpm
 		r["playing"] = self.playing
 		r["nseq"] = len(self.seq)
-		r["nports"] = self.nports
 		
 		return r.__str__()
 
@@ -59,7 +59,7 @@ class VHTModule(Iterable):
 
 	def __iter__(self):
 		for itm in range(self.__len__()):
-			yield PMSSequence(libcvht, libcvht.module_get_seq(itm))
+			yield VHTSequence(libcvht, libcvht.module_get_seq(itm))
 		
 	def __getitem__(self, itm):
 		if itm >= self.__len__():
@@ -152,4 +152,33 @@ class VHTModule(Iterable):
 	@property
 	def max_bpm(self):
 		return 1000
+		
+	def to_xml(self):
+		mod = etree.Element('vhtmodule', attrib={'bpm' : str(self.bpm)})
+	
+		for seq in self:
+			s = etree.SubElement(mod, 'seq', attrib={'length' : str(seq.length)})
+			
+			for trk in seq:
+				attr = {}
+				attr['port'] = str(trk.port)
+				attr['channel'] = str(trk.channel)
+				attr['nrows'] = str(trk.nrows)
+				attr['nsrows'] = str(trk.nsrows)
+				
+				t = etree.SubElement(s, 'trk', attrib=attr)	
+				
+				for col in trk:
+					c = etree.SubElement(t, 'col')
+					for row in col:
+						attr = {}
+						attr['type'] = str(row.type)
+						attr['note'] = str(row.note)
+						attr['velocity'] = str(row.velocity)
+						attr['delay'] = str(row.delay)
+		
+						r = etree.SubElement(c, 'row', attrib = attr)
+		
+		print(dir(etree))
+		return(etree.tostring(mod))
 		
