@@ -130,7 +130,7 @@ def run():
 	if mod.jack_start() != 0:
 		mod.start_error = "you will need JACK for this"
 
-	mod.dump_notes = True
+	#mod.dump_notes = True
 	randomcomposer.muzakize()
 	#print(mod.to_xml())
 	try:

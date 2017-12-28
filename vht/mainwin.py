@@ -102,5 +102,6 @@ class MainWin(Gtk.ApplicationWindow):
 		
 		self.last_filename = filename
 		self.hb.set_title(filename)
+		self.adj.set_value(mod.bpm)
 		self._sequence_view.seq = mod[0]
 		self._sequence_view.build()
