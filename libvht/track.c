@@ -54,6 +54,7 @@ track *track_new(int port, int channel, int len, int songlen) {
 		track_clear_rows(trk, c);
 
 		trk->ring = malloc(sizeof(int) * trk->ncols);
+		trk->ring[c] = -1;
 	};
 
 	track_reset(trk);
@@ -63,8 +64,7 @@ track *track_new(int port, int channel, int len, int songlen) {
 
 void track_reset(track *trk) {
 	trk->pos = 0.0;
-	for (int f = 0; f < trk->ncols; f++)
-		trk->ring[f] = -1;
+	track_kill_notes(trk);
 }
 
 void track_set_row(track *trk, int c, int n, int type, int note, int velocity, int delay) {

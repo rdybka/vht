@@ -68,9 +68,15 @@ int jack_start(char *clt_name) {
 void jack_synch_output_ports() {
 	int port_state[JACK_CLIENT_MAX_PORTS];
 
+	midi_buff_excl_in();
+
 	for (int p = 0; p < JACK_CLIENT_MAX_PORTS; p++) {
 		port_state[p] = 0;
+		if (curr_midi_queue_event[p])
+			port_state[p] = 1;
 	}
+
+	midi_buff_excl_out();
 
 	for (int s = 0; s < module.nseq; s++)
 		for (int t = 0; t < module.seq[s]->ntrk; t++)

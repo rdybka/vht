@@ -98,8 +98,7 @@ class SequenceView(Gtk.Box):
 		
 		self._sv_hadj.connect("value-changed", self.on_sv_hadj_changed)
 		self._prop_view_hadj.connect("value-changed", self.on_sv_hadj_changed)
-					
-		self.add_track(None)
+
 		self.build()
 
 		self.show_all()
@@ -429,11 +428,10 @@ class SequenceView(Gtk.Box):
 	def del_track(self, trk):
 		restore_track_index = None
 		restore_edit = None
-		if mod.active_track.edit:
-			restore_edit = mod.active_track.edit
-			
 		if mod.active_track:
 			restore_track_index = mod.active_track.trk.index
+			if mod.active_track.edit:
+				restore_edit = mod.active_track.edit
 				
 		TrackView.leave_all()
 		mod.active_track = None
@@ -492,8 +490,18 @@ class SequenceView(Gtk.Box):
 		self.queue_draw()
 			
 	def build(self):
+		self.add_track(None)
 		for trk in self.seq:
 			self.add_track(trk)
+			
+		self._side_prop.seq = self.seq
+	
+	def clean(self):
+		while len(self.seq):
+			self.del_track(self.seq[0])
+		
+		self._side_box.remove(self._side_box.get_children()[0])
+
 	
 	def recalculate_row_spacing(self):
 		minspc = 1.0

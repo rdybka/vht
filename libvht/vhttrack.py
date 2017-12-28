@@ -56,6 +56,7 @@ class VHTTrack(Iterable):
 		
 	@port.setter
 	def port(self, value):
+		self.kill_notes()
 		self._vht_handle.track_set_port(self._trk_handle, value)
 
 	@property
@@ -64,6 +65,7 @@ class VHTTrack(Iterable):
 		
 	@channel.setter
 	def channel(self, value):
+		self.kill_notes()
 		self._vht_handle.track_set_channel(self._trk_handle, value)
 
 	@property

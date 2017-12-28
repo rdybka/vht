@@ -1,4 +1,4 @@
-# Poor Man's Sequencer
+# Valhalla Tracker
 #
 # Copyright (C) 2017 Remigiusz Dybka
 #
@@ -18,12 +18,11 @@
 from collections.abc import Iterable
 from libvht import libcvht
 from libvht.vhtsequence import VHTSequence
-import xml.etree.ElementTree as etree
+import json
 
 class VHTModule(Iterable):
 	# a somewhat pythonic interface to the vht magic
 	def __init__(self):
-		self._seq = None
 		self.active_track = None
 		libcvht.module_new();
 		super()
@@ -51,7 +50,6 @@ class VHTModule(Iterable):
 		libcvht.module_reset()
 
 	def new(self):
-		self._seq = None
 		libcvht.module_new();
 
 	def __len__(self):
@@ -87,6 +85,7 @@ class VHTModule(Iterable):
 			ret = ret + "%d : %d\n" % (len(itm), itm.length)
 		return ret
 
+	# nothing sneaky about it, really...
 	def sneakily_queue_midi_note_on(self, port, chn, note, velocity):
 		libcvht.queue_midi_note_on(port, chn, note, velocity)
 		
@@ -153,32 +152,68 @@ class VHTModule(Iterable):
 	def max_bpm(self):
 		return 1000
 		
-	def to_xml(self):
-		mod = etree.Element('vhtmodule', attrib={'bpm' : str(self.bpm)})
-	
+	def save(self, filename):
+		jm = {}
+		jm["bpm"] = self.bpm
+		jm["seq"] = []
 		for seq in self:
-			s = etree.SubElement(mod, 'seq', attrib={'length' : str(seq.length)})
+			s = {}
+			s["length"] = seq.length
+			s["trk"] = []
 			
 			for trk in seq:
-				attr = {}
-				attr['port'] = str(trk.port)
-				attr['channel'] = str(trk.channel)
-				attr['nrows'] = str(trk.nrows)
-				attr['nsrows'] = str(trk.nsrows)
-				
-				t = etree.SubElement(s, 'trk', attrib=attr)	
+				t = {}
+				t["port"] = trk.port
+				t["channel"] = trk.channel
+				t["nrows"] = trk.nrows
+				t["nsrows"] = trk.nsrows
+				t["playing"] = trk.playing
+				t["col"] = []
 				
 				for col in trk:
-					c = etree.SubElement(t, 'col')
+					c = []
 					for row in col:
-						attr = {}
-						attr['type'] = str(row.type)
-						attr['note'] = str(row.note)
-						attr['velocity'] = str(row.velocity)
-						attr['delay'] = str(row.delay)
+						r = {}
+						r["type"] = row.type
+						r["note"] = row.note
+						r["velocity"] = row.velocity
+						r["delay"] = row.delay
+						c.append(r)
+					t["col"].append(c)
+				s["trk"].append(t)
+			jm["seq"].append(s)
 		
-						r = etree.SubElement(c, 'row', attrib = attr)
 		
-		print(dir(etree))
-		return(etree.tostring(mod))
+		with open(filename, 'w') as f:
+			json.dump(jm, f, indent = 4)
+			print("saved %s\n" % (filename))
+
+		
+	def load(self, filename):
+		with open(filename, 'r') as f:
+			jm = json.load(f)
+			p = self.play	
+			self.reset()
+			libcvht.module_new();
+			for seq in jm["seq"]:
+				s = self.add_sequence()
+				s.length = seq["length"]
+				for trk in seq["trk"]:
+					t = s.add_track(trk["port"], trk["channel"], trk["nrows"], trk["nsrows"])
+					t.playing = trk["playing"]
+					for cc, col in enumerate(trk["col"]):
+						if cc == 0:
+							c = t[0]
+						else:
+							c = t.add_column()					
+							
+						for r, row in enumerate(col):
+							rr = c[r]
+							rr.type = row["type"]
+							rr.note = row["note"]
+							rr.velocity = row["velocity"]
+							rr.delay = row["delay"]
+			
+			self.play = p
+			print("loaded %s\n" % (filename))
 		

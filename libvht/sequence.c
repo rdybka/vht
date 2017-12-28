@@ -22,9 +22,6 @@
 #include "sequence.h"
 
 sequence *sequence_new(int length) {
-	if (length == -1)
-		length = module.def_nrows;
-
 	sequence *seq = malloc(sizeof(sequence));
 	seq->ntrk = 0;
 	seq->trk = 0;

@@ -157,11 +157,6 @@ void midi_buffer_add(int port, midi_event evt) {
 
 	midi_buffer[port][curr_midi_event[port]++] = evt;
 
-	if (module.dump_notes) {
-		char desc[256];
-		midi_describe_event(evt, desc, 256);
-		printf("%02d:%02d:%03d %s\n", module.min, module.sec, module.ms, desc);
-	}
 }
 
 int midi_buffer_compare(const void *a, const void *b) {
@@ -189,6 +184,13 @@ void midi_buffer_flush_port(int port) {
 		unsigned char buff[3];
 		if (midi_encode_event(midi_buffer[port][i], buff))
 			jack_midi_event_write(outp, midi_buffer[port][i].time, buff, 3);
+
+		if (module.dump_notes) {
+			char desc[256];
+			midi_describe_event(midi_buffer[port][i], desc, 256);
+			printf("%02d:%02d:%03d pt: %02d, %s\n", module.min, module.sec, module.ms, port, desc);
+		}
+
 	}
 }
 
