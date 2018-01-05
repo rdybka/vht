@@ -97,11 +97,7 @@ class MainWin(Gtk.ApplicationWindow):
 		mod.bpm = int(adj.get_value())
 
 	def load(self, filename):
-		self._sequence_view.clean()
-		mod.load(filename)
-		
+		self._sequence_view.load(filename)
 		self.last_filename = filename
 		self.hb.set_title(filename)
 		self.adj.set_value(mod.bpm)
-		self._sequence_view.seq = mod[0]
-		self._sequence_view.build()

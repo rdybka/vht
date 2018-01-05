@@ -457,7 +457,7 @@ class SequenceView(Gtk.Box):
 				mod.active_track.edit = min(restore_edit[0], len(mod.active_track.trk) - 1), min(restore_edit[1], mod.active_track.trk.nrows - 1)
 
 
-		self.recalculate_row_spacing()				
+		self.recalculate_row_spacing()			
 	
 	def get_track_view(self, trk):
 		for wdg in self.get_tracks():
@@ -490,19 +490,26 @@ class SequenceView(Gtk.Box):
 		self.queue_draw()
 			
 	def build(self):
+		self._prop_view.seq = self.seq
+		self._side_prop.seq = self.seq
+		self._side_prop.popover.seq = self.seq
+
 		self.add_track(None)
 		for trk in self.seq:
 			self.add_track(trk)
 			
-		self._side_prop.seq = self.seq
-	
-	def clean(self):
+	def clear(self):
 		while len(self.seq):
 			self.del_track(self.seq[0])
 		
 		self._side_box.remove(self._side_box.get_children()[0])
 
-	
+	def load(self, filename):
+		self.clear()
+		mod.load(filename)
+		self.seq = mod[0]
+		self.build()
+		
 	def recalculate_row_spacing(self):
 		minspc = 1.0
 		
@@ -585,7 +592,8 @@ class SequenceView(Gtk.Box):
 			ret.append(wdg)
 
 		if with_side_view:
-			ret.append(self._side_box.get_children()[0])
+			if len(self._side_box.get_children()):
+				ret.append(self._side_box.get_children()[0])
 
 		return ret
 	

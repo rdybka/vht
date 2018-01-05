@@ -8,7 +8,7 @@ class Configuration():
 		self.on_highlight = []				# add callbacks here
 
 		#self.seq_font = "Topaz-8"
-		self.seq_font = "Monospace"
+		self.seq_font = "Mono"
 		#self.seq_font = "Press Start 2P"
 		self.seq_font_size = 16
 		self.seq_line_width = 1.0

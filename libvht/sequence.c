@@ -124,6 +124,7 @@ void sequence_swap_track(sequence *seq, int t1, int t2) {
 	if (t1 == t2)
 		return;
 
+
 	module_excl_in();
 
 	track *t3 = seq->trk[t1];

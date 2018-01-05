@@ -77,11 +77,13 @@ class VHTApp(Gtk.Application):
 		self.add_file_filters(dialog)
 
 		response = dialog.run()
+		dialog.close()
 		if response == Gtk.ResponseType.OK:
 			self.main_win.load(dialog.get_filename())
-			
+
+
 		dialog.destroy()
-	
+		
 	def save_with_dialog(self):
 		if not self.main_win.last_filename:
 			dialog = Gtk.FileChooserDialog("Please choose a file", self.get_active_window(),
@@ -92,12 +94,12 @@ class VHTApp(Gtk.Application):
 			self.add_file_filters(dialog)
 
 			response = dialog.run()
+			dialog.close()
 			if response == Gtk.ResponseType.OK:
 				self.main_win.last_filename = dialog.get_filename()
 				mod.save(self.main_win.last_filename)
 				self.main_win.hb.set_title(self.main_win.last_filename)
-				
-			dialog.destroy()
+			dialog.destroy()	
 			return
 		
 		if self.main_win.last_filename:
