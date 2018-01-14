@@ -12,7 +12,6 @@ def muzakize():
 	seq = mod.add_sequence(32)
 	t1 = seq.add_track()
 	#t1.add_column()
-	#t1.add_column()
 	return
 	
 	t1 = seq.add_track()

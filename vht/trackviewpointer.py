@@ -99,7 +99,16 @@ class trackviewpointer():
 			if rw.type == 1 and self.trk.playing:
 				i *= 1.5 + 2.0 * (self.trk.pos - r)
 			
-			x = c * self._parent.txt_width
+			
+			veled = 0
+			xtraoffs = 0
+			if c == self._parent.velocity_edit:
+				veled = self._parent.vel_edit_width
+				
+			if self._parent.velocity_edit > -1 and c > self._parent.velocity_edit:
+				xtraoffs = self._parent.vel_edit_width 
+						
+			x = c * self._parent.txt_width + xtraoffs
 			xx = (self._parent.txt_width / 8.0) * 7.2
 
 			gradient = cairo.LinearGradient(x, y, x, y + self.height)

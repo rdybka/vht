@@ -188,13 +188,13 @@ class VHTModule(Iterable):
 			json.dump(jm, f, indent = 4)
 			print("saved %s\n" % (filename))
 
-		
 	def load(self, filename):
 		with open(filename, 'r') as f:
 			jm = json.load(f)
 			p = self.play	
 			self.reset()
 			libcvht.module_new();
+			self.bpm = jm["bpm"]
 			for seq in jm["seq"]:
 				s = self.add_sequence()
 				s.length = seq["length"]

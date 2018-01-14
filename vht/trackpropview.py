@@ -9,7 +9,7 @@ from vht.sequencepropviewpopover import SequencePropViewPopover
 from vht.trackview import TrackView
 
 class TrackPropView(Gtk.DrawingArea):
-	def __init__(self, trk = None, seq = None, seqview = None, propview = None):
+	def __init__(self, trk = None, trkview = None, seq = None, seqview = None, propview = None):
 		Gtk.DrawingArea.__init__(self)
 
 		self.set_events(Gdk.EventMask.POINTER_MOTION_MASK |
@@ -30,6 +30,7 @@ class TrackPropView(Gtk.DrawingArea):
 
 		self.seq = seq
 		self.trk = trk
+		self.trkview = trkview
 		self.propview = propview
 		self.seqview = seqview
 		self.txt_width = 0
@@ -187,7 +188,8 @@ class TrackPropView(Gtk.DrawingArea):
 
 		self.txt_height = height
 		self.txt_width = int(dx)
-
+		self.width = max(self.txt_width * len(self.trk), self.trkview.width)
+		
 		gradient = cairo.LinearGradient(0, 0, 0, h)
 				
 		gradient.add_color_stop_rgb(0.0, *(col * cfg.intensity_background for col in cfg.colour))
@@ -199,11 +201,11 @@ class TrackPropView(Gtk.DrawingArea):
 		gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_background for col in cfg.colour))
 		cr.set_source(gradient)
 
-		self.set_size_request(self.txt_width * len(self.trk), self.txt_height * 2 * cfg.seq_spacing)
+		self.set_size_request(self.width, self.txt_height * 2 * cfg.seq_spacing)
 		
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
 			
-		cr.rectangle(0, 0, self.txt_width * len(self.trk) - width, h)
+		cr.rectangle(0, 0, self.width - width, h)
 		cr.fill()
 				
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")	
@@ -238,8 +240,8 @@ class TrackPropView(Gtk.DrawingArea):
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
 		cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
 		
-		cr.move_to(self.txt_width * len(self.trk) - (width / 2), self.txt_height * cfg.seq_spacing * .3)
-		cr.line_to(self.txt_width * len(self.trk) - (width / 2), 2 * self.txt_height * cfg.seq_spacing)
+		cr.move_to(self.width - (width / 2), self.txt_height * cfg.seq_spacing * .3)
+		cr.line_to(self.width - (width / 2), 2 * self.txt_height * cfg.seq_spacing)
 		cr.stroke()
 		self.queue_draw()
 

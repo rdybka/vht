@@ -53,6 +53,7 @@ class TrackView(Gtk.DrawingArea):
 		self._pointer = trackviewpointer(self, trk, seq)
 		self.txt_width = 0
 		self.txt_height = 0
+		self.width = 0
 		self.spacing = 1.0
 		self.pmp = PoorMansPiano(self.trk)
 	
@@ -65,6 +66,14 @@ class TrackView(Gtk.DrawingArea):
 		self.select = False
 		self.select_start = None
 		self.select_end = None
+		self.velocity_edit = -1
+		self.velocity_edit_confirmed = False
+		self.velocity_edit_lock = False
+		self.velocity_edit_locked = 0
+		
+		self.veled_from = 0
+		self.veled_to = 0
+		self.vel_edit_width = 127
 	
 		if trk:
 			self.undo_buff = TrackUndoBuffer(trk)
@@ -101,8 +110,7 @@ class TrackView(Gtk.DrawingArea):
 
 		self._context = cairo.Context(self._surface)
 		self._context.set_antialias(cairo.ANTIALIAS_NONE)
-		self._context.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
-		
+	
 		self.tick()
 		self.redraw()
 		return True
@@ -141,13 +149,15 @@ class TrackView(Gtk.DrawingArea):
 			nw = dx
 			nh = (self.txt_height * self.seq.length) + 10
 			self.set_size_request(nw, nh)
-				
+			self.width = nw
 			if complete:
 				cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))	
 				cr.rectangle(0, 0, w, h)
 				cr.fill()
 		
 			rows_to_draw = []
+
+			(x, y, width, height, dx, dy) = cr.text_extents("0000")
 	
 			if complete:
 				rows_to_draw = range(self.seq.length)
@@ -157,10 +167,13 @@ class TrackView(Gtk.DrawingArea):
 						rows_to_draw.append(r)
 		
 			for r in rows_to_draw:
-				if not complete: # redraw background
-					cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))	
-					cr.rectangle(0, r * self.txt_height, w, self.txt_height)
-					cr.fill()
+				even_high = cfg.even_highlight
+				if r % 2 == 0:
+					even_high = 1.0
+				
+				cr.set_source_rgb(*(col * cfg.intensity_background * (even_high) for col in cfg.colour))	
+				cr.rectangle(0, r * self.txt_height, w, self.txt_height)
+				cr.fill()
 
 				if self.hover and r == self.hover[1]:
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight * 1.2 for col in cfg.colour))
@@ -170,7 +183,7 @@ class TrackView(Gtk.DrawingArea):
 					else:
 						cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
 
-				yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2)
+				yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2.0)
 				cr.move_to(x, yy)
 				cr.show_text("%03d" % r)
 				
@@ -189,6 +202,7 @@ class TrackView(Gtk.DrawingArea):
 			(x, y, width, height, dx, dy) = cr.text_extents("|")
 			cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
 			cr.set_antialias(cairo.ANTIALIAS_NONE)
+			cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
 			cr.move_to(self.txt_width - (dx / 2), 0)
 			cr.line_to(self.txt_width - (dx / 2), (self.seq.length) * self.txt_height)
 			cr.stroke()
@@ -196,15 +210,24 @@ class TrackView(Gtk.DrawingArea):
 			if complete:
 				self.queue_draw()
 			return
-			
+
+		(x, y, width, height, dx, dy) = cr.text_extents("0")
+		self.vel_edit_width = max((cfg.velocity_editor_char_width * width), 127)
+		self.veled_from = (self.velocity_edit * self.txt_width + self.txt_width) - (width / 1.2)
+		self.veled_to = self.vel_edit_width
+		
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")
 
 		self.txt_height = float(height) * self.spacing * cfg.seq_spacing
 		self.txt_width = int(dx)
 
 		nw = self.txt_width * len(self.trk)
+		if self.velocity_edit > -1:
+			nw = nw + self.vel_edit_width
+			
 		nh = (self.txt_height * self.trk.nrows) + 5
 		self.set_size_request(nw, nh)
+		self.width = nw
 		
 		if complete:
 			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))	
@@ -222,10 +245,21 @@ class TrackView(Gtk.DrawingArea):
 						rows_to_draw.append(r)
 	
 			for r in rows_to_draw:
-				if not complete: # redraw background
-					cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))	
-					cr.rectangle(c * self.txt_width, r * self.txt_height, self.txt_width + 5, self.txt_height)
-					cr.fill()
+				veled = 0
+				xtraoffs = 0
+				if c == self.velocity_edit:
+					veled = self.vel_edit_width
+				
+				if self.velocity_edit > -1 and c > self.velocity_edit:
+					xtraoffs = self.vel_edit_width 
+				
+				even_high = cfg.even_highlight
+				if r % 2 == 0:
+					even_high = 1.0
+				
+				cr.set_source_rgb(*(col * cfg.intensity_background * even_high for col in cfg.colour))	
+				cr.rectangle(c * self.txt_width + xtraoffs, r * self.txt_height, self.txt_width + 5 + self.vel_edit_width, self.txt_height)
+				cr.fill()
 				
 				if self.hover and r == self.hover[1] and c == self.hover[0]:
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight * 1.2 for col in cfg.colour))
@@ -264,14 +298,15 @@ class TrackView(Gtk.DrawingArea):
 					if self.edit and r == self.edit[1] and c == self.edit[0]:
 						cr.set_source_rgb(*(cfg.colour_record))
 						
-						cr.rectangle(c * self.txt_width, (r * self.txt_height) + self.txt_height * .1, (self.txt_width / 8.0) * 7.2, self.txt_height * .9)
+						cr.rectangle(c * self.txt_width + xtraoffs, (r * self.txt_height) + self.txt_height * .1, (self.txt_width / 8.0) * 7.2, self.txt_height * .9)
 						cr.fill()
 						cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
-						
-				yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2)
-				
-				cr.move_to((c * self.txt_width) + x, yy)
-				
+
+				#(x, y, width, height, dx, dy) = cr.text_extents("000 000|")
+				(x, y, width, height, dx, dy) = cr.text_extents("000 0000")
+				yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2.0)
+				cr.move_to((c * self.txt_width) + x + xtraoffs, yy)
+
 				rw = self.trk[c][r]
 								
 				if rw.type == 1: #note_on
@@ -285,8 +320,23 @@ class TrackView(Gtk.DrawingArea):
 
 				if r == int(self.trk.pos):
 					cr.set_source_rgba(*(col * cfg.intensity_txt_highlight for col in cfg.colour), cfg.current_highlight_opacity)
-					cr.rectangle(c * self.txt_width, r * self.txt_height, (self.txt_width / 8.0) * 7.2, self.txt_height)
+					cr.rectangle(c * self.txt_width + xtraoffs, r * self.txt_height, (self.txt_width / 8.0) * 7.2 + veled, self.txt_height)
 					cr.fill()
+
+				(x, y, width, height, dx, dy) = cr.text_extents("0")
+
+				if veled and rw.type == 1:
+					yh = cfg.velocity_editor_row_height * self.txt_height
+					yp = ((self.txt_height - yh) / 2.0)
+					
+					cr.set_line_width(1.0)
+					cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), .5)
+					cr.rectangle(self.veled_from, r * self.txt_height + yp, (self.veled_to / 127.0) * rw.velocity, yh)
+					cr.fill()
+					
+					cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), 1.0)
+					cr.rectangle(self.veled_from, r * self.txt_height + yp, self.veled_to, yh)
+					cr.stroke()
 
 				if not complete:
 					ir.x = 0
@@ -297,8 +347,12 @@ class TrackView(Gtk.DrawingArea):
 
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
 		cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
-		cr.move_to(self.txt_width * len(self.trk) - (width / 2), 0)
-		cr.line_to(self.txt_width * len(self.trk) - (width / 2), (self.trk.nrows) * self.txt_height)
+		#cr.move_to(self.txt_width * len(self.trk) - (width / 2), 0)
+		#cr.line_to(self.txt_width * len(self.trk) - (width / 2), (self.trk.nrows) * self.txt_height)
+		cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
+		cr.move_to(self.width - (width / 2), 0)
+		cr.line_to(self.width - (width / 2), (self.trk.nrows) * self.txt_height)
+		
 		cr.stroke()
 
 		if complete:
@@ -328,7 +382,41 @@ class TrackView(Gtk.DrawingArea):
 		
 		if event.y > 50:
 			mod.clear_popups()
+		
+		if self.velocity_edit > -1:
+			if event.y < 0:
+				return False
+		
+			if self.trk[self.velocity_edit][new_hover_row].type != 1:
+				return False
+			
+			if not self.velocity_edit_confirmed:
+				if event.x >= self.veled_from and event.x <= self.veled_from + self.veled_to:
+					self.velocity_edit_confirmed = True
+			
+			if not self.velocity_edit_confirmed:
+				return False
+			
+			y1 = new_hover_row * self.txt_height
+			y2 = y1 + self.txt_height
+			
+			yy = (self.txt_height - cfg.velocity_editor_row_height * self.txt_height) / 2.0
+			y1 = y1# + yy
+			y2 = y2# - yy
+						
+			if event.y > y1 and event.y < y2:
+				vel = min(max(((event.x - self.veled_from) / self.veled_to) * 127.0, 0), 127)
+				
+				if not self.velocity_edit_lock:
+					self.velocity_edit_locked = vel
 
+				if self.velocity_edit_lock:
+					vel = self.velocity_edit_locked
+					
+				self.trk[self.velocity_edit][new_hover_row].velocity = vel
+				self.redraw(new_hover_row, new_hover_row)
+				return True
+				
 		if self.select:
 			if not self.select_start:
 				self.select_start = self.edit
@@ -432,7 +520,7 @@ class TrackView(Gtk.DrawingArea):
 		row = min(int(event.y / self.txt_height), self.trk.nsrows - 1)
 		col = int(event.x / self.txt_width)
 		offs = int(event.x) % int(self.txt_width)
-
+		
 		if event.button == cfg.delete_button:
 			if self.trk[col][row].type == 0:
 				trk = mod.active_track
@@ -493,7 +581,7 @@ class TrackView(Gtk.DrawingArea):
 				self.select_start = None
 				self.select_end = None
 
-		if self.trk[col][row].type == 1:# note_ob
+		if self.trk[col][row].type == 1:# note_on
 			enter_edit = True
 			self.drag = True
 			
@@ -504,7 +592,16 @@ class TrackView(Gtk.DrawingArea):
 		if offs < self.txt_width / 2.0:	# edit note
 			enter_edit = True
 		else: 							# edit velocity
-			enter_edit = True
+			if not shift and self.trk[col][row].type == 1:
+				enter_edit = False
+				self.drag = False
+				self.velocity_edit = col
+				self.velocity_edit_confirmed = False
+				self.velocity_edit_lock = False
+				self.velocity_edit_locked = self.trk[col][row].velocity
+				self.redraw()
+				self.parent._prop_view.redraw()
+				self.undo_buff.add_state()
 
 		if enter_edit:
 			if shift:
@@ -530,6 +627,7 @@ class TrackView(Gtk.DrawingArea):
 			if olded:
 				self.redraw(olded[1])
 			return True		
+		
 		
 		return True
 		
@@ -596,6 +694,12 @@ class TrackView(Gtk.DrawingArea):
 			if self.drag:
 				self.drag = False
 				self.undo_buff.add_state()
+
+		if self.velocity_edit > -1:
+			self.velocity_edit = -1
+			self.redraw()
+			self.parent._prop_view.redraw()
+			self.undo_buff.add_state()
 				
 		return False
 
@@ -793,6 +897,11 @@ class TrackView(Gtk.DrawingArea):
 		alt = False
 		if event.state & Gdk.ModifierType.MOD1_MASK:
 			alt = True
+		
+		#if self.velocity_edit_confirmed:
+		if cfg.key["hold_velocity"].matches(event):	
+			if self.velocity_edit_lock == False:
+				self.velocity_edit_lock = True
 
 		if cfg.key["undo"].matches(event):
 			self.undo_buff.restore()
@@ -1329,6 +1438,7 @@ class TrackView(Gtk.DrawingArea):
 		if not self.trk:
 			return
 		
+		self.velocity_edit_lock = False
 		#print("key : %d" % (event.keyval))
 		note = self.pmp.key2note(Gdk.keyval_to_lower(event.keyval), True)
 		return False

@@ -68,7 +68,7 @@ class SequenceView(Gtk.Box):
 		self._prop_view = PropView(self)
 		hbox.pack_end(self._prop_view, True, True, 0)
 		
-		self._side_prop = TrackPropView(None, self.seq, self, None)
+		self._side_prop = TrackPropView(None, None, self.seq, self, None)
 		hbox.pack_start(self._side_prop, False, True, 0)
 
 		self.pack_start(hbox, False, True, 0)
@@ -405,7 +405,7 @@ class SequenceView(Gtk.Box):
 			self._side_box.pack_start(t, False, True, 0)
 
 		if trk:
-			self._prop_view.add_track(trk)
+			self._prop_view.add_track(trk, t)
 		
 		t.show()
 

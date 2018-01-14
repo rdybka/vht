@@ -34,8 +34,8 @@ class PropView(Gtk.ScrolledWindow):
 	def on_leave(self, wdg, prm):
 		pass
 
-	def add_track(self, trk):
-		t = TrackPropView(trk, self.seq, self.seqview, self)
+	def add_track(self, trk, trkview):
+		t = TrackPropView(trk, trkview, self.seq, self.seqview, self)
 		self._track_box.pack_start(t, False, True, 0)
 		t.show()
 
@@ -87,6 +87,8 @@ class PropView(Gtk.ScrolledWindow):
 		for wdg in self._track_box.get_children():
 			if wdg.trk.index == index or index == -1:
 				wdg.redraw()
+				
+		self.queue_draw()
 		
 	def on_draw(self, widget, cr):
 		w = widget.get_allocated_width()

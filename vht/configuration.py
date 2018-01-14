@@ -18,6 +18,7 @@ class Configuration():
 		self.intensity_txt = .7
 		self.intensity_txt_highlight = 1.0
 		self.intensity_lines = .6
+		self.even_highlight = .9
 		self.colour_record = (1.0, 0, 0)
 		self.intensity_select = .7
 		self.pointer_opacity = .7
@@ -25,6 +26,10 @@ class Configuration():
 		self.current_highlight_opacity = 0
 		self.auto_scroll_delay = .15
 		self.tooltip_markup = """<span font_family="Monospace" size="large">%s</span>"""
+		
+		self.velocity_editor_char_width = 12
+		self.velocity_editor_row_height = .5
+		
 		
 		self.octave = 4
 		self.velocity = 100
@@ -85,6 +90,7 @@ class Configuration():
 			"channel_down":		cfgkey("KP_Subtract",	True, False, True),
 			"port_up":			cfgkey("KP_Multiply",	True, False, True),
 			"port_down":		cfgkey("KP_Divide",		True, False, True),
+			"hold_velocity":	cfgkey("Control_L",		False, False, False),
 		}
 		
 	@property
