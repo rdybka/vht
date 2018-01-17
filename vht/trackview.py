@@ -80,6 +80,8 @@ class TrackView(Gtk.DrawingArea):
 			
 		self._surface = None
 		self._context = None
+		self._back_surface = None
+		self._back_context = None
 
 		self.hover = None
 		self.edit = None
@@ -91,9 +93,12 @@ class TrackView(Gtk.DrawingArea):
 	def __del__(self):
 		if self._surface:
 			self._surface.finish()
+			
+		if self._back_surface:
+			self._surface.finish()
 
 	def tick(self):
-		if self._context:
+		if self._context and self._back_context:
 			if self.trk:
 				self._pointer.draw(self.trk.pos)
 			else:
@@ -103,24 +108,110 @@ class TrackView(Gtk.DrawingArea):
 	def on_configure(self, wdg, event):
 		if self._surface:
 			self._surface.finish()
+		
+		if self._back_surface:
+			self._back_surface.finish()
 
 		self._surface = wdg.get_window().create_similar_surface(cairo.CONTENT_COLOR,
+			wdg.get_allocated_width(),
+			wdg.get_allocated_height())
+
+		self._back_surface = wdg.get_window().create_similar_surface(cairo.CONTENT_COLOR,
 			wdg.get_allocated_width(),
 			wdg.get_allocated_height())
 
 		self._context = cairo.Context(self._surface)
 		self._context.set_antialias(cairo.ANTIALIAS_NONE)
 	
+		self._back_context = cairo.Context(self._back_surface)
+		self._back_context.set_antialias(cairo.ANTIALIAS_NONE)
+		
 		self.tick()
 		self.redraw()
 		return True
 
-	def redraw(self, from_row = -666, to_row = -666):
-		cr = self._context
+	def reblit(self, from_row = -666, to_row = -666):
+		cr = self._back_context
+		crf = self._context
+		crf.set_source_surface(self._back_surface)
+		
+		w = self.get_allocated_width()
+		h = self.get_allocated_height()
+		
+		wnd = self.get_window()
+		ir = Gdk.Rectangle()
+		
+		complete = False
+		if from_row == -666 and to_row == -666:
+			complete = True
+			
+		if from_row != -666 and to_row == -666:
+			to_row = from_row
 
-		self._context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-		self._context.set_font_size(cfg.seq_font_size)
-				
+		if from_row > to_row:
+			a = to_row
+			to_row = from_row
+			from_row = a
+
+		# side_column
+		if not self.trk:
+			rows_to_draw = []
+
+			if complete:
+				rows_to_draw = range(self.seq.length)
+			else:
+				for r in range(self.seq.length):
+					if r >= from_row and r <= to_row:
+						rows_to_draw.append(r)
+		
+			if not complete:
+				for r in rows_to_draw:
+					ir.x = 0
+					ir.width = w
+					ir.y = int(r * self.txt_height)
+					ir.height = self.txt_height * 2
+					crf.rectangle(ir.x, ir.y, ir.width, ir.height)
+					crf.fill()
+					wnd.invalidate_rect(ir, False)
+
+			if complete:
+				crf.set_source_surface(self._back_surface)
+				crf.paint()
+				self.queue_draw()
+			
+			return
+
+		rows_to_draw = []
+		
+		if complete:
+			rows_to_draw = range(self.trk.nrows)
+		else:
+			for r in range(self.trk.nrows):
+				if r >= from_row and r <= to_row:
+					rows_to_draw.append(r)
+	
+		if not complete:
+			for r in rows_to_draw:
+				ir.x = 0
+				ir.width = w
+				ir.y = r * self.txt_height
+				ir.height = self.txt_height * 2
+				crf.rectangle(ir.x, ir.y, ir.width, ir.height)
+				crf.fill()
+				wnd.invalidate_rect(ir, False)
+
+		if complete:
+			crf.paint()
+			self.queue_draw()
+
+	def redraw(self, from_row = -666, to_row = -666):
+		cr = self._back_context
+		crf = self._context
+		crf.set_source_surface(self._back_surface)
+
+		self._back_context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+		self._back_context.set_font_size(cfg.seq_font_size)
+						
 		w = self.get_allocated_width()
 		h = self.get_allocated_height()
 		
@@ -186,28 +277,35 @@ class TrackView(Gtk.DrawingArea):
 				yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2.0)
 				cr.move_to(x, yy)
 				cr.show_text("%03d" % r)
-				
-				if r == int(self.seq.pos):
-					cr.set_source_rgba(*(col * cfg.intensity_txt_highlight for col in cfg.colour), cfg.current_highlight_opacity)	
-					cr.rectangle(0, r * self.txt_height, (self.txt_width / 4.0) * 3.1, self.txt_height)
-					cr.fill()
-				
+		
 				if not complete:
+					(x, y, width, height, dx, dy) = cr.text_extents("|")
+					cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
+					cr.set_antialias(cairo.ANTIALIAS_NONE)
+					cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
+					cr.move_to(self.txt_width - (dx / 2), 0)
+					cr.line_to(self.txt_width - (dx / 2), (self.seq.length) * self.txt_height)
+					cr.stroke()
+
 					ir.x = 0
 					ir.width = w
 					ir.y = int(r * self.txt_height)
 					ir.height = self.txt_height * 2
+					crf.rectangle(ir.x, ir.y, ir.width, ir.height)
+					crf.fill()
 					wnd.invalidate_rect(ir, False)
 
-			(x, y, width, height, dx, dy) = cr.text_extents("|")
-			cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
-			cr.set_antialias(cairo.ANTIALIAS_NONE)
-			cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
-			cr.move_to(self.txt_width - (dx / 2), 0)
-			cr.line_to(self.txt_width - (dx / 2), (self.seq.length) * self.txt_height)
-			cr.stroke()
-
 			if complete:
+				(x, y, width, height, dx, dy) = cr.text_extents("|")
+				cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
+				cr.set_antialias(cairo.ANTIALIAS_NONE)
+				cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
+				cr.move_to(self.txt_width - (dx / 2), 0)
+				cr.line_to(self.txt_width - (dx / 2), (self.seq.length) * self.txt_height)
+				cr.stroke()
+			
+				crf.set_source_surface(self._back_surface)
+				crf.paint()
 				self.queue_draw()
 			return
 
@@ -234,6 +332,7 @@ class TrackView(Gtk.DrawingArea):
 			cr.rectangle(0, 0, w, h)
 			cr.fill()
 		
+		last_c = len(self.trk) - 1
 		for c in range(len(self.trk)):
 			rows_to_draw = []
 		
@@ -244,6 +343,8 @@ class TrackView(Gtk.DrawingArea):
 					if r >= from_row and r <= to_row:
 						rows_to_draw.append(r)
 	
+	
+			last_r = rows_to_draw[-1]
 			for r in rows_to_draw:
 				veled = 0
 				xtraoffs = 0
@@ -318,11 +419,6 @@ class TrackView(Gtk.DrawingArea):
 				if rw.type == 0: #none
 					cr.show_text("---    ")
 
-				if r == int(self.trk.pos):
-					cr.set_source_rgba(*(col * cfg.intensity_txt_highlight for col in cfg.colour), cfg.current_highlight_opacity)
-					cr.rectangle(c * self.txt_width + xtraoffs, r * self.txt_height, (self.txt_width / 8.0) * 7.2 + veled, self.txt_height)
-					cr.fill()
-
 				(x, y, width, height, dx, dy) = cr.text_extents("0")
 
 				if veled and rw.type == 1:
@@ -339,24 +435,33 @@ class TrackView(Gtk.DrawingArea):
 					cr.stroke()
 
 				if not complete:
+					if c == last_c and r == last_r:
+						(x, y, width, height, dx, dy) = cr.text_extents("0")
+						cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
+						cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
+						cr.move_to(self.width - (width / 2), 0)
+						cr.line_to(self.width - (width / 2), (self.trk.nrows) * self.txt_height)
+						cr.stroke()
+			
 					ir.x = 0
 					ir.width = w
 					ir.y = r * self.txt_height
 					ir.height = self.txt_height * 2
+					crf.rectangle(ir.x, ir.y, ir.width, ir.height)
+					crf.fill()
 					wnd.invalidate_rect(ir, False)
 
-		(x, y, width, height, dx, dy) = cr.text_extents("0")
-		cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
-		#cr.move_to(self.txt_width * len(self.trk) - (width / 2), 0)
-		#cr.line_to(self.txt_width * len(self.trk) - (width / 2), (self.trk.nrows) * self.txt_height)
-		cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
-		cr.move_to(self.width - (width / 2), 0)
-		cr.line_to(self.width - (width / 2), (self.trk.nrows) * self.txt_height)
-		
-		cr.stroke()
-
 		if complete:
+			(x, y, width, height, dx, dy) = cr.text_extents("0")
+			cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
+			cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
+			cr.move_to(self.width - (width / 2), 0)
+			cr.line_to(self.width - (width / 2), (self.trk.nrows) * self.txt_height)
+			cr.stroke()
+
+			crf.paint()
 			self.queue_draw()
+			
 			
 	def on_draw(self, widget, cr):
 		cr.set_source_surface(self._surface, 0, 0)

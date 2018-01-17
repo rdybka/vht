@@ -22,13 +22,14 @@ class trackviewpointer():
 		self.lpos = None
 
 		self.stopped = False
+		self.gradient = None
 
 	def draw(self, pos):
 		if not mod.playing and pos == 0:
 			if self.stopped:
 				return
 			
-			self._parent.redraw()
+			self._parent.reblit()
 			self.stopped = True
 			return
 
@@ -45,9 +46,9 @@ class trackviewpointer():
 			y = 0
 		
 		if self.lpos:
-			self._parent.redraw(self.lpos - 2, self.lpos + 2)
+			self._parent.reblit(self.lpos - 2, self.lpos)
 			
-		self._parent.redraw(pos - 2, pos + 2)
+		self._parent.reblit(pos -2, pos)
 		self.lpos = pos
 
 		y = pos * self._parent.txt_height
@@ -77,7 +78,7 @@ class trackviewpointer():
 			cr.fill()
 
 			if int(pos) == 0:
-				self._parent.redraw(self._parent.seq.length -1)
+				self._parent.reblit(self._parent.seq.length -1)
 				
 				cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))	
 				cr.rectangle(0, self._parent.seq.length * self._parent.txt_height, w, self._parent.txt_height)
@@ -117,14 +118,14 @@ class trackviewpointer():
 			gradient.add_color_stop_rgba(0.5, *(col * i for col in cfg.colour), self.opacity)
 			gradient.add_color_stop_rgba(.5 + cfg.pointer_width / 2, *(col * i for col in cfg.colour), 0)
 			gradient.add_color_stop_rgba(1.0, *(col * i for col in cfg.colour), 0)
+			
 			cr.set_source(gradient)
-						
 			cr.rectangle(x, y, xx, self.height)
 			cr.fill()
 
 		if int(pos) == 0:
-			self._parent.redraw(self.trk.nrows -1)
+			self._parent.reblit(self.trk.nrows -1)
 			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))	
 			cr.rectangle(0, self.trk.nrows * self._parent.txt_height, w, self._parent.txt_height)
 			cr.fill()
-				
+			
