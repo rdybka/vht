@@ -20,6 +20,8 @@ class MainWin(Gtk.ApplicationWindow):
 		#hb.set_title("")
 		#hb.set_subtitle("")
 		self.set_titlebar(self.hb)
+		self.set_default_icon_name("vht")
+		self.set_icon_name("vht")
 		
 		button = Gtk.Button()
 		icon = Gio.ThemedIcon(name="media-playback-stop")
