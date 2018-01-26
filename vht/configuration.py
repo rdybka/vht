@@ -29,6 +29,8 @@ class Configuration():
 		self.velocity_editor_char_width = 12
 		self.velocity_editor_row_height = .5
 		
+		self.drag_edit_divisor = 1.5
+		self.drag_edit_default_velocity = 100
 		
 		self.octave = 4
 		self.velocity = 100

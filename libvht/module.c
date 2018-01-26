@@ -86,12 +86,6 @@ void module_advance(jack_nframes_t curr_frames) {
 	if (module.playing)
 		sequence_advance(seq, period);
 
-// handle input from keyboard
-
-
-
-
-
 // handle input from MIDI
 	void *inp = jack_port_get_buffer(jack_input_port, jack_buffer_size);
 

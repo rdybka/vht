@@ -66,11 +66,15 @@ class TrackView(Gtk.DrawingArea):
 		self.select = False
 		self.select_start = None
 		self.select_end = None
+		
 		self.velocity_edit = -1
+		self.velocity_edit_row = -1
+		self.velocity_edit_y = 0
+		self.velocity_edit_start_value = 0
 		self.velocity_edit_confirmed = False
 		self.velocity_edit_lock = False
 		self.velocity_edit_locked = 0
-		
+		self.velocity_edit_clearing = True
 		self.veled_from = 0
 		self.veled_to = 0
 		self.vel_edit_width = 127
@@ -492,13 +496,27 @@ class TrackView(Gtk.DrawingArea):
 			if event.y < 0:
 				return False
 		
+			# edit single velocity in place
+			if not self.velocity_edit_confirmed and not self.velocity_edit_lock:
+				if event.x < self.veled_from:
+					vel = self.trk[self.velocity_edit][self.velocity_edit_row].velocity
+					
+					vel = self.velocity_edit_start_value - ((event.y - self.velocity_edit_y) / cfg.drag_edit_divisor)
+					vel = max(min(vel, 127), 0)
+							
+					self.velocity_edit_locked = vel
+								
+					self.trk[self.velocity_edit][self.velocity_edit_row].velocity = vel
+					self.redraw(self.velocity_edit_row)
+					return True
+		
 			if self.trk[self.velocity_edit][new_hover_row].type != 1:
 				return False
 			
 			if not self.velocity_edit_confirmed:
 				if event.x >= self.veled_from and event.x <= self.veled_from + self.veled_to:
 					self.velocity_edit_confirmed = True
-			
+		
 			if not self.velocity_edit_confirmed:
 				return False
 			
@@ -506,9 +524,7 @@ class TrackView(Gtk.DrawingArea):
 			y2 = y1 + self.txt_height
 			
 			yy = (self.txt_height - cfg.velocity_editor_row_height * self.txt_height) / 2.0
-			y1 = y1# + yy
-			y2 = y2# - yy
-						
+
 			if event.y > y1 and event.y < y2:
 				vel = min(max(((event.x - self.veled_from) / self.veled_to) * 127.0, 0), 127)
 				
@@ -637,7 +653,23 @@ class TrackView(Gtk.DrawingArea):
 					
 				self.parent.change_active_track(self)
 				return True
-						
+		
+			if offs > self.txt_width / 2.0:	# reset velocity
+				if self.trk[col][row].type == 1:
+					self.velocity_edit = col
+					self.velocity_edit_row = row
+					self.velocity_edit_y = event.y
+					self.velocity_edit_confirmed = False
+					self.velocity_edit_clearing = True
+					self.velocity_edit_lock = True
+					self.velocity_edit_locked = cfg.drag_edit_default_velocity
+					self.velocity_edit_start_value = self.velocity_edit_locked
+					self.trk[col][row].velocity = self.velocity_edit_locked
+					self.redraw()
+					self.parent._prop_view.redraw()
+					self.undo_buff.add_state()
+					return True
+									
 			self.trk[col][row].clear()
 			self.redraw(row)
 			self.undo_buff.add_state()
@@ -701,9 +733,13 @@ class TrackView(Gtk.DrawingArea):
 				enter_edit = False
 				self.drag = False
 				self.velocity_edit = col
+				self.velocity_edit_row = row
+				self.velocity_edit_y = event.y
 				self.velocity_edit_confirmed = False
+				self.velocity_edit_clearing = False
 				self.velocity_edit_lock = False
 				self.velocity_edit_locked = self.trk[col][row].velocity
+				self.velocity_edit_start_value = self.velocity_edit_locked
 				self.redraw()
 				self.parent._prop_view.redraw()
 				self.undo_buff.add_state()
@@ -802,6 +838,7 @@ class TrackView(Gtk.DrawingArea):
 
 		if self.velocity_edit > -1:
 			self.velocity_edit = -1
+			self.velocity_edit_clearing = False
 			self.redraw()
 			self.parent._prop_view.redraw()
 			self.undo_buff.add_state()
@@ -1005,8 +1042,11 @@ class TrackView(Gtk.DrawingArea):
 		
 		#if self.velocity_edit_confirmed:
 		if cfg.key["hold_velocity"].matches(event):	
-			if self.velocity_edit_lock == False:
-				self.velocity_edit_lock = True
+			if not self.velocity_edit_clearing:
+				if self.velocity_edit > -1:
+					if self.velocity_edit_lock == False:
+						self.velocity_edit_lock = True
+						#self.velocity_edit_locked = self.trk[self.velocity_edit][self.velocity_edit_row].velocity
 
 		if cfg.key["undo"].matches(event):
 			self.undo_buff.restore()
@@ -1543,7 +1583,15 @@ class TrackView(Gtk.DrawingArea):
 		if not self.trk:
 			return
 		
-		self.velocity_edit_lock = False
-		#print("key : %d" % (event.keyval))
+		if self.velocity_edit_clearing:
+			return False
+			
+		if not self.velocity_edit_confirmed and self.velocity_edit > -1:
+			self.velocity_edit_lock = False
+			self.velocity_edit_locked = self.trk[self.velocity_edit][self.velocity_edit_row].velocity
+
+		if self.velocity_edit_confirmed:
+			self.velocity_edit_lock = False
+
 		note = self.pmp.key2note(Gdk.keyval_to_lower(event.keyval), True)
 		return False

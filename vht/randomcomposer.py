@@ -11,19 +11,15 @@ def muzakize():
 	
 	seq = mod.add_sequence(32)
 	t1 = seq.add_track()
-	#t1.add_column()
-	return
-	
-	t1 = seq.add_track()
 	t2 = seq.add_track()
 	t3 = seq.add_track()
 	
 	t1.channel = t2.channel = 10
 	t3.channel = 2
 	
-	track_fill(t1, "c3", 8)
-	track_fill(t2, "f#3", 2)
-	track_fill(t3, "d3", 16)
+	track_fill(t1, "c3", 8, 85)
+	track_fill(t2, "f#3", 2, 63)
+	track_fill(t3, "d3", 16, 45)
 	t1.add_column()
 	t1.add_column()
 	
