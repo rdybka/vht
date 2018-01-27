@@ -22,7 +22,7 @@ class MainWin(Gtk.ApplicationWindow):
 		self.set_titlebar(self.hb)
 		self.set_default_icon_name("vht")
 		self.set_icon_name("vht")
-		
+		self.set_opacity(cfg.window_opacity)
 		button = Gtk.Button()
 		icon = Gio.ThemedIcon(name="media-playback-stop")
 		image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)

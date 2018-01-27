@@ -1583,6 +1583,8 @@ class TrackView(Gtk.DrawingArea):
 		if not self.trk:
 			return
 		
+		note = self.pmp.key2note(Gdk.keyval_to_lower(event.keyval), True)
+		
 		if self.velocity_edit_clearing:
 			return False
 			
@@ -1593,5 +1595,4 @@ class TrackView(Gtk.DrawingArea):
 		if self.velocity_edit_confirmed:
 			self.velocity_edit_lock = False
 
-		note = self.pmp.key2note(Gdk.keyval_to_lower(event.keyval), True)
 		return False

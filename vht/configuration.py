@@ -25,7 +25,7 @@ class Configuration():
 		self.pointer_width = 1
 		self.auto_scroll_delay = .15
 		self.tooltip_markup = """<span font_family="Monospace" size="large">%s</span>"""
-		
+		self.window_opacity = 1
 		self.velocity_editor_char_width = 12
 		self.velocity_editor_row_height = .5
 		
