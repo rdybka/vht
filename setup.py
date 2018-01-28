@@ -29,7 +29,8 @@ setup(name = "vht",
 	data_files = [
 		('share/applications', ['data/com.github.rdybka.vht.desktop']),
 		('share/icons', ['data/vht.svg']),
-		('share/vht', ['COPYING.txt', 'README.md'])
+		('share/vht', ['COPYING.txt', 'README.md']),
+		('data', ['data/vht.svg'], ['data/menu.ui'])
 	],
 	
 	classifiers=[

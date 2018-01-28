@@ -1,4 +1,4 @@
-import gi
+import gi, os
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
 
@@ -22,6 +22,8 @@ class MainWin(Gtk.ApplicationWindow):
 		self.set_titlebar(self.hb)
 		self.set_default_icon_name("vht")
 		self.set_icon_name("vht")
+		self.set_icon_from_file(os.path.join(mod.data_path, "vht.svg"))
+		
 		self.set_opacity(cfg.window_opacity)
 		button = Gtk.Button()
 		icon = Gio.ThemedIcon(name="media-playback-stop")

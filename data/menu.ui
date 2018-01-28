@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <menu id="app-menu">
+    <section>
+	<item>
+        <attribute name="action">app.load</attribute>
+        <attribute name="label">_Load</attribute>
+      </item>
+      <item>
+        <attribute name="action">app.save</attribute>
+        <attribute name="label">_Save</attribute>
+      </item>
+      <item>
+        <attribute name="action">app.save_as</attribute>
+        <attribute name="label">Save as</attribute>
+      </item>
+      
+    </section>
+    <section>
+      <item>
+        <attribute name="action">app.prefs</attribute>
+        <attribute name="label">_Preferences</attribute>
+      </item>
+    
+    </section>
+    <section>
+      
+      <item>
+        <attribute name="action">app.about</attribute>
+        <attribute name="label">_About</attribute>
+      </item>
+      <item>
+        <attribute name="action">app.quit</attribute>
+        <attribute name="label">_Quit</attribute>
+        <attribute name="accel">&lt;Primary&gt;q</attribute>
+    </item>
+    </section>
+  </menu>
+</interface>

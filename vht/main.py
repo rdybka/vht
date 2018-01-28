@@ -51,8 +51,9 @@ class VHTApp(Gtk.Application):
 		action.connect("activate", self.on_save_as)
 		self.add_action(action)
 
-		builder = Gtk.Builder.new_from_string(MENU_XML, -1)
-		self.set_app_menu(builder.get_object("app-menu"))
+		with open(os.path.join(mod.data_path, "menu.ui"), 'r') as f:
+			builder = Gtk.Builder.new_from_string(f.read(), -1)
+			self.set_app_menu(builder.get_object("app-menu"))
 
 	def do_activate(self):
 		self.main_win = MainWin(self)
@@ -134,6 +135,8 @@ def run():
 
 	#mod.dump_notes = True
 	randomcomposer.muzakize()
+	mod.data_path = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "data"))
+
 	#print(mod.to_xml())
 	try:
 		app = VHTApp()
@@ -149,45 +152,3 @@ def run():
 	
 if __name__ == "__main__":
 	run()
-
-MENU_XML="""
-<?xml version="1.0" encoding="UTF-8"?>
-<interface>
-  <menu id="app-menu">
-    <section>
-	<item>
-        <attribute name="action">app.load</attribute>
-        <attribute name="label">_Load</attribute>
-      </item>
-      <item>
-        <attribute name="action">app.save</attribute>
-        <attribute name="label">_Save</attribute>
-      </item>
-      <item>
-        <attribute name="action">app.save_as</attribute>
-        <attribute name="label">Save as</attribute>
-      </item>
-      
-    </section>
-    <section>
-      <item>
-        <attribute name="action">app.prefs</attribute>
-        <attribute name="label">_Preferences</attribute>
-      </item>
-    
-    </section>
-    <section>
-      
-      <item>
-        <attribute name="action">app.about</attribute>
-        <attribute name="label">_About</attribute>
-      </item>
-      <item>
-        <attribute name="action">app.quit</attribute>
-        <attribute name="label">_Quit</attribute>
-        <attribute name="accel">&lt;Primary&gt;q</attribute>
-    </item>
-    </section>
-  </menu>
-</interface>
-"""
