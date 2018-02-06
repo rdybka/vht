@@ -5,6 +5,10 @@ import cairo
 
 from vht import *
 from vht.trackview import TrackView
+from vht.blackgrid import BlackGrid
+from vht.blackcheckbutton import BlackCheckButton
+from vht.blacklabel import BlackLabel
+from vht.blackbutton import BlackButton
 
 class TrackPropViewPopover(Gtk.Popover):
 	def __init__(self, parent, trk):
@@ -18,6 +22,7 @@ class TrackPropViewPopover(Gtk.Popover):
 		
 		self.parent = parent
 		self.trk = trk
+		self.extended_view = False
 		self.grid = Gtk.Grid()
 		self.grid.set_column_spacing(3)
 		self.grid.set_row_spacing(3)
@@ -84,11 +89,62 @@ class TrackPropViewPopover(Gtk.Popover):
 			#icon = Gio.ThemedIcon(name="media-seek-backward")
 			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
 			button.add(image)
-			#button.connect("clicked", self.on_move_first_button_clicked)
+			button.connect("clicked", self.on_extended_view_button_clicked)
 			#button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_move_first"]))
 			self.grid.attach(button, 3, 2, 1, 2)
+			self.extend_button = button
 
+			self.extend_grid = Gtk.Grid()
+			self.extend_grid.set_hexpand(True)
+			self.extend_grid.set_vexpand(True)
+			
+			self.grid.attach(self.extend_grid,4,0,5,6)
 
+			grid = BlackGrid()
+			grid.set_column_homogeneous(True)
+			grid.set_row_homogeneous(True)
+			grid.set_column_spacing(2)
+			grid.set_row_spacing(2)
+
+			self.show_notes_button = BlackCheckButton("notes")
+			self.show_timeshift_button = BlackCheckButton("time")
+			self.show_pitchwheel_button = BlackCheckButton("pitch")
+			self.show_controllers_button = BlackCheckButton("ctrl")
+
+			grid.attach(BlackLabel("show:"), 0, 0, 1, 1)
+			grid.attach(self.show_notes_button, 1, 0, 1, 1)
+			grid.attach(self.show_timeshift_button, 2, 0, 1, 1)
+			grid.attach(self.show_pitchwheel_button, 3, 0, 1, 1)
+			grid.attach(self.show_controllers_button, 4, 0, 1, 1)
+			
+			grid.attach(BlackLabel(""), 0, 2, 1, 1)
+			grid.attach(BlackLabel("rotate:"), 0, 1, 1, 1)
+			rotate_up_button = BlackButton("up")
+			grid.attach(rotate_up_button, 1, 1, 1, 1)
+			rotate_down_button = BlackButton("down")
+			grid.attach(rotate_down_button, 2, 1, 1, 1)
+			
+			self.extend_loop_check = BlackCheckButton("loop")
+			grid.attach(self.extend_loop_check, 4, 3, 1, 1)
+						
+			self.clone_button = BlackButton("clone")
+			grid.attach(self.clone_button, 4, 2, 1, 1)
+						
+						
+			self.extend_track_grid = grid
+						
+			self.extend_notebook = Gtk.Notebook()
+			self.extend_notebook.set_hexpand(True)
+			self.extend_notebook.set_vexpand(True)
+			self.extend_controllers_grid = BlackGrid()
+			self.extend_triggers_grid = BlackGrid()
+			
+			self.extend_notebook.append_page(self.extend_track_grid, Gtk.Label("track"))
+			self.extend_notebook.append_page(self.extend_controllers_grid, Gtk.Label("controllers"))
+			self.extend_notebook.append_page(self.extend_triggers_grid, Gtk.Label("triggers"))
+			
+			self.extend_grid.attach(self.extend_notebook, 0, 0, 5, 5)
+			
 			self.port_adj = Gtk.Adjustment(0, 0, 15, 1.0, 1.0)
 			self.port_button = Gtk.SpinButton()
 			self.port_button.set_adjustment(self.port_adj)
@@ -151,6 +207,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.nrows_check_button.set_sensitive(False)
 			
 			self.grid.show_all()
+			self.extend_grid.hide()
 			self.add(self.grid)
 
 	def popup(self):
@@ -242,3 +299,16 @@ class TrackPropViewPopover(Gtk.Popover):
 	def on_move_last_button_clicked(self, switch):
 		self.parent.move_last()
 	
+	def on_extended_view_button_clicked(self, switch):
+		if self.extended_view:
+			icon = Gio.ThemedIcon(name="media-seek-forward")
+			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+			self.extend_button.set_image(image)
+			self.extend_grid.hide()
+			self.extended_view = False
+		else:
+			icon = Gio.ThemedIcon(name="media-seek-backward")
+			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+			self.extend_button.set_image(image)
+			self.extend_grid.show()
+			self.extended_view = True

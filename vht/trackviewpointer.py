@@ -103,11 +103,11 @@ class trackviewpointer():
 			
 			veled = 0
 			xtraoffs = 0
-			if c == self._parent.velocity_edit:
-				veled = self._parent.vel_edit_width
-				
-			if self._parent.velocity_edit > -1 and c > self._parent.velocity_edit:
-				xtraoffs = self._parent.vel_edit_width 
+			if self._parent.velocity_editor:
+				if c == self._parent.velocity_editor.col:
+					veled = self._parent.velocity_editor.width
+				if c > self._parent.velocity_editor.col:
+					xtraoffs = self._parent.velocity_editor.width 
 						
 			x = c * self._parent.txt_width + xtraoffs
 			xx = (self._parent.txt_width / 8.0) * 7.2
