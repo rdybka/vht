@@ -27,7 +27,8 @@ class Configuration():
 		self.tooltip_markup = """<span font_family="Monospace" size="large">%s</span>"""
 		self.window_opacity = 1
 		self.velocity_editor_char_width = 12
-		self.velocity_editor_row_height = .5
+		self.timeshift_editor_char_width = 20
+		self.editor_row_height = .5
 		
 		self.drag_edit_divisor = 1.5
 		self.default_velocity = 100
@@ -91,7 +92,7 @@ class Configuration():
 			"channel_down":		cfgkey("KP_Subtract",	True, False, True),
 			"port_up":			cfgkey("KP_Multiply",	True, False, True),
 			"port_down":		cfgkey("KP_Divide",		True, False, True),
-			"hold_velocity":	cfgkey("Control_L",		False, False, False),
+			"hold_editor":		cfgkey("Control_L",		False, False, False),
 		}
 		
 	@property

@@ -189,7 +189,7 @@ void track_advance(track *trk, double speriod) {
 				row r;
 				track_get_row(trk, c, nn, &r);
 
-				double trigger_time = (double)n + ((double)r.delay / 1000.0);
+				double trigger_time = (double)n + ((double)r.delay / 99.0);
 				double delay = trigger_time - trk->pos;
 				if ((delay >= 0) & (delay < tperiod)) {
 					if (trk->playing)

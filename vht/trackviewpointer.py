@@ -100,17 +100,30 @@ class trackviewpointer():
 			if rw.type == 1 and self.trk.playing:
 				i *= 1.5 + 2.0 * (self.trk.pos - r)
 			
-			
 			veled = 0
+			tsed = 0
 			xtraoffs = 0
+			
 			if self._parent.velocity_editor:
 				if c == self._parent.velocity_editor.col:
 					veled = self._parent.velocity_editor.width
 				if c > self._parent.velocity_editor.col:
 					xtraoffs = self._parent.velocity_editor.width 
+
+			if self._parent.timeshift_editor:
+				if c == self._parent.timeshift_editor.col:
+					tsed = self._parent.timeshift_editor.width
+				if c > self._parent.timeshift_editor.col:
+					xtraoffs = self._parent.timeshift_editor.width 
 						
+									
 			x = c * self._parent.txt_width + xtraoffs
-			xx = (self._parent.txt_width / 8.0) * 7.2
+			#xx = (self._parent.txt_width / 8.0) * 7.2
+			xx = self._parent.txt_width * .95
+			
+			if veled:
+				if self._parent.show_timeshift and self._parent.velocity_editor:
+					xx = (self._parent.txt_width / 12.0) * 7.2
 
 			gradient = cairo.LinearGradient(x, y, x, y + self.height)
 			gradient.add_color_stop_rgba(0.0, *(col * i for col in cfg.colour), 0)
@@ -123,6 +136,13 @@ class trackviewpointer():
 			cr.rectangle(x, y, xx, self.height)
 			cr.fill()
 
+			if veled:
+				if self._parent.show_timeshift and self._parent.velocity_editor:
+					x = x + xx + self._parent.velocity_editor.width + (self._parent.txt_width / 12.0) * .5
+					cr.set_source(gradient)
+					cr.rectangle(x, y, (self._parent.txt_width / 12.0) * 3.2, self.height)
+					cr.fill()
+			
 		if int(pos) == 0:
 			self._parent.reblit(self.trk.nrows -1)
 			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))	

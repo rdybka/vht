@@ -8,6 +8,7 @@ from vht.trackviewpointer import trackviewpointer
 from vht.trackundobuffer import TrackUndoBuffer
 from vht.poormanspiano import PoorMansPiano
 from vht.velocityeditor import VelocityEditor
+from vht.timeshifteditor import TimeshiftEditor
 
 class TrackView(Gtk.DrawingArea):
 	track_views = []
@@ -69,7 +70,15 @@ class TrackView(Gtk.DrawingArea):
 		self.select_end = None
 		
 		self.velocity_editor = None
-	
+		self.timeshift_editor = None
+		self.pitchwheel_editor = None
+		self.controller_editor = None
+		
+		self.show_notes = True
+		self.show_timeshift = True
+		self.show_pitchwheel = False
+		self.show_controllers = False
+					
 		if trk:
 			self.undo_buff = TrackUndoBuffer(trk)
 			
@@ -304,8 +313,10 @@ class TrackView(Gtk.DrawingArea):
 				self.queue_draw()
 			return
 
-
-		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")
+		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")	
+		if self.show_timeshift:
+			(x, y, width, height, dx, dy) = cr.text_extents("000 000 000|")
+						
 		self.txt_height = float(height) * self.spacing * cfg.seq_spacing
 		self.txt_width = int(dx)
 
@@ -314,7 +325,11 @@ class TrackView(Gtk.DrawingArea):
 		if self.velocity_editor:
 			self.velocity_editor.precalc(cr)
 			nw = nw + self.velocity_editor.width
-			
+		
+		if self.timeshift_editor:
+			self.timeshift_editor.precalc(cr)
+			nw = nw + self.timeshift_editor.width
+					
 		nh = (self.txt_height * self.trk.nrows) + 5
 		self.set_size_request(nw, nh)
 		self.width = nw
@@ -339,6 +354,7 @@ class TrackView(Gtk.DrawingArea):
 			last_r = rows_to_draw[-1]
 			for r in rows_to_draw:
 				veled = 0
+				tsed = 0
 				xtraoffs = 0
 				ed_width = 0
 				
@@ -349,6 +365,14 @@ class TrackView(Gtk.DrawingArea):
 					if c > self.velocity_editor.col:
 						xtraoffs = self.velocity_editor.width 	
 				
+				if self.timeshift_editor:
+					ed_width = self.timeshift_editor.width
+					if c == self.timeshift_editor.col:
+						tsed = self.timeshift_editor.width
+					if c > self.timeshift_editor.col:
+						xtraoffs = self.timeshift_editor.width 	
+				
+								
 				even_high = cfg.even_highlight
 				if r % 2 == 0:
 					even_high = 1.0
@@ -405,9 +429,25 @@ class TrackView(Gtk.DrawingArea):
 				cr.move_to((c * self.txt_width) + x + xtraoffs, yy)
 
 				rw = self.trk[c][r]
-								
+																
 				if rw.type == 1: #note_on
-					cr.show_text("%3s %03d" % (str(rw), rw.velocity))
+					if self.show_timeshift:
+						ts_sign = '0'
+						if rw.delay > 0:
+							ts_sign = '+'
+						if rw.delay < 0:
+							ts_sign = '-'
+							
+						if not self.velocity_editor:
+							cr.show_text("%3s %03d %c%02d" % (str(rw), rw.velocity, ts_sign, abs(rw.delay)))
+						else:
+							cr.show_text("%3s %03d" % (str(rw), rw.velocity))
+							cr.move_to((c * self.txt_width) + dx + xtraoffs + self.velocity_editor.width, yy)
+							cr.show_text("%c%02d" % (ts_sign, abs(rw.delay)))
+					else:
+						cr.show_text("%3s %03d" % (str(rw), rw.velocity))
+				
+				
 				
 				if rw.type == 2: #note_off
 					cr.show_text("%3s" % (str(rw)))
@@ -419,7 +459,10 @@ class TrackView(Gtk.DrawingArea):
 
 				if veled and rw.type == 1:
 					self.velocity_editor.draw(cr, c, r, rw)
-					
+				
+				if tsed and rw.type == 1:
+					self.timeshift_editor.draw(cr, c, r, rw)
+				
 				if not complete:
 					if c == last_c and r == last_r:
 						(x, y, width, height, dx, dy) = cr.text_extents("0")
@@ -476,6 +519,10 @@ class TrackView(Gtk.DrawingArea):
 		
 		if self.velocity_editor:
 			return self.velocity_editor.on_motion(widget, event)
+		
+		if self.timeshift_editor:
+			return self.timeshift_editor.on_motion(widget, event)
+		
 				
 		if self.select:
 			if not self.select_start:
@@ -592,8 +639,14 @@ class TrackView(Gtk.DrawingArea):
 					
 				self.parent.change_active_track(self)
 				return True
+
+			flds = 2
+			if self.show_timeshift:
+				flds = 3
+
+			fldwidth =  self.txt_width / flds
 		
-			if offs > self.txt_width / 2.0:	# reset velocity
+			if offs > fldwidth and offs < fldwidth * 2:	# reset velocity
 				if self.trk[col][row].type == 1:
 					self.velocity_editor = VelocityEditor(self, col, row, event)
 					self.velocity_editor.clearing = True
@@ -603,6 +656,20 @@ class TrackView(Gtk.DrawingArea):
 					self.parent._prop_view.redraw()
 					self.undo_buff.add_state()
 					return True
+			
+			if self.show_timeshift:
+				if offs > fldwidth * 2 and offs < fldwidth * 3:	# reset timeshift
+					if self.trk[col][row].type == 1:
+						self.timeshift_editor = TimeshiftEditor(self, col, row, event)
+						self.timeshift_editor.clearing = True
+						self.trk[col][row].delay = 0
+					
+						self.redraw()
+						self.parent._prop_view.redraw()
+						self.undo_buff.add_state()
+						return True
+			
+			
 									
 			self.trk[col][row].clear()
 			self.redraw(row)
@@ -660,15 +727,26 @@ class TrackView(Gtk.DrawingArea):
 			enter_edit = True
 			self.drag = True
 		
-		if offs < self.txt_width / 2.0:	# edit note
+		flds = 2
+		if self.show_timeshift:
+			flds = 3
+
+		fldwidth =  self.txt_width / flds
+		
+		if offs < fldwidth:	# edit note
 			enter_edit = True
-		else: 							# edit velocity
+		else: 							# edit velocity or timeshift
 			if not shift and self.trk[col][row].type == 1:
 				enter_edit = False
 				self.drag = False
 				
-				self.velocity_editor = VelocityEditor(self, col, row, event)
-
+				if offs > fldwidth and offs < fldwidth * 2:
+					self.velocity_editor = VelocityEditor(self, col, row, event)
+				
+				if self.show_timeshift:
+					if offs > fldwidth * 2 and offs < fldwidth * 3:
+						self.timeshift_editor = TimeshiftEditor(self, col, row, event)
+					
 				self.redraw()
 				self.parent._prop_view.redraw()
 				self.undo_buff.add_state()
@@ -770,6 +848,13 @@ class TrackView(Gtk.DrawingArea):
 			self.redraw()
 			self.parent._prop_view.redraw()
 			self.undo_buff.add_state()
+
+		if self.timeshift_editor:
+			self.timeshift_editor = None
+			self.redraw()
+			self.parent._prop_view.redraw()
+			self.undo_buff.add_state()
+
 				
 		return False
 

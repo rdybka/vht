@@ -22,6 +22,7 @@ class TrackPropViewPopover(Gtk.Popover):
 		
 		self.parent = parent
 		self.trk = trk
+		self.trkview = parent.trkview
 		self.extended_view = False
 		self.grid = Gtk.Grid()
 		self.grid.set_column_spacing(3)
@@ -124,8 +125,8 @@ class TrackPropViewPopover(Gtk.Popover):
 			rotate_down_button = BlackButton("down")
 			grid.attach(rotate_down_button, 2, 1, 1, 1)
 			
-			self.extend_loop_check = BlackCheckButton("loop")
-			grid.attach(self.extend_loop_check, 4, 3, 1, 1)
+			self.loop_button = BlackCheckButton("loop")
+			grid.attach(self.loop_button, 4, 3, 1, 1)
 						
 			self.clone_button = BlackButton("clone")
 			grid.attach(self.clone_button, 4, 2, 1, 1)
@@ -217,6 +218,12 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.nsrows_adj.set_value(self.trk.nsrows)
 		self.nrows_adj.set_value(self.trk.nrows)
 		self.port_adj.set_upper(mod.nports - 1)
+		
+		#self.loop_button.set_active(self.trk.loop) // not yet implemented
+		self.show_notes_button.set_active(self.trkview.show_notes)
+		self.show_timeshift_button.set_active(self.trkview.show_timeshift)
+		
+		
 		super().popup()
 
 	def on_leave(self, wdg, prm):

@@ -185,7 +185,9 @@ class TrackPropView(Gtk.DrawingArea):
 			return
 
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")
-
+		if self.trkview.show_timeshift:
+			(x, y, width, height, dx, dy) = cr.text_extents("000 000 000|")
+		
 		self.txt_height = height
 		self.txt_width = int(dx)
 		self.width = max(self.txt_width * len(self.trk), self.trkview.width)
@@ -208,7 +210,9 @@ class TrackPropView(Gtk.DrawingArea):
 		cr.rectangle(0, 0, self.width - width, h)
 		cr.fill()
 				
-		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")	
+		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")
+		if self.trkview.show_timeshift:
+			(x, y, width, height, dx, dy) = cr.text_extents("000 000 000|")
 		
 		cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
 		
@@ -220,11 +224,14 @@ class TrackPropView(Gtk.DrawingArea):
 		cr.move_to(x, self.txt_height * cfg.seq_spacing)	
 		cr.show_text("c%02d p%02d" % (self.trk.channel, self.trk.port))
 		
-		self.button_rect.width = (dx / 8.0) * 3.0
-		self.button_rect.height = height * cfg.seq_spacing
-				
-		self.button_rect.x = x + (dx * (len(self.trk) - 1) + dx / 2)
-		self.button_rect.y = height * cfg.seq_spacing
+		(x, y, width, height, dx, dy) = cr.text_extents("***!")
+		self.button_rect.height = self.txt_height * cfg.seq_spacing
+		self.button_rect.x = self.trkview.width - (dx + x)
+		self.button_rect.y = self.txt_height * cfg.seq_spacing
+		
+		(x, y, width, height, dx, dy) = cr.text_extents("***")
+		self.button_rect.width = dx + x
+						
 		self.popover.set_pointing_to(self.button_rect)
 		
 		if self.button_highlight:
@@ -232,8 +239,10 @@ class TrackPropView(Gtk.DrawingArea):
 		else:
 			cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
 
-		cr.move_to(x + (dx) * (len(self.trk) - 1), self.txt_height * 2 * cfg.seq_spacing)	
-		cr.show_text("    ***")
+		(x, y, width, height, dx, dy) = cr.text_extents("*** ")
+
+		cr.move_to(self.trkview.width - (dx + x), self.txt_height * 2 * cfg.seq_spacing)	
+		cr.show_text("***")
 
 		cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
 
