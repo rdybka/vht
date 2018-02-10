@@ -51,7 +51,7 @@ class VelocityEditor():
 		cr.stroke()
 
 	def on_key_press(self, widget, event):
-		if cfg.key["hold_editor"].matches(event):	
+		if cfg.key["hold_editor"].matches(event):
 			if not self.clearing:
 				if not self.lock:
 					self.lock = True
@@ -88,7 +88,7 @@ class VelocityEditor():
 			if event.x >= self.x_from and event.x <= self.x_from + self.x_to:
 				self.confirmed = True
 		
-			if not self.confirmed:
+			if not self.confirmed and not self.clearing:
 				return False
 			
 		new_hover_row = min(int(event.y / self.tv.txt_height), self.tv.trk.nrows - 1)

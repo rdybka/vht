@@ -87,7 +87,7 @@ class StatusBar(Gtk.DrawingArea):
 		self.pos.append(xx)
 
 		if self.active_field == 1:
-			cr.set_source_rgb(*(col * 1.0 for col in cfg.colour))
+			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 		else:
 			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
 		
@@ -99,7 +99,7 @@ class StatusBar(Gtk.DrawingArea):
 		self.pos.append(xx)
 
 		if self.active_field == 2:
-			cr.set_source_rgb(*(col * 1.0 for col in cfg.colour))
+			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 		else:
 			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
 				
@@ -111,7 +111,7 @@ class StatusBar(Gtk.DrawingArea):
 		self.pos.append(xx)
 
 		if self.active_field == 3:
-			cr.set_source_rgb(*(col * 1.0 for col in cfg.colour))
+			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 		else:
 			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
 						
@@ -123,7 +123,7 @@ class StatusBar(Gtk.DrawingArea):
 		self.pos.append(xx)
 				
 		if self.active_field == 4:
-			cr.set_source_rgb(*(col * 1.0 for col in cfg.colour))
+			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 		else:
 			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
 		
@@ -139,7 +139,7 @@ class StatusBar(Gtk.DrawingArea):
 		self.pos.append(xx)
 				
 		if self.active_field == 5:
-			cr.set_source_rgb(*(col * 1.0 for col in cfg.colour))
+			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 		else:
 			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
 		

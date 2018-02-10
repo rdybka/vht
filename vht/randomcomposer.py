@@ -11,15 +11,15 @@ def muzakize():
 	
 	seq = mod.add_sequence(32)
 	t1 = seq.add_track()
-	t2 = seq.add_track()
-	t3 = seq.add_track()
+	t2 = seq.add_track(0, 1, 12)
+	t3 = seq.add_track(0, 3, 8)
 	
 	t1.channel = t2.channel = 10
 	t3.channel = 2
 	
 	track_fill(t1, "c3", 8, 85)
-	track_fill(t2, "f#3", 2, 63)
-	track_fill(t3, "d3", 16, 45)
+	#track_fill(t2, "f#3", 2, 63)
+	#track_fill(t3, "d3", 16, 45)
 	t1.add_column()
 	t1.add_column()
 	
@@ -37,9 +37,6 @@ def muzakize():
 	
 	t1[0][28] = "c3"
 	t1[0][28].velocity = 100
-	
-	
-	t2[0][30] = "a#3"
 	
 
 #	for i in range(10):

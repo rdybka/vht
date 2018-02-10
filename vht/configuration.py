@@ -11,12 +11,13 @@ class Configuration():
 		self.seq_font_size = 16
 		self.seq_line_width = 1.0
 		self.seq_spacing = 1.05
-		self.colour = (.9, 1.0, .2)			
+		self.colour = (.5, .5, 1)
+		self.star_colour = (.5, .5, 0)			
 		#self.colour = (.3, 1.0, 1.0)			
 
-		self.intensity_background = 0.3
-		self.intensity_txt = .7
-		self.intensity_txt_highlight = 1.0
+		self.intensity_background = .2
+		self.intensity_txt = 1
+		self.intensity_txt_highlight = 2
 		self.intensity_lines = .6
 		self.even_highlight = .9
 		self.colour_record = (1.0, 0, 0)
@@ -26,6 +27,7 @@ class Configuration():
 		self.auto_scroll_delay = .15
 		self.tooltip_markup = """<span font_family="Monospace" size="large">%s</span>"""
 		self.window_opacity = 1
+		self.popover_wait_before_close = 1000
 		self.velocity_editor_char_width = 12
 		self.timeshift_editor_char_width = 20
 		self.editor_row_height = .5

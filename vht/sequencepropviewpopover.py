@@ -1,6 +1,6 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gdk, Gtk, Gio
+from gi.repository import GObject, Gdk, Gtk, Gio
 import cairo
 
 from vht import *
@@ -14,6 +14,7 @@ class SequencePropViewPopover(Gtk.Popover):
 		self.connect("leave-notify-event", self.on_leave)
 		self.connect("enter-notify-event", self.on_enter)
 		self.entered = False
+		self.allow_close = True
 		
 		self.parent = parent
 		self.seq = seq
@@ -52,11 +53,15 @@ class SequencePropViewPopover(Gtk.Popover):
 
 	def on_leave(self, wdg, prm):
 		if prm.detail == Gdk.NotifyType.NONLINEAR:
-			wdg.popdown()
-			self.entered = False
-			self.parent.popped = False
-			self.parent.button_highlight = False
-			self.parent.redraw()
+			if self.allow_close and self.entered:
+				print("popdown")
+				wdg.popdown()
+				self.entered = False
+				self.parent.popped = False
+				self.parent.button_highlight = False
+				self.parent.redraw()
+			else:
+				print("early!")
 
 	def on_enter(self, wdg, prm):
 		if prm.detail == Gdk.NotifyType.NONLINEAR:
@@ -69,3 +74,11 @@ class SequencePropViewPopover(Gtk.Popover):
 		self.parent.add_track()
 		self.parent.seqview.recalculate_row_spacing()
 	
+	def on_timeout(self, args):
+		self.allow_close = True
+		return False
+	
+	def popup(self):
+		self.allow_close = False
+		GObject.timeout_add(cfg.popover_wait_before_close, self.on_timeout, None)
+		super().popup()

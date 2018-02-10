@@ -38,9 +38,11 @@ class TimeshiftEditor():
 		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), .5)
 		cr.rectangle(self.x_from + (self.x_to / 2), r * self.tv.txt_height + yp, (self.x_to / 200) * rw.delay, yh)
 		cr.fill()
-					
+							
 		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), 1.0)
 		cr.rectangle(self.x_from, r * self.tv.txt_height + yp, self.x_to, yh)
+		cr.move_to(self.x_from + (self.x_to / 2), r * self.tv.txt_height + (yp * .5))
+		cr.line_to(self.x_from + (self.x_to / 2), (r + 1) * self.tv.txt_height - (yp * .5))
 		cr.stroke()
 
 	def on_key_press(self, widget, event):
@@ -81,7 +83,7 @@ class TimeshiftEditor():
 			if event.x >= self.x_from and event.x <= self.x_from + self.x_to:
 				self.confirmed = True
 		
-			if not self.confirmed:
+			if not self.confirmed and not self.clearing:
 				return False
 			
 		new_hover_row = min(int(event.y / self.tv.txt_height), self.tv.trk.nrows - 1)

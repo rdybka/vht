@@ -1,6 +1,6 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, Gdk, Gtk, Gio
+from gi.repository import GObject, Gdk, Gtk, Gio
 import cairo
 
 from vht import *
@@ -19,6 +19,7 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.connect("leave-notify-event", self.on_leave)
 		self.connect("enter-notify-event", self.on_enter)
 		self.entered = False
+		self.allow_close = True
 		
 		self.parent = parent
 		self.trk = trk
@@ -111,6 +112,11 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.show_timeshift_button = BlackCheckButton("time")
 			self.show_pitchwheel_button = BlackCheckButton("pitch")
 			self.show_controllers_button = BlackCheckButton("ctrl")
+
+			self.show_notes_button.connect("toggled", self.on_show_notes_toggled)
+			self.show_timeshift_button.connect("toggled", self.on_show_timeshift_toggled)
+			self.show_pitchwheel_button.connect("toggled", self.on_show_pitchwheel_toggled)
+			self.show_controllers_button.connect("toggled", self.on_show_controllers_toggled)
 
 			grid.attach(BlackLabel("show:"), 0, 0, 1, 1)
 			grid.attach(self.show_notes_button, 1, 0, 1, 1)
@@ -211,7 +217,14 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.extend_grid.hide()
 			self.add(self.grid)
 
+	def on_timeout(self, args):
+		self.allow_close = True
+		return False
+
 	def popup(self):
+		self.allow_close = False
+		self.entered = False
+		GObject.timeout_add(cfg.popover_wait_before_close, self.on_timeout, None)
 		self.channel_adj.set_value(self.trk.channel)
 		self.port_adj.set_value(self.trk.port)
 		self.nsrows_adj.set_upper(self.parent.seq.length)
@@ -219,21 +232,22 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.nrows_adj.set_value(self.trk.nrows)
 		self.port_adj.set_upper(mod.nports - 1)
 		
-		#self.loop_button.set_active(self.trk.loop) // not yet implemented
+		#self.loop_button.set_active(self.trk.loop) // not yet implemented in vhtlib
+		self.show_notes_button.set_sensitive(False)
 		self.show_notes_button.set_active(self.trkview.show_notes)
 		self.show_timeshift_button.set_active(self.trkview.show_timeshift)
-		
 		
 		super().popup()
 
 	def on_leave(self, wdg, prm):
 		if self.entered:
-			if prm.detail == Gdk.NotifyType.NONLINEAR:
-				wdg.popdown()
-				self.entered = False
-				self.parent.popped = False
-				self.parent.button_highlight = False
-				self.parent.redraw()
+			if self.allow_close:
+				if prm.detail == Gdk.NotifyType.NONLINEAR:
+					wdg.popdown()
+					self.entered = False
+					self.parent.popped = False
+					self.parent.button_highlight = False
+					self.parent.redraw()
 
 	def on_enter(self, wdg, prm):
 		if prm.detail == Gdk.NotifyType.NONLINEAR:
@@ -242,6 +256,33 @@ class TrackPropViewPopover(Gtk.Popover):
 				self.parent.button_highlight = False
 				self.parent.redraw()
 
+	def on_show_notes_toggled(self, wdg):
+		if not self.entered:
+			return False
+			
+
+	def on_show_timeshift_toggled(self, wdg):
+		if not self.entered:
+			return False
+		
+		self.trkview.show_timeshift = wdg.get_active()
+		self.trkview.redraw()
+		self.parent.redraw()
+
+	def on_show_pitchwheel_toggled(self, wdg):
+		if not self.entered:
+			return False
+
+	def on_show_controllers_toggled(self, wdg):
+		if not self.entered:
+			return False
+
+		if wdg.get_active():
+			self.show_notes_button.set_sensitive(True)
+		else:
+			self.show_notes_button.set_active(True)
+			self.show_notes_button.set_sensitive(False)
+			
 	def on_remove_button_clicked(self, switch):
 		self.parent.del_track()
 					

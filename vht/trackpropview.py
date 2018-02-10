@@ -47,8 +47,7 @@ class TrackPropView(Gtk.DrawingArea):
 			
 		self.popover.set_position(Gtk.PositionType.BOTTOM)
 		self.popover.set_modal(False)
-		self.popover.set_transitions_enabled(False)
-
+		
 		self.popped = False
 	
 	def on_configure(self, wdg, event):
@@ -155,10 +154,10 @@ class TrackPropView(Gtk.DrawingArea):
 			cr.rectangle(0, 0, w, h)
 			cr.fill()			
 		
-			if self.button_highlight:
-				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
+			if self.popped or self.button_highlight:
+				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 			else:
-				cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
+				cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.star_colour))
 
 			cr.move_to(x, self.txt_height * cfg.seq_spacing)
 			cr.show_text("vht")
@@ -234,10 +233,10 @@ class TrackPropView(Gtk.DrawingArea):
 						
 		self.popover.set_pointing_to(self.button_rect)
 		
-		if self.button_highlight:
-			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
+		if self.popped or self.button_highlight:
+			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 		else:
-			cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
+			cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.star_colour))
 
 		(x, y, width, height, dx, dy) = cr.text_extents("*** ")
 

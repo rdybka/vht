@@ -75,7 +75,7 @@ class TrackView(Gtk.DrawingArea):
 		self.controller_editor = None
 		
 		self.show_notes = True
-		self.show_timeshift = True
+		self.show_timeshift = False
 		self.show_pitchwheel = False
 		self.show_controllers = False
 					
@@ -389,8 +389,12 @@ class TrackView(Gtk.DrawingArea):
 						cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
 					else:
 						cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
-	
-				if self.select_start and self.select_end:
+				
+				show_selection = True
+				if self.velocity_editor or self.timeshift_editor:
+					show_selection = False
+				
+				if show_selection and self.select_start and self.select_end:
 					ssx = self.select_start[0]
 					ssy = self.select_start[1]
 					sex = self.select_end[0]
@@ -414,12 +418,18 @@ class TrackView(Gtk.DrawingArea):
 							cr.rectangle(c * self.txt_width, r * self.txt_height, self.txt_width, self.txt_height)
 						cr.fill()
 						cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
-
-				if not self.select_start and not self.select_end:
+				
+				if show_selection and not self.select_start and not self.select_end:
 					if self.edit and r == self.edit[1] and c == self.edit[0]:
 						cr.set_source_rgb(*(cfg.colour_record))
 						
-						cr.rectangle(c * self.txt_width + xtraoffs, (r * self.txt_height) + self.txt_height * .1, (self.txt_width / 8.0) * 7.2, self.txt_height * .9)
+						#cr.rectangle(c * self.txt_width + xtraoffs, (r * self.txt_height) + self.txt_height * .1, (self.txt_width / 8.0) * 7.2, self.txt_height * .9)
+						
+						if c == len(self.trk) - 1:
+							cr.rectangle(c * self.txt_width + xtraoffs, (r * self.txt_height) + self.txt_height * .1, (self.txt_width / 8.0) * 7.2, self.txt_height * .9)
+						else:
+							cr.rectangle(c * self.txt_width + xtraoffs, (r * self.txt_height) + self.txt_height * .1, self.txt_width, self.txt_height * .9)
+
 						cr.fill()
 						cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 
@@ -464,7 +474,7 @@ class TrackView(Gtk.DrawingArea):
 					self.timeshift_editor.draw(cr, c, r, rw)
 				
 				if not complete:
-					if c == last_c and r == last_r:
+					if c == last_c:
 						(x, y, width, height, dx, dy) = cr.text_extents("0")
 						cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
 						cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
@@ -514,15 +524,14 @@ class TrackView(Gtk.DrawingArea):
 		new_hover_row = max(new_hover_row, 0)
 		new_hover_column = max(new_hover_column, 0)
 		
-		if event.y > 50:
-			mod.clear_popups()
+		#if event.y > 50:
+		#	mod.clear_popups()
 		
 		if self.velocity_editor:
 			return self.velocity_editor.on_motion(widget, event)
 		
 		if self.timeshift_editor:
 			return self.timeshift_editor.on_motion(widget, event)
-		
 				
 		if self.select:
 			if not self.select_start:
@@ -619,6 +628,8 @@ class TrackView(Gtk.DrawingArea):
 	def on_button_press(self, widget, event):
 		if not self.trk:
 			return
+	
+		mod.clear_popups()
 	
 		shift = False
 		if event.state & Gdk.ModifierType.SHIFT_MASK:
@@ -879,13 +890,13 @@ class TrackView(Gtk.DrawingArea):
 			
 			if self.edit[0] >= len(self.trk):
 				self.go_right(True)
-				mod.active_track.edit = 0, mod.active_track.edit[1]
+				mod.active_track.edit = 0, min(mod.active_track.edit[1], mod.active_track.trk.nrows - 1)
 				mod.active_track.redraw()
 				return
 				
 			if self.edit[0] < 0:
 				self.go_left(True)
-				mod.active_track.edit = len(mod.active_track.trk) - 1, mod.active_track.edit[1]
+				mod.active_track.edit = len(mod.active_track.trk) - 1, min(mod.active_track.edit[1], mod.active_track.trk.nrows - 1)
 				mod.active_track.redraw()
 				return
 				
@@ -915,7 +926,7 @@ class TrackView(Gtk.DrawingArea):
 			self.parent.change_active_track(trk)
 			
 			trk.edit = 0, int(round((old[1] * self.spacing) / trk.spacing))
-			trk.redraw(trk.edit[1])
+			trk.redraw(min(trk.edit[1], trk.trk.nrows - 1))
 			
 			self.redraw(old[1])
 			
