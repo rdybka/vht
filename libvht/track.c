@@ -177,6 +177,9 @@ void track_advance(track *trk, double speriod) {
 	int row_start = floorf(trk->pos);
 	int row_end = floorf(trk->pos + tperiod) + 1;
 
+	if (row_end > trk->nrows)
+		row_end = trk->nrows;
+
 	for (int c = 0; c < trk->ncols; c++)
 		for (int n = row_start; n <= row_end; n++) {
 			int nn = n;
@@ -191,9 +194,10 @@ void track_advance(track *trk, double speriod) {
 
 				double trigger_time = (double)n + ((double)r.delay / 99.0);
 				double delay = trigger_time - trk->pos;
-				if ((delay >= 0) & (delay < tperiod)) {
-					if (trk->playing)
+				if ((delay >= 0) && (delay < tperiod)) {
+					if (trk->playing) {
 						track_play_row(trk, nn, c, delay * tmul);
+					}
 				}
 			}
 		}

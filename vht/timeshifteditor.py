@@ -26,7 +26,7 @@ class TimeshiftEditor():
 	
 	def precalc(self, cr):
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
-		self.width = max((cfg.timeshift_editor_char_width * width), 199)
+		self.width = max((cfg.timeshift_editor_char_width * width), 99)
 		self.x_from = (self.col * self.tv.txt_width + self.tv.txt_width) - (width / 1.2)
 		self.x_to = self.width
 			
@@ -36,7 +36,7 @@ class TimeshiftEditor():
 					
 		cr.set_line_width(1.0)
 		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), .5)
-		cr.rectangle(self.x_from + (self.x_to / 2), r * self.tv.txt_height + yp, (self.x_to / 200) * rw.delay, yh)
+		cr.rectangle(self.x_from + (self.x_to / 2), r * self.tv.txt_height + yp, (self.x_to / 100) * rw.delay, yh)
 		cr.fill()
 							
 		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), 1.0)
@@ -71,7 +71,7 @@ class TimeshiftEditor():
 				vel = self.trk[self.col][self.row].delay
 				
 				vel = self.start_value + ((event.y - self.event_y) / cfg.drag_edit_divisor)
-				vel = max(min(vel, 99), -99)
+				vel = max(min(vel, 49), -49)
 						
 				self.locked = vel
 						
@@ -99,8 +99,8 @@ class TimeshiftEditor():
 			
 		yy = (self.tv.txt_height - cfg.editor_row_height * self.tv.txt_height) / 2.0
 		if event.y > y1 and event.y < y2:
-			vel = min(max(((event.x - self.x_from) / self.x_to) * 198.0, 0), 198)
-			vel = vel - 99
+			vel = min(max(((event.x - self.x_from) / self.x_to) * 98.0, 0), 98)
+			vel = vel - 49
 			
 				
 		if self.lock:
