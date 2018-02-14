@@ -24,7 +24,7 @@
 #include "module.h"
 #include "track.h"
 #include "row.h"
-#include "midi_event.h"
+#include "libvht.h"
 
 track *track_new(int port, int channel, int len, int songlen) {
 	track *trk = malloc(sizeof(track));
@@ -45,8 +45,9 @@ track *track_new(int port, int channel, int len, int songlen) {
 	trk->ncols = 1;
 	trk->playing = 0;
 	trk->port = 0;
-
+	trk->cur_rec_update = 0;
 	pthread_mutex_init(&trk->excl, NULL);
+	pthread_mutex_init(&trk->exclrec, NULL);
 
 	trk->rows = malloc(sizeof(row*) * trk->ncols);
 	for (int c = 0; c < trk->ncols; c++) {
@@ -104,6 +105,7 @@ int track_get_row(track *trk, int c, int n, row *r) {
 
 void track_free(track *trk) {
 	pthread_mutex_destroy(&trk->excl);
+	pthread_mutex_destroy(&trk->exclrec);
 	for (int c = 0; c < trk->ncols; c++) {
 		free(trk->rows[c]);
 	}
@@ -126,9 +128,10 @@ void track_clear_rows(track *trk, int c) {
 	pthread_mutex_unlock(&trk->excl);
 }
 
+// do we reaaaaaly need it?
 track *track_clone(track *src) {
 	track *dst = track_new(src->port, src->channel, src->nrows, src->nsrows);
-	// todo: copy cols and shit
+	// todo: copy cols and shit or scrap
 	return dst;
 }
 
@@ -218,7 +221,7 @@ void track_wind(track *trk, double period) {
 void track_kill_notes(track *trk) {
 	for (int c = 0; c < trk->ncols; c++) {
 		if (trk->ring[c] != -1) {
-			queue_midi_note_off(trk->port, trk->channel, trk->ring[c]);
+			queue_midi_note_off(0, 0, trk->channel, trk->ring[c]);
 
 			trk->ring[c] = -1;
 		}
@@ -306,4 +309,48 @@ void track_trigger(track *trk) {
 	} else {
 		trk->playing = 1;
 	}
+}
+
+char *track_get_rec_update(track *trk) {
+	static char rc[256];
+	pthread_mutex_lock(&trk->exclrec);
+
+	char *ret = NULL;
+
+	if (trk->cur_rec_update > 0) {
+		sprintf(rc, "{\"col\" :%d, \"row\" : %d}", trk->updates[trk->cur_rec_update - 1].col,
+		        trk->updates[trk->cur_rec_update - 1].row);
+		trk->cur_rec_update--;
+		ret = rc;
+	}
+
+	pthread_mutex_unlock(&trk->exclrec);
+	return ret;
+}
+
+void track_insert_rec_update(track *trk, int col, int row) {
+	pthread_mutex_lock(&trk->exclrec);
+
+	trk->updates[trk->cur_rec_update].col = col;
+	trk->updates[trk->cur_rec_update].row = row;
+	trk->cur_rec_update++;
+
+	pthread_mutex_unlock(&trk->exclrec);
+}
+
+void track_clear_updates(track *trk) {
+	pthread_mutex_lock(&trk->exclrec);
+
+	trk->cur_rec_update = 0;
+
+	pthread_mutex_unlock(&trk->exclrec);
+}
+
+void track_handle_record(track *trk, midi_event evt) {
+	char buff[256];
+	printf("rec: %f %s\n", trk->pos, midi_describe_event(evt, buff, 256));
+
+	int r = floorf(trk->pos);
+	track_set_row(trk, 0, r, evt.type, evt.note, evt.velocity, 0);
+	track_insert_rec_update(trk, 0, r);
 }

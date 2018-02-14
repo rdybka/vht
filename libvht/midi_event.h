@@ -22,6 +22,7 @@
 #include <jack/jack.h>
 #include <pthread.h>
 #include "jack_client.h"
+
 #define EVT_BUFFER_LENGTH 1024
 
 enum MIDI_EVENT_TYPE {none, note_on, note_off, pitch_wheel, control_change};
@@ -53,9 +54,6 @@ extern int curr_midi_queue_event[JACK_CLIENT_MAX_PORTS];
 void midi_buff_excl_in();
 void midi_buff_excl_out();
 
-
-void queue_midi_note_on(int port, int chn, int note, int velocity);
-void queue_midi_note_off(int port, int chn, int note);
 void midi_buffer_clear();
 void midi_buffer_flush();
 void midi_buffer_add(int port, midi_event evt);

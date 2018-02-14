@@ -1,7 +1,8 @@
 from vht import *
 
 class PoorMansPiano():
-	def __init__(self, trk):
+	def __init__(self, trk, seq):
+		self.seq = seq
 		self.trk = trk
 		self.notes = {122: "c", 115: "c#", 120 : "d", 100 : "d#", 99 : "e", 118 : "f",
 					103 : "f#", 98 : "g", 104 : "g#", 110 : "a" , 106 : "a#", 109 : "b"}
@@ -11,7 +12,6 @@ class PoorMansPiano():
 		self.mnotes = [122, 115, 120, 100, 99, 118, 103, 98, 104, 110, 106, 109]
 		self.mnotes2 = [113, 50, 119, 51, 101, 114, 53, 116, 54, 121, 55, 117]
 
-
 		self.note_on = None
 		self.mnotes.append(self.mnotes)
 		self.ringing = []
@@ -19,7 +19,7 @@ class PoorMansPiano():
 	def silence(self):
 		for n in self.ringing:
 			self.ringing.remove(n)
-			mod.sneakily_queue_midi_note_off(self.trk.port, self.trk.channel, n)
+			mod.sneakily_queue_midi_note_off(self.seq._seq_handle, self.trk.port, self.trk.channel, n)
 		
 		self.note_on = None
 
@@ -40,12 +40,12 @@ class PoorMansPiano():
 	
 		if not note_off:
 			if not self.note_on == mnt:
-				mod.sneakily_queue_midi_note_on(self.trk.port, self.trk.channel, mnt, cfg.velocity)
+				mod.sneakily_queue_midi_note_on(self.seq._seq_handle, self.trk.port, self.trk.channel, mnt, cfg.velocity)
 				self.note_on = mnt
 				self.ringing.append(mnt)
 		else:
 			self.note_on = None
-			mod.sneakily_queue_midi_note_off(self.trk.port, self.trk.channel, mnt)
+			mod.sneakily_queue_midi_note_off(self.seq._seq_handle, self.trk.port, self.trk.channel, mnt)
 			while mnt in self.ringing:
 				self.ringing.remove(mnt)
 			

@@ -23,10 +23,14 @@
 #include <jack/jack.h>
 #include <jack/midiport.h>
 #include <pthread.h>
+#include "midi_event.h"
 #include "sequence.h"
 
 struct module_t {
 	int playing;
+
+	int recording;
+
 	jack_nframes_t zero_time;
 	double song_pos;
 	int min, sec, ms;

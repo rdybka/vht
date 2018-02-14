@@ -14,9 +14,7 @@ class trackviewpointer():
 			
 		self.spacing = 1.0
 		self.opacity = cfg.pointer_opacity
-	
 		self._parent = parent
-		
 		self.height = cfg.seq_font_size
 
 		self.lpos = None
@@ -65,13 +63,17 @@ class trackviewpointer():
 			
 			x = 0
 			xx = (self._parent.txt_width / 4.0) * 3.1
+			
+			cl = cfg.colour
+			if mod.record:
+				cl = cfg.record_colour
 
 			gradient = cairo.LinearGradient(x, y, x, y + self.height)
-			gradient.add_color_stop_rgba(0.0, *(col * i for col in cfg.colour), 0)
-			gradient.add_color_stop_rgba(.5 - cfg.pointer_width / 2, *(col * i for col in cfg.colour), 0)
-			gradient.add_color_stop_rgba(0.5, *(col * i for col in cfg.colour), self.opacity)
-			gradient.add_color_stop_rgba(.5 + cfg.pointer_width / 2, *(col * i for col in cfg.colour), 0)
-			gradient.add_color_stop_rgba(1.0, *(col * i for col in cfg.colour), 0)
+			gradient.add_color_stop_rgba(0.0, *(col * i for col in cl), 0)
+			gradient.add_color_stop_rgba(.5 - cfg.pointer_width / 2, *(col * i for col in cl), 0)
+			gradient.add_color_stop_rgba(0.5, *(col * i for col in cl), self.opacity)
+			gradient.add_color_stop_rgba(.5 + cfg.pointer_width / 2, *(col * i for col in cl), 0)
+			gradient.add_color_stop_rgba(1.0, *(col * i for col in cl), 0)
 			cr.set_source(gradient)
 			
 			cr.rectangle(x, y, xx, self.height)
@@ -125,12 +127,17 @@ class trackviewpointer():
 				if self._parent.show_timeshift and self._parent.velocity_editor:
 					xx = (self._parent.txt_width / 12.0) * 7.2
 
+			cl = cfg.colour
+			if mod.active_track:
+				if mod.active_track.trk.index == self.trk.index and mod.record:
+					cl = cfg.record_colour
+				
 			gradient = cairo.LinearGradient(x, y, x, y + self.height)
-			gradient.add_color_stop_rgba(0.0, *(col * i for col in cfg.colour), 0)
-			gradient.add_color_stop_rgba(.5 - cfg.pointer_width / 2, *(col * i for col in cfg.colour), 0)
-			gradient.add_color_stop_rgba(0.5, *(col * i for col in cfg.colour), self.opacity)
-			gradient.add_color_stop_rgba(.5 + cfg.pointer_width / 2, *(col * i for col in cfg.colour), 0)
-			gradient.add_color_stop_rgba(1.0, *(col * i for col in cfg.colour), 0)
+			gradient.add_color_stop_rgba(0.0, *(col * i for col in cl), 0)
+			gradient.add_color_stop_rgba(.5 - cfg.pointer_width / 2, *(col * i for col in cl), 0)
+			gradient.add_color_stop_rgba(0.5, *(col * i for col in cl), self.opacity)
+			gradient.add_color_stop_rgba(.5 + cfg.pointer_width / 2, *(col * i for col in cl), 0)
+			gradient.add_color_stop_rgba(1.0, *(col * i for col in cl), 0)
 			
 			cr.set_source(gradient)
 			cr.rectangle(x, y, xx, self.height)

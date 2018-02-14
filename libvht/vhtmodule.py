@@ -85,12 +85,12 @@ class VHTModule(Iterable):
 			ret = ret + "%d : %d\n" % (len(itm), itm.length)
 		return ret
 
-	# nothing sneaky about it, really...
-	def sneakily_queue_midi_note_on(self, port, chn, note, velocity):
-		libcvht.queue_midi_note_on(port, chn, note, velocity)
+	# sneaky as a dead parrot...
+	def sneakily_queue_midi_note_on(self, seq, port, chn, note, velocity):
+		libcvht.queue_midi_note_on(seq, port, chn, note, velocity)
 		
-	def sneakily_queue_midi_note_off(self, port, chn, note):
-		libcvht.queue_midi_note_off(port, chn, note)
+	def sneakily_queue_midi_note_off(self, seq, port, chn, note):
+		libcvht.queue_midi_note_off(seq, port, chn, note)
 	
 	@property
 	def jack_error(self):
@@ -105,8 +105,19 @@ class VHTModule(Iterable):
 		return libcvht.module_is_playing()
 		
 	@property
+	def record(self):
+		return libcvht.module_is_recording()
+	
+	@property
 	def curr_seq(self):
 		return libcvht.module_get_curr_seq()
+	
+	@record.setter
+	def record(self, value):
+		if value:
+			libcvht.module_record(1)
+		else:
+			libcvht.module_record(0)
 		
 	@play.setter
 	def play(self, value):
@@ -118,7 +129,7 @@ class VHTModule(Iterable):
 	@property
 	def dump_notes(self):
 		return 0	# we need write-only properties in python :)
-		
+					# ...or I need to learn to code
 	@dump_notes.setter
 	def dump_notes(self, n):
 		libcvht.module_dump_notes(n)
@@ -216,4 +227,4 @@ class VHTModule(Iterable):
 			
 			self.play = p
 			print("loaded %s\n" % (filename))
-		
+

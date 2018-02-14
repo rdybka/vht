@@ -104,7 +104,7 @@ midi_event midi_decode_event(unsigned char *data, int len) {
 	return ret;
 }
 
-char * midi_describe_event(midi_event evt, char *buff, int len) {
+char *midi_describe_event(midi_event evt, char *buff, int len) {
 	buff[0] = 0;
 
 	char *b;
@@ -238,7 +238,7 @@ int parse_note(char *buff) {
 	return note + octave * 12;
 }
 
-void queue_midi_note_on(int port, int chn, int note, int velocity) {
+void queue_midi_note_on(sequence *seq, int port, int chn, int note, int velocity) {
 	midi_event evt;
 	evt.type = note_on;
 	evt.channel = chn;
@@ -246,12 +246,18 @@ void queue_midi_note_on(int port, int chn, int note, int velocity) {
 	evt.velocity = velocity;
 	evt.time = 0;
 
-	midi_buff_excl_in();
-	midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
-	midi_buff_excl_out();
+	if (module.recording) {
+		evt.time = -1; // tap into jack for that!
+		if (seq)
+			sequence_handle_record(seq, evt);
+	} else {
+		midi_buff_excl_in();
+		midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
+		midi_buff_excl_out();
+	}
 }
 
-void queue_midi_note_off(int port, int chn, int note) {
+void queue_midi_note_off(sequence *seq, int port, int chn, int note) {
 	midi_event evt;
 	evt.type = note_off;
 	evt.channel = chn;
@@ -259,7 +265,13 @@ void queue_midi_note_off(int port, int chn, int note) {
 	evt.velocity = 0;
 	evt.time = 0;
 
-	midi_buff_excl_in();
-	midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
-	midi_buff_excl_out();
+	if (module.recording) {
+		evt.time = -1; //
+		if (seq)
+			sequence_handle_record(seq, evt);
+	} else {
+		midi_buff_excl_in();
+		midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
+		midi_buff_excl_out();
+	}
 }

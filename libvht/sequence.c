@@ -27,6 +27,7 @@ sequence *sequence_new(int length) {
 	seq->trk = 0;
 	seq->pos = 0;
 	seq->length = length;
+	seq->midi_focus = 0;
 	return seq;
 }
 
@@ -124,7 +125,6 @@ void sequence_swap_track(sequence *seq, int t1, int t2) {
 	if (t1 == t2)
 		return;
 
-
 	module_excl_in();
 
 	track *t3 = seq->trk[t1];
@@ -132,4 +132,13 @@ void sequence_swap_track(sequence *seq, int t1, int t2) {
 	seq->trk[t2] = t3;
 
 	module_excl_out();
+}
+
+void sequence_set_midi_focus(sequence *seq, int foc) {
+	seq->midi_focus = foc;
+}
+
+void sequence_handle_record(sequence *seq, midi_event evt) {
+	if (seq->midi_focus >= 0 && seq->midi_focus < seq->ntrk)
+		track_handle_record(seq->trk[seq->midi_focus], evt);
 }

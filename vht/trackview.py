@@ -57,7 +57,7 @@ class TrackView(Gtk.DrawingArea):
 		self.txt_height = 0
 		self.width = 0
 		self.spacing = 1.0
-		self.pmp = PoorMansPiano(self.trk)
+		self.pmp = PoorMansPiano(self.trk, self.seq)
 	
 		self.drag = False
 		self.sel_drag = False
@@ -421,7 +421,7 @@ class TrackView(Gtk.DrawingArea):
 				
 				if show_selection and not self.select_start and not self.select_end:
 					if self.edit and r == self.edit[1] and c == self.edit[0]:
-						cr.set_source_rgb(*(cfg.colour_record))
+						cr.set_source_rgb(*(cfg.record_colour))
 						
 						#cr.rectangle(c * self.txt_width + xtraoffs, (r * self.txt_height) + self.txt_height * .1, (self.txt_width / 8.0) * 7.2, self.txt_height * .9)
 						

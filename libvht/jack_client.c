@@ -51,14 +51,14 @@ int jack_start(char *clt_name) {
 
 	module.jack_running = 1;
 
-	jack_set_process_callback (jack_client, jack_process, 0);
-	jack_set_sample_rate_callback(jack_client, jack_sample_rate_changed, 0);
-	jack_set_buffer_size_callback(jack_client, jack_buffer_size_changed, 0);
-
 	for (int p = 0; p < JACK_CLIENT_MAX_PORTS; p++)
 		jack_output_ports[p] = 0;
 
 	jack_input_port = jack_port_register (jack_client, "in", JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0);
+
+	jack_set_process_callback (jack_client, jack_process, 0);
+	jack_set_sample_rate_callback(jack_client, jack_sample_rate_changed, 0);
+	jack_set_buffer_size_callback(jack_client, jack_buffer_size_changed, 0);
 
 	jack_activate(jack_client);
 
@@ -77,6 +77,8 @@ void jack_synch_output_ports() {
 	}
 
 	midi_buff_excl_out();
+
+	//port_state[0] = 1;
 
 	for (int s = 0; s < module.nseq; s++)
 		for (int t = 0; t < module.seq[s]->ntrk; t++)

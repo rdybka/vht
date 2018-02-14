@@ -132,6 +132,14 @@ def module_is_playing():
     return _libcvht.module_is_playing()
 module_is_playing = _libcvht.module_is_playing
 
+def module_record(arg1):
+    return _libcvht.module_record(arg1)
+module_record = _libcvht.module_record
+
+def module_is_recording():
+    return _libcvht.module_is_recording()
+module_is_recording = _libcvht.module_is_recording
+
 def module_reset():
     return _libcvht.module_reset()
 module_reset = _libcvht.module_reset
@@ -176,13 +184,21 @@ def module_dump_notes(arg1):
     return _libcvht.module_dump_notes(arg1)
 module_dump_notes = _libcvht.module_dump_notes
 
-def queue_midi_note_on(port, chn, note, velocity):
-    return _libcvht.queue_midi_note_on(port, chn, note, velocity)
+def queue_midi_note_on(seq, port, chn, note, velocity):
+    return _libcvht.queue_midi_note_on(seq, port, chn, note, velocity)
 queue_midi_note_on = _libcvht.queue_midi_note_on
 
-def queue_midi_note_off(port, chn, note):
-    return _libcvht.queue_midi_note_off(port, chn, note)
+def queue_midi_note_off(seq, port, chn, note):
+    return _libcvht.queue_midi_note_off(seq, port, chn, note)
 queue_midi_note_off = _libcvht.queue_midi_note_off
+
+def track_get_rec_update(trk):
+    return _libcvht.track_get_rec_update(trk)
+track_get_rec_update = _libcvht.track_get_rec_update
+
+def track_clear_updates(trk):
+    return _libcvht.track_clear_updates(trk)
+track_clear_updates = _libcvht.track_clear_updates
 
 def sequence_new(length):
     return _libcvht.sequence_new(length)
@@ -219,6 +235,10 @@ sequence_swap_track = _libcvht.sequence_swap_track
 def sequence_get_pos(seq):
     return _libcvht.sequence_get_pos(seq)
 sequence_get_pos = _libcvht.sequence_get_pos
+
+def sequence_set_midi_focus(seq, foc):
+    return _libcvht.sequence_set_midi_focus(seq, foc)
+sequence_set_midi_focus = _libcvht.sequence_set_midi_focus
 
 def track_get_row_ptr(arg1, c, r):
     return _libcvht.track_get_row_ptr(arg1, c, r)

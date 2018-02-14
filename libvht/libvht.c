@@ -5,7 +5,7 @@
 #include "libvht.h"
 #include "module.h"
 
-// all wrappers and getters/setters go here
+// all wrappers and getters/setters go here, what a mess!
 
 int start(char *name) {
 	return jack_start(name);
@@ -39,6 +39,14 @@ void module_play(int play) {
 
 int module_is_playing() {
 	return module.playing;
+}
+
+void module_record(int rec) {
+	module.recording = rec;
+}
+
+int module_is_recording() {
+	return module.recording;
 }
 
 void module_reset() {

@@ -26,6 +26,8 @@
 #include "jack_client.h"
 
 struct module_t module;
+struct rec_update_t rec_update[EVT_BUFFER_LENGTH];
+int cur_rec_update;
 
 int lastsec;
 
@@ -49,8 +51,6 @@ void module_advance(jack_nframes_t curr_frames) {
 		return;
 
 	module_excl_in();
-
-
 
 	midi_buffer_clear();
 
@@ -102,6 +102,10 @@ void module_advance(jack_nframes_t curr_frames) {
 			midi_event mev = midi_decode_event(evt.buffer, evt.size);
 			mev.time = evt.time;
 			midi_buffer_add(0, mev);
+
+			if (module.recording) {
+				sequence_handle_record(module.seq[module.curr_seq], mev);
+			}
 		}
 	}
 
@@ -122,10 +126,13 @@ void module_new() {
 	module.nseq = 0;
 	module.curr_seq = 0;
 	module.playing = 0;
+	module.recording = 0;
 	module.zero_time = 0;
 	module.song_pos = 0.0;
 	module.mute = 0;
 	module.dump_notes = 0;
+
+	cur_rec_update = 0;
 
 	module_excl_out();
 }

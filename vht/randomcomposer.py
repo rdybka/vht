@@ -10,4 +10,5 @@ def muzakize():
 	mod.bpm = 123
 	
 	seq = mod.add_sequence(32)
+	seq.add_track()
 

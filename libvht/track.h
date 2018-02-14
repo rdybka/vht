@@ -19,11 +19,17 @@
 #ifndef __TRACK_H__
 #define __TRACK_H__
 #include <pthread.h>
+#include "midi_event.h"
 #include "row.h"
 
 #define TRIGGER_NONE 	0
 #define TRIGGER_NORMAL 	1
 #define TRIGGER_HOLD	2
+
+struct rec_update_t {
+	int col;
+	int row;
+} rec_upd;
 
 typedef struct track_t {
 	int port;
@@ -40,9 +46,11 @@ typedef struct track_t {
 	int trigger_channel;
 	int trigger_note;
 	int loop;
-
+	struct rec_update_t updates[EVT_BUFFER_LENGTH];
+	int cur_rec_update;
 	unsigned char trigger_type;
 	pthread_mutex_t excl; // for atomic row access
+	pthread_mutex_t exclrec; // for row changes
 } track;
 
 track *track_new(int port, int channel, int len, int songlen);
@@ -58,6 +66,11 @@ void track_del_col(track *trk, int c);
 void track_swap_col(track *trk, int c, int c2);
 void track_resize(track *trk, int size);
 void track_trigger(track *trk);
+
+char *track_get_rec_update(track *trk);
+void track_insert_rec_update(track *trk, int col, int row);
+void track_clear_rec_updates(track *trk);
+void track_handle_record(track *trk, midi_event evt);
 
 // don't touch those from python
 void track_reset(track *trk);

@@ -40,6 +40,9 @@ class VHTSequence(Iterable):
 	def del_track(self, t = -1):
 		self._vht_handle.sequence_del_track(self._seq_handle, t)
 
+	def set_midi_focus(self, foc):
+		self._vht_handle.sequence_set_midi_focus(self._seq_handle, foc)
+
 	@property
 	def pos(self):
 		return self._vht_handle.sequence_get_pos(self._seq_handle)

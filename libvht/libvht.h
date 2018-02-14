@@ -40,6 +40,9 @@ extern void module_new();
 extern void module_free();
 extern void module_play(int);
 extern int module_is_playing();
+extern void module_record(int);
+extern int module_is_recording();
+
 extern void module_reset();
 
 extern int module_get_bpm();
@@ -55,8 +58,12 @@ extern void module_swap_sequence(int s1, int s2);
 extern int module_get_curr_seq();
 extern void module_dump_notes(int);
 
-extern void queue_midi_note_on(int port, int chn, int note, int velocity);
-extern void queue_midi_note_off(int port, int chn, int note);
+extern void queue_midi_note_on(sequence *seq, int port, int chn, int note, int velocity);
+extern void queue_midi_note_off(sequence *seq, int port, int chn, int note);
+
+extern char *track_get_rec_update(track *trk);
+extern void track_clear_updates(track *trk);
+
 
 // sequence
 extern sequence *sequence_new(int length);
@@ -68,6 +75,7 @@ extern void sequence_add_track(sequence *seq, track *trk);
 extern void sequence_del_track(sequence *seq, int t);
 extern void sequence_swap_track(sequence *seq, int t1, int t2);
 extern double sequence_get_pos(sequence *seq);
+extern void sequence_set_midi_focus(sequence *seq, int foc);
 
 // track
 extern row *track_get_row_ptr(track *, int c, int r);

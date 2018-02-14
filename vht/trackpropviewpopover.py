@@ -259,7 +259,12 @@ class TrackPropViewPopover(Gtk.Popover):
 	def on_show_notes_toggled(self, wdg):
 		if not self.entered:
 			return False
-			
+		
+		if wdg.get_active():
+			self.show_controllers_button.set_sensitive(True)
+		else:
+			self.show_controllers_button.set_active(True)
+			self.show_controllers_button.set_sensitive(False)	
 
 	def on_show_timeshift_toggled(self, wdg):
 		if not self.entered:

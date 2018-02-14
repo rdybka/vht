@@ -117,3 +117,13 @@ class VHTTrack(Iterable):
 			ret = ret + "\n"
 			
 		return ret
+
+	def clear_updates(self):
+		self._vht_handle.track_clear_updates(self._trk_handle)
+
+	def get_rec_update(self):
+		rec = self._vht_handle.track_get_rec_update(self._trk_handle)
+		if rec:
+			return eval(rec)
+		else:
+			return None

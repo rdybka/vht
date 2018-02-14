@@ -132,6 +132,15 @@ class SequenceView(Gtk.Box):
 			else:
 				mod.play = 1
 
+		if cfg.key["record"].matches(event):
+			# play/stop
+			if mod.record:
+				mod.record = 0
+				self._prop_view.redraw()
+			else:
+				mod.record = 1
+				self._prop_view.redraw()
+
 		if cfg.key["fullscreen"].matches(event):
 			if mod.mainwin.fs:
 				mod.mainwin.unfullscreen()
@@ -474,6 +483,8 @@ class SequenceView(Gtk.Box):
 				ac.pmp.silence()
 				
 			self._prop_view.redraw(trk.trk.index)
+		
+		self.seq.set_midi_focus(trk.trk.index)
 	
 	def redraw_track(self, trk = None):
 		for wdg in self.get_tracks(True):
@@ -576,6 +587,13 @@ class SequenceView(Gtk.Box):
 				wdg.tick()
 				if wdg.edit and wdg.trk:
 					self.auto_scroll(wdg)
+					
+		for trk in self.get_tracks():
+			r = trk.trk.get_rec_update()
+			while r:
+				trk.redraw(r["row"])
+				r = trk.trk.get_rec_update()
+			
 		return 1
 	
 	def on_draw(self, widget, cr):

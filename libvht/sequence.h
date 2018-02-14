@@ -18,7 +18,7 @@
 
 #ifndef __SEQUENCE_H__
 #define __SEQUENCE_H__
-
+#include "midi_event.h"
 #include "track.h"
 
 typedef struct sequence_t {
@@ -26,6 +26,7 @@ typedef struct sequence_t {
 	int ntrk;
 	int length;
 	double pos;
+	int midi_focus;
 } sequence;
 
 sequence *sequence_new(int length);
@@ -35,4 +36,6 @@ void sequence_swap_track(sequence *seq, int t1, int t2);
 
 void sequence_free(sequence *);
 void sequence_advance(sequence *seq, double period);
+
+void sequence_handle_record(sequence *seq, midi_event evt);
 #endif //__SEQUENCE_H__

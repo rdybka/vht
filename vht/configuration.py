@@ -6,13 +6,14 @@ class Configuration():
 	def __init__(self):
 		self._highlight = 4
 		self.on_highlight = []				# add callbacks here
-
+											# bad design
 		self.seq_font = "Monospace"
 		self.seq_font_size = 16
 		self.seq_line_width = 1.0
 		self.seq_spacing = 1.05
 		self.colour = (.5, .5, 1)
 		self.star_colour = (.5, .5, 0)			
+		self.record_colour = (1.0, 0, 0)
 		#self.colour = (.3, 1.0, 1.0)			
 
 		self.intensity_background = .2
@@ -20,14 +21,13 @@ class Configuration():
 		self.intensity_txt_highlight = 2
 		self.intensity_lines = .6
 		self.even_highlight = .9
-		self.colour_record = (1.0, 0, 0)
 		self.intensity_select = .7
 		self.pointer_opacity = .7
 		self.pointer_width = 1
 		self.auto_scroll_delay = .15
 		self.tooltip_markup = """<span font_family="Monospace" size="large">%s</span>"""
 		self.window_opacity = 1
-		self.popover_wait_before_close = 1000
+		self.popover_wait_before_close = 500
 		self.velocity_editor_char_width = 12
 		self.timeshift_editor_char_width = 20
 		self.editor_row_height = .5
@@ -48,6 +48,7 @@ class Configuration():
 			"quit": 			cfgkey("q", 			False, True, False),
 			"play": 			cfgkey("Return", 		False, False, False),
 			"reset": 			cfgkey("Escape", 		False, False, False),
+			"record":			cfgkey("space",			False, False, False),			
 			"fullscreen": 		cfgkey("Return", 		False, False, True),
 			"exit_edit": 		cfgkey("Escape", 		False, False, False),
 			"undo":				cfgkey("z",				False, True, False),
