@@ -50,7 +50,8 @@ void module_advance(jack_nframes_t curr_frames) {
 	if (module.nseq == 0)
 		return;
 
-	module_excl_in();
+//	module_excl_in();
+//	module_excl_out();
 
 	midi_buffer_clear();
 
@@ -102,6 +103,7 @@ void module_advance(jack_nframes_t curr_frames) {
 			midi_event mev = midi_decode_event(evt.buffer, evt.size);
 			mev.time = evt.time;
 			midi_buffer_add(0, mev);
+			midi_in_buffer_add(mev);
 
 			if (module.recording) {
 				sequence_handle_record(module.seq[module.curr_seq], mev);
@@ -112,8 +114,6 @@ void module_advance(jack_nframes_t curr_frames) {
 	midi_buffer_flush();
 	//printf("time: %02d:%02d:%03d %3.5f %d\n", module.min, module.sec, module.ms, period, module.bpm);
 	module.song_pos += period;
-
-	module_excl_out();
 }
 
 void module_new() {

@@ -3863,6 +3863,31 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_midi_in_get_event(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  char *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)":midi_in_get_event")) SWIG_fail;
+  result = (char *)midi_in_get_event();
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_midi_in_clear_events(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  
+  if (!PyArg_ParseTuple(args,(char *)":midi_in_clear_events")) SWIG_fail;
+  midi_in_clear_events();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_sequence_new(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int arg1 ;
@@ -5036,6 +5061,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"queue_midi_note_off", _wrap_queue_midi_note_off, METH_VARARGS, NULL},
 	 { (char *)"track_get_rec_update", _wrap_track_get_rec_update, METH_VARARGS, NULL},
 	 { (char *)"track_clear_updates", _wrap_track_clear_updates, METH_VARARGS, NULL},
+	 { (char *)"midi_in_get_event", _wrap_midi_in_get_event, METH_VARARGS, NULL},
+	 { (char *)"midi_in_clear_events", _wrap_midi_in_clear_events, METH_VARARGS, NULL},
 	 { (char *)"sequence_new", _wrap_sequence_new, METH_VARARGS, NULL},
 	 { (char *)"sequence_get_ntrk", _wrap_sequence_get_ntrk, METH_VARARGS, NULL},
 	 { (char *)"sequence_get_length", _wrap_sequence_get_length, METH_VARARGS, NULL},

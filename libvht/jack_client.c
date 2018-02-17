@@ -28,6 +28,7 @@ jack_port_t *jack_output_ports[JACK_CLIENT_MAX_PORTS];
 jack_port_t *jack_input_port;
 jack_nframes_t jack_sample_rate;
 jack_nframes_t jack_buffer_size;
+jack_nframes_t jack_last_frame;
 char *jack_error;
 
 int jack_start(char *clt_name) {
@@ -59,6 +60,8 @@ int jack_start(char *clt_name) {
 	jack_set_process_callback (jack_client, jack_process, 0);
 	jack_set_sample_rate_callback(jack_client, jack_sample_rate_changed, 0);
 	jack_set_buffer_size_callback(jack_client, jack_buffer_size_changed, 0);
+
+	curr_midi_in_event = 0;
 
 	jack_activate(jack_client);
 

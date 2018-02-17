@@ -5,8 +5,9 @@ class TrackUndoBuffer():
 		self._states = []
 		self._state = {}
 		
-		self.add_state(True)
-				
+		self._states.append({})
+		#self.add_state(True)
+						
 	def add_state(self, add_if_empty = False):
 		state = {}
 		for x, c in enumerate(self._trk):

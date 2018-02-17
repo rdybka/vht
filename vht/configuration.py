@@ -48,6 +48,7 @@ class Configuration():
 			"quit": 			cfgkey("q", 			False, True, False),
 			"play": 			cfgkey("Return", 		False, False, False),
 			"reset": 			cfgkey("Escape", 		False, False, False),
+			"multi_record":		cfgkey("space", 		False, True, False),
 			"record":			cfgkey("space",			False, False, False),			
 			"fullscreen": 		cfgkey("Return", 		False, False, True),
 			"exit_edit": 		cfgkey("Escape", 		False, False, False),

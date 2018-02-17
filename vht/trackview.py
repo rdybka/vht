@@ -234,7 +234,7 @@ class TrackView(Gtk.DrawingArea):
 			to_row = from_row
 			from_row = a
 
-		# side_column
+		# --------------  side_column -------------
 		if not self.trk:
 			(x, y, width, height, dx, dy) = cr.text_extents("000|")
 		
@@ -313,6 +313,8 @@ class TrackView(Gtk.DrawingArea):
 				self.queue_draw()
 			return
 
+
+		# --------------  track --------------
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")	
 		if self.show_timeshift:
 			(x, y, width, height, dx, dy) = cr.text_extents("000 000 000|")
@@ -338,6 +340,7 @@ class TrackView(Gtk.DrawingArea):
 			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))	
 			cr.rectangle(0, 0, w, h)
 			cr.fill()
+			self.trk.clear_updates()
 		
 		last_c = len(self.trk) - 1
 		for c in range(len(self.trk)):
@@ -420,7 +423,7 @@ class TrackView(Gtk.DrawingArea):
 						cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 				
 				if show_selection and not self.select_start and not self.select_end:
-					if self.edit and r == self.edit[1] and c == self.edit[0]:
+					if self.edit and r == self.edit[1] and c == self.edit[0] and mod.record == 0:
 						cr.set_source_rgb(*(cfg.record_colour))
 						
 						#cr.rectangle(c * self.txt_width + xtraoffs, (r * self.txt_height) + self.txt_height * .1, (self.txt_width / 8.0) * 7.2, self.txt_height * .9)
@@ -1048,6 +1051,31 @@ class TrackView(Gtk.DrawingArea):
 			self.edit = self.edit[0], new_y
 		self.redraw()
 
+	def midi_in(self, midin):
+		m_note = midin["note"]
+		m_type = midin["type"]
+		m_velocity = midin["velocity"]
+		
+		if m_type == 1:# or m_type == 2:
+			if self.edit and m_note and mod.record == 0:
+				self.undo_buff.add_state()
+				old = self.edit[1]
+				self.trk[self.edit[0]][self.edit[1]].type = m_type
+				self.trk[self.edit[0]][self.edit[1]].note = m_note
+				self.trk[self.edit[0]][self.edit[1]].velocity = m_velocity
+				self.trk[self.edit[0]][self.edit[1]].time = 0
+							
+				self.edit = self.edit[0], self.edit[1] + cfg.skip
+				if self.edit[1] >= self.trk.nrows:
+					self.edit = self.edit[0], self.edit[1] - self.trk.nrows
+			
+				while self.edit[1] < 0:
+					self.edit = self.edit[0], self.edit[1] + self.trk.nrows
+				self.redraw(self.edit[1])
+				self.redraw(old)
+				self.undo_buff.add_state()
+				return True
+
 	def on_key_press(self, widget, event):
 		if not self.trk:
 			return
@@ -1128,7 +1156,7 @@ class TrackView(Gtk.DrawingArea):
 
 		note = self.pmp.key2note(Gdk.keyval_to_lower(event.keyval))
 				
-		if self.edit and note:
+		if self.edit and note and mod.record == 0:
 			self.undo_buff.add_state()
 			old = self.edit[1]
 			self.trk[self.edit[0]][self.edit[1]] = note

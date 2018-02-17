@@ -115,7 +115,7 @@ class VHTModule(Iterable):
 	@record.setter
 	def record(self, value):
 		if value:
-			libcvht.module_record(1)
+			libcvht.module_record(value)
 		else:
 			libcvht.module_record(0)
 		
@@ -125,6 +125,7 @@ class VHTModule(Iterable):
 			libcvht.module_play(1)
 		else:
 			libcvht.module_play(0)
+			self.record = 0
 
 	@property
 	def dump_notes(self):
@@ -163,6 +164,16 @@ class VHTModule(Iterable):
 	def max_bpm(self):
 		return 1000
 		
+	def clear_midi_in(self):
+		libcvht.midi_in_clear_events()
+
+	def get_midi_in_event(self):
+		midin = libcvht.midi_in_get_event()
+		if midin:
+			return eval(midin)
+		else:
+			return None		
+	
 	def save(self, filename):
 		jm = {}
 		jm["bpm"] = self.bpm

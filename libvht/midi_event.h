@@ -51,6 +51,10 @@ int parse_note(char *);
 
 extern int curr_midi_event[JACK_CLIENT_MAX_PORTS];
 extern int curr_midi_queue_event[JACK_CLIENT_MAX_PORTS];
+extern int curr_midi_in_event;
+
+void midi_in_buffer_add(midi_event evt);
+
 void midi_buff_excl_in();
 void midi_buff_excl_out();
 

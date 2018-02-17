@@ -24,7 +24,6 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.parent = parent
 		self.trk = trk
 		self.trkview = parent.trkview
-		self.extended_view = False
 		self.grid = Gtk.Grid()
 		self.grid.set_column_spacing(3)
 		self.grid.set_row_spacing(3)
@@ -86,16 +85,6 @@ class TrackPropViewPopover(Gtk.Popover):
 			button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_move_last"]))
 			self.grid.attach(button, 3, 1, 1, 1)
 
-			button = Gtk.Button()
-			icon = Gio.ThemedIcon(name="media-seek-forward")
-			#icon = Gio.ThemedIcon(name="media-seek-backward")
-			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-			button.add(image)
-			button.connect("clicked", self.on_extended_view_button_clicked)
-			#button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_move_first"]))
-			self.grid.attach(button, 3, 2, 1, 2)
-			self.extend_button = button
-
 			self.extend_grid = Gtk.Grid()
 			self.extend_grid.set_hexpand(True)
 			self.extend_grid.set_vexpand(True)
@@ -137,7 +126,6 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.clone_button = BlackButton("clone")
 			grid.attach(self.clone_button, 4, 2, 1, 1)
 						
-						
 			self.extend_track_grid = grid
 						
 			self.extend_notebook = Gtk.Notebook()
@@ -151,6 +139,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.extend_notebook.append_page(self.extend_triggers_grid, Gtk.Label("triggers"))
 			
 			self.extend_grid.attach(self.extend_notebook, 0, 0, 5, 5)
+			self.extend_grid.show()
 			
 			self.port_adj = Gtk.Adjustment(0, 0, 15, 1.0, 1.0)
 			self.port_button = Gtk.SpinButton()
@@ -214,7 +203,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.nrows_check_button.set_sensitive(False)
 			
 			self.grid.show_all()
-			self.extend_grid.hide()
+			#self.extend_grid.hide()
 			self.add(self.grid)
 
 	def on_timeout(self, args):
@@ -352,16 +341,3 @@ class TrackPropViewPopover(Gtk.Popover):
 	def on_move_last_button_clicked(self, switch):
 		self.parent.move_last()
 	
-	def on_extended_view_button_clicked(self, switch):
-		if self.extended_view:
-			icon = Gio.ThemedIcon(name="media-seek-forward")
-			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-			self.extend_button.set_image(image)
-			self.extend_grid.hide()
-			self.extended_view = False
-		else:
-			icon = Gio.ThemedIcon(name="media-seek-backward")
-			image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-			self.extend_button.set_image(image)
-			self.extend_grid.show()
-			self.extended_view = True

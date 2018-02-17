@@ -39,6 +39,10 @@ typedef struct track_t {
 	int playing;
 	double pos;
 
+	// used for recording
+	double last_pos;
+	double last_period;
+
 	int ncols;
 	row **rows;
 	int arows; // allocated rows
@@ -46,8 +50,10 @@ typedef struct track_t {
 	int trigger_channel;
 	int trigger_note;
 	int loop;
+
 	struct rec_update_t updates[EVT_BUFFER_LENGTH];
 	int cur_rec_update;
+
 	unsigned char trigger_type;
 	pthread_mutex_t excl; // for atomic row access
 	pthread_mutex_t exclrec; // for row changes
@@ -72,7 +78,6 @@ void track_insert_rec_update(track *trk, int col, int row);
 void track_clear_rec_updates(track *trk);
 void track_handle_record(track *trk, midi_event evt);
 
-// don't touch those from python
 void track_reset(track *trk);
 void track_advance(track *trk, double speriod);
 void track_wind(track *trk, double speriod);

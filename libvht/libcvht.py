@@ -200,6 +200,14 @@ def track_clear_updates(trk):
     return _libcvht.track_clear_updates(trk)
 track_clear_updates = _libcvht.track_clear_updates
 
+def midi_in_get_event():
+    return _libcvht.midi_in_get_event()
+midi_in_get_event = _libcvht.midi_in_get_event
+
+def midi_in_clear_events():
+    return _libcvht.midi_in_clear_events()
+midi_in_clear_events = _libcvht.midi_in_clear_events
+
 def sequence_new(length):
     return _libcvht.sequence_new(length)
 sequence_new = _libcvht.sequence_new

@@ -30,6 +30,7 @@ extern jack_port_t *jack_output_ports[];
 jack_status_t jack_status;
 jack_nframes_t jack_sample_rate;
 jack_nframes_t jack_buffer_size;
+jack_nframes_t jack_last_frame;
 extern char *jack_error;
 
 int jack_start(char *clt_name);

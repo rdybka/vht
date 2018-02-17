@@ -64,6 +64,8 @@ extern void queue_midi_note_off(sequence *seq, int port, int chn, int note);
 extern char *track_get_rec_update(track *trk);
 extern void track_clear_updates(track *trk);
 
+extern char *midi_in_get_event();
+extern void midi_in_clear_events();
 
 // sequence
 extern sequence *sequence_new(int length);

@@ -129,18 +129,44 @@ class SequenceView(Gtk.Box):
 			# play/stop
 			if mod.play:
 				mod.play = 0
+				self._prop_view.redraw()
 			else:
 				mod.play = 1
-
+				
+		if cfg.key["multi_record"].matches(event):
+			# play/stop
+			if mod.record:
+				mod.record = 0
+				self._prop_view.redraw()
+				for trk in self.get_tracks():
+					trk.undo_buff.add_state()
+			else:
+				mod.record = 2
+				self._prop_view.redraw()
+				for trk in self.get_tracks():
+					trk.undo_buff.add_state()
+			
+			if mod.active_track:
+				self.redraw_track(mod.active_track.trk)
+			
+			return True
+			
 		if cfg.key["record"].matches(event):
 			# play/stop
 			if mod.record:
 				mod.record = 0
 				self._prop_view.redraw()
+				for trk in self.get_tracks():
+					trk.undo_buff.add_state()
 			else:
 				mod.record = 1
 				self._prop_view.redraw()
+				for trk in self.get_tracks():
+					trk.undo_buff.add_state()
 
+			if mod.active_track:
+				self.redraw_track(mod.active_track.trk)
+			
 		if cfg.key["fullscreen"].matches(event):
 			if mod.mainwin.fs:
 				mod.mainwin.unfullscreen()
@@ -478,13 +504,12 @@ class SequenceView(Gtk.Box):
 		
 		mod.active_track = trk
 		if ac != trk:
+			self.seq.set_midi_focus(trk.trk.index)
 			if ac:
 				self._prop_view.redraw(ac.trk.index)
 				ac.pmp.silence()
 				
 			self._prop_view.redraw(trk.trk.index)
-		
-		self.seq.set_midi_focus(trk.trk.index)
 	
 	def redraw_track(self, trk = None):
 		for wdg in self.get_tracks(True):
@@ -587,13 +612,38 @@ class SequenceView(Gtk.Box):
 				wdg.tick()
 				if wdg.edit and wdg.trk:
 					self.auto_scroll(wdg)
-					
-		for trk in self.get_tracks():
-			r = trk.trk.get_rec_update()
-			while r:
-				trk.redraw(r["row"])
+		
+		midin = mod.get_midi_in_event()
+		while(midin):
+			if mod.active_track:
+				mod.active_track.midi_in(midin)
+						
+			midin = mod.get_midi_in_event()
+				
+		if mod.record:			
+			for trk in self.get_tracks():
+				redr_props = False
 				r = trk.trk.get_rec_update()
-			
+				while r:
+					trk.redraw(r["row"])
+					redr_props = True
+					r = trk.trk.get_rec_update()
+				
+				if redr_props:
+					self._prop_view.redraw(trk.trk.index)
+					trk.show_timeshift = True
+					#trk.undo_buff.add_state()
+								
+			if len(self.get_tracks()) != len(self.seq):
+				for trk in self.seq:
+					found = False
+					for t in self.get_tracks():
+						if trk.index == t.trk.index:
+							found = True
+					
+					if not found:
+						self.add_track(trk)
+						
 		return 1
 	
 	def on_draw(self, widget, cr):

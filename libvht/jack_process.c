@@ -30,6 +30,7 @@ int jack_process(jack_nframes_t nframes, void *arg) {
 	//void *inp = jack_port_get_buffer(jack_input_port, nframes);
 
 	jack_get_cycle_times(jack_client, &curr_frames, &curr_usecs, &next_usecs, &period_usecs);
+	jack_last_frame = jack_last_frame_time(jack_client);
 	jack_synch_output_ports();
 	module_advance(curr_frames);
 	return 0;

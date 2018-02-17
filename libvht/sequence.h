@@ -26,6 +26,7 @@ typedef struct sequence_t {
 	int ntrk;
 	int length;
 	double pos;
+	double last_period;
 	int midi_focus;
 } sequence;
 

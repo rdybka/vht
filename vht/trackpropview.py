@@ -219,7 +219,7 @@ class TrackPropView(Gtk.DrawingArea):
 		if mod.active_track:
 			if mod.active_track.trk.index == self.trk.index:
 				cr.set_source_rgb(0, 0, 0)
-				if mod.record:
+				if mod.record == 1:
 					cr.set_source_rgb(*(cfg.record_colour))
 					
 		cr.move_to(x, self.txt_height * cfg.seq_spacing)	

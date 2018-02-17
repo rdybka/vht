@@ -28,6 +28,9 @@
 midi_event midi_buffer[JACK_CLIENT_MAX_PORTS][EVT_BUFFER_LENGTH];
 midi_event midi_queue_buffer[JACK_CLIENT_MAX_PORTS][EVT_BUFFER_LENGTH];
 
+midi_event midi_in_buffer[EVT_BUFFER_LENGTH];
+int curr_midi_in_event;
+
 int curr_midi_event[JACK_CLIENT_MAX_PORTS];
 int curr_midi_queue_event[JACK_CLIENT_MAX_PORTS];
 
@@ -246,15 +249,15 @@ void queue_midi_note_on(sequence *seq, int port, int chn, int note, int velocity
 	evt.velocity = velocity;
 	evt.time = 0;
 
-	if (module.recording) {
-		evt.time = -1; // tap into jack for that!
+	if (module.recording && module.playing) {
+		evt.time = jack_frame_time(jack_client) - jack_last_frame;
 		if (seq)
 			sequence_handle_record(seq, evt);
-	} else {
-		midi_buff_excl_in();
-		midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
-		midi_buff_excl_out();
 	}
+
+	midi_buff_excl_in();
+	midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
+	midi_buff_excl_out();
 }
 
 void queue_midi_note_off(sequence *seq, int port, int chn, int note) {
@@ -265,13 +268,35 @@ void queue_midi_note_off(sequence *seq, int port, int chn, int note) {
 	evt.velocity = 0;
 	evt.time = 0;
 
-	if (module.recording) {
-		evt.time = -1; //
+	if (module.recording && module.playing) {
+		evt.time = jack_frame_time(jack_client) - jack_last_frame;
 		if (seq)
 			sequence_handle_record(seq, evt);
-	} else {
-		midi_buff_excl_in();
-		midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
-		midi_buff_excl_out();
 	}
+
+	midi_buff_excl_in();
+	midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
+	midi_buff_excl_out();
+}
+
+void midi_in_buffer_add(midi_event evt) {
+	if (curr_midi_in_event == EVT_BUFFER_LENGTH)
+		return;
+
+	midi_in_buffer[curr_midi_in_event++] = evt;
+}
+
+char *midi_in_get_event() {
+	if (curr_midi_in_event == 0)
+		return NULL;
+
+	midi_event evt = midi_in_buffer[--curr_midi_in_event];
+
+	static char buff[1024];
+	sprintf(buff, "{\"type\" :%d, \"note\" : %d, \"velocity\" : %d, \"time\" : %d}", evt.type, evt.note, evt.velocity, evt.time);
+	return buff;
+}
+
+void midi_in_clear_events() {
+	curr_midi_in_event = 0;
 }

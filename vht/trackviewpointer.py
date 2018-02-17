@@ -65,7 +65,7 @@ class trackviewpointer():
 			xx = (self._parent.txt_width / 4.0) * 3.1
 			
 			cl = cfg.colour
-			if mod.record:
+			if mod.record == 2:
 				cl = cfg.record_colour
 
 			gradient = cairo.LinearGradient(x, y, x, y + self.height)
@@ -129,7 +129,7 @@ class trackviewpointer():
 
 			cl = cfg.colour
 			if mod.active_track:
-				if mod.active_track.trk.index == self.trk.index and mod.record:
+				if mod.active_track.trk.index == self.trk.index and mod.record == 1:
 					cl = cfg.record_colour
 				
 			gradient = cairo.LinearGradient(x, y, x, y + self.height)

@@ -64,7 +64,7 @@ track *track_new(int port, int channel, int len, int songlen) {
 };
 
 void track_reset(track *trk) {
-	trk->pos = 0.0;
+	trk->pos = trk->last_pos = trk->last_period = 0.0;
 	track_kill_notes(trk);
 }
 
@@ -78,6 +78,7 @@ void track_set_row(track *trk, int c, int n, int type, int note, int velocity, i
 	r->delay = delay;
 
 	pthread_mutex_unlock(&trk->excl);
+	track_insert_rec_update(trk, c, n);
 }
 
 int track_get_row(track *trk, int c, int n, row *r) {
@@ -195,7 +196,7 @@ void track_advance(track *trk, double speriod) {
 				row r;
 				track_get_row(trk, c, nn, &r);
 
-				double trigger_time = (double)n + ((double)r.delay / 99.0);
+				double trigger_time = (double)n + ((double)r.delay / 49.0);
 				double delay = trigger_time - trk->pos;
 				if ((delay >= 0) && (delay < tperiod)) {
 					if (trk->playing) {
@@ -205,6 +206,8 @@ void track_advance(track *trk, double speriod) {
 			}
 		}
 
+	trk->last_pos = trk->pos;
+	trk->last_period = tperiod;
 	trk->pos += tperiod;
 
 	if (trk->loop) {
@@ -229,16 +232,15 @@ void track_kill_notes(track *trk) {
 }
 
 void track_add_col(track *trk) {
-	module_excl_in();
-
+	pthread_mutex_lock(&trk->excl);
 	trk->ncols++;
 
 	trk->rows = realloc(trk->rows, sizeof(row*) * trk->ncols);
 	trk->rows[trk->ncols -1] = malloc(sizeof(row) * trk->arows);
 	trk->ring = realloc(trk->ring, sizeof(int) * trk->ncols);
-	track_clear_rows(trk, trk->ncols - 1);
+	pthread_mutex_unlock(&trk->excl);
 
-	module_excl_out();
+	track_clear_rows(trk, trk->ncols - 1);
 }
 
 void track_del_col(track *trk, int c) {
@@ -300,6 +302,7 @@ void track_resize(track *trk, int size) {
 	trk->nrows = size;
 
 	module_excl_out();
+	track_clear_updates(trk);
 }
 
 void track_trigger(track *trk) {
@@ -346,11 +349,176 @@ void track_clear_updates(track *trk) {
 	pthread_mutex_unlock(&trk->exclrec);
 }
 
-void track_handle_record(track *trk, midi_event evt) {
-	char buff[256];
-	printf("rec: %f %s\n", trk->pos, midi_describe_event(evt, buff, 256));
+int col_free(track *trk, int col, int pos) {
+	if (col >= trk->ncols)
+		return 0;
 
-	int r = floorf(trk->pos);
-	track_set_row(trk, 0, r, evt.type, evt.note, evt.velocity, 0);
-	track_insert_rec_update(trk, 0, r);
+	// since we only read, ignore thread safety
+	int ret = 1;
+
+	int found = 0;
+	for (int y = pos; y >= 0 && !found; y--) {
+		if (trk->rows[col][y].type == note_on) {
+			found = 1;
+			ret = 0;
+		}
+
+		if (trk->rows[col][y].type == note_off) {
+			found = 1;
+		}
+	}
+
+	if (!found) {
+		for (int y = trk->nrows - 1; y > pos && !found; y--) {
+			if (trk->rows[col][y].type == note_on) {
+				found = 1;
+				ret = 0;
+			}
+
+			if (trk->rows[col][y].type == note_off) {
+				found = 1;
+			}
+		}
+	}
+
+	return ret;
+}
+
+int col_last_note(track *trk, int col, double pos) {
+	if (col >= trk->ncols)
+		return 0;
+
+	// since we only read, ignore thread safety
+	int ret = 0;
+
+	int found = 0;
+	for (int y = pos; y >= 0 && !found; y--) {
+		if (trk->rows[col][y].type == note_on) {
+			found = 1;
+			ret = trk->rows[col][y].note;
+		}
+
+		if (trk->rows[col][y].type == note_off) {
+			found = 1;
+		}
+	}
+
+	if (!found) {
+		for (int y = trk->nrows - 1; y > pos && !found; y--) {
+			if (trk->rows[col][y].type == note_on) {
+				found = 1;
+				ret = trk->rows[col][y].note;
+			}
+
+			if (trk->rows[col][y].type == note_off) {
+				found = 1;
+			}
+		}
+	}
+
+	return ret;
+}
+
+int col_has_note(track *trk, int col, int note) {
+	int found_notes = 0;
+	for (int y = 0; y < trk->nrows; y++) {
+		if (trk->rows[col][y].type == note_on) {
+			found_notes = 1;
+			if (trk->rows[col][y].note == note)
+				return 1;
+		}
+	}
+
+	if (!found_notes)
+		return 1;
+
+	return 0;
+}
+
+// shit gets real
+void track_handle_record(track *trk, midi_event evt) {
+	double pos = trk->last_pos + ((trk->last_period / (double)jack_buffer_size) * evt.time);
+
+	int p = floorf(pos);
+	double rem = pos - p;
+
+	if (rem >= .5) {
+		p++;
+		rem = -(1.0 - rem);
+	}
+
+	int t = floorf(50.0 * rem);
+
+	if (p > trk->nrows - 1)
+		p = p - trk->nrows;
+
+	/*
+	char buff[256];
+	printf("rec: %f %s -> %f : %d:%d\n", trk->pos, midi_describe_event(evt, buff, 256), pos, p, t);
+	*/
+
+	int c = 0;
+
+	// are we in a sounding note? try next column
+	if (trk->channel != 10) {
+		if (evt.type == note_on) {
+			for (int col = 0; col < trk->ncols; col++) {
+				if (!col_free(trk, col, p)) {
+					c = col + 1;
+				}
+			}
+
+			if (c == trk->ncols) {
+				track_add_col(trk);
+			}
+		}
+	}
+
+	// if drums, find a column with given note
+	if (trk->channel == 10) {
+		if (evt.type == note_on) {
+			int found = 0;
+
+			for (int col = 0; col < trk->ncols && found == 0; col++) {
+				if (col_has_note(trk, col, evt.note)) {
+					c = col;
+					found = 1;
+				}
+			}
+
+			if (!found) {
+				track_add_col(trk);
+				c = trk->ncols - 1;
+			}
+		}
+	}
+
+	// where to put note_off?
+	if (evt.type == note_off) {
+		int found = 0;
+
+		for (int col = trk->ncols -1; col >= 0; col--) {
+			if (col_last_note(trk, col, p) == evt.note) {
+				found = 1;
+				c = col;
+			}
+		}
+
+		if (!found)
+			return;
+	}
+
+	row r;
+	track_get_row(trk, c, p, &r);
+
+	// don't overwrite note_ons with note_offs
+	if (evt.type == note_off && r.type == note_on) {
+		p++;
+		t = 0;
+	}
+
+	if (p > trk->nrows - 1)
+		p = p - trk->nrows;
+
+	track_set_row(trk, c, p, evt.type, evt.note, evt.velocity, t);
 }

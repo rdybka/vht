@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include "module.h"
 #include "sequence.h"
+#include "track.h"
 
 sequence *sequence_new(int length) {
 	sequence *seq = malloc(sizeof(sequence));
@@ -28,6 +29,7 @@ sequence *sequence_new(int length) {
 	seq->pos = 0;
 	seq->length = length;
 	seq->midi_focus = 0;
+	seq->last_period = 0;
 	return seq;
 }
 
@@ -57,6 +59,7 @@ void sequence_free(sequence *seq) {
 }
 
 void sequence_advance(sequence *seq, double period) {
+	seq->last_period = period;
 	for (int t = 0; t < seq->ntrk; t++) {
 		//if (seq->trk[t]->playing) {
 		track_advance(seq->trk[t], period);
@@ -139,6 +142,33 @@ void sequence_set_midi_focus(sequence *seq, int foc) {
 }
 
 void sequence_handle_record(sequence *seq, midi_event evt) {
-	if (seq->midi_focus >= 0 && seq->midi_focus < seq->ntrk)
-		track_handle_record(seq->trk[seq->midi_focus], evt);
+	if (module.recording == 1)
+		if (seq->midi_focus >= 0 && seq->midi_focus < seq->ntrk)
+			track_handle_record(seq->trk[seq->midi_focus], evt);
+
+	if (module.recording == 2) {
+		int found = 0;
+		for (int tr = 0; tr < seq->ntrk; tr++) {
+			if (seq->trk[tr]->channel == evt.channel) {
+				track_handle_record(seq->trk[tr], evt);
+				found = 1;
+			}
+		}
+
+		if (!found) {
+			track *trk;
+			trk = track_new(0, evt.channel, seq->length, seq->length);
+			trk->last_pos = seq->pos - seq->last_period;
+			trk->pos = seq->pos;
+			trk->last_period = seq->last_period;
+
+			if (trk->last_pos < 0) {
+				trk->last_pos += seq->length;
+			}
+
+			sequence_add_track(seq, trk);
+			track_handle_record(trk, evt);
+			trk->pos = seq->pos;
+		}
+	}
 }
