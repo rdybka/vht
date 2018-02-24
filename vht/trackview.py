@@ -423,9 +423,12 @@ class TrackView(Gtk.DrawingArea):
 						cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 				
 				if show_selection and not self.select_start and not self.select_end:
-					if self.edit and r == self.edit[1] and c == self.edit[0] and mod.record == 0:
-						cr.set_source_rgb(*(cfg.record_colour))
-						
+					if self.edit and r == self.edit[1] and c == self.edit[0]:
+						if mod.record == 0:
+							cr.set_source_rgb(*(cfg.record_colour))
+						else:
+							cr.set_source_rgb(*(cfg.colour))
+							
 						#cr.rectangle(c * self.txt_width + xtraoffs, (r * self.txt_height) + self.txt_height * .1, (self.txt_width / 8.0) * 7.2, self.txt_height * .9)
 						
 						if c == len(self.trk) - 1:
@@ -940,9 +943,9 @@ class TrackView(Gtk.DrawingArea):
 		if not self.select_start or not self.select_end:
 			return None
 			
-		ssx = self.select_start[0]
+		ssx = min(self.select_start[0], len(self.trk) -1)
 		ssy = self.select_start[1]
-		sex = self.select_end[0]
+		sex = min(self.select_end[0], len(self.trk) -1)
 		sey = self.select_end[1]
 				
 		if sex < ssx:
@@ -988,9 +991,9 @@ class TrackView(Gtk.DrawingArea):
 			sey = self.edit[1]
 				
 		if self.select_start and self.select_end:
-			ssx = self.select_start[0]
+			ssx = min(self.select_start[0], len(self.trk) - 1)
 			ssy = self.select_start[1]
-			sex = self.select_end[0]
+			sex = min(self.select_end[0], len(self.trk) - 1)
 			sey = self.select_end[1]
 		
 		if sex < ssx:
@@ -1097,6 +1100,8 @@ class TrackView(Gtk.DrawingArea):
 
 		if cfg.key["undo"].matches(event):
 			self.undo_buff.restore()
+			self.optimise()
+			self.trk.kill_notes()
 			self.parent.redraw_track(self.trk)
 			return True
 			
@@ -1562,7 +1567,9 @@ class TrackView(Gtk.DrawingArea):
 			if sel:
 				for r in sel:
 					r.clear()
-			
+							
+				self.trk.kill_notes()
+				self.undo_buff.add_state()
 				self.redraw()
 				return True
 
@@ -1577,6 +1584,7 @@ class TrackView(Gtk.DrawingArea):
 			if self.edit[1] >= self.trk.nrows:
 				self.edit = self.edit[0], self.trk.nrows - 1
 					
+			self.trk.kill_notes()
 			self.redraw(self.edit[1])
 			self.redraw(old)
 
@@ -1636,3 +1644,29 @@ class TrackView(Gtk.DrawingArea):
 			return self.velocity_editor.on_key_release(widget, event)
 		
 		return False
+		
+	def optimise(self):
+		redr = False
+		cont = True
+		
+		while cont and len(self.trk) > 1:
+			c = self.trk[len(self.trk) - 1]
+			found = False
+			for r in c:
+				if r.type != 0:
+					found = True
+			
+			cont = False
+			
+			if not found:
+				self.parent.shrink_track(self.trk)
+				redr = True
+				cont = True
+			
+			if len(self.trk) == 1:
+				cont = False
+				
+				
+
+		if redr:
+			self.redraw()

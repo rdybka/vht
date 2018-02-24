@@ -24,6 +24,7 @@ typedef struct row_t {
 	int note;
 	int velocity;
 	int delay; // +/- 1-999
+	int ringing;
 } row;
 
 int row_get_type(row *rw);

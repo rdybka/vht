@@ -163,7 +163,9 @@ class VHTModule(Iterable):
 	@property
 	def max_bpm(self):
 		return 1000
-		
+	
+	# those two work non-realtime,
+	# actual recording happens in c
 	def clear_midi_in(self):
 		libcvht.midi_in_clear_events()
 

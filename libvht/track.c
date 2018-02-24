@@ -76,9 +76,17 @@ void track_set_row(track *trk, int c, int n, int type, int note, int velocity, i
 	r->note = note;
 	r->velocity = velocity;
 	r->delay = delay;
+	r->ringing = 0;
 
 	pthread_mutex_unlock(&trk->excl);
 	track_insert_rec_update(trk, c, n);
+}
+
+void track_set_wanderer(track *trk, int c, int p, int v) {
+	pthread_mutex_lock(&trk->excl);
+	row *r = &trk->rows[c][p];
+	r->ringing = v;
+	pthread_mutex_unlock(&trk->excl);
 }
 
 int track_get_row(track *trk, int c, int n, row *r) {
@@ -99,6 +107,7 @@ int track_get_row(track *trk, int c, int n, row *r) {
 	r->note = s->note;
 	r->velocity = s->velocity;
 	r->delay = s->delay;
+	r->ringing = s->ringing;
 
 	pthread_mutex_unlock(&trk->excl);
 	return 0;
@@ -124,6 +133,7 @@ void track_clear_rows(track *trk, int c) {
 		trk->rows[c][t].note = 0;
 		trk->rows[c][t].velocity = 0;
 		trk->rows[c][t].delay = 0;
+		trk->rows[c][t].ringing = 0;
 	}
 
 	pthread_mutex_unlock(&trk->excl);
@@ -134,6 +144,124 @@ track *track_clone(track *src) {
 	track *dst = track_new(src->port, src->channel, src->nrows, src->nsrows);
 	// todo: copy cols and shit or scrap
 	return dst;
+}
+
+int col_free(track *trk, int col, int pos) {
+	if (col >= trk->ncols)
+		return 0;
+
+	// since we only read, ignore thread safety
+	int ret = 1;
+
+	int found = 0;
+	for (int y = pos; y >= 0 && !found; y--) {
+		if (trk->rows[col][y].type == note_on) {
+			found = 1;
+			ret = 0;
+		}
+
+		if (trk->rows[col][y].type == note_off) {
+			found = 1;
+		}
+	}
+
+	if (!found) {
+		for (int y = trk->nrows - 1; y > pos && !found; y--) {
+			if (trk->rows[col][y].type == note_on) {
+				found = 1;
+				ret = 0;
+			}
+
+			if (trk->rows[col][y].type == note_off) {
+				found = 1;
+			}
+		}
+	}
+
+	return ret;
+}
+
+int track_get_wandering_note(track *trk, int c, int pos) {
+	int ret = -1;
+
+	if (c >= trk->ncols)
+		return ret;
+
+	// since we only read, ignore thread safety
+	int found = 0;
+	for (int y = pos - 1; y >= 0 && !found; y--) {
+		if (trk->rows[c][y].type == note_on) {
+			found = 1;
+			if (trk->rows[c][y].ringing) {
+				ret = y;
+			}
+		}
+
+		if (trk->rows[c][y].type == note_off) {
+			found = 1;
+		}
+	}
+
+	if (!found) {
+		for (int y = trk->nrows - 1; y > pos && !found; y--) {
+			if (trk->rows[c][y].type == note_on) {
+				found = 1;
+				if (trk->rows[c][y].ringing) {
+					ret = y;
+				}
+			}
+
+			if (trk->rows[c][y].type == note_off) {
+				found = 1;
+			}
+		}
+	}
+
+	return ret;
+}
+
+int col_last_note(track *trk, int col, double pos) {
+	// since we only read, ignore thread safety
+
+	if (col >= trk->ncols)
+		return 0;
+
+	if (trk->rows[col][(int)pos].type == note_on) {
+		return trk->rows[col][(int)pos].note;
+	}
+
+	if (trk->rows[col][(int)pos].type == note_off) {
+		return trk->rows[col][(int)pos].note;
+	}
+
+	int ret = -1;
+
+	int found = 0;
+	for (int y = pos; y >= 0 && !found; y--) {
+		if (trk->rows[col][y].type == note_on) {
+			found = 1;
+			ret = trk->rows[col][y].note;
+		}
+
+		if (trk->rows[col][y].type == note_off) {
+			found = 1;
+		}
+	}
+
+	if (!found) {
+		for (int y = trk->nrows - 1; y > pos && !found; y--) {
+			if (trk->rows[col][y].type == note_on) {
+				found = 1;
+				ret = trk->rows[col][y].note;
+			}
+
+			if (trk->rows[col][y].type == note_off) {
+				found = 1;
+			}
+		}
+	}
+
+	return ret;
 }
 
 // yooohoooo!!!
@@ -154,7 +282,6 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 			evt.note = trk->ring[c];
 			evt.velocity = 0;
 			midi_buffer_add(trk->port, evt);
-
 			trk->ring[c] = -1;
 		}
 	}
@@ -166,10 +293,40 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 		evt.note = r.note;
 		evt.velocity = r.velocity;
 		midi_buffer_add(trk->port, evt);
+
+		// fix wandering notes
+		int wanderer = track_get_wandering_note(trk, c, pos);
+		if (wanderer > -1) {
+			int found = 0;
+			int dest_col = 0;
+
+			for (int cc = 0; cc < trk->ncols && !found; cc++) {
+				int ln = col_last_note(trk, cc, pos);
+
+				if (ln == -1) {
+					found = 1;
+					dest_col = cc;
+				}
+			}
+
+			if (!found) {
+				track_add_col(trk);
+				dest_col = trk->ncols - 1;
+			}
+
+			// copy wanderer to new position
+			row r;
+			track_get_row(trk, c, wanderer, &r);
+			track_set_row(trk, c, wanderer, none, 0, 0, 0);
+			track_set_row(trk, dest_col, wanderer, r.type, r.note, r.velocity, r.delay);
+			track_set_wanderer(trk, dest_col, wanderer, 1);
+		}
+
 	}
 
 	if (r.type == note_on) {
 		trk->ring[c] = r.note;
+		track_set_wanderer(trk, c, pos, 0);
 	}
 }
 
@@ -228,6 +385,14 @@ void track_kill_notes(track *trk) {
 
 			trk->ring[c] = -1;
 		}
+
+		pthread_mutex_lock(&trk->excl);
+
+		for (int t = 0; t < trk->nrows; t++) {
+			trk->rows[c][t].ringing = 0;
+		}
+
+		pthread_mutex_unlock(&trk->excl);
 	}
 }
 
@@ -349,76 +514,6 @@ void track_clear_updates(track *trk) {
 	pthread_mutex_unlock(&trk->exclrec);
 }
 
-int col_free(track *trk, int col, int pos) {
-	if (col >= trk->ncols)
-		return 0;
-
-	// since we only read, ignore thread safety
-	int ret = 1;
-
-	int found = 0;
-	for (int y = pos; y >= 0 && !found; y--) {
-		if (trk->rows[col][y].type == note_on) {
-			found = 1;
-			ret = 0;
-		}
-
-		if (trk->rows[col][y].type == note_off) {
-			found = 1;
-		}
-	}
-
-	if (!found) {
-		for (int y = trk->nrows - 1; y > pos && !found; y--) {
-			if (trk->rows[col][y].type == note_on) {
-				found = 1;
-				ret = 0;
-			}
-
-			if (trk->rows[col][y].type == note_off) {
-				found = 1;
-			}
-		}
-	}
-
-	return ret;
-}
-
-int col_last_note(track *trk, int col, double pos) {
-	if (col >= trk->ncols)
-		return 0;
-
-	// since we only read, ignore thread safety
-	int ret = 0;
-
-	int found = 0;
-	for (int y = pos; y >= 0 && !found; y--) {
-		if (trk->rows[col][y].type == note_on) {
-			found = 1;
-			ret = trk->rows[col][y].note;
-		}
-
-		if (trk->rows[col][y].type == note_off) {
-			found = 1;
-		}
-	}
-
-	if (!found) {
-		for (int y = trk->nrows - 1; y > pos && !found; y--) {
-			if (trk->rows[col][y].type == note_on) {
-				found = 1;
-				ret = trk->rows[col][y].note;
-			}
-
-			if (trk->rows[col][y].type == note_off) {
-				found = 1;
-			}
-		}
-	}
-
-	return ret;
-}
-
 int col_has_note(track *trk, int col, int note) {
 	int found_notes = 0;
 	for (int y = 0; y < trk->nrows; y++) {
@@ -463,7 +558,8 @@ void track_handle_record(track *trk, midi_event evt) {
 	if (trk->channel != 10) {
 		if (evt.type == note_on) {
 			for (int col = 0; col < trk->ncols; col++) {
-				if (!col_free(trk, col, p)) {
+				int ln = col_last_note(trk, col, p);
+				if (ln != -1 || ln == evt.note) {
 					c = col + 1;
 				}
 			}
@@ -493,14 +589,19 @@ void track_handle_record(track *trk, midi_event evt) {
 		}
 	}
 
-	// where to put note_off?
+	// find the possibly wandering note_on
 	if (evt.type == note_off) {
 		int found = 0;
 
-		for (int col = trk->ncols -1; col >= 0; col--) {
+		for (int col = 0; col < trk->ncols; col++) {
 			if (col_last_note(trk, col, p) == evt.note) {
 				found = 1;
 				c = col;
+
+				int wanderer = track_get_wandering_note(trk, c, p);
+				if (wanderer >-1) {
+					track_set_wanderer(trk, c, wanderer, 0);
+				}
 			}
 		}
 
@@ -511,14 +612,17 @@ void track_handle_record(track *trk, midi_event evt) {
 	row r;
 	track_get_row(trk, c, p, &r);
 
-	// don't overwrite note_ons with note_offs
+	// try not to overwrite note_ons with note_offs
 	if (evt.type == note_off && r.type == note_on) {
 		p++;
-		t = 0;
 	}
 
 	if (p > trk->nrows - 1)
 		p = p - trk->nrows;
 
 	track_set_row(trk, c, p, evt.type, evt.note, evt.velocity, t);
+
+	if (evt.type == note_on) {
+		track_set_wanderer(trk, c, p, 1);
+	}
 }

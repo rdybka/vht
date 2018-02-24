@@ -134,17 +134,10 @@ class SequenceView(Gtk.Box):
 				mod.play = 1
 				
 		if cfg.key["multi_record"].matches(event):
-			# play/stop
-			if mod.record:
-				mod.record = 0
-				self._prop_view.redraw()
-				for trk in self.get_tracks():
-					trk.undo_buff.add_state()
-			else:
-				mod.record = 2
-				self._prop_view.redraw()
-				for trk in self.get_tracks():
-					trk.undo_buff.add_state()
+			mod.record = 2
+			self._prop_view.redraw()
+			for trk in self.get_tracks():
+				trk.undo_buff.add_state()
 			
 			if mod.active_track:
 				self.redraw_track(mod.active_track.trk)
@@ -158,11 +151,13 @@ class SequenceView(Gtk.Box):
 				self._prop_view.redraw()
 				for trk in self.get_tracks():
 					trk.undo_buff.add_state()
+					trk.optimise()
 			else:
 				mod.record = 1
 				self._prop_view.redraw()
 				for trk in self.get_tracks():
 					trk.undo_buff.add_state()
+					trk.optimise()
 
 			if mod.active_track:
 				self.redraw_track(mod.active_track.trk)
@@ -441,9 +436,10 @@ class SequenceView(Gtk.Box):
 
 		if trk:
 			self._prop_view.add_track(trk, t)
-		
-		t.show()
+			self.change_active_track(t)
 
+		t.show()
+		
 	def expand_track(self, trk):
 		trk.add_column()
 		self.redraw_track(trk)
@@ -500,16 +496,20 @@ class SequenceView(Gtk.Box):
 				return wdg
 			
 	def change_active_track(self, trk):
+		if mod.active_track == trk:
+			self._prop_view.redraw()
+			return
+			
 		ac = mod.active_track
 		
 		mod.active_track = trk
 		if ac != trk:
 			self.seq.set_midi_focus(trk.trk.index)
 			if ac:
-				self._prop_view.redraw(ac.trk.index)
 				ac.pmp.silence()
-				
-			self._prop_view.redraw(trk.trk.index)
+			
+			if trk._surface:
+				self._prop_view.redraw(trk.trk.index)
 	
 	def redraw_track(self, trk = None):
 		for wdg in self.get_tracks(True):
@@ -627,6 +627,7 @@ class SequenceView(Gtk.Box):
 				while r:
 					trk.redraw(r["row"])
 					redr_props = True
+					trk.undo_buff.add_state()
 					r = trk.trk.get_rec_update()
 				
 				if redr_props:

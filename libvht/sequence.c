@@ -143,10 +143,14 @@ void sequence_set_midi_focus(sequence *seq, int foc) {
 
 void sequence_handle_record(sequence *seq, midi_event evt) {
 	if (module.recording == 1)
-		if (seq->midi_focus >= 0 && seq->midi_focus < seq->ntrk)
+		if (seq->midi_focus >= 0 && seq->midi_focus < seq->ntrk) {
 			track_handle_record(seq->trk[seq->midi_focus], evt);
+			evt.channel = seq->trk[seq->midi_focus]->channel;
+			midi_buffer_add(0, evt);
+		}
 
 	if (module.recording == 2) {
+		midi_buffer_add(0, evt);
 		int found = 0;
 		for (int tr = 0; tr < seq->ntrk; tr++) {
 			if (seq->trk[tr]->channel == evt.channel) {

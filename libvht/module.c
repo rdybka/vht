@@ -102,7 +102,11 @@ void module_advance(jack_nframes_t curr_frames) {
 		if (!empty) {
 			midi_event mev = midi_decode_event(evt.buffer, evt.size);
 			mev.time = evt.time;
-			midi_buffer_add(0, mev);
+
+			if (!module.recording) {
+				midi_buffer_add(0, mev);
+			}
+
 			midi_in_buffer_add(mev);
 
 			if (module.recording) {
