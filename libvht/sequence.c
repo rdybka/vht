@@ -152,7 +152,7 @@ void sequence_handle_record(sequence *seq, midi_event evt) {
 	if (module.recording == 2) {
 		midi_buffer_add(0, evt);
 		int found = 0;
-		for (int tr = 0; tr < seq->ntrk; tr++) {
+		for (int tr = seq->ntrk - 1; tr > 0 && !found; tr--) {
 			if (seq->trk[tr]->channel == evt.channel) {
 				track_handle_record(seq->trk[tr], evt);
 				found = 1;

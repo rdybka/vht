@@ -1084,19 +1084,28 @@ class TrackView(Gtk.DrawingArea):
 			return
 
 		shift = False
-		if event.state & Gdk.ModifierType.SHIFT_MASK:
-			shift = True
-
 		ctrl = False
-		if event.state & Gdk.ModifierType.CONTROL_MASK:
-			ctrl = True
-
 		alt = False
-		if event.state & Gdk.ModifierType.MOD1_MASK:
-			alt = True
+		
+		if event.state:
+			if event.state & Gdk.ModifierType.SHIFT_MASK:
+				shift = True
+
+			if event.state & Gdk.ModifierType.CONTROL_MASK:
+				ctrl = True
+
+			if event.state & Gdk.ModifierType.MOD1_MASK:
+				alt = True
 		
 		if self.velocity_editor:
 			self.velocity_editor.on_key_press(widget, event)
+
+		if cfg.key["track_clear"].matches(event):
+			self.undo_buff.restore()
+			self.trk.clear()
+			self.trk.kill_notes()
+			self.redraw()
+			return True
 
 		if cfg.key["undo"].matches(event):
 			self.undo_buff.restore()

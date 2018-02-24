@@ -109,7 +109,12 @@ void module_advance(jack_nframes_t curr_frames) {
 
 			midi_in_buffer_add(mev);
 
-			if (module.recording) {
+			int ignore = 0;
+
+			if (mev.channel == 16)
+				ignore = 1;
+
+			if (module.recording && !ignore) {
 				sequence_handle_record(module.seq[module.curr_seq], mev);
 			}
 		}

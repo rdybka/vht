@@ -1,6 +1,6 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gdk, Gtk, Gio
+from gi.repository import Gdk, Gtk, Gio, GObject
 import cairo
 
 from vht import *
@@ -134,6 +134,14 @@ class SequenceView(Gtk.Box):
 				mod.play = 1
 				
 		if cfg.key["multi_record"].matches(event):
+			if mod.record == 2:
+				mod.record = 0
+				self._prop_view.redraw()
+				for trk in self.get_tracks():
+					trk.undo_buff.add_state()
+					trk.optimise()
+				return
+						
 			mod.record = 2
 			self._prop_view.redraw()
 			for trk in self.get_tracks():
@@ -617,7 +625,36 @@ class SequenceView(Gtk.Box):
 		while(midin):
 			if mod.active_track:
 				mod.active_track.midi_in(midin)
-						
+			
+			#print(midin)
+			
+			for k in cfg.midi_in.keys():
+				m = cfg.midi_in[k]
+				if midin["channel"] == m[0]:
+					if midin["type"] == m[1]:
+						if midin["note"] == m[2]:
+							if midin["velocity"] == m[3]:
+								class kbd_evt():
+									pass
+								
+								cfg_evt = cfg.key[k]
+								
+								kev = kbd_evt()
+												
+								kev.keyval = Gdk.keyval_from_name(cfg_evt.key)
+								kev.state = Gdk.ModifierType.META_MASK
+								
+								if cfg_evt.shift:
+									kev.state = kev.state | Gdk.ModifierType.SHIFT_MASK
+								
+								if cfg_evt.ctrl:
+									kev.state = kev.state | Gdk.ModifierType.CONTROL_MASK
+								
+								if cfg_evt.alt:
+									kev.state = kev.state | Gdk.ModifierType.MOD1_MASK
+								
+								self.on_key_press(self, kev)
+					
 			midin = mod.get_midi_in_event()
 				
 		if mod.record:			

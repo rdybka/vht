@@ -2,6 +2,8 @@ import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
 
+from vht import *
+
 class Configuration():
 	def __init__(self):
 		self._highlight = 4
@@ -77,6 +79,7 @@ class Configuration():
 			"track_move_left":	cfgkey("Left",			False, True, False), 
 			"track_move_last":	cfgkey("End",			False, True, False), 
 			"track_move_first":	cfgkey("Home",			False, True, False), 
+			"track_clear":		cfgkey("d",				True, False, False), 
 			"select_all":		cfgkey("a",				False, True, False), 
 			"copy":				cfgkey("c",				False, True, False), 
 			"cut":				cfgkey("x",				False, True, False), 
@@ -97,6 +100,13 @@ class Configuration():
 			"port_up":			cfgkey("KP_Multiply",	True, False, True),
 			"port_down":		cfgkey("KP_Divide",		True, False, True),
 			"hold_editor":		cfgkey("Control_L",		False, False, False),
+		}
+
+		self.midi_in = {
+			"play": [16, 4, 117, 127],
+			"multi_record": [16, 4, 118, 127],
+			"reset": [16, 4, 116, 127],
+			"track_clear": [16, 4, 113, 127],
 		}
 		
 	@property
@@ -128,19 +138,18 @@ class cfgkey():
 
 	def matches(self, event):
 		key = Gdk.keyval_name(Gdk.keyval_to_lower(event.keyval))
+		
 		if key != self.key:
 			return False
 
 		shift = False
 		ctrl = False
 		alt = False
-		
+
 		if event.state & Gdk.ModifierType.SHIFT_MASK:
 			shift = True
-		
 		if event.state & Gdk.ModifierType.CONTROL_MASK:
 			ctrl = True
-		
 		if event.state & Gdk.ModifierType.MOD1_MASK:
 			alt = True
 		

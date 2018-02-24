@@ -293,7 +293,7 @@ char *midi_in_get_event() {
 	midi_event evt = midi_in_buffer[--curr_midi_in_event];
 
 	static char buff[1024];
-	sprintf(buff, "{\"type\" :%d, \"note\" : %d, \"velocity\" : %d, \"time\" : %d}", evt.type, evt.note, evt.velocity, evt.time);
+	sprintf(buff, "{\"channel\" :%d, \"type\" :%d, \"note\" : %d, \"velocity\" : %d, \"time\" : %d}", evt.channel, evt.type, evt.note, evt.velocity, evt.time);
 	return buff;
 }
 
