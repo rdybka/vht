@@ -49,6 +49,9 @@ int jack_start(char *clt_name) {
 
 	pthread_mutex_init(&module.excl, NULL);
 	pthread_mutex_init(&midi_buff_exl, NULL);
+	pthread_mutex_init(&midi_in_buff_exl, NULL);
+	pthread_mutex_init(&midi_ignore_buff_exl, NULL);
+
 
 	module.jack_running = 1;
 
@@ -109,4 +112,6 @@ void jack_stop() {
 	module.jack_running = 0;
 	pthread_mutex_destroy(&module.excl);
 	pthread_mutex_destroy(&midi_buff_exl);
+	pthread_mutex_destroy(&midi_ignore_buff_exl);
+	pthread_mutex_destroy(&midi_in_buff_exl);
 }

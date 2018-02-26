@@ -29,8 +29,10 @@ midi_event midi_buffer[JACK_CLIENT_MAX_PORTS][EVT_BUFFER_LENGTH];
 midi_event midi_queue_buffer[JACK_CLIENT_MAX_PORTS][EVT_BUFFER_LENGTH];
 
 midi_event midi_in_buffer[EVT_BUFFER_LENGTH];
-int curr_midi_in_event;
+midi_event midi_ignore_buffer[EVT_BUFFER_LENGTH];
 
+int curr_midi_in_event;
+int curr_midi_ignore_event;
 int curr_midi_event[JACK_CLIENT_MAX_PORTS];
 int curr_midi_queue_event[JACK_CLIENT_MAX_PORTS];
 
@@ -42,6 +44,22 @@ void midi_buff_excl_in() {
 
 void midi_buff_excl_out() {
 	pthread_mutex_unlock(&midi_buff_exl);
+}
+
+pthread_mutex_t midi_ignore_buff_exl;
+void midi_ignore_buff_excl_in() {
+	pthread_mutex_lock(&midi_ignore_buff_exl);
+}
+void midi_ignore_buff_excl_out() {
+	pthread_mutex_unlock(&midi_ignore_buff_exl);
+}
+
+pthread_mutex_t midi_in_buff_exl;
+void midi_in_buff_excl_in() {
+	pthread_mutex_lock(&midi_in_buff_exl);
+}
+void midi_in_buff_excl_out() {
+	pthread_mutex_unlock(&midi_in_buff_exl);
 }
 
 int midi_encode_event(midi_event evt, unsigned char *buff) {
@@ -280,23 +298,47 @@ void queue_midi_note_off(sequence *seq, int port, int chn, int note) {
 }
 
 void midi_in_buffer_add(midi_event evt) {
+	midi_in_buff_excl_in();
 	if (curr_midi_in_event == EVT_BUFFER_LENGTH)
 		return;
 
 	midi_in_buffer[curr_midi_in_event++] = evt;
+	midi_in_buff_excl_out();
 }
 
 char *midi_in_get_event() {
 	if (curr_midi_in_event == 0)
 		return NULL;
 
+	midi_in_buff_excl_in();
 	midi_event evt = midi_in_buffer[--curr_midi_in_event];
 
 	static char buff[1024];
 	sprintf(buff, "{\"channel\" :%d, \"type\" :%d, \"note\" : %d, \"velocity\" : %d, \"time\" : %d}", evt.channel, evt.type, evt.note, evt.velocity, evt.time);
+	midi_in_buff_excl_out();
 	return buff;
 }
 
 void midi_in_clear_events() {
+	midi_in_buff_excl_in();
 	curr_midi_in_event = 0;
+	midi_in_buff_excl_out();
+}
+
+void midi_ignore_buffer_clear() {
+	midi_ignore_buff_excl_in();
+	curr_midi_ignore_event = 0;
+	midi_ignore_buff_excl_out();
+}
+
+void midi_ignore_buffer_add(int channel, int type, int note) {
+	midi_event evt;
+	evt.channel = channel;
+	evt.type = type;
+	evt.note = note;
+	evt.velocity = evt.time = 0;
+
+	midi_ignore_buff_excl_out();
+	midi_ignore_buffer[curr_midi_ignore_event++] = evt;
+	midi_ignore_buff_excl_out();
 }

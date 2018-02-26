@@ -27,6 +27,8 @@
 
 enum MIDI_EVENT_TYPE {none, note_on, note_off, pitch_wheel, control_change};
 extern pthread_mutex_t midi_buff_exl; // initialised from jack_start()
+extern pthread_mutex_t midi_in_buff_exl;
+extern pthread_mutex_t midi_ignore_buff_exl;
 
 typedef struct midi_event_t {
 	jack_nframes_t time;
@@ -45,6 +47,7 @@ typedef struct midi_event_t {
 } midi_event;
 
 midi_event midi_decode_event(unsigned char *data, int len);
+
 char *midi_describe_event(midi_event evt, char *output, int len);
 char *i2n(unsigned char i);
 int parse_note(char *);
@@ -61,5 +64,11 @@ void midi_buff_excl_out();
 void midi_buffer_clear();
 void midi_buffer_flush();
 void midi_buffer_add(int port, midi_event evt);
+
+extern int curr_midi_ignore_event;
+extern midi_event midi_ignore_buffer[EVT_BUFFER_LENGTH];
+void midi_ignore_buff_excl_in();
+void midi_ignore_buff_excl_out();
+
 
 #endif //__MIDI_EVENT_H__ 

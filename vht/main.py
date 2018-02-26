@@ -134,6 +134,11 @@ def run():
 		mod.start_error = "you will need JACK for this"
 
 	#mod.dump_notes = True
+	midig = []
+	for val in cfg.midi_in.values():
+		midig.append(tuple(val[:-1]))
+	
+	mod.set_midi_record_ignore(midig)
 	randomcomposer.muzakize()
 	mod.data_path = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "data"))
 

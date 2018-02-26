@@ -3888,6 +3888,57 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_midi_ignore_buffer_clear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  
+  if (!PyArg_ParseTuple(args,(char *)":midi_ignore_buffer_clear")) SWIG_fail;
+  midi_ignore_buffer_clear();
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_midi_ignore_buffer_add(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int arg1 ;
+  int arg2 ;
+  int arg3 ;
+  int val1 ;
+  int ecode1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:midi_ignore_buffer_add",&obj0,&obj1,&obj2)) SWIG_fail;
+  ecode1 = SWIG_AsVal_int(obj0, &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "midi_ignore_buffer_add" "', argument " "1"" of type '" "int""'");
+  } 
+  arg1 = (int)(val1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "midi_ignore_buffer_add" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "midi_ignore_buffer_add" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  midi_ignore_buffer_add(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_sequence_new(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int arg1 ;
@@ -5063,6 +5114,8 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"track_clear_updates", _wrap_track_clear_updates, METH_VARARGS, NULL},
 	 { (char *)"midi_in_get_event", _wrap_midi_in_get_event, METH_VARARGS, NULL},
 	 { (char *)"midi_in_clear_events", _wrap_midi_in_clear_events, METH_VARARGS, NULL},
+	 { (char *)"midi_ignore_buffer_clear", _wrap_midi_ignore_buffer_clear, METH_VARARGS, NULL},
+	 { (char *)"midi_ignore_buffer_add", _wrap_midi_ignore_buffer_add, METH_VARARGS, NULL},
 	 { (char *)"sequence_new", _wrap_sequence_new, METH_VARARGS, NULL},
 	 { (char *)"sequence_get_ntrk", _wrap_sequence_get_ntrk, METH_VARARGS, NULL},
 	 { (char *)"sequence_get_length", _wrap_sequence_get_length, METH_VARARGS, NULL},

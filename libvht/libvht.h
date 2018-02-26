@@ -67,6 +67,10 @@ extern void track_clear_updates(track *trk);
 extern char *midi_in_get_event();
 extern void midi_in_clear_events();
 
+extern void midi_ignore_buffer_clear();
+extern void midi_ignore_buffer_add(int channel, int type, int note);
+
+
 // sequence
 extern sequence *sequence_new(int length);
 extern int sequence_get_ntrk(sequence *seq);

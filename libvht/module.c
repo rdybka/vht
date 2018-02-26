@@ -111,8 +111,16 @@ void module_advance(jack_nframes_t curr_frames) {
 
 			int ignore = 0;
 
-			if (mev.channel == 16)
-				ignore = 1;
+			midi_ignore_buff_excl_in();
+			for (int f = 0; f < curr_midi_ignore_event; f++) {
+				midi_event ignev = midi_ignore_buffer[f];
+				if (ignev.channel == mev.channel)
+					if (ignev.type == mev.type)
+						if (ignev.note == mev.note)
+							ignore = 1;
+			}
+
+			midi_ignore_buff_excl_out();
 
 			if (module.recording && !ignore) {
 				sequence_handle_record(module.seq[module.curr_seq], mev);

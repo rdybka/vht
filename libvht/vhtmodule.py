@@ -176,6 +176,13 @@ class VHTModule(Iterable):
 		else:
 			return None		
 	
+	# so we don't record control midi events
+	# expects a list of (channel, evt_type, note) tuples
+	def set_midi_record_ignore(self, midig):
+		libcvht.midi_ignore_buffer_clear()
+		for ig in midig:
+			libcvht.midi_ignore_buffer_add(ig[0], ig[1], ig[2])
+		
 	def save(self, filename):
 		jm = {}
 		jm["bpm"] = self.bpm

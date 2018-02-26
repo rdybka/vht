@@ -208,6 +208,14 @@ def midi_in_clear_events():
     return _libcvht.midi_in_clear_events()
 midi_in_clear_events = _libcvht.midi_in_clear_events
 
+def midi_ignore_buffer_clear():
+    return _libcvht.midi_ignore_buffer_clear()
+midi_ignore_buffer_clear = _libcvht.midi_ignore_buffer_clear
+
+def midi_ignore_buffer_add(channel, type, note):
+    return _libcvht.midi_ignore_buffer_add(channel, type, note)
+midi_ignore_buffer_add = _libcvht.midi_ignore_buffer_add
+
 def sequence_new(length):
     return _libcvht.sequence_new(length)
 sequence_new = _libcvht.sequence_new
