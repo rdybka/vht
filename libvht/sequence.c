@@ -146,14 +146,14 @@ void sequence_handle_record(sequence *seq, midi_event evt) {
 		if (seq->midi_focus >= 0 && seq->midi_focus < seq->ntrk) {
 			track_handle_record(seq->trk[seq->midi_focus], evt);
 			evt.channel = seq->trk[seq->midi_focus]->channel;
-			midi_buffer_add(0, evt);
+			midi_buffer_add(seq->trk[seq->midi_focus]->port, evt);
 		}
 
 	if (module.recording == 2) {
-		midi_buffer_add(0, evt);
+		midi_buffer_add(default_midi_port, evt);
 		int found = 0;
 		for (int tr = seq->ntrk - 1; tr > -1 && !found; tr--) {
-			if (seq->trk[tr]->channel == evt.channel) {
+			if ((seq->trk[tr]->channel == evt.channel) && (seq->trk[tr]->port == default_midi_port)) {
 				track_handle_record(seq->trk[tr], evt);
 				found = 1;
 			}
@@ -161,7 +161,7 @@ void sequence_handle_record(sequence *seq, midi_event evt) {
 
 		if (!found) {
 			track *trk;
-			trk = track_new(0, evt.channel, seq->length, seq->length);
+			trk = track_new(default_midi_port, evt.channel, seq->length, seq->length);
 			sequence_add_track(seq, trk);
 
 			trk->last_pos = seq->pos - seq->last_period;

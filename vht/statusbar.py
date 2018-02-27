@@ -27,7 +27,7 @@ class StatusBar(Gtk.DrawingArea):
 				
 		self._surface = None
 		self._context = None
-		self.min_char_width = 60
+		self.min_char_width = 70
 		
 		self.pos = []
 		self.active_field = None
@@ -42,7 +42,7 @@ class StatusBar(Gtk.DrawingArea):
 		w = self.get_allocated_width()
 		h = self.get_allocated_height()
 		
-		(x, y, width, height, dx, dy) = cr.text_extents("000" * self.min_char_width)
+		(x, y, width, height, dx, dy) = cr.text_extents("0" * self.min_char_width)
 
 		self.set_size_request(1, height * 1.5 * cfg.seq_spacing)
 
@@ -150,6 +150,18 @@ class StatusBar(Gtk.DrawingArea):
 		xx += dx
 		self.pos.append(xx)
 		
+		if self.active_field == 6:
+			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
+		else:
+			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
+		
+		txt = " prt:%d" % cfg.default_midi_out_port
+		(x, y, width, height, dx, dy) = cr.text_extents(txt)
+		cr.move_to(self.pos[-1], h)
+		cr.show_text(txt)
+		xx += dx
+		self.pos.append(xx)
+				
 		cr.set_source_rgb(*(col * 0 for col in cfg.colour))		
 		txt = "%02d:%03d.%03d ***" % (cs, int(mod[cs].pos), (mod[cs].pos - int(mod[cs].pos)) * 1000)
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
@@ -235,6 +247,9 @@ class StatusBar(Gtk.DrawingArea):
 			if self.active_field == 5:	# bpm
 				self.tt_txt = "<big>⇑</big> %s\n<big>↑</big> %s\n<big>↓</big> %s\n<big>⇓</big> %s" % (cfg.key["bpm_10_up"], cfg.key["bpm_up"], cfg.key["bpm_down"], cfg.key["bpm_10_down"])
 		
+			if self.active_field == 6:	# prt
+				self.tt_txt = "<big>↑</big> %s\n<big>↓</big> %s" % (cfg.key["def_port_up"], cfg.key["def_port_down"])
+		
 			self.last_active_field = self.active_field
 
 	def on_scroll(self, widget, event):
@@ -275,6 +290,15 @@ class StatusBar(Gtk.DrawingArea):
 			if down:
 				mod.bpm = mod.bpm - 1
 				mod.mainwin.adj.set_value(mod.bpm)
+
+		if self.active_field == 6:
+			if up:
+				cfg.default_midi_out_port = min(max(cfg.default_midi_out_port + 1, 0), mod.max_ports - 1)
+				mod.set_default_midi_port(cfg.default_midi_out_port)
+			if down:
+				cfg.default_midi_out_port = min(max(cfg.default_midi_out_port - 1, 0), mod.max_ports - 1)
+				mod.set_default_midi_port(cfg.default_midi_out_port)
+
 		
 		return True		
 		
@@ -324,6 +348,15 @@ class StatusBar(Gtk.DrawingArea):
 			if down:
 				mod.bpm = mod.bpm - 1
 				mod.mainwin.adj.set_value(mod.bpm)
+				
+		if self.active_field == 6:
+			if up:
+				cfg.default_midi_out_port = min(max(cfg.default_midi_out_port + 1, 0), mod.max_ports - 1)
+				mod.set_default_midi_port(cfg.default_midi_out_port)
+			if down:
+				cfg.default_midi_out_port = min(max(cfg.default_midi_out_port - 1, 0), mod.max_ports - 1)
+				mod.set_default_midi_port(cfg.default_midi_out_port)
+				
 		
 	def on_tooltip(self, wdg, x, y, kbd, tt):
 		if not self.active_field:

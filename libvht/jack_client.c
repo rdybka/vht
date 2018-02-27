@@ -31,6 +31,8 @@ jack_nframes_t jack_buffer_size;
 jack_nframes_t jack_last_frame;
 char *jack_error;
 
+int default_midi_port;
+
 int jack_start(char *clt_name) {
 	jack_options_t opt;
 	opt = JackNoStartServer;
@@ -52,7 +54,6 @@ int jack_start(char *clt_name) {
 	pthread_mutex_init(&midi_in_buff_exl, NULL);
 	pthread_mutex_init(&midi_ignore_buff_exl, NULL);
 
-
 	module.jack_running = 1;
 
 	for (int p = 0; p < JACK_CLIENT_MAX_PORTS; p++)
@@ -60,11 +61,14 @@ int jack_start(char *clt_name) {
 
 	jack_input_port = jack_port_register (jack_client, "in", JACK_DEFAULT_MIDI_TYPE, JackPortIsInput, 0);
 
+	curr_midi_in_event = 0;
+	default_midi_port = 0;
+
+	jack_synch_output_ports();
+
 	jack_set_process_callback (jack_client, jack_process, 0);
 	jack_set_sample_rate_callback(jack_client, jack_sample_rate_changed, 0);
 	jack_set_buffer_size_callback(jack_client, jack_buffer_size_changed, 0);
-
-	curr_midi_in_event = 0;
 
 	jack_activate(jack_client);
 
@@ -82,9 +86,9 @@ void jack_synch_output_ports() {
 			port_state[p] = 1;
 	}
 
-	midi_buff_excl_out();
+	port_state[default_midi_port] = 1;
 
-	//port_state[0] = 1;
+	midi_buff_excl_out();
 
 	for (int s = 0; s < module.nseq; s++)
 		for (int t = 0; t < module.seq[s]->ntrk; t++)
@@ -94,12 +98,14 @@ void jack_synch_output_ports() {
 		if ((port_state[p] == 0) && (jack_output_ports[p])) {
 			jack_port_unregister(jack_client, jack_output_ports[p]);
 			jack_output_ports[p] = 0;
+			//printf("unregistering port %d\n", p);
 		}
 
 		if ((port_state[p] == 1) && (jack_output_ports[p] == 0)) {
 			char pname[256];
 			sprintf(pname, "out_%02d", p);
 			jack_output_ports[p] = jack_port_register (jack_client, pname, JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
+			//printf("registering port %s\n", pname);
 		}
 	}
 }
@@ -114,4 +120,11 @@ void jack_stop() {
 	pthread_mutex_destroy(&midi_buff_exl);
 	pthread_mutex_destroy(&midi_ignore_buff_exl);
 	pthread_mutex_destroy(&midi_in_buff_exl);
+}
+
+void set_default_midi_port(int port) {
+	if ((port < 0) || (port >= JACK_CLIENT_MAX_PORTS))
+		return;
+
+	default_midi_port = port;
 }

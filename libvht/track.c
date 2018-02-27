@@ -44,7 +44,7 @@ track *track_new(int port, int channel, int len, int songlen) {
 	trk->trigger_type = TRIGGER_NORMAL;
 	trk->ncols = 1;
 	trk->playing = 0;
-	trk->port = 0;
+	trk->port = port;
 	trk->cur_rec_update = 0;
 	pthread_mutex_init(&trk->excl, NULL);
 	pthread_mutex_init(&trk->exclrec, NULL);

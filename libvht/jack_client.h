@@ -36,5 +36,7 @@ extern char *jack_error;
 int jack_start(char *clt_name);
 void jack_stop();
 void jack_synch_output_ports();
+extern int default_midi_port;
+
 
 #endif //__JACK_CLIENT_H__

@@ -104,7 +104,7 @@ void module_advance(jack_nframes_t curr_frames) {
 			mev.time = evt.time;
 
 			if (!module.recording) {
-				midi_buffer_add(0, mev);
+				midi_buffer_add(default_midi_port, mev);
 			}
 
 			midi_in_buffer_add(mev);

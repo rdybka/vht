@@ -182,6 +182,9 @@ class VHTModule(Iterable):
 		libcvht.midi_ignore_buffer_clear()
 		for ig in midig:
 			libcvht.midi_ignore_buffer_add(ig[0], ig[1], ig[2])
+
+	def set_default_midi_port(self, port):
+		libcvht.set_default_midi_port(port)
 		
 	def save(self, filename):
 		jm = {}

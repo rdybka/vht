@@ -41,6 +41,7 @@ class Configuration():
 		self.velocity = 100
 		self.page_height = 16
 		self.skip = 1
+		self.default_midi_out_port = 0
 		
 		self.select_button = 1
 		self.delete_button = 3
@@ -67,6 +68,8 @@ class Configuration():
 			"octave_down":		cfgkey("KP_Divide",		False, False, False),
 			"highlight_up":		cfgkey("KP_Multiply",	True, False, False),
 			"highlight_down":	cfgkey("KP_Divide",		True, False, False),
+			"def_port_up":		cfgkey("KP_Multiply",	True, True, False),
+			"def_port_down":	cfgkey("KP_Divide",		True, True, False),
 			"follow":			cfgkey("f",				False, False, False),
 			
 			# trackview
@@ -97,8 +100,8 @@ class Configuration():
 			"velocity_10_down":	cfgkey("Page_Down",		False, False, True),
 			"channel_up":		cfgkey("KP_Add",		True, False, True),
 			"channel_down":		cfgkey("KP_Subtract",	True, False, True),
-			"port_up":			cfgkey("KP_Multiply",	True, False, True),
-			"port_down":		cfgkey("KP_Divide",		True, False, True),
+			"port_up":			cfgkey("none",			True, False, True),
+			"port_down":		cfgkey("none",			True, False, True),
 			"hold_editor":		cfgkey("Control_L",		False, False, False),
 		}
 

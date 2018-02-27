@@ -226,6 +226,16 @@ class SequenceView(Gtk.Box):
 				self._prop_view.redraw()
 			return True
 
+		if cfg.key["def_port_up"].matches(event):
+			cfg.default_midi_out_port = min(max(cfg.default_midi_out_port + 1, 0), mod.max_ports - 1)
+			mod.set_default_midi_port(cfg.default_midi_out_port)
+			return True
+
+		if cfg.key["def_port_down"].matches(event):
+			cfg.default_midi_out_port = min(max(cfg.default_midi_out_port - 1, 0), mod.max_ports - 1)
+			mod.set_default_midi_port(cfg.default_midi_out_port)
+			return True
+
 		if cfg.key["track_add"].matches(event):
 			self._side_prop.add_track()
 			return True

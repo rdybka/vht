@@ -70,6 +70,7 @@ extern void midi_in_clear_events();
 extern void midi_ignore_buffer_clear();
 extern void midi_ignore_buffer_add(int channel, int type, int note);
 
+extern void set_default_midi_port(int port);
 
 // sequence
 extern sequence *sequence_new(int length);

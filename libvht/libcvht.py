@@ -216,6 +216,10 @@ def midi_ignore_buffer_add(channel, type, note):
     return _libcvht.midi_ignore_buffer_add(channel, type, note)
 midi_ignore_buffer_add = _libcvht.midi_ignore_buffer_add
 
+def set_default_midi_port(port):
+    return _libcvht.set_default_midi_port(port)
+set_default_midi_port = _libcvht.set_default_midi_port
+
 def sequence_new(length):
     return _libcvht.sequence_new(length)
 sequence_new = _libcvht.sequence_new

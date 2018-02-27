@@ -3939,6 +3939,27 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_set_default_midi_port(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int arg1 ;
+  int val1 ;
+  int ecode1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:set_default_midi_port",&obj0)) SWIG_fail;
+  ecode1 = SWIG_AsVal_int(obj0, &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "set_default_midi_port" "', argument " "1"" of type '" "int""'");
+  } 
+  arg1 = (int)(val1);
+  set_default_midi_port(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_sequence_new(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int arg1 ;
@@ -5116,6 +5137,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"midi_in_clear_events", _wrap_midi_in_clear_events, METH_VARARGS, NULL},
 	 { (char *)"midi_ignore_buffer_clear", _wrap_midi_ignore_buffer_clear, METH_VARARGS, NULL},
 	 { (char *)"midi_ignore_buffer_add", _wrap_midi_ignore_buffer_add, METH_VARARGS, NULL},
+	 { (char *)"set_default_midi_port", _wrap_set_default_midi_port, METH_VARARGS, NULL},
 	 { (char *)"sequence_new", _wrap_sequence_new, METH_VARARGS, NULL},
 	 { (char *)"sequence_get_ntrk", _wrap_sequence_get_ntrk, METH_VARARGS, NULL},
 	 { (char *)"sequence_get_length", _wrap_sequence_get_length, METH_VARARGS, NULL},
