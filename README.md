@@ -1,1 +1,1 @@
-Valhalla Tracker by Remigiusz Dybka
+#Valhalla Tracker
