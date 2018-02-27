@@ -1,4 +1,4 @@
-![vht screenshot](/data/vht_2018-02-26.png)
+![vht header](/data/vht_header.png)
 ## about
 Valhalla Tracker is....
 
