@@ -1,3 +1,1 @@
-# Valhalla Tracker
-
-![vht logo](/data/vht.png)
+# ![vht logo](/data/vht.png) Valhalla Tracker
