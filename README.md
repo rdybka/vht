@@ -1,7 +1,22 @@
 ![vht header](/data/vht_header.png)
 ## about
-Valhalla Tracker is....
+Valhalla Tracker aims to be a perfect companion for your
+JACK/Yoshimi/ZynAddSubFX/Calf setup. It relies 100% on JACK for timing
+which allows sample-exact synchronisation and, in future, 
+asynchronous rendering of projects.
 
 ## installation
-./setup.py and so on
+The preferred method for now is:
 
+`./setup.py install --user`
+
+## roadmap before a file release
+- [x] record/edit midi
+- [ ] record/edit controllers
+- [ ] triggers
+- [ ] timeline
+- [ ] loops
+- [ ] export to wav
+- [ ] configuration window
+
+deadline: soon enough
