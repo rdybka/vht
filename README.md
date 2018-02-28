@@ -10,13 +10,18 @@ The preferred method for now is:
 
 `./setup.py install --user`
 
+## dependencies
+- python3-gobject
+- jack-audio-connection-kit-devel
+
 ## roadmap before a file release
-- [x] record/edit midi
+- [x] record/edit notes
 - [ ] record/edit controllers
 - [ ] triggers
 - [ ] timeline
 - [ ] loops
 - [ ] export to wav
 - [ ] configuration window
+- [ ] some documentation
 
 deadline: soon enough
