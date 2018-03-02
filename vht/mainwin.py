@@ -14,7 +14,7 @@ class MainWin(Gtk.ApplicationWindow):
 		
 		self.last_filename = None		
 		
-		# fucking gui
+		# damn gui
 		self.hb = Gtk.HeaderBar()
 		self.hb.set_show_close_button(True)
 		self.set_titlebar(self.hb)
