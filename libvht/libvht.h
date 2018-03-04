@@ -101,6 +101,13 @@ extern void track_set_nrows(track *trk, int n);
 extern void track_set_nsrows(track *trk, int n);
 extern void track_set_playing(track *trk, int p);
 
+extern void track_set_ctrl(track *trk, int c, int n, int val);
+extern char *track_get_ctrl(track *tkl, int c, int n);
+extern char *track_get_ctrl_nums(track *tkl);
+
+extern int track_get_nctrl(track *trk);
+extern int track_get_ctrlpr(track *trk);
+
 extern void track_add_col(track *trk);
 extern void track_del_col(track *trk, int c);
 extern void track_swap_col(track *trk, int c, int c2);

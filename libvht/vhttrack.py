@@ -96,6 +96,28 @@ class VHTTrack(Iterable):
 	def pos(self):
 		return self._vht_handle.track_get_pos(self._trk_handle)
 
+	# number of controllers
+	@property
+	def nctrl(self):
+		return self._vht_handle.track_get_nctrl(self._trk_handle)
+
+	# controller rows per row
+	@property
+	def ctrlpr(self):
+		return self._vht_handle.track_get_ctrlpr(self._trk_handle)
+
+	@property
+	def ctrls(self):
+		return eval(self._vht_handle.track_get_ctrl_nums(self._trk_handle))
+
+	# sets control - r = is row * ctrlpr + offset
+	def set_ctrl(self, c, r, val):
+		return self._vht_handle.track_set_ctrl(self._trk_handle, c, r, val)
+
+	# gets all controls for given row
+	def get_ctrl(self, c, r):
+		return eval(self._vht_handle.track_get_ctrl(self._trk_handle, c, rl))
+
 	def trigger(self):
 		self._vht_handle.track_trigger(self._trk_handle)
 

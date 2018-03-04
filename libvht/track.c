@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -48,6 +49,7 @@ track *track_new(int port, int channel, int len, int songlen) {
 	trk->cur_rec_update = 0;
 	pthread_mutex_init(&trk->excl, NULL);
 	pthread_mutex_init(&trk->exclrec, NULL);
+	pthread_mutex_init(&trk->exclctrl, NULL);
 
 	trk->rows = malloc(sizeof(row*) * trk->ncols);
 	for (int c = 0; c < trk->ncols; c++) {
@@ -57,6 +59,11 @@ track *track_new(int port, int channel, int len, int songlen) {
 		trk->ring = malloc(sizeof(int) * trk->ncols);
 		trk->ring[c] = -1;
 	};
+
+	trk->ctrlpr = TRACK_DEFAULT_CONTROLS_PER_ROW;
+	trk->nctrl = 0;
+	trk->ctrl = 0;
+	trk->ctrlnum = 0;
 
 	track_reset(trk);
 	trk->playing = 1;
@@ -113,15 +120,81 @@ int track_get_row(track *trk, int c, int n, row *r) {
 	return 0;
 }
 
+void track_set_ctrl(track *trk, int c, int n, int val) {
+	pthread_mutex_lock(&trk->exclctrl);
+
+	trk->ctrl[c][n] = val;
+
+	pthread_mutex_unlock(&trk->exclctrl);
+
+	track_insert_rec_update(trk, c, n / trk->ctrlpr);
+}
+
+char *track_get_ctrl_nums(track *trk) {
+	static char rc[256];
+	pthread_mutex_lock(&trk->exclctrl);
+
+	char *ret = NULL;
+
+	sprintf(rc, "[");
+	for (int c = 0; c < trk->nctrl; c++) {
+		char buff[256];
+		sprintf(buff, "%d,", trk->ctrlnum[c]);
+	}
+
+	strcat(rc, "]");
+	ret = rc;
+
+	pthread_mutex_unlock(&trk->exclctrl);
+	return ret;
+}
+
+char *track_get_ctrl(track *trk, int c, int n) {
+	static char rc[256];
+	pthread_mutex_lock(&trk->exclctrl);
+
+	char *ret = NULL;
+
+	if (trk->nctrl > 0) {
+		int empty = 1;
+
+		sprintf(rc, "[");
+		for (int nn = n * trk->ctrlpr; nn < (n + 1) * trk->ctrlpr; n++) {
+			char buff[256];
+			sprintf(buff, "%d, ", trk->ctrl[c][nn]);
+			strcat(rc, buff);
+			if (trk->ctrl[c][nn] > -1)
+				empty = 0;
+		}
+
+
+		if (!empty) {
+			strcat(rc, "]");
+			ret = rc;
+		}
+	}
+
+	pthread_mutex_unlock(&trk->exclctrl);
+	return ret;
+}
+
 void track_free(track *trk) {
 	pthread_mutex_destroy(&trk->excl);
 	pthread_mutex_destroy(&trk->exclrec);
+	pthread_mutex_destroy(&trk->exclctrl);
+
 	for (int c = 0; c < trk->ncols; c++) {
 		free(trk->rows[c]);
 	}
 
+	for (int c = 0; c < trk->nctrl; c++) {
+		free(trk->ctrl[c]);
+	}
+
 	free(trk->ring);
 	free(trk->rows);
+	free(trk->ctrl);
+	free(trk->ctrlnum);
 	free(trk);
 }
 
@@ -224,14 +297,15 @@ int col_last_note(track *trk, int col, double pos) {
 	// since we only read, ignore thread safety
 
 	if (col >= trk->ncols)
-		return 0;
+		return -1;
 
 	if (trk->rows[col][(int)pos].type == note_on) {
 		return trk->rows[col][(int)pos].note;
 	}
 
 	if (trk->rows[col][(int)pos].type == note_off) {
-		return trk->rows[col][(int)pos].note;
+		return -1;
+		//return trk->rows[col][(int)pos].note;
 	}
 
 	int ret = -1;
@@ -341,6 +415,7 @@ void track_advance(track *trk, double speriod) {
 	if (row_end > trk->nrows)
 		row_end = trk->nrows;
 
+	// play notes
 	for (int c = 0; c < trk->ncols; c++)
 		for (int n = row_start; n <= row_end; n++) {
 			int nn = n;
@@ -362,6 +437,50 @@ void track_advance(track *trk, double speriod) {
 				}
 			}
 		}
+
+	// play controllers
+	int ctrlfrom = (trk->pos / trk->nrows) * trk->nrows * trk->ctrlpr;
+	int ctrlto = ((trk->pos + tperiod)  / trk->nrows) * trk->nrows * trk->ctrlpr;
+
+	if (ctrlto == ctrlfrom)
+		ctrlto += 1;
+
+	double cper = tperiod / (ctrlto - ctrlfrom);
+	for (int c = 0; c < trk->nctrl; c++) {
+		double delay = 0;
+
+		for (int r = ctrlfrom; r < ctrlto; r++) {
+			int rr = r;
+
+			while(rr > trk->nrows * trk->ctrlpr)
+				rr -= trk->nrows * trk->ctrlpr;
+
+			int ctrl = trk->ctrlnum[c];
+			int data = trk->ctrl[c][rr];
+
+			if (data > -1) {
+				midi_event evt;
+
+				evt.time = delay * tmul;
+				evt.channel = trk->channel;
+				evt.type = control_change;
+				evt.control = ctrl;
+				evt.data = data;
+
+				if (ctrl == -1) {
+					evt.type = pitch_wheel;
+					evt.msb = data / 128;
+					evt.lsb = data - (evt.msb * 128);
+				}
+
+				if (trk->playing) {
+					midi_buffer_add(trk->port, evt);
+				}
+			}
+
+			delay += cper;
+		}
+	}
 
 	trk->last_pos = trk->pos;
 	trk->last_period = tperiod;
@@ -408,13 +527,27 @@ void track_add_col(track *trk) {
 	track_clear_rows(trk, trk->ncols - 1);
 }
 
-void track_del_col(track *trk, int c) {
-	module_excl_in();
+void track_add_ctrl(track *trk, int c) {
+	pthread_mutex_lock(&trk->exclctrl);
+	trk->nctrl++;
 
+	trk->ctrl = realloc(trk->ctrl, sizeof(int*) * trk->nctrl);
+	trk->ctrl[trk->nctrl -1] = malloc(sizeof(int *)  * trk->ctrlpr * trk->arows);
+	trk->ctrlnum = realloc(trk->ctrlnum, sizeof(int) * trk->nctrl);
+	trk->ctrlnum[trk->nctrl -1] = c;
+
+	for (int r = 0; r < trk->ctrlpr * trk->arows; r++)
+		trk->ctrl[trk->nctrl -1][r] = -1;
+
+	pthread_mutex_unlock(&trk->exclctrl);
+}
+
+void track_del_col(track *trk, int c) {
 	if ((c >= trk->ncols) || (c < 0) || (trk->ncols == 1)) {
-		module_excl_out();
 		return;
 	}
+
+	module_excl_in();
 
 	for (int cc = c; cc < trk->ncols - 1; cc++) {
 		trk->rows[cc] = trk->rows[cc+1];
@@ -429,6 +562,26 @@ void track_del_col(track *trk, int c) {
 	module_excl_out();
 }
 
+void track_del_ctrl(track *trk, int c) {
+	if ((c >= trk->nctrl) || (c < 0)) {
+		return;
+	}
+
+	pthread_mutex_lock(&trk->exclctrl);
+
+	for (int cc = c; cc < trk->nctrl - 1; cc++) {
+		trk->ctrl[cc] = trk->ctrl[cc+1];
+		trk->ctrlnum[cc] = trk->ctrlnum[cc+1];
+	}
+
+	trk->nctrl--;
+
+	trk->ctrl = realloc(trk->ctrl, sizeof(int*) * trk->nctrl * trk->ctrlpr);
+	trk->ring = realloc(trk->ring, sizeof(int) * trk->nctrl);
+
+	pthread_mutex_unlock(&trk->exclctrl);
+}
+
 void track_swap_col(track *trk, int c, int c2) {
 	if ((c > trk->ncols) || (c2 > trk->ncols)) {
 		return;
@@ -439,6 +592,24 @@ void track_swap_col(track *trk, int c, int c2) {
 	trk->rows[c] = trk->rows[c2];
 	trk->rows[c2] = c3;
 	module_excl_out();
+}
+
+void track_swap_ctrl(track *trk, int c, int c2) {
+	if ((c > trk->nctrl) || (c2 > trk->nctrl)) {
+		return;
+	}
+
+	pthread_mutex_lock(&trk->exclctrl);
+
+	int *cc3 = trk->ctrl[c];
+	trk->ctrl[c] = trk->ctrl[c2];
+	trk->ctrl[c2] = cc3;
+
+	int c3 = trk->ctrlnum[c];
+	trk->ctrlnum[c] = trk->ctrlnum[c2];
+	trk->ctrlnum[c2] = c3;
+
+	pthread_mutex_unlock(&trk->exclctrl);
 }
 
 void track_resize(track *trk, int size) {
@@ -453,16 +624,25 @@ void track_resize(track *trk, int size) {
 
 	trk->arows = size * 2;
 
+	pthread_mutex_lock(&trk->exclctrl);
+
 	for (int c = 0; c < trk->ncols; c++) {
 		trk->rows[c] = realloc(trk->rows[c], sizeof(row) * trk->arows);
+		trk->ctrl[c] = realloc(trk->ctrl[c], sizeof(int) * trk->arows * trk->ctrlpr);
 
 		for (int n = trk->nrows; n < trk->arows; n++) {
 			trk->rows[c][n].type = none;
 			trk->rows[c][n].note = 0;
 			trk->rows[c][n].velocity = 0;
 			trk->rows[c][n].delay = 0;
+
+			for (int nn = 0; nn < trk->ctrlpr; n++) {
+				trk->ctrl[c][n * trk->ctrlpr + nn] = 0;
+			}
 		}
 	}
+
+	pthread_mutex_unlock(&trk->exclctrl);
 
 	trk->nrows = size;
 
@@ -497,6 +677,13 @@ char *track_get_rec_update(track *trk) {
 }
 
 void track_insert_rec_update(track *trk, int col, int row) {
+	if (trk->cur_rec_update > 0) {
+		if ((trk->updates[trk->cur_rec_update - 1].col == col)
+		        && (trk->updates[trk->cur_rec_update - 1].row == row)) {
+			return;
+		}
+	}
+
 	pthread_mutex_lock(&trk->exclrec);
 
 	trk->updates[trk->cur_rec_update].col = col;
@@ -547,25 +734,23 @@ void track_handle_record(track *trk, midi_event evt) {
 	if (p > trk->nrows - 1)
 		p = p - trk->nrows;
 
-	/*
-	char buff[256];
-	printf("rec: %f %s -> %f : %d:%d\n", trk->pos, midi_describe_event(evt, buff, 256), pos, p, t);
-	*/
 
 	int c = 0;
-
+	int found = 0;
 	// are we in a sounding note? try next column
 	if (trk->channel != 10) {
 		if (evt.type == note_on) {
-			for (int col = 0; col < trk->ncols; col++) {
+			for (int col = 0; col < trk->ncols && !found; col++) {
+				c = col;
 				int ln = col_last_note(trk, col, p);
-				if (ln != -1 || ln == evt.note) {
-					c = col + 1;
+				if (ln == -1 || ln == evt.note) {
+					found = 1;
 				}
 			}
 
-			if (c == trk->ncols) {
+			if (!found) {
 				track_add_col(trk);
+				c = trk->ncols - 1;
 			}
 		}
 	}
@@ -614,15 +799,58 @@ void track_handle_record(track *trk, midi_event evt) {
 
 	// try not to overwrite note_ons with note_offs
 	if (evt.type == note_off && r.type == note_on) {
-		p++;
+		return;
 	}
 
 	if (p > trk->nrows - 1)
 		p = p - trk->nrows;
 
-	track_set_row(trk, c, p, evt.type, evt.note, evt.velocity, t);
+
+	if (evt.type == note_on || evt.type == note_off) {
+		track_set_row(trk, c, p, evt.type, evt.note, evt.velocity, t);
+	}
 
 	if (evt.type == note_on) {
 		track_set_wanderer(trk, c, p, 1);
 	}
+
+	if (!(evt.type == pitch_wheel || evt.type == control_change))
+		return;
+
+	int ctrl = evt.control;
+
+	int ctrlval = evt.msb;
+
+	if (evt.type == pitch_wheel) {
+		ctrl = -1;
+		ctrlval = (ctrlval * 128) + evt.lsb;
+	}
+
+	int pp = (p * trk->ctrlpr) + (int)((pos - p) * trk->ctrlpr);
+
+	/*char buff[256];
+	printf("rec: %f %s -> %f : %d:%d %d:%d:%d\n", trk->pos, midi_describe_event(evt, buff, 256), pos, p, t, ctrl, pp, ctrlval);
+	*/
+
+	int nc = -1;
+
+	for (int c = 0; c < trk->nctrl; c++) {
+		if (trk->ctrlnum[c] == ctrl)
+			nc = c;
+	}
+
+	if (nc == -1) {
+		track_add_ctrl(trk, ctrl);
+	}
+
+	for (int c = 0; c < trk->nctrl; c++) {
+		if (trk->ctrlnum[c] == ctrl)
+			nc = c;
+	}
+
+	while (pp >= trk->ctrlpr * trk->nrows) {
+		pp -= trk->ctrlpr * trk->nrows;
+	}
+
+	track_set_ctrl(trk, nc, pp, ctrlval);
 }

@@ -117,6 +117,14 @@ int track_get_playing(track *trk) {
 	return trk->playing;
 }
 
+int track_get_nctrl(track *trk) {
+	return trk->nctrl;
+}
+
+int track_get_ctrlpr(track *trk) {
+	return trk->ctrlpr;
+}
+
 double track_get_pos(track *trk) {
 	return trk->pos;
 }

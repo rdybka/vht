@@ -126,7 +126,6 @@ class VHTApp(Gtk.Application):
 		filter_any.set_name("Any files")
 		filter_any.add_pattern("*")
 		dialog.add_filter(filter_any)
-
 	
 def run():
 	mod.start_error = None

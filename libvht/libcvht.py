@@ -316,6 +316,26 @@ def track_set_playing(trk, p):
     return _libcvht.track_set_playing(trk, p)
 track_set_playing = _libcvht.track_set_playing
 
+def track_set_ctrl(trk, c, n, val):
+    return _libcvht.track_set_ctrl(trk, c, n, val)
+track_set_ctrl = _libcvht.track_set_ctrl
+
+def track_get_ctrl(tkl, c, n):
+    return _libcvht.track_get_ctrl(tkl, c, n)
+track_get_ctrl = _libcvht.track_get_ctrl
+
+def track_get_ctrl_nums(tkl):
+    return _libcvht.track_get_ctrl_nums(tkl)
+track_get_ctrl_nums = _libcvht.track_get_ctrl_nums
+
+def track_get_nctrl(trk):
+    return _libcvht.track_get_nctrl(trk)
+track_get_nctrl = _libcvht.track_get_nctrl
+
+def track_get_ctrlpr(trk):
+    return _libcvht.track_get_ctrlpr(trk)
+track_get_ctrlpr = _libcvht.track_get_ctrlpr
+
 def track_add_col(trk):
     return _libcvht.track_add_col(trk)
 track_add_col = _libcvht.track_add_col

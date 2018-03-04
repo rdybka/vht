@@ -680,6 +680,7 @@ class SequenceView(Gtk.Box):
 				if redr_props:
 					self._prop_view.redraw(trk.trk.index)
 					trk.show_timeshift = True
+					trk.tick()
 					#trk.undo_buff.add_state()
 								
 			if len(self.get_tracks()) != len(self.seq):
