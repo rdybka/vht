@@ -47,6 +47,7 @@ track *track_new(int port, int channel, int len, int songlen) {
 	trk->playing = 0;
 	trk->port = port;
 	trk->cur_rec_update = 0;
+
 	pthread_mutex_init(&trk->excl, NULL);
 	pthread_mutex_init(&trk->exclrec, NULL);
 	pthread_mutex_init(&trk->exclctrl, NULL);
@@ -64,7 +65,9 @@ track *track_new(int port, int channel, int len, int songlen) {
 	trk->nctrl = 0;
 	trk->ctrl = 0;
 	trk->ctrlnum = 0;
+	trk->lctrlval = 0;
 
+	track_add_ctrl(trk, -1);
 	track_reset(trk);
 	trk->playing = 1;
 	return trk;
@@ -84,6 +87,9 @@ void track_set_row(track *trk, int c, int n, int type, int note, int velocity, i
 	r->velocity = velocity;
 	r->delay = delay;
 	r->ringing = 0;
+
+	for (int c = 0; c < trk->nctrl; c++)
+		trk->lctrlval[c] = -1;
 
 	pthread_mutex_unlock(&trk->excl);
 	track_insert_rec_update(trk, c, n);
@@ -125,6 +131,24 @@ void track_set_ctrl(track *trk, int c, int n, int val) {
 
 	trk->ctrl[c][n] = val;
 
+	// pitch wheel is a bit trickier
+	if (trk->ctrlnum[c] == -1) {
+		if (val == 64 * 128) {
+			int disc = 0;
+			for (int r = 0; r < trk->nrows * trk->ctrlpr; r++) {
+				if (trk->ctrl[c][r] == 64 * 128) {
+					if (disc == 0) {
+						disc = 1;
+					} else {
+						trk->ctrl[c][r] = -1;
+					}
+				} else if (trk->ctrl[c][r] > -1) {
+					disc = 0;
+				}
+			}
+		}
+	}
+
 	pthread_mutex_unlock(&trk->exclctrl);
 
 	track_insert_rec_update(trk, c, n / trk->ctrlpr);
@@ -134,48 +158,36 @@ char *track_get_ctrl_nums(track *trk) {
 	static char rc[256];
 	pthread_mutex_lock(&trk->exclctrl);
 
-	char *ret = NULL;
-
 	sprintf(rc, "[");
 	for (int c = 0; c < trk->nctrl; c++) {
-		char buff[256];
+		char buff[32];
 		sprintf(buff, "%d,", trk->ctrlnum[c]);
+		strcat(rc, buff);
 	}
 
 	strcat(rc, "]");
-	ret = rc;
 
 	pthread_mutex_unlock(&trk->exclctrl);
-	return ret;
+	return rc;
 }
 
 char *track_get_ctrl(track *trk, int c, int n) {
 	static char rc[256];
 	pthread_mutex_lock(&trk->exclctrl);
 
-	char *ret = NULL;
+	sprintf(rc, "[");
 
 	if (trk->nctrl > 0) {
-		int empty = 1;
-
-		sprintf(rc, "[");
-		for (int nn = n * trk->ctrlpr; nn < (n + 1) * trk->ctrlpr; n++) {
-			char buff[256];
+		for (int nn = n * trk->ctrlpr; nn < (n + 1) * trk->ctrlpr; nn++) {
+			char buff[32];
 			sprintf(buff, "%d, ", trk->ctrl[c][nn]);
 			strcat(rc, buff);
-			if (trk->ctrl[c][nn] > -1)
-				empty = 0;
-		}
-
-
-		if (!empty) {
-			strcat(rc, "]");
-			ret = rc;
 		}
 	}
 
+	strcat(rc, "]");
 	pthread_mutex_unlock(&trk->exclctrl);
-	return ret;
+	return rc;
 }
 
 void track_free(track *trk) {
@@ -195,6 +207,8 @@ void track_free(track *trk) {
 	free(trk->rows);
 	free(trk->ctrl);
 	free(trk->ctrlnum);
+	free(trk->lctrlval);
+
 	free(trk);
 }
 
@@ -467,6 +481,8 @@ void track_advance(track *trk, double speriod) {
 				evt.control = ctrl;
 				evt.data = data;
 
+				trk->lctrlval[c] = data;
+
 				if (ctrl == -1) {
 					evt.type = pitch_wheel;
 					evt.msb = data / 128;
@@ -535,6 +551,8 @@ void track_add_ctrl(track *trk, int c) {
 	trk->ctrl[trk->nctrl -1] = malloc(sizeof(int *)  * trk->ctrlpr * trk->arows);
 	trk->ctrlnum = realloc(trk->ctrlnum, sizeof(int) * trk->nctrl);
 	trk->ctrlnum[trk->nctrl -1] = c;
+	trk->lctrlval = realloc(trk->lctrlval, sizeof(int) * trk->nctrl);
+	trk->lctrlval[trk->nctrl -1] = -1;
 
 	for (int r = 0; r < trk->ctrlpr * trk->arows; r++)
 		trk->ctrl[trk->nctrl -1][r] = -1;
@@ -628,16 +646,20 @@ void track_resize(track *trk, int size) {
 
 	for (int c = 0; c < trk->ncols; c++) {
 		trk->rows[c] = realloc(trk->rows[c], sizeof(row) * trk->arows);
-		trk->ctrl[c] = realloc(trk->ctrl[c], sizeof(int) * trk->arows * trk->ctrlpr);
 
 		for (int n = trk->nrows; n < trk->arows; n++) {
 			trk->rows[c][n].type = none;
 			trk->rows[c][n].note = 0;
 			trk->rows[c][n].velocity = 0;
 			trk->rows[c][n].delay = 0;
+		}
+	}
 
-			for (int nn = 0; nn < trk->ctrlpr; n++) {
-				trk->ctrl[c][n * trk->ctrlpr + nn] = 0;
+	for (int c = 0; c < trk->nctrl; c++) {
+		trk->ctrl[c] = realloc(trk->ctrl[c], sizeof(int) * trk->arows * trk->ctrlpr);
+		for (int n = trk->nrows; n < trk->arows; n++) {
+			for (int nn = 0; nn < trk->ctrlpr; nn++) {
+				trk->ctrl[c][(n * trk->ctrlpr) + nn] = 0;
 			}
 		}
 	}
@@ -844,8 +866,10 @@ void track_handle_record(track *trk, midi_event evt) {
 	}
 
 	for (int c = 0; c < trk->nctrl; c++) {
-		if (trk->ctrlnum[c] == ctrl)
+		if (trk->ctrlnum[c] == ctrl) {
 			nc = c;
+			trk->lctrlval[c] = ctrlval;
+		}
 	}
 
 	while (pp >= trk->ctrlpr * trk->nrows) {
@@ -853,4 +877,12 @@ void track_handle_record(track *trk, midi_event evt) {
 	}
 
 	track_set_ctrl(trk, nc, pp, ctrlval);
+}
+
+int track_get_lctrlval(track *trk, int c) {
+	int ret = -1;
+	pthread_mutex_lock(&trk->exclctrl);
+	ret = trk->lctrlval[c];
+	pthread_mutex_unlock(&trk->exclctrl);
+	return ret;
 }

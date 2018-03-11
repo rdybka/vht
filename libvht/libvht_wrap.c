@@ -4714,6 +4714,37 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_track_get_lctrlval(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:track_get_lctrlval",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_get_lctrlval" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "track_get_lctrlval" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  result = (int)track_get_lctrlval(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_track_get_nctrl(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   track *arg1 = (track *) 0 ;
@@ -5319,6 +5350,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"track_set_ctrl", _wrap_track_set_ctrl, METH_VARARGS, NULL},
 	 { (char *)"track_get_ctrl", _wrap_track_get_ctrl, METH_VARARGS, NULL},
 	 { (char *)"track_get_ctrl_nums", _wrap_track_get_ctrl_nums, METH_VARARGS, NULL},
+	 { (char *)"track_get_lctrlval", _wrap_track_get_lctrlval, METH_VARARGS, NULL},
 	 { (char *)"track_get_nctrl", _wrap_track_get_nctrl, METH_VARARGS, NULL},
 	 { (char *)"track_get_ctrlpr", _wrap_track_get_ctrlpr, METH_VARARGS, NULL},
 	 { (char *)"track_add_col", _wrap_track_add_col, METH_VARARGS, NULL},

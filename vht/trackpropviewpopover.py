@@ -225,6 +225,8 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.show_notes_button.set_sensitive(False)
 		self.show_notes_button.set_active(self.trkview.show_notes)
 		self.show_timeshift_button.set_active(self.trkview.show_timeshift)
+		self.show_pitchwheel_button.set_active(self.trkview.show_pitchwheel)
+		self.show_controllers_button.set_active(self.trkview.show_controllers)
 		
 		super().popup()
 
@@ -266,6 +268,10 @@ class TrackPropViewPopover(Gtk.Popover):
 	def on_show_pitchwheel_toggled(self, wdg):
 		if not self.entered:
 			return False
+			
+		self.trkview.show_pitchwheel = wdg.get_active()
+		self.trkview.redraw()
+		self.parent.redraw()
 
 	def on_show_controllers_toggled(self, wdg):
 		if not self.entered:
@@ -276,6 +282,10 @@ class TrackPropViewPopover(Gtk.Popover):
 		else:
 			self.show_notes_button.set_active(True)
 			self.show_notes_button.set_sensitive(False)
+
+		self.trkview.show_controllers = wdg.get_active()
+		self.trkview.redraw()
+		self.parent.redraw()
 			
 	def on_remove_button_clicked(self, switch):
 		self.parent.del_track()

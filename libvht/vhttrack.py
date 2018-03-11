@@ -110,13 +110,17 @@ class VHTTrack(Iterable):
 	def ctrls(self):
 		return eval(self._vht_handle.track_get_ctrl_nums(self._trk_handle))
 
-	# sets control - r = is row * ctrlpr + offset
+	# sets control, r = row * ctrlpr + offset
 	def set_ctrl(self, c, r, val):
 		return self._vht_handle.track_set_ctrl(self._trk_handle, c, r, val)
 
 	# gets all controls for given row
 	def get_ctrl(self, c, r):
-		return eval(self._vht_handle.track_get_ctrl(self._trk_handle, c, rl))
+		return eval(self._vht_handle.track_get_ctrl(self._trk_handle, c, r))
+
+	# gets last sent controller value
+	def get_lctrlval(self, c):
+		return self._vht_handle.track_get_lctrlval(self._trk_handle, c)
 
 	def trigger(self):
 		self._vht_handle.track_trigger(self._trk_handle)

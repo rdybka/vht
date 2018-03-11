@@ -51,6 +51,7 @@ typedef struct track_t {
 	int ctrlpr;
 	int nctrl;
 	int *ctrlnum;
+	int *lctrlval;
 	int **ctrl;
 
 	int arows; // allocated rows

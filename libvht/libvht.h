@@ -104,6 +104,8 @@ extern void track_set_playing(track *trk, int p);
 extern void track_set_ctrl(track *trk, int c, int n, int val);
 extern char *track_get_ctrl(track *tkl, int c, int n);
 extern char *track_get_ctrl_nums(track *tkl);
+extern int track_get_lctrlval(track *trk, int c);
+
 
 extern int track_get_nctrl(track *trk);
 extern int track_get_ctrlpr(track *trk);

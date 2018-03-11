@@ -328,6 +328,10 @@ def track_get_ctrl_nums(tkl):
     return _libcvht.track_get_ctrl_nums(tkl)
 track_get_ctrl_nums = _libcvht.track_get_ctrl_nums
 
+def track_get_lctrlval(trk, c):
+    return _libcvht.track_get_lctrlval(trk, c)
+track_get_lctrlval = _libcvht.track_get_lctrlval
+
 def track_get_nctrl(trk):
     return _libcvht.track_get_nctrl(trk)
 track_get_nctrl = _libcvht.track_get_nctrl

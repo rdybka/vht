@@ -9,6 +9,7 @@ from vht.trackundobuffer import TrackUndoBuffer
 from vht.poormanspiano import PoorMansPiano
 from vht.velocityeditor import VelocityEditor
 from vht.timeshifteditor import TimeshiftEditor
+from vht.pitchwheeleditor import PitchwheelEditor
 
 class TrackView(Gtk.DrawingArea):
 	track_views = []
@@ -71,13 +72,13 @@ class TrackView(Gtk.DrawingArea):
 		
 		self.velocity_editor = None
 		self.timeshift_editor = None
-		self.pitchwheel_editor = None
+		self.pitchwheel_editor = PitchwheelEditor(self)
 		self.controller_editor = None
 		
 		self.show_notes = True
 		self.show_timeshift = False
-		self.show_pitchwheel = True
-		self.show_controllers = True
+		self.show_pitchwheel = False
+		self.show_controllers = False
 					
 		if trk:
 			self.undo_buff = TrackUndoBuffer(trk)
@@ -115,7 +116,7 @@ class TrackView(Gtk.DrawingArea):
 		
 		if self._back_surface:
 			self._back_surface.finish()
-
+		
 		self._surface = wdg.get_window().create_similar_surface(cairo.CONTENT_COLOR,
 			wdg.get_allocated_width(),
 			wdg.get_allocated_height())
@@ -126,12 +127,12 @@ class TrackView(Gtk.DrawingArea):
 
 		self._context = cairo.Context(self._surface)
 		self._context.set_antialias(cairo.ANTIALIAS_NONE)
-	
+
 		self._back_context = cairo.Context(self._back_surface)
 		self._back_context.set_antialias(cairo.ANTIALIAS_NONE)
 		
-		self.tick()
 		self.redraw()
+		self.tick()
 		return True
 
 	def reblit(self, from_row = -666, to_row = -666):
@@ -331,6 +332,10 @@ class TrackView(Gtk.DrawingArea):
 		if self.timeshift_editor:
 			self.timeshift_editor.precalc(cr)
 			nw = nw + self.timeshift_editor.width
+		
+		if self.show_pitchwheel:
+			self.pitchwheel_editor.precalc(cr, nw)
+			nw = nw + self.pitchwheel_editor.width
 					
 		nh = (self.txt_height * self.trk.nrows) + 5
 		self.set_size_request(nw, nh)
@@ -353,8 +358,9 @@ class TrackView(Gtk.DrawingArea):
 					if r >= from_row and r <= to_row:
 						rows_to_draw.append(r)
 	
-	
-			last_r = rows_to_draw[-1]
+			if len(rows_to_draw):
+				last_r = rows_to_draw[-1]
+				
 			for r in rows_to_draw:
 				veled = 0
 				tsed = 0
@@ -374,16 +380,18 @@ class TrackView(Gtk.DrawingArea):
 						tsed = self.timeshift_editor.width
 					if c > self.timeshift_editor.col:
 						xtraoffs = self.timeshift_editor.width 	
-				
-								
+										
 				even_high = cfg.even_highlight
 				if r % 2 == 0:
 					even_high = 1.0
 				
 				cr.set_source_rgb(*(col * cfg.intensity_background * even_high for col in cfg.colour))	
 				cr.rectangle(c * self.txt_width + xtraoffs, r * self.txt_height, self.txt_width + 5 + ed_width, self.txt_height)
-				
 				cr.fill()
+				
+				if self.show_pitchwheel:
+					cr.rectangle(self.pitchwheel_editor.x_from, r * self.txt_height, self.pitchwheel_editor.x_to - self.pitchwheel_editor.x_from, self.txt_height)
+					cr.fill()
 				
 				if self.hover and r == self.hover[1] and c == self.hover[0]:
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight * 1.2 for col in cfg.colour))
@@ -463,8 +471,6 @@ class TrackView(Gtk.DrawingArea):
 					else:
 						cr.show_text("%3s %03d" % (str(rw), rw.velocity))
 				
-				
-				
 				if rw.type == 2: #note_off
 					cr.show_text("%3s" % (str(rw)))
 					
@@ -478,6 +484,9 @@ class TrackView(Gtk.DrawingArea):
 				
 				if tsed and rw.type == 1:
 					self.timeshift_editor.draw(cr, c, r, rw)
+			
+				if self.show_pitchwheel:
+					self.pitchwheel_editor.draw(cr, r)
 				
 				if not complete:
 					if c == last_c:
@@ -506,8 +515,7 @@ class TrackView(Gtk.DrawingArea):
 
 			crf.paint()
 			self.queue_draw()
-			
-			
+						
 	def on_draw(self, widget, cr):
 		cr.set_source_surface(self._surface, 0, 0)
 		cr.paint()
@@ -538,7 +546,10 @@ class TrackView(Gtk.DrawingArea):
 		
 		if self.timeshift_editor:
 			return self.timeshift_editor.on_motion(widget, event)
-				
+		
+		if self.show_pitchwheel:
+			self.pitchwheel_editor.on_motion(widget, event)
+		
 		if self.select:
 			if not self.select_start:
 				self.select_start = self.edit
@@ -644,7 +655,14 @@ class TrackView(Gtk.DrawingArea):
 		row = min(int(event.y / self.txt_height), self.trk.nsrows - 1)
 		col = int(event.x / self.txt_width)
 		offs = int(event.x) % int(self.txt_width)
-		
+
+		# pitchwheel/controllers
+		if col >= len(self.trk):
+			if self.show_pitchwheel:
+				if event.x > self.pitchwheel_editor.x_from and event.x < self.pitchwheel_editor.x_to:
+					self.pitchwheel_editor.on_button_press(widget, event)
+			return
+				
 		if event.button == cfg.delete_button:
 			if self.trk[col][row].type == 0:
 				trk = mod.active_track
@@ -685,9 +703,7 @@ class TrackView(Gtk.DrawingArea):
 						self.parent._prop_view.redraw()
 						self.undo_buff.add_state()
 						return True
-			
-			
-									
+												
 			self.trk[col][row].clear()
 			self.redraw(row)
 			self.undo_buff.add_state()
@@ -797,6 +813,10 @@ class TrackView(Gtk.DrawingArea):
 		return True
 		
 	def on_button_release(self, widget, event):
+		# pitchwheel/controllers
+		if self.show_pitchwheel:
+			self.pitchwheel_editor.on_button_release(widget, event)
+		
 		if self.sel_drag and event.button == cfg.select_button:
 			if self.sel_dragged:
 				self.sel_drag = False
@@ -1096,6 +1116,9 @@ class TrackView(Gtk.DrawingArea):
 
 			if event.state & Gdk.ModifierType.MOD1_MASK:
 				alt = True
+	
+		if self.show_pitchwheel:
+			self.pitchwheel_editor.on_key_press(widget, event)	
 		
 		if self.velocity_editor:
 			self.velocity_editor.on_key_press(widget, event)
@@ -1650,7 +1673,10 @@ class TrackView(Gtk.DrawingArea):
 		note = self.pmp.key2note(Gdk.keyval_to_lower(event.keyval), True)
 		
 		if self.velocity_editor:
-			return self.velocity_editor.on_key_release(widget, event)
+			self.velocity_editor.on_key_release(widget, event)
+		
+		if self.show_pitchwheel:
+			self.pitchwheel_editor.on_key_press(widget, event)	
 		
 		return False
 		
@@ -1675,7 +1701,5 @@ class TrackView(Gtk.DrawingArea):
 			if len(self.trk) == 1:
 				cont = False
 				
-				
-
 		if redr:
 			self.redraw()

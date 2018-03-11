@@ -22,7 +22,7 @@ class Configuration():
 		self.intensity_txt = 1
 		self.intensity_txt_highlight = 2
 		self.intensity_lines = .6
-		self.even_highlight = .9
+		self.even_highlight = 1.6
 		self.intensity_select = .7
 		self.pointer_opacity = .7
 		self.pointer_width = 1
@@ -31,7 +31,8 @@ class Configuration():
 		self.window_opacity = 1
 		self.popover_wait_before_close = 500
 		self.velocity_editor_char_width = 12
-		self.timeshift_editor_char_width = 20
+		self.timeshift_editor_char_width = 12
+		self.pitchwheel_editor_char_width = 12
 		self.editor_row_height = .5
 		
 		self.drag_edit_divisor = 1.5

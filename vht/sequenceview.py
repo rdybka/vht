@@ -667,14 +667,17 @@ class SequenceView(Gtk.Box):
 					
 			midin = mod.get_midi_in_event()
 				
-		if mod.record:			
+		if mod.record > -1:	
 			for trk in self.get_tracks():
 				redr_props = False
 				r = trk.trk.get_rec_update()
 				while r:
 					trk.redraw(r["row"])
-					redr_props = True
-					trk.undo_buff.add_state()
+					
+					if mod.record:
+						trk.undo_buff.add_state()
+						redr_props = True
+					
 					r = trk.trk.get_rec_update()
 				
 				if redr_props:
