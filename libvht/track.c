@@ -201,6 +201,7 @@ void track_free(track *trk) {
 
 	for (int c = 0; c < trk->nctrl; c++) {
 		free(trk->ctrl[c]);
+		envelope_free(trk->env[c]);
 	}
 
 	free(trk->ring);
@@ -208,6 +209,7 @@ void track_free(track *trk) {
 	free(trk->ctrl);
 	free(trk->ctrlnum);
 	free(trk->lctrlval);
+	free(trk->env);
 
 	free(trk);
 }
@@ -553,6 +555,8 @@ void track_add_ctrl(track *trk, int c) {
 	trk->ctrlnum[trk->nctrl -1] = c;
 	trk->lctrlval = realloc(trk->lctrlval, sizeof(int) * trk->nctrl);
 	trk->lctrlval[trk->nctrl -1] = -1;
+	trk->env = realloc(trk->env, sizeof(envelope *) * trk->nctrl);
+	trk->env[trk->nctrl -1] = envelope_new();
 
 	for (int r = 0; r < trk->ctrlpr * trk->arows; r++)
 		trk->ctrl[trk->nctrl -1][r] = -1;
@@ -590,12 +594,14 @@ void track_del_ctrl(track *trk, int c) {
 	for (int cc = c; cc < trk->nctrl - 1; cc++) {
 		trk->ctrl[cc] = trk->ctrl[cc+1];
 		trk->ctrlnum[cc] = trk->ctrlnum[cc+1];
+		trk->env[cc] = trk->env[cc+1];
 	}
 
 	trk->nctrl--;
 
 	trk->ctrl = realloc(trk->ctrl, sizeof(int*) * trk->nctrl * trk->ctrlpr);
 	trk->ring = realloc(trk->ring, sizeof(int) * trk->nctrl);
+	trk->env = realloc(trk->env, sizeof(envelope *) * trk->nctrl);
 
 	pthread_mutex_unlock(&trk->exclctrl);
 }

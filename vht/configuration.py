@@ -22,7 +22,7 @@ class Configuration():
 		self.intensity_txt = 1
 		self.intensity_txt_highlight = 2
 		self.intensity_lines = .6
-		self.even_highlight = 1.6
+		self.even_highlight = 1.2
 		self.intensity_select = .7
 		self.pointer_opacity = .7
 		self.pointer_width = 1

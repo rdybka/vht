@@ -340,6 +340,22 @@ def track_get_ctrlpr(trk):
     return _libcvht.track_get_ctrlpr(trk)
 track_get_ctrlpr = _libcvht.track_get_ctrlpr
 
+def track_envelope_add_node(trk, c, x, y, helper, linked):
+    return _libcvht.track_envelope_add_node(trk, c, x, y, helper, linked)
+track_envelope_add_node = _libcvht.track_envelope_add_node
+
+def track_envelope_del_node(trk, c, n):
+    return _libcvht.track_envelope_del_node(trk, c, n)
+track_envelope_del_node = _libcvht.track_envelope_del_node
+
+def track_envelope_set_node(trk, c, n, x, y, helper, linked):
+    return _libcvht.track_envelope_set_node(trk, c, n, x, y, helper, linked)
+track_envelope_set_node = _libcvht.track_envelope_set_node
+
+def track_get_envelope(trk, c):
+    return _libcvht.track_get_envelope(trk, c)
+track_get_envelope = _libcvht.track_get_envelope
+
 def track_add_col(trk):
     return _libcvht.track_add_col(trk)
 track_add_col = _libcvht.track_add_col

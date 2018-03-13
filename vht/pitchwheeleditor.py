@@ -56,7 +56,6 @@ class PitchwheelEditor():
 			
 		yp = yh / len(ctrl)
 
-				
 		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), .7)
 		for v in ctrl:
 			xx = (v / 127) - 64
@@ -102,11 +101,24 @@ class PitchwheelEditor():
 			self.deleting = True
 			self.last_r = -1
 			self.last_x = -1
-			
-		if event.button == cfg.select_button:
+		
+		ctrl = False
+		
+		if event.state & Gdk.ModifierType.CONTROL_MASK:
+			ctrl = True
+		
+		if not ctrl and event.button == cfg.select_button:
 			self.drawing = True
 			self.last_r = -1
 			self.last_x = -1
+			
+		if ctrl:
+			xw = self.x_to - self.x_from
+			x0 = self.x_from + (xw / 2)
+			v = max(min(((event.x - self.x_from) / xw) * 127, 127), 0)
+
+			self.trk.env_add_node(self.ctrlnum, v, event.y / self.tv.txt_height, 0, 0)
+			
 			
 		return True
 		

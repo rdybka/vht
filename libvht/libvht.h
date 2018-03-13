@@ -106,9 +106,13 @@ extern char *track_get_ctrl(track *tkl, int c, int n);
 extern char *track_get_ctrl_nums(track *tkl);
 extern int track_get_lctrlval(track *trk, int c);
 
-
 extern int track_get_nctrl(track *trk);
 extern int track_get_ctrlpr(track *trk);
+
+extern void track_envelope_add_node(track *trk, int c, float x, float y, int helper, int linked);
+extern void track_envelope_del_node(track *trk, int c, int n);
+extern void track_envelope_set_node(track *trk, int c, int n, float x, float y, int helper, int linked);
+extern char *track_get_envelope(track *trk, int c);
 
 extern void track_add_col(track *trk);
 extern void track_del_col(track *trk, int c);

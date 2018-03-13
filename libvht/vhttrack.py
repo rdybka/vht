@@ -96,16 +96,17 @@ class VHTTrack(Iterable):
 	def pos(self):
 		return self._vht_handle.track_get_pos(self._trk_handle)
 
-	# number of controllers
+	# number of controllers / envelopes
 	@property
 	def nctrl(self):
 		return self._vht_handle.track_get_nctrl(self._trk_handle)
 
-	# controller rows per row
+	# controller rows per row 
 	@property
 	def ctrlpr(self):
 		return self._vht_handle.track_get_ctrlpr(self._trk_handle)
 
+	# controller numbers
 	@property
 	def ctrls(self):
 		return eval(self._vht_handle.track_get_ctrl_nums(self._trk_handle))
@@ -121,6 +122,22 @@ class VHTTrack(Iterable):
 	# gets last sent controller value
 	def get_lctrlval(self, c):
 		return self._vht_handle.track_get_lctrlval(self._trk_handle, c)
+
+	# get envelope for ctrl c
+	def env(self, c):
+		return eval(self._vht_handle.track_get_envelope(self._trk_handle, c))
+		
+	def env_del_node(self, c, n):
+		self._vht_handle.track_envelope_del_node(self._trk_handle, c, n)
+		
+	def env_add_node(self, c, x, y, helper, linked):
+		self._vht_handle.track_envelope_add_node(self._trk_handle, c, x, y, helper, linked)
+	
+	def env_set_node(self, c, n, x, y, helper, linked):
+		self._vth_handle.track_envelope_set_node(self._trk_handle, c, n, x, y, helper, linked)
+
+	def get_envelope(self, c):
+		return eval(self._vht_handle.envelope_get(self._trk_handle, c))
 
 	def trigger(self):
 		self._vht_handle.track_trigger(self._trk_handle)

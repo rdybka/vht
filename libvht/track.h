@@ -21,6 +21,7 @@
 #include <pthread.h>
 #include "midi_event.h"
 #include "row.h"
+#include "envelope.h"
 
 #define TRIGGER_NONE 	0
 #define TRIGGER_NORMAL 	1
@@ -47,6 +48,7 @@ typedef struct track_t {
 
 	int ncols;
 	row **rows;
+	envelope **env;
 
 	int ctrlpr;
 	int nctrl;
