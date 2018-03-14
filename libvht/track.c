@@ -66,6 +66,7 @@ track *track_new(int port, int channel, int len, int songlen) {
 	trk->ctrl = 0;
 	trk->ctrlnum = 0;
 	trk->lctrlval = 0;
+	trk->env = 0;
 
 	track_add_ctrl(trk, -1);
 	track_reset(trk);
@@ -554,7 +555,7 @@ void track_add_ctrl(track *trk, int c) {
 	trk->ctrlnum = realloc(trk->ctrlnum, sizeof(int) * trk->nctrl);
 	trk->ctrlnum[trk->nctrl -1] = c;
 	trk->lctrlval = realloc(trk->lctrlval, sizeof(int) * trk->nctrl);
-	trk->lctrlval[trk->nctrl -1] = -1;
+	trk->lctrlval[trk->nctrl -1] = 64 * 127;
 	trk->env = realloc(trk->env, sizeof(envelope *) * trk->nctrl);
 	trk->env[trk->nctrl -1] = envelope_new();
 
