@@ -181,13 +181,13 @@ class trackviewpointer():
 				cr.set_source(gradient)
 				cr.rectangle(x, y, xx, self.height)
 				cr.fill()
-	
+				
 				if cc == -1:
 					xw = self._parent.pitchwheel_editor.x_to - self._parent.pitchwheel_editor.x_from
 					xx = (v / 127) - 64
 					xx = xx * ((xw / 2) / 64)
 					x0 = self._parent.pitchwheel_editor.x_from + (xw / 2)
-				
+
 					if v == -1:
 						xx = 0
 	

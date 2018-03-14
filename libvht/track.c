@@ -469,7 +469,7 @@ void track_advance(track *trk, double speriod) {
 		for (int r = ctrlfrom; r < ctrlto; r++) {
 			int rr = r;
 
-			while(rr > trk->nrows * trk->ctrlpr)
+			while(rr >= trk->nrows * trk->ctrlpr)
 				rr -= trk->nrows * trk->ctrlpr;
 
 			int ctrl = trk->ctrlnum[c];
@@ -551,7 +551,7 @@ void track_add_ctrl(track *trk, int c) {
 	trk->nctrl++;
 
 	trk->ctrl = realloc(trk->ctrl, sizeof(int*) * trk->nctrl);
-	trk->ctrl[trk->nctrl -1] = malloc(sizeof(int *)  * trk->ctrlpr * trk->arows);
+	trk->ctrl[trk->nctrl -1] = malloc(sizeof(int)  * trk->ctrlpr * trk->arows);
 	trk->ctrlnum = realloc(trk->ctrlnum, sizeof(int) * trk->nctrl);
 	trk->ctrlnum[trk->nctrl -1] = c;
 	trk->lctrlval = realloc(trk->lctrlval, sizeof(int) * trk->nctrl);
@@ -559,8 +559,10 @@ void track_add_ctrl(track *trk, int c) {
 	trk->env = realloc(trk->env, sizeof(envelope *) * trk->nctrl);
 	trk->env[trk->nctrl -1] = envelope_new();
 
-	for (int r = 0; r < trk->ctrlpr * trk->arows; r++)
+	for (int r = 0; r < trk->ctrlpr * trk->arows; r++) {
 		trk->ctrl[trk->nctrl -1][r] = -1;
+	}
+
 
 	pthread_mutex_unlock(&trk->exclctrl);
 }

@@ -63,7 +63,7 @@ class PitchwheelEditor():
 			
 			if v == -1:
 				xx = 0
-
+				
 			if x0 + xx > self.x_to:
 				xx = self.x_to - x0
 
