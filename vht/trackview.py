@@ -72,7 +72,7 @@ class TrackView(Gtk.DrawingArea):
 		
 		self.velocity_editor = None
 		self.timeshift_editor = None
-		self.pitchwheel_editor = PitchwheelEditor(self)
+		self.pitchwheel_editor = PitchwheelEditor(self, 0)
 		self.controller_editor = None
 		
 		self.show_notes = True
@@ -130,6 +130,9 @@ class TrackView(Gtk.DrawingArea):
 
 		self._back_context = cairo.Context(self._back_surface)
 		self._back_context.set_antialias(cairo.ANTIALIAS_NONE)
+		
+		if self.pitchwheel_editor:
+			self.pitchwheel_editor.configure(wdg)
 		
 		self.redraw()
 		self.tick()
@@ -209,7 +212,7 @@ class TrackView(Gtk.DrawingArea):
 			crf.paint()
 			self.queue_draw()
 
-	def redraw(self, from_row = -666, to_row = -666):
+	def redraw(self, from_row = -666, to_row = -666, controller = None):
 		cr = self._back_context
 		crf = self._context
 		crf.set_source_surface(self._back_surface)

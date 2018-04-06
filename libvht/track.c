@@ -181,7 +181,16 @@ char *track_get_ctrl(track *trk, int c, int n) {
 	if (trk->nctrl > 0) {
 		for (int nn = n * trk->ctrlpr; nn < (n + 1) * trk->ctrlpr; nn++) {
 			char buff[32];
-			sprintf(buff, "%d, ", trk->ctrl[c][nn]);
+
+			int v = env_get_v(trk->env[c],  trk->ctrlpr, (float)nn / (float)trk->ctrlpr);
+
+			if ((v > -1) && (c == 0)) // pitchwheel
+				v *= 128;
+
+			if (v == -1)
+				v = trk->ctrl[c][nn];
+
+			sprintf(buff, "%d, ", v);
 			strcat(rc, buff);
 		}
 	}
@@ -473,7 +482,14 @@ void track_advance(track *trk, double speriod) {
 				rr -= trk->nrows * trk->ctrlpr;
 
 			int ctrl = trk->ctrlnum[c];
-			int data = trk->ctrl[c][rr];
+
+			int data = env_get_v(trk->env[c],  trk->ctrlpr, (float)rr / (float)trk->ctrlpr);
+
+			if ((data > -1) && (c == 0)) // pitchwheel
+				data *= 128;
+
+			if (data == -1)
+				data = trk->ctrl[c][rr];
 
 			if (data > -1) {
 				midi_event evt;
@@ -557,7 +573,7 @@ void track_add_ctrl(track *trk, int c) {
 	trk->lctrlval = realloc(trk->lctrlval, sizeof(int) * trk->nctrl);
 	trk->lctrlval[trk->nctrl -1] = 64 * 127;
 	trk->env = realloc(trk->env, sizeof(envelope *) * trk->nctrl);
-	trk->env[trk->nctrl -1] = envelope_new();
+	trk->env[trk->nctrl -1] = envelope_new(trk->nrows, trk->ctrlpr);
 
 	for (int r = 0; r < trk->ctrlpr * trk->arows; r++) {
 		trk->ctrl[trk->nctrl -1][r] = -1;

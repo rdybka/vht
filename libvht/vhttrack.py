@@ -130,14 +130,14 @@ class VHTTrack(Iterable):
 	def env_del_node(self, c, n):
 		self._vht_handle.track_envelope_del_node(self._trk_handle, c, n)
 		
-	def env_add_node(self, c, x, y, helper, linked):
-		self._vht_handle.track_envelope_add_node(self._trk_handle, c, x, y, helper, linked)
+	def env_add_node(self, c, x, y, z, linked):
+		self._vht_handle.track_envelope_add_node(self._trk_handle, c, x, y, z, linked)
 	
-	def env_set_node(self, c, n, x, y, helper, linked):
-		self._vth_handle.track_envelope_set_node(self._trk_handle, c, n, x, y, helper, linked)
+	def env_set_node(self, c, n, x, y, z, linked = -1):
+		self._vht_handle.track_envelope_set_node(self._trk_handle, c, n, x, y, z, linked)
 
 	def get_envelope(self, c):
-		return eval(self._vht_handle.envelope_get(self._trk_handle, c))
+		return eval(self._vht_handle.track_get_envelope(self._trk_handle, c))
 
 	def trigger(self):
 		self._vht_handle.track_trigger(self._trk_handle)

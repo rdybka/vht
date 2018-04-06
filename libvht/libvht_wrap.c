@@ -4849,7 +4849,7 @@ SWIGINTERN PyObject *_wrap_track_envelope_add_node(PyObject *SWIGUNUSEDPARM(self
   int arg2 ;
   float arg3 ;
   float arg4 ;
-  int arg5 ;
+  float arg5 ;
   int arg6 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -4859,7 +4859,7 @@ SWIGINTERN PyObject *_wrap_track_envelope_add_node(PyObject *SWIGUNUSEDPARM(self
   int ecode3 = 0 ;
   float val4 ;
   int ecode4 = 0 ;
-  int val5 ;
+  float val5 ;
   int ecode5 = 0 ;
   int val6 ;
   int ecode6 = 0 ;
@@ -4891,11 +4891,11 @@ SWIGINTERN PyObject *_wrap_track_envelope_add_node(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "track_envelope_add_node" "', argument " "4"" of type '" "float""'");
   } 
   arg4 = (float)(val4);
-  ecode5 = SWIG_AsVal_int(obj4, &val5);
+  ecode5 = SWIG_AsVal_float(obj4, &val5);
   if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "track_envelope_add_node" "', argument " "5"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "track_envelope_add_node" "', argument " "5"" of type '" "float""'");
   } 
-  arg5 = (int)(val5);
+  arg5 = (float)(val5);
   ecode6 = SWIG_AsVal_int(obj5, &val6);
   if (!SWIG_IsOK(ecode6)) {
     SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "track_envelope_add_node" "', argument " "6"" of type '" "int""'");
@@ -4955,7 +4955,7 @@ SWIGINTERN PyObject *_wrap_track_envelope_set_node(PyObject *SWIGUNUSEDPARM(self
   int arg3 ;
   float arg4 ;
   float arg5 ;
-  int arg6 ;
+  float arg6 ;
   int arg7 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
@@ -4967,7 +4967,7 @@ SWIGINTERN PyObject *_wrap_track_envelope_set_node(PyObject *SWIGUNUSEDPARM(self
   int ecode4 = 0 ;
   float val5 ;
   int ecode5 = 0 ;
-  int val6 ;
+  float val6 ;
   int ecode6 = 0 ;
   int val7 ;
   int ecode7 = 0 ;
@@ -5005,11 +5005,11 @@ SWIGINTERN PyObject *_wrap_track_envelope_set_node(PyObject *SWIGUNUSEDPARM(self
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "track_envelope_set_node" "', argument " "5"" of type '" "float""'");
   } 
   arg5 = (float)(val5);
-  ecode6 = SWIG_AsVal_int(obj5, &val6);
+  ecode6 = SWIG_AsVal_float(obj5, &val6);
   if (!SWIG_IsOK(ecode6)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "track_envelope_set_node" "', argument " "6"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "track_envelope_set_node" "', argument " "6"" of type '" "float""'");
   } 
-  arg6 = (int)(val6);
+  arg6 = (float)(val6);
   ecode7 = SWIG_AsVal_int(obj6, &val7);
   if (!SWIG_IsOK(ecode7)) {
     SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "track_envelope_set_node" "', argument " "7"" of type '" "int""'");

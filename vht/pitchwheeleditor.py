@@ -7,26 +7,116 @@ import math
 from vht import *
 
 class PitchwheelEditor():
-	def __init__(self, tv):
+	def __init__(self, tv, ctrlnum):
 		self.tv = tv
 		self.trk = tv.trk
 		
 		self.x_from = 0
 		self.x_to = 0
 		self.width = 127
-		self.ctrlnum = None
+		self.ctrlnum = ctrlnum
+		
 		self.deleting = False
 		self.drawing = False
+		self.moving = False
 		self.last_r = -1
 		self.last_x = -1
-			
+		self.ctrl_pressed = False
+		self.env = None
+		self.env_cr = None
+		self.env_sf = None
+		self.active_node = -1
+		self.node_size = 0
+		
 	def precalc(self, cr, x_from):
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
-		self.width = max((cfg.pitchwheel_editor_char_width * width), 99)
+		self.width = cfg.pitchwheel_editor_char_width * width
 		self.x_from = x_from
 		self.x_to = x_from + self.width - width
+
+	def configure(self, wdg):
+		self.redraw_env()
 			
+	def redraw_env(self):
+		if self.x_to == 0:
+			return
+
+		self.env = self.trk.get_envelope(self.ctrlnum)
+	
+		# some test data
+		if not len(self.env):
+			self.trk.env_add_node(self.ctrlnum, 5, 2, 0, 0)
+			self.trk.env_add_node(self.ctrlnum, 50, 5, .4, 1)
+			self.trk.env_add_node(self.ctrlnum, 100, 10, 0, 1)
+			self.env = self.trk.get_envelope(self.ctrlnum)
+	
+		recr_cr = False
+		
+		if self.env_cr:
+			if self.env_cr.get_target().get_width() != self.x_to - self.x_from:
+				recr_cr = True
+			if self.env_cr.get_target().get_height() != self.tv._back_surface.get_height():
+				recr_cr = True
+		else:
+			recr_cr = True
+		
+		if recr_cr:
+			if self.env_sf:
+				self.env_sf.finish()
+				
+			self.env_sf = self.tv._back_surface.create_similar(cairo.CONTENT_COLOR_ALPHA, int(self.x_to - self.x_from), self.tv._back_surface.get_height())
+			self.env_cr = cairo.Context(self.env_sf)
+			self.env_cr.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+			self.env_cr.set_font_size(cfg.seq_font_size)
+						
+		cr = self.env_cr
+
+		node_size = 0
+
+		cr.set_operator(cairo.Operator.CLEAR)
+		self.env_cr.paint()
+		cr.set_operator(cairo.Operator.OVER)		
+		
+		if self.env:
+			if len(self.env):
+				cr.set_source_rgba(*(col * cfg.intensity_lines * 1 for col in cfg.star_colour), 1)
+				(x, y, width, height, dx, dy) = cr.text_extents("*")
+				node_size = dx
+				self.node_size = dx / 2
+				
+			# nodes
+			for n, node in enumerate(self.env):
+				cr.set_source_rgba(*(col * cfg.intensity_lines * 1.5 for col in cfg.star_colour), 1)
+				
+				xw = self.x_to - self.x_from
+				x0 = xw / 2
+				
+				xx = (node["x"]) - 64
+				xx = xx * ((xw / 2) / 64)
+				#cr.move_to(x0 + xx, n["y"] * yh)
+				
+				size_div = 4
+				
+				if self.active_node == n:
+					cr.set_source_rgba(*(col * cfg.intensity_lines * 2 for col in cfg.star_colour), 1)
+					size_div = 2
+
+				cr.arc((x0 + xx) - ((node_size / size_div) / 2), node["y"] * self.tv.txt_height + (((node_size / size_div) / 2)), node_size / size_div, 0, 2*math.pi)
+				
+				if node["l"]:
+					cr.fill()
+				else:
+					cr.stroke()
+				
+			self.tv.queue_draw()
+	
 	def draw(self, cr, r):
+		if not cr:
+			cr = self.tv._back_context
+		
+		if not cr:
+			return
+				
 		yh = self.tv.txt_height
 		y0 = r * yh
 		
@@ -37,6 +127,7 @@ class PitchwheelEditor():
 			for c, ct in enumerate(self.trk.ctrls):
 				if ct == -1:
 					self.ctrlnum = c
+					self.env = self.trk.get_envelope(self.ctrlnum)
 		
 		cr.set_line_width(1.0)
 		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), .2)
@@ -84,41 +175,87 @@ class PitchwheelEditor():
 		
 		cr.move_to(self.x_to, r * yh)
 		cr.line_to(self.x_to, (r + 1) * yh)
-		cr.stroke()		
-				
+		cr.stroke()
+		
+		if self.env_sf:
+			cr.set_source_surface(self.env_sf, self.x_from, 0)
+			cr.rectangle(self.x_from, r * yh, xw, yh)
+			cr.fill()
+		
 	def on_key_press(self, widget, event):
-		#if cfg.key["hold_editor"].matches(event):	
+		if event.state & Gdk.ModifierType.CONTROL_MASK:
+			self.ctrl_pressed = True
 		return True
 		
 	def on_key_release(self, widget, event):
+		if event.state & Gdk.ModifierType.CONTROL_MASK:
+			self.ctrl_pressed = False
 		return True
 		
 	def on_button_press(self, widget, event):
 		if event.x < self.x_from or event.x > self.x_to:
 			return
 		
-		if event.button == cfg.delete_button:
-			self.deleting = True
-			self.last_r = -1
-			self.last_x = -1
-		
 		ctrl = False
 		
 		if event.state & Gdk.ModifierType.CONTROL_MASK:
 			ctrl = True
 		
+		if self.active_node != -1:
+			node = self.env[self.active_node]
+
+			if event.button == cfg.delete_button:
+				#r = int(node["y"])
+				self.trk.env_del_node(self.ctrlnum, self.active_node)
+				self.active_node = -1
+				self.env = self.trk.get_envelope(self.ctrlnum)
+				self.redraw_env()
+				self.tv.redraw(controller = self.ctrlnum)
+				return True
+			
+			if event.button == cfg.select_button:
+				if event.type == Gdk.EventType._2BUTTON_PRESS or event.type == Gdk.EventType._3BUTTON_PRESS:
+					l = node["l"]
+
+					if l == 0:
+						l = 1
+					else:
+						l = 0
+									
+					self.trk.env_set_node(self.ctrlnum, self.active_node, node["x"], node["y"], node["z"], l)
+					self.env = self.trk.get_envelope(self.ctrlnum)
+					self.redraw_env()
+					self.tv.redraw(controller = self.ctrlnum)
+				else:
+					self.moving = True
+				
+				return True
+		
+		if event.button == cfg.delete_button:
+			self.deleting = True
+			self.last_r = -1
+			self.last_x = -1
+			self.on_motion(widget, event)
+		
 		if not ctrl and event.button == cfg.select_button:
 			self.drawing = True
 			self.last_r = -1
 			self.last_x = -1
+			self.on_motion(widget, event)
 			
 		if ctrl:
 			xw = self.x_to - self.x_from
 			x0 = self.x_from + (xw / 2)
 			v = max(min(((event.x - self.x_from) / xw) * 127, 127), 0)
-
-			self.trk.env_add_node(self.ctrlnum, v, event.y / self.tv.txt_height, 0, 0)
 			
+			self.trk.env_add_node(self.ctrlnum, v, event.y / self.tv.txt_height, 0, 1)
+			self.env = self.trk.get_envelope(self.ctrlnum)
+			
+			self.on_motion(widget, event)
+			
+			self.redraw_env()
+			
+			self.tv.redraw(controller = self.ctrlnum)
 			
 		return True
 		
@@ -129,6 +266,9 @@ class PitchwheelEditor():
 		if event.button == cfg.select_button:
 			self.drawing = False
 
+		if self.moving:
+			self.moving = False
+			
 		return True
 		
 	def on_motion(self, widget, event):
@@ -143,6 +283,7 @@ class PitchwheelEditor():
 			return
 		
 		r = int(min(event.y / (self.tv.txt_height * self.trk.nrows),1) * (self.trk.nrows * self.trk.ctrlpr))
+		xw = self.x_to - self.x_from
 		
 		going_down = True
 			
@@ -178,7 +319,6 @@ class PitchwheelEditor():
 				self.trk.set_ctrl(self.ctrlnum, rr + sr, 64 * 128)
 		
 			if self.drawing:
-				xw = self.x_to - self.x_from
 				x0 = self.x_from + (xw / 2)
 
 				v = max(min(round(((x - self.x_from) / xw) * 127), 127), 0)
@@ -191,4 +331,43 @@ class PitchwheelEditor():
 		else:
 			self.last_x = event.x
 		
+		# moving node
+		if self.moving:
+			xw = self.x_to - self.x_from
+			x0 = self.x_from + (xw / 2)
+			v = max(min(((event.x - self.x_from) / xw) * 127, 127), 0)
+			r = event.y / self.tv.txt_height
+						
+			lr = self.env[self.active_node]["y"]
+			
+			self.trk.env_set_node(self.ctrlnum, self.active_node, v, r, self.env[self.active_node]["z"])
+			self.env = self.trk.get_envelope(self.ctrlnum)
+			self.redraw_env()
+			
+			#self.tv.redraw(lr - 2, lr + 2)
+			self.tv.redraw(controller = self.ctrlnum)
+					
+		l_act_node = self.active_node
+				
+		if self.env:
+			ns2 = self.node_size
+			self.active_node = -1
+			
+			for n, node in enumerate(self.env):
+				v = max(min(((event.x - self.x_from) / xw) * 127, 127), 0)
+				r = event.y / self.tv.txt_height
+				
+				if abs(node["x"] - v) < ns2 and abs(node["y"] * self.tv.txt_height - r * self.tv.txt_height) < ns2:
+					self.active_node = n
+				
+			if l_act_node != self.active_node:
+				self.redraw_env()
+				if l_act_node != -1:
+					r = int(self.env[l_act_node]["y"])
+					self.tv.redraw(r - 1, r + 1)
+			
+				if self.active_node != -1:
+					r = int(self.env[self.active_node]["y"])
+					self.tv.redraw(r - 1, r + 1)
+					
 		return True

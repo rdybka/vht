@@ -35,7 +35,7 @@ struct module_t {
 	double song_pos;
 	int min, sec, ms;
 
-	int bpm;
+	int bpm; // why is this an int ?!?!?!?
 	int rpb; // rows per beat
 
 	int def_nrows;

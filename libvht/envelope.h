@@ -20,23 +20,29 @@
 #define __ENVELOPE_H__
 #include <pthread.h>
 
+#define ENV_MAX_NNODES	256
+
 typedef struct env_node_t {
 	float x;
 	float y;
-	int helper;
-	int link_to_prev;
+	float z;
+	int linked;
 } env_node;
 
 typedef struct envelope_t {
 	int nnodes;
 	env_node *nodes;
+	int nrows;
+	int res;
 	pthread_mutex_t excl;
+	int *bzspace;
 } envelope;
 
-envelope *envelope_new();
+envelope *envelope_new(int nrows, int ctrlpr);
 void envelope_free(envelope *env);
 void envelope_del_node(envelope *env, int n);
-void envelope_add_node(envelope *env, float x, float y, int helper, int linked);
-void envelope_set_node(envelope *env, int n, float x, float y, int helper, int linked);
+void envelope_add_node(envelope *env, float x, float y, float z, int linked);
+void envelope_set_node(envelope *env, int n, float x, float y, float z, int linked);
+int env_get_v(envelope *env, int res, float y);
 
 #endif //__ENVELOPE_H__
