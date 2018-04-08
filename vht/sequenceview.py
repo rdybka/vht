@@ -438,6 +438,9 @@ class SequenceView(Gtk.Box):
 				mod.active_track.redraw(mod.active_track.edit[1])
 				return True	
 			
+			if mod.active_track.show_pitchwheel:
+				return mod.active_track.pitchwheel_editor.on_scroll(event)
+			
 		return False
 
 	def on_motion(self, widget, event):

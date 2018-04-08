@@ -682,6 +682,7 @@ void track_resize(track *trk, int size) {
 
 	for (int c = 0; c < trk->nctrl; c++) {
 		trk->ctrl[c] = realloc(trk->ctrl[c], sizeof(int) * trk->arows * trk->ctrlpr);
+		envelope_resize(trk->env[c], trk->arows, trk->ctrlpr);
 		for (int n = trk->nrows; n < trk->arows; n++) {
 			for (int nn = 0; nn < trk->ctrlpr; nn++) {
 				trk->ctrl[c][(n * trk->ctrlpr) + nn] = 0;

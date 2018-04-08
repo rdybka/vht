@@ -36,7 +36,7 @@ class PitchwheelEditor():
 
 	def configure(self, wdg):
 		self.redraw_env()
-			
+
 	def redraw_env(self):
 		if self.x_to == 0:
 			return
@@ -44,11 +44,12 @@ class PitchwheelEditor():
 		self.env = self.trk.get_envelope(self.ctrlnum)
 	
 		# some test data
-		if not len(self.env):
-			self.trk.env_add_node(self.ctrlnum, 5, 2, 0, 0)
-			self.trk.env_add_node(self.ctrlnum, 50, 5, .4, 1)
-			self.trk.env_add_node(self.ctrlnum, 100, 10, 0, 1)
-			self.env = self.trk.get_envelope(self.ctrlnum)
+		#if not len(self.env):
+		#	self.trk.env_add_node(self.ctrlnum, 5, 2, 0, 0)
+		#	self.trk.env_add_node(self.ctrlnum, 8, 5, .9, 1)
+		#	self.trk.env_add_node(self.ctrlnum, 120, 10, 1, 1)
+		#	self.trk.env_add_node(self.ctrlnum, 100, 15, 0, 1)
+		#	self.env = self.trk.get_envelope(self.ctrlnum)
 	
 		recr_cr = False
 		
@@ -370,4 +371,28 @@ class PitchwheelEditor():
 					r = int(self.env[self.active_node]["y"])
 					self.tv.redraw(r - 1, r + 1)
 					
+		return True
+
+	def on_scroll(self, event):
+		if self.active_node == -1:
+			return False
+		
+		z = self.env[self.active_node]["z"]
+		
+		if event.delta_y > 0:
+			z = z + .05
+		
+		if event.delta_y < 0:
+			z = z - .05
+		
+		if z < 0:
+			z = 0
+			
+		if z > 1:
+			z = 1;
+			
+		self.trk.env_set_node(self.ctrlnum, self.active_node, self.env[self.active_node]["x"], self.env[self.active_node]["y"], z)
+		self.env = self.trk.get_envelope(self.ctrlnum)
+		self.redraw_env()
+		self.tv.redraw()
 		return True

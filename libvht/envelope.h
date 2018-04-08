@@ -43,6 +43,8 @@ void envelope_free(envelope *env);
 void envelope_del_node(envelope *env, int n);
 void envelope_add_node(envelope *env, float x, float y, float z, int linked);
 void envelope_set_node(envelope *env, int n, float x, float y, float z, int linked);
+void envelope_resize(envelope *env, int nrows, int res);
+void envelope_refresh(envelope *env);
 int env_get_v(envelope *env, int res, float y);
 
 #endif //__ENVELOPE_H__

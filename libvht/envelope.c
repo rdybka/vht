@@ -34,9 +34,7 @@ envelope *envelope_new(int nrows, int res) {
 
 	env->bzspace = malloc(sizeof(int) * nrows * res);
 
-	for (int y = 0; y < nrows * res; y++)
-		env->bzspace[y] = -1;
-
+	envelope_refresh(env);
 	return env;
 }
 
@@ -49,93 +47,25 @@ void envelope_free(envelope *env) {
 	pthread_mutex_destroy(&env->excl);
 }
 
+
+void envelope_resize(envelope *env, int nrows, int res) {
+	pthread_mutex_lock(&env->excl);
+
+	free(env->bzspace);
+	env->bzspace = malloc(sizeof(int) * nrows * res);
+
+	env->nrows = nrows;
+	env->res = res;
+
+	envelope_refresh(env);
+	pthread_mutex_unlock(&env->excl);
+}
+
 int env_get_v(envelope *env, int res, float y) {
 	if (!env->nnodes)
 		return -1;
 
 	return env->bzspace[(int)y * env->res + (int)((y - floorf(y)) * res)];
-
-	int v = -1;
-
-	// single node
-	float rr = 1.0 / (float)res;
-	for (int n = 0; n < env->nnodes; n++) {
-		if ((!env->nodes[n].linked) && (y >= env->nodes[n].y) && (y - env->nodes[n].y < (rr))) {
-			v = env->nodes[n].x;
-			return v;
-		}
-	}
-
-	// are we between two nodes?
-	int n1 = -1;
-	int n2 = 666;
-	int h = -1;
-
-	for (int n = 0; n < env->nnodes; n++) {
-		if ((env->nodes[n].y <= y) && (n > n1))
-			n1 = n;
-
-		if ((env->nodes[n].y > y) && (n < n2))
-			n2 = n;
-	}
-
-	if ((n1 == -1) || (n2 == 666))
-		return -1; // clearly not
-
-	// if bottom is linked, does it have a linked node after it?
-	if (env->nodes[n2].linked) {
-		if (n2 < env->nnodes - 1)
-			if (env->nodes[n2+1].linked)
-				h = n2++;
-	}
-
-	// same for top
-	if (h == -1)
-		if (env->nodes[n1].linked) {
-			if (n1 > 0)
-				h = n1--;
-		}
-
-	// is bottom node linked or helper?
-	if (!(env->nodes[n2].linked))
-		return -1;
-
-	printf("n1:%d h:%d n2:%d \n", n1, h, n2);
-
-	// no helper - simple interpolation
-	if (h == -1) {
-		double delta = (env->nodes[n2].x - env->nodes[n1].x) / (env->nodes[n2].y - env->nodes[n1].y);
-		v = env->nodes[n1].x + (delta * (y - env->nodes[n1].y));
-		return v;
-	}
-
-	// helper - bezier'ish interpolation
-	double ll = env->nodes[n2].y - env->nodes[n1].y;
-	double l1 = env->nodes[h].y - env->nodes[n1].y;
-	double l2 = env->nodes[n2].y - env->nodes[h].y;
-	double l = y - env->nodes[n1].y;
-
-	double ld1 = l1 / ll;
-	double ld2 = l2 / ll;
-
-	double y1 = ld1 * l;
-	double y2 = ld2 * l;
-
-	double wl = ((l1 + y2) - l1) / ll;
-	wl *= l;
-	wl += y1;
-
-	//wl = l;
-
-	double delta1 = ((env->nodes[h].x - env->nodes[n1].x) / ll);
-	double delta2 = ((env->nodes[n2].x - env->nodes[h].x) / ll);
-	double p1 = -(delta1 * ll) + env->nodes[n1].x + (delta1 * 2 * wl);
-	double p2 = (env->nodes[h].x - (delta2 * ll)) + (delta2 * 2 * wl);
-	v = p1 + (((p2 - p1) / ll) * wl);
-
-	printf("%f %f %f %f %f %f / %f\n", l, ld1, ld2, y1, y2, wl, ll);
-
-	return v;
 }
 
 int env_node_compare(const void *a, const void *b) {
@@ -151,24 +81,25 @@ int y2bz(envelope *env, float y) {
 }
 
 void envelope_draw_cluster(envelope *env, int nf, int nl) {
-	printf("Drawing %d -> %d\n", nf, nl);
+	float lx = 0;					// past
+	float ly = 0;
+	float lz = 0;
+
 	for (int n = nf; n < nl + 1; n++) {
-		float lx, ly, lz;	// past
-		float x, y, z;		// present
-		float nx, ny, nz;	// future
+		float x, y, z;				// present
+		float nx, ny;	 			// future
 
 		x = env->nodes[n].x;
 		y = env->nodes[n].y;
 		z = env->nodes[n].z;
 
 		if (n == nl) { // last node
-			nz = 1;
 			nx = x + (x - lx);
 			ny = y + (y - ly);
+			z = 0;
 		} else {
 			nx = env->nodes[n + 1].x;
 			ny = env->nodes[n + 1].y;
-			nz = env->nodes[n + 1].z;
 		}
 
 		if (n == nf) { // first node
@@ -178,29 +109,103 @@ void envelope_draw_cluster(envelope *env, int nf, int nl) {
 		} else {
 			lx = env->nodes[n - 1].x;
 			ly = env->nodes[n - 1].y;
-			lz = env->nodes[n - 1].z;
 		}
 
-		printf("n:%d\n%7f,%7f,%7f\n%7f,%7f,%7f\n%7f,%7f,%7f\n", n, lx, ly, lz, x, y, z, nx, ny, nz);
+		if (n == nf + 1) { // second node
+			lz = 0;
+		}
 
-		// line from top
-		float z2d = 1 - (z + lz);
-		float xx = lx;
+		int y0 = y2bz(env, ly);
+		int y1 = y2bz(env, y);
 
-		if (z2d > 0) {
-			int y0 = y2bz(env, ly);
-			int y1 = y2bz(env, y);
-			y0 += (y1 - y0) * z2d;
-			xx += (x - lx) * z2d;
+		float dx = (x - lx) / (y - ly);
+		float lny = fabs(y2bz(env, y) - y2bz(env, ly));
 
-			float dx = (x - lx) / (y - ly);
-			for (int yy = y0; yy < y1; yy++) {
+		int yend = y2bz(env, env->nodes[nl].y);
+		int ystart = y2bz(env, env->nodes[nf].y);
+		// straight line from previous node
+		float xx = lx + (lz * (x - lx));
+		for (int yy = y0 + (lz * lny); yy <  y1; yy++) {
+			float l = (yy - y0) / lny;
+
+			if ((l >= lz) && (l < 1.0 - z) && (yy < y1) && (yy < env->nrows * env->res) && (yy >= ystart))
 				env->bzspace[yy] = xx;
-				xx+=(dx / env->res);
+
+			xx+=dx / env->res;
+		}
+
+		// bezier part
+		if (z + lz > 1) {
+			z = 1 - lz;
+		}
+
+		if (z < 0)
+			z = 0;
+
+		lz = z;
+
+		if (z > 0.0) {
+			int bzaddr0 = y2bz(env, ly + ((y - ly) * (1 - z)));
+			int bzaddr1 = y2bz(env, y + ((ny - y) * z));
+			float bzinc = 1.0 / (bzaddr1 - bzaddr0);
+			float bzt = 0.0;
+			int lbzy = bzaddr0 - 1;
+
+			float bzx0 = x - (x - lx) * z;
+			float bzx1 = x + (nx - x) * z;
+			float bzy0 = y - (y - ly) * z;
+			float bzy1 = y + (ny - y) * z;
+
+			float bzdx0 = (x - bzx0);
+			float bzdx1 = bzx1 - x;
+			float bzdy0 = (y - bzy0);
+			float bzdy1 = bzy1 - y;
+
+			for (int yy = bzaddr0; yy <= bzaddr1; yy++) {
+				float p0x = bzx0 + bzdx0 * bzt;
+				float p1x = x + bzdx1 * bzt;
+				float p0y = bzy0 + bzdy0 * bzt;
+				float p1y = y + bzdy1 * bzt;
+
+				float px = p0x + (p1x - p0x) * bzt;
+				float py = p0y + (p1y - p0y) * bzt;
+
+				int yyy = (int)(py * env->res);
+
+				while(yyy <= lbzy) {
+					bzt+=bzinc;
+
+					p0x = bzx0 + bzdx0 * bzt;
+					p1x = x + bzdx1 * bzt;
+					p0y = bzy0 + bzdy0 * bzt;
+					p1y = y + bzdy1 * bzt;
+
+					px = p0x + (p1x - p0x) * bzt;
+					py = p0y + (p1y - p0y) * bzt;
+					yyy = (int)(py * env->res);
+				}
+
+				while((yyy > lbzy + 1) && (bzinc > .0001)) {
+					bzinc *= .5;
+					bzt -= bzinc;
+					p0x = bzx0 + bzdx0 * bzt;
+					p1x = x + bzdx1 * bzt;
+					p0y = bzy0 + bzdy0 * bzt;
+					p1y = y + bzdy1 * bzt;
+
+					px = p0x + (p1x - p0x) * bzt;
+					py = p0y + (p1y - p0y) * bzt;
+					yyy = (int)(py * env->res);
+				}
+
+				if ((yyy < yend) && (yyy >= ystart)) {
+					env->bzspace[yyy] = px;
+					lbzy = yyy;
+				}
+
+				bzt+=bzinc;
 			}
 		}
-
-
 	}
 }
 
@@ -224,11 +229,17 @@ void envelope_refresh(envelope *env) {
 	// find clusters
 	int lnode = -1;
 	for (int n = env->nnodes - 1; n >= 0; n--) {
+		if (env->nodes[n].z > 1)
+			env->nodes[n].z = 1;
+
 		if (env->nodes[n].linked) {
 			if (lnode == -1)
 				lnode = n;
 		} else {
 			if (lnode > n) {
+				// even out zds
+
+
 				envelope_draw_cluster(env, n, lnode);
 				lnode = -1;
 			}
