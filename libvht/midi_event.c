@@ -299,8 +299,10 @@ void queue_midi_note_off(sequence *seq, int port, int chn, int note) {
 
 void midi_in_buffer_add(midi_event evt) {
 	midi_in_buff_excl_in();
-	if (curr_midi_in_event == EVT_BUFFER_LENGTH)
+	if (curr_midi_in_event == EVT_BUFFER_LENGTH) {
+		midi_in_buff_excl_out();
 		return;
+	}
 
 	midi_in_buffer[curr_midi_in_event++] = evt;
 	midi_in_buff_excl_out();
