@@ -16,14 +16,14 @@
 * midi_in ignoring
 * midi_in routing to other ports
 * multi-track-recording in empty seq
-
 - make bpm a float
 - move selection with keyboard
-- rotation
 - note-off follows note-on
 - clone - ctrl-n
-- stretching (new bpm suggestion)
-- move/resize tracks with mouse
+- gui magic
+	- stretching (new bpm suggestion)
+	- rotation
+	- move/resize tracks with mouse
 - get rid of overshoot thingys
 - move menu in fullscreen
 - disable menu when no jack
@@ -32,13 +32,20 @@
 - extended view
 	* show/hide timeshift
 	- disable notes hiding when controllers off
-- edit pitchwheel
+	- minimise mode
+* trackpropviewpopover on_enter bug
+- controllers
+	- refactor pitchwheeleditor into controllereditor
+	- gui in track props
+	- resolution
 	- envelopes
+		- show coordinates on mouse over
+		- snapping
+		- doodle/envelope weigth
 - controller resolution
 - auto-scroll
 	- fix with visible controllers
 	- inhibit while moving notes
-- edit controllers
 - optimise zooming / redrawing of empties
 - triggers
 - timeline
@@ -47,7 +54,6 @@
 	- version from setup.py
 - save notification
 - split filename in title
-- minimise mode
 - magic transposing
 - shpoingliness
 - 3d

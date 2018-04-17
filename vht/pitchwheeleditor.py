@@ -44,12 +44,12 @@ class PitchwheelEditor():
 		self.env = self.trk.get_envelope(self.ctrlnum)
 	
 		# some test data
-		#if not len(self.env):
-		#	self.trk.env_add_node(self.ctrlnum, 5, 2, 0, 0)
-		#	self.trk.env_add_node(self.ctrlnum, 8, 5, .9, 1)
-		#	self.trk.env_add_node(self.ctrlnum, 120, 10, 1, 1)
-		#	self.trk.env_add_node(self.ctrlnum, 100, 15, 0, 1)
-		#	self.env = self.trk.get_envelope(self.ctrlnum)
+		if not len(self.env):
+			self.trk.env_add_node(self.ctrlnum, 5, 2, 0, 0)
+			self.trk.env_add_node(self.ctrlnum, 8, 5, .5, 1)
+			self.trk.env_add_node(self.ctrlnum, 120, 10, 0, 1)
+			self.trk.env_add_node(self.ctrlnum, 100, 15, 0, 1)
+			self.env = self.trk.get_envelope(self.ctrlnum)
 	
 		recr_cr = False
 		
@@ -67,8 +67,8 @@ class PitchwheelEditor():
 				
 			self.env_sf = self.tv._back_surface.create_similar(cairo.CONTENT_COLOR_ALPHA, int(self.x_to - self.x_from), self.tv._back_surface.get_height())
 			self.env_cr = cairo.Context(self.env_sf)
-			self.env_cr.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-			self.env_cr.set_font_size(cfg.seq_font_size)
+			self.env_cr.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
+			self.env_cr.set_font_size(cfg.seq_font_size / 2)
 						
 		cr = self.env_cr
 
@@ -83,7 +83,7 @@ class PitchwheelEditor():
 				cr.set_source_rgba(*(col * cfg.intensity_lines * 1 for col in cfg.star_colour), 1)
 				(x, y, width, height, dx, dy) = cr.text_extents("*")
 				node_size = dx
-				self.node_size = dx / 2
+				self.node_size = dx# / 2
 				
 			# nodes
 			for n, node in enumerate(self.env):
@@ -99,9 +99,12 @@ class PitchwheelEditor():
 				size_div = 4
 				
 				if self.active_node == n:
-					cr.set_source_rgba(*(col * cfg.intensity_lines * 2 for col in cfg.star_colour), 1)
+					cr.set_source_rgba(*(col * cfg.intensity_lines * 3 for col in cfg.star_colour), 1)
+					txt = "[%.2f:%.2f:%.2f]" % (node["x"], node["y"], node["z"])
+					cr.move_to(x0 + xx, node["y"] * self.tv.txt_height)
+					cr.show_text(txt)
 					size_div = 2
-
+					
 				cr.arc((x0 + xx) - ((node_size / size_div) / 2), node["y"] * self.tv.txt_height + (((node_size / size_div) / 2)), node_size / size_div, 0, 2*math.pi)
 				
 				if node["l"]:
