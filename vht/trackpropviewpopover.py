@@ -15,9 +15,14 @@ class TrackPropViewPopover(Gtk.Popover):
 		super(TrackPropViewPopover, self).__init__()
 		self.set_relative_to(parent)
 
-		self.set_events(Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.ENTER_NOTIFY_MASK)
+		self.set_events(Gdk.EventMask.LEAVE_NOTIFY_MASK 
+						| Gdk.EventMask.ENTER_NOTIFY_MASK 
+						| Gdk.EventMask.POINTER_MOTION_MASK)
+		
 		self.connect("leave-notify-event", self.on_leave)
 		self.connect("enter-notify-event", self.on_enter)
+		self.connect("motion-notify-event", self.on_motion)
+		
 		self.entered = False
 		self.allow_close = True
 		
@@ -211,6 +216,7 @@ class TrackPropViewPopover(Gtk.Popover):
 		return False
 
 	def popup(self):
+		super().popup()
 		self.allow_close = False
 		self.entered = False
 		GObject.timeout_add(cfg.popover_wait_before_close, self.on_timeout, None)
@@ -227,11 +233,9 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.show_timeshift_button.set_active(self.trkview.show_timeshift)
 		self.show_pitchwheel_button.set_active(self.trkview.show_pitchwheel)
 		self.show_controllers_button.set_active(self.trkview.show_controllers)
-		
-		super().popup()
 
 	def on_leave(self, wdg, prm):
-		if self.entered:
+		#if self.entered:
 			if self.allow_close:
 				if prm.detail == Gdk.NotifyType.NONLINEAR:
 					wdg.popdown()
@@ -242,10 +246,17 @@ class TrackPropViewPopover(Gtk.Popover):
 
 	def on_enter(self, wdg, prm):
 		if prm.detail == Gdk.NotifyType.NONLINEAR:
-			if self.entered == 0:
+			if self.entered == False:
 				self.entered = True
 				self.parent.button_highlight = False
 				self.parent.redraw()
+
+	def on_motion(self, wdg, evt):
+			if self.entered == False:
+				self.entered = True
+				self.parent.button_highlight = False
+				self.parent.redraw()
+
 
 	def on_show_notes_toggled(self, wdg):
 		if not self.entered:
