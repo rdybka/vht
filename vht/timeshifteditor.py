@@ -35,7 +35,7 @@ class TimeshiftEditor():
 		yp = ((self.tv.txt_height - yh) / 2.0)
 					
 		cr.set_line_width(1.0)
-		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), .5)
+		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), 1)
 		cr.rectangle(self.x_from + (self.x_to / 2), r * self.tv.txt_height + yp, (self.x_to / 100) * rw.delay, yh)
 		cr.fill()
 							

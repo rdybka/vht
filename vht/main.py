@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Valhalla Tracker
+# Valhalla Tracker - my magnum opus
 # Copyright (C) 2017 Remigiusz Dybka
 #
 # This program is free software: you can redistribute it and/or modify

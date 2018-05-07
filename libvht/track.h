@@ -21,6 +21,7 @@
 #include <pthread.h>
 #include "midi_event.h"
 #include "row.h"
+#include "ctrlrow.h"
 #include "envelope.h"
 
 #define TRIGGER_NONE 	0
@@ -56,6 +57,8 @@ typedef struct track_t {
 	int *lctrlval;
 	int **ctrl;
 
+	ctrlrow **crows;
+
 	int arows; // allocated rows
 	int *ring;
 
@@ -89,9 +92,14 @@ void track_trigger(track *trk);
 void track_add_ctrl(track *trk, int ctl);
 void track_del_ctrl(track *trk, int c);
 void track_swap_ctrl(track *trk, int c, int c2);
+void track_ctrl_refresh_envelope(track *trk, int c);
 
 void track_set_ctrl(track *trk, int c, int n, int val);
 char *track_get_ctrl(track *tkl, int c, int n);
+
+void track_set_ctrl_num(track *trk, int c, int v);
+void track_set_ctrl_row(track *trk, int c, int r, int val, int linked, int smooth);
+int track_get_ctrl_row(track *trk, int c, int r, ctrlrow *row);
 
 char *track_get_rec_update(track *trk);
 void track_insert_rec_update(track *trk, int col, int row);

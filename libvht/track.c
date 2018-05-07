@@ -68,6 +68,8 @@ track *track_new(int port, int channel, int len, int songlen) {
 	trk->lctrlval = 0;
 	trk->env = 0;
 
+	trk->crows = 0;
+
 	track_add_ctrl(trk, -1);
 	track_reset(trk);
 	trk->playing = 1;
@@ -172,6 +174,12 @@ char *track_get_ctrl_nums(track *trk) {
 	return rc;
 }
 
+void track_set_ctrl_num(track *trk, int c, int v) {
+	pthread_mutex_lock(&trk->exclctrl);
+	trk->ctrlnum[c] = v;
+	pthread_mutex_unlock(&trk->exclctrl);
+}
+
 char *track_get_ctrl(track *trk, int c, int n) {
 	static char rc[256];
 	pthread_mutex_lock(&trk->exclctrl);
@@ -212,8 +220,10 @@ void track_free(track *trk) {
 	for (int c = 0; c < trk->nctrl; c++) {
 		free(trk->ctrl[c]);
 		envelope_free(trk->env[c]);
+		free(trk->crows[c]);
 	}
 
+	free(trk->crows);
 	free(trk->ring);
 	free(trk->rows);
 	free(trk->ctrl);
@@ -236,6 +246,17 @@ void track_clear_rows(track *trk, int c) {
 	}
 
 	pthread_mutex_unlock(&trk->excl);
+}
+
+void track_clear_crows(track *trk, int c) {
+	pthread_mutex_lock(&trk->exclctrl);
+
+	for (int t = 0; t < trk->nrows; t++) {
+		trk->crows[c][t].velocity = -1;
+		trk->crows[c][t].linked = 0;
+	}
+
+	pthread_mutex_unlock(&trk->exclctrl);
 }
 
 // do we reaaaaaly need it?
@@ -550,6 +571,10 @@ void track_kill_notes(track *trk) {
 	}
 }
 
+void track_ctrl_refresh_envelope(track *trk, int c) {
+	envelope_regenerate(trk->env[c], trk->crows[c]);
+}
+
 void track_add_col(track *trk) {
 	pthread_mutex_lock(&trk->excl);
 	trk->ncols++;
@@ -575,12 +600,16 @@ void track_add_ctrl(track *trk, int c) {
 	trk->env = realloc(trk->env, sizeof(envelope *) * trk->nctrl);
 	trk->env[trk->nctrl -1] = envelope_new(trk->nrows, trk->ctrlpr);
 
+	trk->crows = realloc(trk->crows, sizeof(ctrlrow *) * trk->nctrl);
+	trk->crows[trk->nctrl - 1] = malloc(sizeof(ctrlrow) * trk->arows);
+
 	for (int r = 0; r < trk->ctrlpr * trk->arows; r++) {
 		trk->ctrl[trk->nctrl -1][r] = -1;
 	}
 
-
 	pthread_mutex_unlock(&trk->exclctrl);
+
+	track_clear_crows(trk, trk->nctrl - 1);
 }
 
 void track_del_col(track *trk, int c) {
@@ -618,9 +647,13 @@ void track_del_ctrl(track *trk, int c) {
 
 	trk->nctrl--;
 
+	free(trk->crows[trk->nctrl]);
+	trk->crows = realloc(trk->crows, sizeof(ctrlrow *) * trk->nctrl);
+
 	trk->ctrl = realloc(trk->ctrl, sizeof(int*) * trk->nctrl * trk->ctrlpr);
 	trk->ring = realloc(trk->ring, sizeof(int) * trk->nctrl);
 	trk->env = realloc(trk->env, sizeof(envelope *) * trk->nctrl);
+
 
 	pthread_mutex_unlock(&trk->exclctrl);
 }

@@ -6,13 +6,14 @@ import math
 
 from vht import *
 
-class PitchwheelEditor():
+class ControllerEditor():
 	def __init__(self, tv, ctrlnum):
 		self.tv = tv
 		self.trk = tv.trk
 		
 		self.x_from = 0
 		self.x_to = 0
+		self.txt_width = 0
 		self.width = 127
 		self.ctrlnum = ctrlnum
 		
@@ -21,7 +22,7 @@ class PitchwheelEditor():
 		self.moving = False
 		self.last_r = -1
 		self.last_x = -1
-		self.ctrl_pressed = False
+		self.snap = False
 		self.env = None
 		self.env_cr = None
 		self.env_sf = None
@@ -31,8 +32,13 @@ class PitchwheelEditor():
 	def precalc(self, cr, x_from):
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
 		self.width = cfg.pitchwheel_editor_char_width * width
+		w1 = width
+		(x, y, width, height, dx, dy) = cr.text_extents("000 0 0|")
+		self.txt_width = width
+		self.width = self.width + self.txt_width
 		self.x_from = x_from
-		self.x_to = x_from + self.width - width
+		self.x_to = x_from + self.width - w1
+		
 
 	def configure(self, wdg):
 		self.redraw_env()
@@ -45,10 +51,10 @@ class PitchwheelEditor():
 	
 		# some test data
 		if not len(self.env):
-			self.trk.env_add_node(self.ctrlnum, 5, 2, 0, 0)
-			self.trk.env_add_node(self.ctrlnum, 8, 5, .5, 1)
-			self.trk.env_add_node(self.ctrlnum, 120, 10, 0, 1)
-			self.trk.env_add_node(self.ctrlnum, 100, 15, 0, 1)
+			self.trk.ctrl[0][0] = [127, 0, 0]
+			self.trk.ctrl[0][12] = [0, 1, 8]
+			self.trk.ctrl[0][24] = [64, 1, 0]
+			self.trk.ctrl[0].refresh()
 			self.env = self.trk.get_envelope(self.ctrlnum)
 	
 		recr_cr = False
@@ -68,7 +74,7 @@ class PitchwheelEditor():
 			self.env_sf = self.tv._back_surface.create_similar(cairo.CONTENT_COLOR_ALPHA, int(self.x_to - self.x_from), self.tv._back_surface.get_height())
 			self.env_cr = cairo.Context(self.env_sf)
 			self.env_cr.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
-			self.env_cr.set_font_size(cfg.seq_font_size / 2)
+			self.env_cr.set_font_size(cfg.seq_font_size * .8)
 						
 		cr = self.env_cr
 
@@ -87,31 +93,29 @@ class PitchwheelEditor():
 				
 			# nodes
 			for n, node in enumerate(self.env):
-				cr.set_source_rgba(*(col * cfg.intensity_lines * 1.5 for col in cfg.star_colour), 1)
+				cr.set_source_rgba(*(col * cfg.intensity_lines * 2 for col in cfg.star_colour), 1)
 				
-				xw = self.x_to - self.x_from
+				xw = self.x_to - (self.x_from + self.txt_width)
 				x0 = xw / 2
 				
 				xx = (node["x"]) - 64
 				xx = xx * ((xw / 2) / 64)
-				#cr.move_to(x0 + xx, n["y"] * yh)
-				
-				size_div = 4
 				
 				if self.active_node == n:
-					cr.set_source_rgba(*(col * cfg.intensity_lines * 3 for col in cfg.star_colour), 1)
-					txt = "[%.2f:%.2f:%.2f]" % (node["x"], node["y"], node["z"])
-					cr.move_to(x0 + xx, node["y"] * self.tv.txt_height)
-					cr.show_text(txt)
 					size_div = 2
-					
-				cr.arc((x0 + xx) - ((node_size / size_div) / 2), node["y"] * self.tv.txt_height + (((node_size / size_div) / 2)), node_size / size_div, 0, 2*math.pi)
+				else:
+					size_div = 3
+				
+				if self.active_node == n:
+					cr.set_source_rgba(*(col * cfg.intensity_lines * 4 for col in cfg.star_colour), 1)
+
+				cr.arc((x0 + xx), node["y"] * self.tv.txt_height + (((node_size / size_div) / 2)), node_size / size_div, 0, 2*math.pi)
 				
 				if node["l"]:
 					cr.fill()
 				else:
 					cr.stroke()
-				
+					
 			self.tv.queue_draw()
 	
 	def draw(self, cr, r):
@@ -124,8 +128,8 @@ class PitchwheelEditor():
 		yh = self.tv.txt_height
 		y0 = r * yh
 		
-		xw = self.x_to - self.x_from
-		x0 = self.x_from + (xw / 2)
+		xw = self.x_to - (self.x_from + self.txt_width)
+		x0 = self.x_from + self.txt_width + (xw / 2)
 
 		if not self.ctrlnum:
 			for c, ct in enumerate(self.trk.ctrls):
@@ -135,7 +139,7 @@ class PitchwheelEditor():
 		
 		cr.set_line_width(1.0)
 		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), .2)
-		cr.rectangle(self.x_from, r * self.tv.txt_height, xw, yh)
+		cr.rectangle(self.x_from + self.txt_width, r * self.tv.txt_height, xw, yh)
 		cr.fill()
 				
 		if self.ctrlnum == None:
@@ -182,18 +186,18 @@ class PitchwheelEditor():
 		cr.stroke()
 		
 		if self.env_sf:
-			cr.set_source_surface(self.env_sf, self.x_from, 0)
-			cr.rectangle(self.x_from, r * yh, xw, yh)
+			cr.set_source_surface(self.env_sf, self.x_from + self.txt_width, 0)
+			cr.rectangle(self.x_from + self.txt_width, r * yh, xw, yh)
 			cr.fill()
 		
 	def on_key_press(self, widget, event):
-		if event.state & Gdk.ModifierType.CONTROL_MASK:
-			self.ctrl_pressed = True
+		if cfg.key["node_snap"].matches(event):
+			self.snap = True
 		return True
 		
 	def on_key_release(self, widget, event):
-		if event.state & Gdk.ModifierType.CONTROL_MASK:
-			self.ctrl_pressed = False
+		if cfg.key["node_snap"].matches(event):
+			self.snap = False
 		return True
 		
 	def on_button_press(self, widget, event):
@@ -254,9 +258,9 @@ class PitchwheelEditor():
 			
 			self.trk.env_add_node(self.ctrlnum, v, event.y / self.tv.txt_height, 0, 1)
 			self.env = self.trk.get_envelope(self.ctrlnum)
-			
+
 			self.on_motion(widget, event)
-			
+			self.moving = True
 			self.redraw_env()
 			
 			self.tv.redraw(controller = self.ctrlnum)
@@ -272,14 +276,17 @@ class PitchwheelEditor():
 
 		if self.moving:
 			self.moving = False
+			self.active_node = -1
+			self.redraw_env()
+			self.tv.redraw(controller = self.ctrlnum)
 			
 		return True
 		
 	def on_motion(self, widget, event):
 		if self.ctrlnum == None:
-			return;
+			return
 		
-		if not self.drawing and not self.deleting:
+		if not self.drawing and not self.deleting and not self.moving:
 			if event.x < self.x_from or event.x > self.x_to:
 				return
 		
@@ -287,7 +294,7 @@ class PitchwheelEditor():
 			return
 		
 		r = int(min(event.y / (self.tv.txt_height * self.trk.nrows),1) * (self.trk.nrows * self.trk.ctrlpr))
-		xw = self.x_to - self.x_from
+		xw = self.x_to - (self.x_from + self.txt_width)
 		
 		going_down = True
 			
@@ -323,9 +330,9 @@ class PitchwheelEditor():
 				self.trk.set_ctrl(self.ctrlnum, rr + sr, 64 * 128)
 		
 			if self.drawing:
-				x0 = self.x_from + (xw / 2)
+				x0 = self.x_from + self.txt_width + (xw / 2)
 
-				v = max(min(round(((x - self.x_from) / xw) * 127), 127), 0)
+				v = max(min(round(((x - (self.x_from + self.txt_width)) / xw) * 127), 127), 0)
 				self.trk.set_ctrl(self.ctrlnum, rr + sr, round(v * 129))
 				x = x + delta
 							
@@ -339,11 +346,16 @@ class PitchwheelEditor():
 		if self.moving:
 			xw = self.x_to - self.x_from
 			x0 = self.x_from + (xw / 2)
-			v = max(min(((event.x - self.x_from) / xw) * 127, 127), 0)
-			r = event.y / self.tv.txt_height
-						
+			v = round(max(min(((event.x - self.x_from) / xw) * 127, 127), 0))
+			r = min(event.y / self.tv.txt_height, self.trk.nrows)
+
 			lr = self.env[self.active_node]["y"]
 			
+			if self.snap:
+				v = min(round(v / 8) * 8, 127)
+				r = round(r)
+
+			r = min(r, self.trk.nrows - .01)			
 			self.trk.env_set_node(self.ctrlnum, self.active_node, v, r, self.env[self.active_node]["z"])
 			self.env = self.trk.get_envelope(self.ctrlnum)
 			self.redraw_env()
@@ -358,11 +370,14 @@ class PitchwheelEditor():
 			self.active_node = -1
 			
 			for n, node in enumerate(self.env):
-				v = max(min(((event.x - self.x_from) / xw) * 127, 127), 0)
+				v = max(min(((event.x - (self.x_from + self.txt_width)) / xw) * 127, 127), 0)
 				r = event.y / self.tv.txt_height
 				
 				if abs(node["x"] - v) < ns2 and abs(node["y"] * self.tv.txt_height - r * self.tv.txt_height) < ns2:
 					self.active_node = n
+
+			if self.moving and self.active_node == -1:
+				self.active_node = l_act_node
 				
 			if l_act_node != self.active_node:
 				self.redraw_env()
@@ -373,7 +388,6 @@ class PitchwheelEditor():
 				if self.active_node != -1:
 					r = int(self.env[self.active_node]["y"])
 					self.tv.redraw(r - 1, r + 1)
-					
 		return True
 
 	def on_scroll(self, event):

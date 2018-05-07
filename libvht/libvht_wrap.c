@@ -2980,11 +2980,12 @@ SWIG_Python_NonDynamicSetAttr(PyObject *obj, PyObject *name, PyObject *value) {
 /* -------- TYPES TABLE (BEGIN) -------- */
 
 #define SWIGTYPE_p_char swig_types[0]
-#define SWIGTYPE_p_row swig_types[1]
-#define SWIGTYPE_p_sequence swig_types[2]
-#define SWIGTYPE_p_track swig_types[3]
-static swig_type_info *swig_types[5];
-static swig_module_info swig_module = {swig_types, 4, 0, 0, 0, 0};
+#define SWIGTYPE_p_ctrlrow swig_types[1]
+#define SWIGTYPE_p_row swig_types[2]
+#define SWIGTYPE_p_sequence swig_types[3]
+#define SWIGTYPE_p_track swig_types[4]
+static swig_type_info *swig_types[6];
+static swig_module_info swig_module = {swig_types, 5, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3343,60 +3344,6 @@ SWIG_AsVal_int (PyObject * obj, int *val)
 
 
   #define SWIG_From_double   PyFloat_FromDouble 
-
-
-/* Getting isfinite working pre C99 across multiple platforms is non-trivial. Users can provide SWIG_isfinite on older platforms. */
-#ifndef SWIG_isfinite
-/* isfinite() is a macro for C99 */
-# if defined(isfinite)
-#  define SWIG_isfinite(X) (isfinite(X))
-# elif defined __cplusplus && __cplusplus >= 201103L
-/* Use a template so that this works whether isfinite() is std::isfinite() or
- * in the global namespace.  The reality seems to vary between compiler
- * versions.
- *
- * Make sure namespace std exists to avoid compiler warnings.
- *
- * extern "C++" is required as this fragment can end up inside an extern "C" { } block
- */
-namespace std { }
-extern "C++" template<typename T>
-inline int SWIG_isfinite_func(T x) {
-  using namespace std;
-  return isfinite(x);
-}
-#  define SWIG_isfinite(X) (SWIG_isfinite_func(X))
-# elif defined(_MSC_VER)
-#  define SWIG_isfinite(X) (_finite(X))
-# elif defined(__sun) && defined(__SVR4)
-#  include <ieeefp.h>
-#  define SWIG_isfinite(X) (finite(X))
-# endif
-#endif
-
-
-/* Accept infinite as a valid float value unless we are unable to check if a value is finite */
-#ifdef SWIG_isfinite
-# define SWIG_Float_Overflow_Check(X) ((X < -FLT_MAX || X > FLT_MAX) && SWIG_isfinite(X))
-#else
-# define SWIG_Float_Overflow_Check(X) ((X < -FLT_MAX || X > FLT_MAX))
-#endif
-
-
-SWIGINTERN int
-SWIG_AsVal_float (PyObject * obj, float *val)
-{
-  double v;
-  int res = SWIG_AsVal_double (obj, &v);
-  if (SWIG_IsOK(res)) {
-    if (SWIG_Float_Overflow_Check(v)) {
-      return SWIG_OverflowError;
-    } else {
-      if (val) *val = (float)(v);
-    }
-  }  
-  return res;
-}
 
 #ifdef __cplusplus
 extern "C" {
@@ -4332,6 +4279,46 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_track_get_ctrlrow_ptr(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  ctrlrow *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:track_get_ctrlrow_ptr",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_get_ctrlrow_ptr" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "track_get_ctrlrow_ptr" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "track_get_ctrlrow_ptr" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  result = (ctrlrow *)track_get_ctrlrow_ptr(arg1,arg2,arg3);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ctrlrow, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_track_get_length(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   track *arg1 = (track *) 0 ;
@@ -4658,6 +4645,105 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_track_add_ctrl(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:track_add_ctrl",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_add_ctrl" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "track_add_ctrl" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  track_add_ctrl(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_track_del_ctrl(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:track_del_ctrl",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_del_ctrl" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "track_del_ctrl" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  track_del_ctrl(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_track_swap_ctrl(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:track_swap_ctrl",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_swap_ctrl" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "track_swap_ctrl" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "track_swap_ctrl" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  track_swap_ctrl(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_track_set_ctrl(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   track *arg1 = (track *) 0 ;
@@ -4768,6 +4854,45 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_track_set_ctrl_num(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:track_set_ctrl_num",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_set_ctrl_num" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "track_set_ctrl_num" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "track_set_ctrl_num" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  track_set_ctrl_num(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_track_get_lctrlval(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   track *arg1 = (track *) 0 ;
@@ -4793,6 +4918,36 @@ SWIGINTERN PyObject *_wrap_track_get_lctrlval(PyObject *SWIGUNUSEDPARM(self), Py
   arg2 = (int)(val2);
   result = (int)track_get_lctrlval(arg1,arg2);
   resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_track_ctrl_refresh_envelope(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:track_ctrl_refresh_envelope",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_ctrl_refresh_envelope" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "track_ctrl_refresh_envelope" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  track_ctrl_refresh_envelope(arg1,arg2);
+  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -4837,186 +4992,6 @@ SWIGINTERN PyObject *_wrap_track_get_ctrlpr(PyObject *SWIGUNUSEDPARM(self), PyOb
   arg1 = (track *)(argp1);
   result = (int)track_get_ctrlpr(arg1);
   resultobj = SWIG_From_int((int)(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_track_envelope_add_node(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  track *arg1 = (track *) 0 ;
-  int arg2 ;
-  float arg3 ;
-  float arg4 ;
-  float arg5 ;
-  int arg6 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  float val3 ;
-  int ecode3 = 0 ;
-  float val4 ;
-  int ecode4 = 0 ;
-  float val5 ;
-  int ecode5 = 0 ;
-  int val6 ;
-  int ecode6 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  PyObject * obj4 = 0 ;
-  PyObject * obj5 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:track_envelope_add_node",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_envelope_add_node" "', argument " "1"" of type '" "track *""'"); 
-  }
-  arg1 = (track *)(argp1);
-  ecode2 = SWIG_AsVal_int(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "track_envelope_add_node" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = (int)(val2);
-  ecode3 = SWIG_AsVal_float(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "track_envelope_add_node" "', argument " "3"" of type '" "float""'");
-  } 
-  arg3 = (float)(val3);
-  ecode4 = SWIG_AsVal_float(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "track_envelope_add_node" "', argument " "4"" of type '" "float""'");
-  } 
-  arg4 = (float)(val4);
-  ecode5 = SWIG_AsVal_float(obj4, &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "track_envelope_add_node" "', argument " "5"" of type '" "float""'");
-  } 
-  arg5 = (float)(val5);
-  ecode6 = SWIG_AsVal_int(obj5, &val6);
-  if (!SWIG_IsOK(ecode6)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "track_envelope_add_node" "', argument " "6"" of type '" "int""'");
-  } 
-  arg6 = (int)(val6);
-  track_envelope_add_node(arg1,arg2,arg3,arg4,arg5,arg6);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_track_envelope_del_node(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  track *arg1 = (track *) 0 ;
-  int arg2 ;
-  int arg3 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OOO:track_envelope_del_node",&obj0,&obj1,&obj2)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_envelope_del_node" "', argument " "1"" of type '" "track *""'"); 
-  }
-  arg1 = (track *)(argp1);
-  ecode2 = SWIG_AsVal_int(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "track_envelope_del_node" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = (int)(val2);
-  ecode3 = SWIG_AsVal_int(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "track_envelope_del_node" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = (int)(val3);
-  track_envelope_del_node(arg1,arg2,arg3);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_track_envelope_set_node(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  track *arg1 = (track *) 0 ;
-  int arg2 ;
-  int arg3 ;
-  float arg4 ;
-  float arg5 ;
-  float arg6 ;
-  int arg7 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  float val4 ;
-  int ecode4 = 0 ;
-  float val5 ;
-  int ecode5 = 0 ;
-  float val6 ;
-  int ecode6 = 0 ;
-  int val7 ;
-  int ecode7 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  PyObject * obj4 = 0 ;
-  PyObject * obj5 = 0 ;
-  PyObject * obj6 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OOOOOOO:track_envelope_set_node",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5,&obj6)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_envelope_set_node" "', argument " "1"" of type '" "track *""'"); 
-  }
-  arg1 = (track *)(argp1);
-  ecode2 = SWIG_AsVal_int(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "track_envelope_set_node" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = (int)(val2);
-  ecode3 = SWIG_AsVal_int(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "track_envelope_set_node" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = (int)(val3);
-  ecode4 = SWIG_AsVal_float(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "track_envelope_set_node" "', argument " "4"" of type '" "float""'");
-  } 
-  arg4 = (float)(val4);
-  ecode5 = SWIG_AsVal_float(obj4, &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "track_envelope_set_node" "', argument " "5"" of type '" "float""'");
-  } 
-  arg5 = (float)(val5);
-  ecode6 = SWIG_AsVal_float(obj5, &val6);
-  if (!SWIG_IsOK(ecode6)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "track_envelope_set_node" "', argument " "6"" of type '" "float""'");
-  } 
-  arg6 = (float)(val6);
-  ecode7 = SWIG_AsVal_int(obj6, &val7);
-  if (!SWIG_IsOK(ecode7)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "track_envelope_set_node" "', argument " "7"" of type '" "int""'");
-  } 
-  arg7 = (int)(val7);
-  track_envelope_set_node(arg1,arg2,arg3,arg4,arg5,arg6,arg7);
-  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -5530,6 +5505,210 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_ctrlrow_get_velocity(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ctrlrow *arg1 = (ctrlrow *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:ctrlrow_get_velocity",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_ctrlrow, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ctrlrow_get_velocity" "', argument " "1"" of type '" "ctrlrow *""'"); 
+  }
+  arg1 = (ctrlrow *)(argp1);
+  result = (int)ctrlrow_get_velocity(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ctrlrow_get_linked(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ctrlrow *arg1 = (ctrlrow *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:ctrlrow_get_linked",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_ctrlrow, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ctrlrow_get_linked" "', argument " "1"" of type '" "ctrlrow *""'"); 
+  }
+  arg1 = (ctrlrow *)(argp1);
+  result = (int)ctrlrow_get_linked(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ctrlrow_get_smooth(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ctrlrow *arg1 = (ctrlrow *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:ctrlrow_get_smooth",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_ctrlrow, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ctrlrow_get_smooth" "', argument " "1"" of type '" "ctrlrow *""'"); 
+  }
+  arg1 = (ctrlrow *)(argp1);
+  result = (int)ctrlrow_get_smooth(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ctrlrow_set_velocity(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ctrlrow *arg1 = (ctrlrow *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:ctrlrow_set_velocity",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_ctrlrow, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ctrlrow_set_velocity" "', argument " "1"" of type '" "ctrlrow *""'"); 
+  }
+  arg1 = (ctrlrow *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ctrlrow_set_velocity" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  ctrlrow_set_velocity(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ctrlrow_set_linked(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ctrlrow *arg1 = (ctrlrow *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:ctrlrow_set_linked",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_ctrlrow, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ctrlrow_set_linked" "', argument " "1"" of type '" "ctrlrow *""'"); 
+  }
+  arg1 = (ctrlrow *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ctrlrow_set_linked" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  ctrlrow_set_linked(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ctrlrow_set_smooth(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ctrlrow *arg1 = (ctrlrow *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:ctrlrow_set_smooth",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_ctrlrow, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ctrlrow_set_smooth" "', argument " "1"" of type '" "ctrlrow *""'"); 
+  }
+  arg1 = (ctrlrow *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ctrlrow_set_smooth" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  ctrlrow_set_smooth(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_ctrlrow_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  ctrlrow *arg1 = (ctrlrow *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:ctrlrow_set",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_ctrlrow, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "ctrlrow_set" "', argument " "1"" of type '" "ctrlrow *""'"); 
+  }
+  arg1 = (ctrlrow *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "ctrlrow_set" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "ctrlrow_set" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "ctrlrow_set" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = (int)(val4);
+  ctrlrow_set(arg1,arg2,arg3,arg4);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_parse_note(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   char *arg1 = (char *) 0 ;
@@ -5599,6 +5778,7 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"sequence_get_pos", _wrap_sequence_get_pos, METH_VARARGS, NULL},
 	 { (char *)"sequence_set_midi_focus", _wrap_sequence_set_midi_focus, METH_VARARGS, NULL},
 	 { (char *)"track_get_row_ptr", _wrap_track_get_row_ptr, METH_VARARGS, NULL},
+	 { (char *)"track_get_ctrlrow_ptr", _wrap_track_get_ctrlrow_ptr, METH_VARARGS, NULL},
 	 { (char *)"track_get_length", _wrap_track_get_length, METH_VARARGS, NULL},
 	 { (char *)"track_get_ncols", _wrap_track_get_ncols, METH_VARARGS, NULL},
 	 { (char *)"track_get_port", _wrap_track_get_port, METH_VARARGS, NULL},
@@ -5612,15 +5792,17 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"track_set_nrows", _wrap_track_set_nrows, METH_VARARGS, NULL},
 	 { (char *)"track_set_nsrows", _wrap_track_set_nsrows, METH_VARARGS, NULL},
 	 { (char *)"track_set_playing", _wrap_track_set_playing, METH_VARARGS, NULL},
+	 { (char *)"track_add_ctrl", _wrap_track_add_ctrl, METH_VARARGS, NULL},
+	 { (char *)"track_del_ctrl", _wrap_track_del_ctrl, METH_VARARGS, NULL},
+	 { (char *)"track_swap_ctrl", _wrap_track_swap_ctrl, METH_VARARGS, NULL},
 	 { (char *)"track_set_ctrl", _wrap_track_set_ctrl, METH_VARARGS, NULL},
 	 { (char *)"track_get_ctrl", _wrap_track_get_ctrl, METH_VARARGS, NULL},
 	 { (char *)"track_get_ctrl_nums", _wrap_track_get_ctrl_nums, METH_VARARGS, NULL},
+	 { (char *)"track_set_ctrl_num", _wrap_track_set_ctrl_num, METH_VARARGS, NULL},
 	 { (char *)"track_get_lctrlval", _wrap_track_get_lctrlval, METH_VARARGS, NULL},
+	 { (char *)"track_ctrl_refresh_envelope", _wrap_track_ctrl_refresh_envelope, METH_VARARGS, NULL},
 	 { (char *)"track_get_nctrl", _wrap_track_get_nctrl, METH_VARARGS, NULL},
 	 { (char *)"track_get_ctrlpr", _wrap_track_get_ctrlpr, METH_VARARGS, NULL},
-	 { (char *)"track_envelope_add_node", _wrap_track_envelope_add_node, METH_VARARGS, NULL},
-	 { (char *)"track_envelope_del_node", _wrap_track_envelope_del_node, METH_VARARGS, NULL},
-	 { (char *)"track_envelope_set_node", _wrap_track_envelope_set_node, METH_VARARGS, NULL},
 	 { (char *)"track_get_envelope", _wrap_track_get_envelope, METH_VARARGS, NULL},
 	 { (char *)"track_add_col", _wrap_track_add_col, METH_VARARGS, NULL},
 	 { (char *)"track_del_col", _wrap_track_del_col, METH_VARARGS, NULL},
@@ -5638,6 +5820,13 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"row_set_velocity", _wrap_row_set_velocity, METH_VARARGS, NULL},
 	 { (char *)"row_set_delay", _wrap_row_set_delay, METH_VARARGS, NULL},
 	 { (char *)"row_set", _wrap_row_set, METH_VARARGS, NULL},
+	 { (char *)"ctrlrow_get_velocity", _wrap_ctrlrow_get_velocity, METH_VARARGS, NULL},
+	 { (char *)"ctrlrow_get_linked", _wrap_ctrlrow_get_linked, METH_VARARGS, NULL},
+	 { (char *)"ctrlrow_get_smooth", _wrap_ctrlrow_get_smooth, METH_VARARGS, NULL},
+	 { (char *)"ctrlrow_set_velocity", _wrap_ctrlrow_set_velocity, METH_VARARGS, NULL},
+	 { (char *)"ctrlrow_set_linked", _wrap_ctrlrow_set_linked, METH_VARARGS, NULL},
+	 { (char *)"ctrlrow_set_smooth", _wrap_ctrlrow_set_smooth, METH_VARARGS, NULL},
+	 { (char *)"ctrlrow_set", _wrap_ctrlrow_set, METH_VARARGS, NULL},
 	 { (char *)"parse_note", _wrap_parse_note, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
 };
@@ -5646,24 +5835,28 @@ static PyMethodDef SwigMethods[] = {
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_ctrlrow = {"_p_ctrlrow", "ctrlrow *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_row = {"_p_row", "row *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_sequence = {"_p_sequence", "sequence *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_track = {"_p_track", "track *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_char,
+  &_swigt__p_ctrlrow,
   &_swigt__p_row,
   &_swigt__p_sequence,
   &_swigt__p_track,
 };
 
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_ctrlrow[] = {  {&_swigt__p_ctrlrow, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_row[] = {  {&_swigt__p_row, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_sequence[] = {  {&_swigt__p_sequence, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_track[] = {  {&_swigt__p_track, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_char,
+  _swigc__p_ctrlrow,
   _swigc__p_row,
   _swigc__p_sequence,
   _swigc__p_track,

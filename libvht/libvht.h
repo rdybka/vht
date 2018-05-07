@@ -86,6 +86,7 @@ extern void sequence_set_midi_focus(sequence *seq, int foc);
 
 // track
 extern row *track_get_row_ptr(track *, int c, int r);
+extern ctrlrow *track_get_ctrlrow_ptr(track *, int c, int r);
 extern int track_get_length(track *trk);
 extern int track_get_ncols(track *trk);
 extern int track_get_port(track *trk);
@@ -101,17 +102,19 @@ extern void track_set_nrows(track *trk, int n);
 extern void track_set_nsrows(track *trk, int n);
 extern void track_set_playing(track *trk, int p);
 
+extern void track_add_ctrl(track *trk, int ctl);
+extern void track_del_ctrl(track *trk, int c);
+extern void track_swap_ctrl(track *trk, int c, int c2);
 extern void track_set_ctrl(track *trk, int c, int n, int val);
 extern char *track_get_ctrl(track *tkl, int c, int n);
-extern char *track_get_ctrl_nums(track *tkl);
+extern char *track_get_ctrl_nums(track *trk);
+extern void track_set_ctrl_num(track *trk, int c, int v);
 extern int track_get_lctrlval(track *trk, int c);
+extern void track_ctrl_refresh_envelope(track *trk, int c);
 
 extern int track_get_nctrl(track *trk);
 extern int track_get_ctrlpr(track *trk);
 
-extern void track_envelope_add_node(track *trk, int c, float x, float y, float z, int linked);
-extern void track_envelope_del_node(track *trk, int c, int n);
-extern void track_envelope_set_node(track *trk, int c, int n, float x, float y, float z, int linked);
 extern char *track_get_envelope(track *trk, int c);
 
 extern void track_add_col(track *trk);
@@ -135,6 +138,16 @@ extern void row_set_velocity(row *rw, int velocity);
 extern void row_set_delay(row *rw, int delay);
 
 extern void row_set(row *rw, int type, int note, int velocity, int delay);
+
+// ctrlrow
+extern int ctrlrow_get_velocity(ctrlrow *crw);
+extern int ctrlrow_get_linked(ctrlrow *crw);
+extern int ctrlrow_get_smooth(ctrlrow *crw);
+
+extern void ctrlrow_set_velocity(ctrlrow *crw, int v);
+extern void ctrlrow_set_linked(ctrlrow *crw, int l);
+extern void ctrlrow_set_smooth(ctrlrow *crw, int s);
+extern void ctrlrow_set(ctrlrow *crw, int v, int l, int s);
 
 extern int parse_note(char *);
 #endif //__LIBVHT_H__

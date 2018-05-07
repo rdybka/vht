@@ -9,7 +9,7 @@ from vht.trackundobuffer import TrackUndoBuffer
 from vht.poormanspiano import PoorMansPiano
 from vht.velocityeditor import VelocityEditor
 from vht.timeshifteditor import TimeshiftEditor
-from vht.pitchwheeleditor import PitchwheelEditor
+from vht.controllereditor import ControllerEditor
 
 class TrackView(Gtk.DrawingArea):
 	track_views = []
@@ -72,7 +72,7 @@ class TrackView(Gtk.DrawingArea):
 		
 		self.velocity_editor = None
 		self.timeshift_editor = None
-		self.pitchwheel_editor = PitchwheelEditor(self, 0)
+		self.pitchwheel_editor = ControllerEditor(self, 0)
 		self.controller_editor = None
 		
 		self.show_notes = True
@@ -1679,7 +1679,7 @@ class TrackView(Gtk.DrawingArea):
 			self.velocity_editor.on_key_release(widget, event)
 		
 		if self.show_pitchwheel:
-			self.pitchwheel_editor.on_key_press(widget, event)	
+			self.pitchwheel_editor.on_key_release(widget, event)	
 		
 		return False
 		

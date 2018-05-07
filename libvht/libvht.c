@@ -89,6 +89,10 @@ row *track_get_row_ptr(track *trk, int c, int r) {
 	return &trk->rows[c][r];
 }
 
+ctrlrow *track_get_ctrlrow_ptr(track *trk, int c, int r) {
+	return &trk->crows[c][r];
+}
+
 int track_get_length(track *trk) {
 	return trk->nrows;
 }

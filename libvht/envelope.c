@@ -47,7 +47,6 @@ void envelope_free(envelope *env) {
 	pthread_mutex_destroy(&env->excl);
 }
 
-
 void envelope_resize(envelope *env, int nrows, int res) {
 	pthread_mutex_lock(&env->excl);
 
@@ -247,11 +246,26 @@ void envelope_refresh(envelope *env) {
 	}
 }
 
+void envelope_regenerate(envelope *env, ctrlrow *rows) {
+	pthread_mutex_lock(&env->excl);
+
+	if(env->nodes)
+		free(env->nodes);
+
+	env->nnodes = 0;
+
+	for (int r = 0; r < env->nrows; r++) {
+		if (rows[r].velocity > -1) {
+			envelope_add_node(env, rows[r].velocity, r, rows[r].smooth, rows[r].linked);
+		}
+	}
+	envelope_refresh(env);
+	pthread_mutex_unlock(&env->excl);
+}
+
 void envelope_add_node(envelope *env, float x, float y, float z, int linked) {
 	if (env->nnodes >= ENV_MAX_NNODES)
 		return;
-
-	pthread_mutex_lock(&env->excl);
 
 	env->nodes = realloc(env->nodes, sizeof(env_node) * (env->nnodes + 1));
 	env->nodes[env->nnodes].x = x;
@@ -260,39 +274,28 @@ void envelope_add_node(envelope *env, float x, float y, float z, int linked) {
 	env->nodes[env->nnodes].linked = linked;
 
 	env->nnodes++;
-
-	envelope_refresh(env);
-	pthread_mutex_unlock(&env->excl);
 }
 
 void envelope_del_node(envelope *env, int n) {
-	pthread_mutex_lock(&env->excl);
-
 	for (int nn = n; nn < env->nnodes - 1; nn++) {
 		env->nodes[nn] = env->nodes[nn + 1];
 	}
 
 	env->nodes = realloc(env->nodes, sizeof(env_node) * env->nnodes - 1);
 	env->nnodes--;
-
-	envelope_refresh(env);
-	pthread_mutex_unlock(&env->excl);
 }
 
 void envelope_set_node(envelope *env, int n, float x, float y, float z, int linked) {
+	if ((n < 0) || (n >= env->nnodes))
+		return;
+
 	//printf("node_set: %d: %f:%f:%f %d\n", n, x, y, z, linked);
-
-	pthread_mutex_lock(&env->excl);
-
 	env->nodes[n].x = x;
 	env->nodes[n].y = y;
 	env->nodes[n].z = z;
 
 	if (linked != -1)
 		env->nodes[n].linked = linked;
-
-	envelope_refresh(env);
-	pthread_mutex_unlock(&env->excl);
 }
 
 // from python, we will access envelopes through track

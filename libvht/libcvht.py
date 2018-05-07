@@ -264,6 +264,10 @@ def track_get_row_ptr(arg1, c, r):
     return _libcvht.track_get_row_ptr(arg1, c, r)
 track_get_row_ptr = _libcvht.track_get_row_ptr
 
+def track_get_ctrlrow_ptr(arg1, c, r):
+    return _libcvht.track_get_ctrlrow_ptr(arg1, c, r)
+track_get_ctrlrow_ptr = _libcvht.track_get_ctrlrow_ptr
+
 def track_get_length(trk):
     return _libcvht.track_get_length(trk)
 track_get_length = _libcvht.track_get_length
@@ -316,6 +320,18 @@ def track_set_playing(trk, p):
     return _libcvht.track_set_playing(trk, p)
 track_set_playing = _libcvht.track_set_playing
 
+def track_add_ctrl(trk, ctl):
+    return _libcvht.track_add_ctrl(trk, ctl)
+track_add_ctrl = _libcvht.track_add_ctrl
+
+def track_del_ctrl(trk, c):
+    return _libcvht.track_del_ctrl(trk, c)
+track_del_ctrl = _libcvht.track_del_ctrl
+
+def track_swap_ctrl(trk, c, c2):
+    return _libcvht.track_swap_ctrl(trk, c, c2)
+track_swap_ctrl = _libcvht.track_swap_ctrl
+
 def track_set_ctrl(trk, c, n, val):
     return _libcvht.track_set_ctrl(trk, c, n, val)
 track_set_ctrl = _libcvht.track_set_ctrl
@@ -324,13 +340,21 @@ def track_get_ctrl(tkl, c, n):
     return _libcvht.track_get_ctrl(tkl, c, n)
 track_get_ctrl = _libcvht.track_get_ctrl
 
-def track_get_ctrl_nums(tkl):
-    return _libcvht.track_get_ctrl_nums(tkl)
+def track_get_ctrl_nums(trk):
+    return _libcvht.track_get_ctrl_nums(trk)
 track_get_ctrl_nums = _libcvht.track_get_ctrl_nums
+
+def track_set_ctrl_num(trk, c, v):
+    return _libcvht.track_set_ctrl_num(trk, c, v)
+track_set_ctrl_num = _libcvht.track_set_ctrl_num
 
 def track_get_lctrlval(trk, c):
     return _libcvht.track_get_lctrlval(trk, c)
 track_get_lctrlval = _libcvht.track_get_lctrlval
+
+def track_ctrl_refresh_envelope(trk, c):
+    return _libcvht.track_ctrl_refresh_envelope(trk, c)
+track_ctrl_refresh_envelope = _libcvht.track_ctrl_refresh_envelope
 
 def track_get_nctrl(trk):
     return _libcvht.track_get_nctrl(trk)
@@ -339,18 +363,6 @@ track_get_nctrl = _libcvht.track_get_nctrl
 def track_get_ctrlpr(trk):
     return _libcvht.track_get_ctrlpr(trk)
 track_get_ctrlpr = _libcvht.track_get_ctrlpr
-
-def track_envelope_add_node(trk, c, x, y, z, linked):
-    return _libcvht.track_envelope_add_node(trk, c, x, y, z, linked)
-track_envelope_add_node = _libcvht.track_envelope_add_node
-
-def track_envelope_del_node(trk, c, n):
-    return _libcvht.track_envelope_del_node(trk, c, n)
-track_envelope_del_node = _libcvht.track_envelope_del_node
-
-def track_envelope_set_node(trk, c, n, x, y, z, linked):
-    return _libcvht.track_envelope_set_node(trk, c, n, x, y, z, linked)
-track_envelope_set_node = _libcvht.track_envelope_set_node
 
 def track_get_envelope(trk, c):
     return _libcvht.track_get_envelope(trk, c)
@@ -419,6 +431,34 @@ row_set_delay = _libcvht.row_set_delay
 def row_set(rw, type, note, velocity, delay):
     return _libcvht.row_set(rw, type, note, velocity, delay)
 row_set = _libcvht.row_set
+
+def ctrlrow_get_velocity(crw):
+    return _libcvht.ctrlrow_get_velocity(crw)
+ctrlrow_get_velocity = _libcvht.ctrlrow_get_velocity
+
+def ctrlrow_get_linked(crw):
+    return _libcvht.ctrlrow_get_linked(crw)
+ctrlrow_get_linked = _libcvht.ctrlrow_get_linked
+
+def ctrlrow_get_smooth(crw):
+    return _libcvht.ctrlrow_get_smooth(crw)
+ctrlrow_get_smooth = _libcvht.ctrlrow_get_smooth
+
+def ctrlrow_set_velocity(crw, v):
+    return _libcvht.ctrlrow_set_velocity(crw, v)
+ctrlrow_set_velocity = _libcvht.ctrlrow_set_velocity
+
+def ctrlrow_set_linked(crw, l):
+    return _libcvht.ctrlrow_set_linked(crw, l)
+ctrlrow_set_linked = _libcvht.ctrlrow_set_linked
+
+def ctrlrow_set_smooth(crw, s):
+    return _libcvht.ctrlrow_set_smooth(crw, s)
+ctrlrow_set_smooth = _libcvht.ctrlrow_set_smooth
+
+def ctrlrow_set(crw, v, l, s):
+    return _libcvht.ctrlrow_set(crw, v, l, s)
+ctrlrow_set = _libcvht.ctrlrow_set
 
 def parse_note(arg1):
     return _libcvht.parse_note(arg1)

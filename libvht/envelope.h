@@ -19,6 +19,7 @@
 #ifndef __ENVELOPE_H__
 #define __ENVELOPE_H__
 #include <pthread.h>
+#include "ctrlrow.h"
 
 #define ENV_MAX_NNODES	256
 
@@ -45,6 +46,8 @@ void envelope_add_node(envelope *env, float x, float y, float z, int linked);
 void envelope_set_node(envelope *env, int n, float x, float y, float z, int linked);
 void envelope_resize(envelope *env, int nrows, int res);
 void envelope_refresh(envelope *env);
+void envelope_regenerate(envelope *env, ctrlrow *rows);
+
 int env_get_v(envelope *env, int res, float y);
 
 #endif //__ENVELOPE_H__

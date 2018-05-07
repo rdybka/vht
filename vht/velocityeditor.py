@@ -42,11 +42,11 @@ class VelocityEditor():
 		yp = ((self.tv.txt_height - yh) / 2.0)
 					
 		cr.set_line_width(1.0)
-		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), .5)
+		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), 1)
 		cr.rectangle(self.x_from, r * self.tv.txt_height + yp, (self.x_to / 127.0) * rw.velocity, yh)
 		cr.fill()
 					
-		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), 1.0)
+		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), 1)
 		cr.rectangle(self.x_from, r * self.tv.txt_height + yp, self.x_to, yh)
 		cr.stroke()
 

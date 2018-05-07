@@ -104,6 +104,7 @@ class Configuration():
 			"port_up":			cfgkey("none",			True, False, True),
 			"port_down":		cfgkey("none",			True, False, True),
 			"hold_editor":		cfgkey("Control_L",		False, False, False),
+			"node_snap":		cfgkey("Control_L",		False, False, False),
 		}
 
 		self.midi_in = {
@@ -133,6 +134,10 @@ key_aliases = {	"KP_Add": "keypad +",
 				"backslash": "\\",
 				}
 
+ignore_modifiers = {
+				"Control_L",
+			}
+
 class cfgkey():
 	def __init__(self, key, shift, ctrl, alt):
 		self.key = key
@@ -142,9 +147,14 @@ class cfgkey():
 
 	def matches(self, event):
 		key = Gdk.keyval_name(Gdk.keyval_to_lower(event.keyval))
-		
+	
 		if key != self.key:
 			return False
+
+		# ignore modifiers?
+		for k in ignore_modifiers:
+			if key == k:
+				return True
 
 		shift = False
 		ctrl = False

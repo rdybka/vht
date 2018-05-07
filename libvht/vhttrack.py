@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 from libvht.vhtcolumn import VHTColumn
+from libvht.vhtctrllist import VHTCtrlList
 
 class VHTTrack(Iterable):
 	def __init__(self, vht, trk, index):
@@ -95,6 +96,10 @@ class VHTTrack(Iterable):
 	@property
 	def pos(self):
 		return self._vht_handle.track_get_pos(self._trk_handle)
+
+	@property
+	def ctrl(self):
+		return VHTCtrlList(self._vht_handle, self._trk_handle)
 
 	# number of controllers / envelopes
 	@property
