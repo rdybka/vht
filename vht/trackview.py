@@ -130,9 +130,9 @@ class TrackView(Gtk.DrawingArea):
 
 		self._back_context = cairo.Context(self._back_surface)
 		self._back_context.set_antialias(cairo.ANTIALIAS_NONE)
-		
+				
 		if self.pitchwheel_editor:
-			self.pitchwheel_editor.configure(wdg)
+			self.pitchwheel_editor.configure()
 		
 		self.redraw()
 		self.tick()
@@ -216,12 +216,12 @@ class TrackView(Gtk.DrawingArea):
 		cr = self._back_context
 		crf = self._context
 		crf.set_source_surface(self._back_surface)
-
-		self._back_context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-		self._back_context.set_font_size(cfg.seq_font_size)
 						
 		w = self.get_allocated_width()
 		h = self.get_allocated_height()
+		
+		self._back_context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+		self._back_context.set_font_size(cfg.seq_font_size)
 		
 		wnd = self.get_window()
 		ir = Gdk.Rectangle()
@@ -246,7 +246,7 @@ class TrackView(Gtk.DrawingArea):
 			self.txt_width = int(dx)
 
 			nw = dx
-			nh = (self.txt_height * self.seq.length) + 10
+			nh = self.txt_height * self.seq.length + 10
 			self.set_size_request(nw, nh)
 			self.width = nw
 			if complete:
@@ -317,7 +317,6 @@ class TrackView(Gtk.DrawingArea):
 				self.queue_draw()
 			return
 
-
 		# --------------  track --------------
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")	
 		if self.show_timeshift:
@@ -348,6 +347,7 @@ class TrackView(Gtk.DrawingArea):
 			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))	
 			cr.rectangle(0, 0, w, h)
 			cr.fill()
+			self.pitchwheel_editor.configure()
 			self.trk.clear_updates()
 		
 		last_c = len(self.trk) - 1
@@ -392,9 +392,9 @@ class TrackView(Gtk.DrawingArea):
 				cr.rectangle(c * self.txt_width + xtraoffs, r * self.txt_height, self.txt_width + 5 + ed_width, self.txt_height)
 				cr.fill()
 				
-				if self.show_pitchwheel:
-					cr.rectangle(self.pitchwheel_editor.x_from, r * self.txt_height, self.pitchwheel_editor.x_to - self.pitchwheel_editor.x_from, self.txt_height)
-					cr.fill()
+				#if self.show_pitchwheel:
+				#	cr.rectangle(self.pitchwheel_editor.x_from, r * self.txt_height, self.pitchwheel_editor.x_to - self.pitchwheel_editor.x_from, self.txt_height)
+				#	cr.fill()
 				
 				if self.hover and r == self.hover[1] and c == self.hover[0]:
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight * 1.2 for col in cfg.colour))

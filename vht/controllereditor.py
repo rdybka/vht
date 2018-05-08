@@ -29,6 +29,11 @@ class ControllerEditor():
 		self.active_node = -1
 		self.node_size = 0
 		
+		self.zero_pattern = None
+		self.zero_pattern_surface = None
+		self.empty_pattern = None
+		self.empty_pattern_surface = None
+		
 	def precalc(self, cr, x_from):
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
 		self.width = cfg.pitchwheel_editor_char_width * width
@@ -36,19 +41,20 @@ class ControllerEditor():
 		(x, y, width, height, dx, dy) = cr.text_extents("000 0 0|")
 		self.txt_width = width
 		self.width = self.width + self.txt_width
+		reconf = False
+		if self.x_from != x_from:
+			reconf = True
 		self.x_from = x_from
 		self.x_to = x_from + self.width - w1
 		
-
-	def configure(self, wdg):
-		self.redraw_env()
-
-	def redraw_env(self):
+		if reconf:
+			self.configure()
+		
+	def configure(self):
 		if self.x_to == 0:
 			return
 
 		self.env = self.trk.get_envelope(self.ctrlnum)
-	
 		# some test data
 		if not len(self.env):
 			self.trk.ctrl[0][0] = [127, 0, 0]
@@ -70,12 +76,71 @@ class ControllerEditor():
 		if recr_cr:
 			if self.env_sf:
 				self.env_sf.finish()
-				
+			
+			if self.zero_pattern_surface:
+				self.zero_pattern_surface.finish()
+		
+			if self.empty_pattern_surface:
+				self.empty_pattern_surface.finish()
+						
 			self.env_sf = self.tv._back_surface.create_similar(cairo.CONTENT_COLOR_ALPHA, int(self.x_to - self.x_from), self.tv._back_surface.get_height())
 			self.env_cr = cairo.Context(self.env_sf)
-			self.env_cr.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
-			self.env_cr.set_font_size(cfg.seq_font_size * .8)
+			
+			self.env_cr.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+			self.env_cr.set_font_size(cfg.seq_font_size)
+			
+			# zero pattern
+			self.zero_pattern_surface = self.tv._back_surface.create_similar(cairo.CONTENT_COLOR_ALPHA, int(self.x_to - self.x_from), int(self.tv.txt_height * 2))
+			cr = cairo.Context(self.zero_pattern_surface)
+			
+			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))	
+			cr.rectangle(0, 0, self.width, self.tv.txt_height)
+			cr.fill()
+			cr.set_source_rgb(*(col * cfg.intensity_background * cfg.even_highlight for col in cfg.colour))	
+			cr.rectangle(0, self.tv.txt_height, self.width, self.tv.txt_height)
+			cr.fill()
 						
+			self.zero_pattern = cairo.SurfacePattern(self.zero_pattern_surface)
+			self.zero_pattern.set_extend(cairo.Extend.REPEAT)
+		
+			# empty pattern
+			self.empty_pattern_surface = self.tv._back_surface.create_similar(cairo.CONTENT_COLOR_ALPHA, int(self.x_to - self.x_from), round(self.tv.txt_height * cfg.highlight))
+			cr = cairo.Context(self.empty_pattern_surface)
+
+			cr.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+			cr.set_font_size(cfg.seq_font_size)
+			
+			(x, y, width, height, dx, dy) = cr.text_extents("000 0 0")	
+									
+			for r in range(cfg.highlight):
+				even_high = cfg.even_highlight
+				if r % 2 == 0:
+					even_high = 1.0
+					
+				cr.set_source_rgb(*(col * cfg.intensity_background * even_high for col in cfg.colour))	
+				cr.rectangle(0, r * self.tv.txt_height, self.width, self.tv.txt_height)
+				cr.fill()
+			
+				if cfg.highlight > 1 and (r) % cfg.highlight == 0:
+					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
+				else:
+					cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
+
+				yy = (r + 1) * self.tv.txt_height - ((self.tv.txt_height - height) / 2.0)
+				cr.move_to(x, yy)
+				cr.show_text("--- - -")
+									
+			self.empty_pattern = cairo.SurfacePattern(self.empty_pattern_surface)
+			self.empty_pattern.set_extend(cairo.Extend.REPEAT)
+			matrix = cairo.Matrix()
+			matrix.translate(-self.x_from, 0)
+			# because rowheight is float
+			matrix.scale(1.0, round(self.tv.txt_height * cfg.highlight) / (self.tv.txt_height * cfg.highlight))
+			self.empty_pattern.set_matrix(matrix)
+								
+			self.redraw_env()
+
+	def redraw_env(self):
 		cr = self.env_cr
 
 		node_size = 0
@@ -136,6 +201,11 @@ class ControllerEditor():
 				if ct == -1:
 					self.ctrlnum = c
 					self.env = self.trk.get_envelope(self.ctrlnum)
+		
+		
+		cr.set_source(self.empty_pattern)
+		cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
+		cr.fill()
 		
 		cr.set_line_width(1.0)
 		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), .2)

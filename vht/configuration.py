@@ -13,16 +13,16 @@ class Configuration():
 		self.seq_font_size = 16
 		self.seq_line_width = 1.0
 		self.seq_spacing = 1.05
-		self.colour = (.5, .5, 1)
+		#self.colour = (.5, .5, 1)
+		self.colour = (.3, 1.0, 1.0)
 		self.star_colour = (.5, .5, 0)			
 		self.record_colour = (1.0, 0, 0)
-		#self.colour = (.3, 1.0, 1.0)			
 
 		self.intensity_background = .2
 		self.intensity_txt = 1
 		self.intensity_txt_highlight = 2
 		self.intensity_lines = .6
-		self.even_highlight = 1.2
+		self.even_highlight = 1.4
 		self.intensity_select = .7
 		self.pointer_opacity = .7
 		self.pointer_width = 1
