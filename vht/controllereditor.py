@@ -7,7 +7,7 @@ import math
 from vht import *
 
 class ControllerEditor():
-	def __init__(self, tv, ctrlnum):
+	def __init__(self, tv, ctrlnum = 0):
 		self.tv = tv
 		self.trk = tv.trk
 		
@@ -16,6 +16,7 @@ class ControllerEditor():
 		self.txt_width = 0
 		self.width = 127
 		self.ctrlnum = ctrlnum
+		self.ctrlrows = None
 		
 		self.deleting = False
 		self.drawing = False
@@ -27,8 +28,11 @@ class ControllerEditor():
 		self.env_cr = None
 		self.env_sf = None
 		self.active_node = -1
+		self.active_row = -1
 		self.node_size = 0
 		
+		self.txt_height = 0
+		self.txt_x = 0
 		self.zero_pattern = None
 		self.zero_pattern_surface = None
 		self.empty_pattern = None
@@ -54,12 +58,22 @@ class ControllerEditor():
 		if self.x_to == 0:
 			return
 
-		self.env = self.trk.get_envelope(self.ctrlnum)
+		found = False
+		for c, ct in enumerate(self.trk.ctrls):
+			if ct == self.ctrlnum or (ct == -1 and self.ctrlnum == 0):
+				self.env = self.trk.get_envelope(c)
+				self.ctrlrows = self.trk.ctrl[self.ctrlnum]
+				found = True
+				
+		if not found:
+			raise KeyError("controller %d not found" % self.ctrlnum)
+
 		# some test data
 		if not len(self.env):
-			self.trk.ctrl[0][0] = [127, 0, 0]
-			self.trk.ctrl[0][12] = [0, 1, 8]
-			self.trk.ctrl[0][24] = [64, 1, 0]
+			self.trk.ctrl[0][0] = [127, 0, 0, 0]
+			self.trk.ctrl[0][12] = [0, 1, 8, 0]
+			self.trk.ctrl[0][22] = [64, 1, 0, 0]
+			self.trk.ctrl[0][25] = [127, 1, 0, 1]
 			self.trk.ctrl[0].refresh()
 			self.env = self.trk.get_envelope(self.ctrlnum)
 	
@@ -90,7 +104,7 @@ class ControllerEditor():
 			self.env_cr.set_font_size(cfg.seq_font_size)
 			
 			# zero pattern
-			self.zero_pattern_surface = self.tv._back_surface.create_similar(cairo.CONTENT_COLOR_ALPHA, int(self.x_to - self.x_from), int(self.tv.txt_height * 2))
+			self.zero_pattern_surface = self.tv._back_surface.create_similar(cairo.CONTENT_COLOR_ALPHA, int(self.x_to - self.x_from), round(self.tv.txt_height * 2))
 			cr = cairo.Context(self.zero_pattern_surface)
 			
 			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))	
@@ -102,7 +116,11 @@ class ControllerEditor():
 						
 			self.zero_pattern = cairo.SurfacePattern(self.zero_pattern_surface)
 			self.zero_pattern.set_extend(cairo.Extend.REPEAT)
-		
+			matrix = cairo.Matrix()
+			# because rowheight is float
+			matrix.scale(1.0, round(self.tv.txt_height * 2) / (self.tv.txt_height * 2))
+			self.zero_pattern.set_matrix(matrix)
+				
 			# empty pattern
 			self.empty_pattern_surface = self.tv._back_surface.create_similar(cairo.CONTENT_COLOR_ALPHA, int(self.x_to - self.x_from), round(self.tv.txt_height * cfg.highlight))
 			cr = cairo.Context(self.empty_pattern_surface)
@@ -111,7 +129,9 @@ class ControllerEditor():
 			cr.set_font_size(cfg.seq_font_size)
 			
 			(x, y, width, height, dx, dy) = cr.text_extents("000 0 0")	
-									
+							
+			self.txt_height = height
+			self.txt_x = x
 			for r in range(cfg.highlight):
 				even_high = cfg.even_highlight
 				if r % 2 == 0:
@@ -195,23 +215,32 @@ class ControllerEditor():
 		
 		xw = self.x_to - (self.x_from + self.txt_width)
 		x0 = self.x_from + self.txt_width + (xw / 2)
+		
+		row = self.ctrlrows[r]
+		
+		if row.velocity == -1:		# empty row
+			cr.set_source(self.empty_pattern)
+			cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
+			cr.fill()
+		else:
+			cr.set_source(self.zero_pattern)
+			cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
+			cr.fill()
+			
+			if cfg.highlight > 1 and (r) % cfg.highlight == 0:
+				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
+			else:
+				cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
 
-		if not self.ctrlnum:
-			for c, ct in enumerate(self.trk.ctrls):
-				if ct == -1:
-					self.ctrlnum = c
-					self.env = self.trk.get_envelope(self.ctrlnum)
-		
-		
-		cr.set_source(self.empty_pattern)
-		cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
-		cr.fill()
+			yy = (r + 1) * self.tv.txt_height - ((self.tv.txt_height - self.txt_height) / 2.0)
+			cr.move_to(self.x_from + self.txt_x, yy)
+			cr.show_text(str(row))
 		
 		cr.set_line_width(1.0)
 		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), .2)
 		cr.rectangle(self.x_from + self.txt_width, r * self.tv.txt_height, xw, yh)
 		cr.fill()
-				
+
 		if self.ctrlnum == None:
 			cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), .3)
 			cr.move_to(x0, r * yh)
@@ -412,11 +441,12 @@ class ControllerEditor():
 		else:
 			self.last_x = event.x
 		
+		lrow = None
 		# moving node
 		if self.moving:
-			xw = self.x_to - self.x_from
-			x0 = self.x_from + (xw / 2)
-			v = round(max(min(((event.x - self.x_from) / xw) * 127, 127), 0))
+			xw = self.x_to - (self.x_from + self.txt_width)
+			x0 = self.x_from + self.txt_width + (xw / 2)
+			v = round(max(min(((event.x - (self.x_from + self.txt_width)) / xw) * 127, 127), 0))
 			r = min(event.y / self.tv.txt_height, self.trk.nrows)
 
 			lr = self.env[self.active_node]["y"]
@@ -425,30 +455,56 @@ class ControllerEditor():
 				v = min(round(v / 8) * 8, 127)
 				r = round(r)
 
-			r = min(r, self.trk.nrows - .01)			
-			self.trk.env_set_node(self.ctrlnum, self.active_node, v, r, self.env[self.active_node]["z"])
-			self.env = self.trk.get_envelope(self.ctrlnum)
-			self.redraw_env()
+			r = int(min(r, self.trk.nrows))
+
+			anchor = self.trk.ctrl[self.ctrlnum][self.active_row].anchor
+			smooth = self.trk.ctrl[self.ctrlnum][self.active_row].smooth
+			linked = self.trk.ctrl[self.ctrlnum][self.active_row].linked
 			
-			#self.tv.redraw(lr - 2, lr + 2)
-			self.tv.redraw(controller = self.ctrlnum)
+			if r != self.active_row and self.trk.ctrl[self.ctrlnum][r].velocity == -1:
+				self.trk.ctrl[self.ctrlnum][self.active_row].anchor = 0
+				self.trk.ctrl[self.ctrlnum][self.active_row].velocity = -1
+				self.trk.ctrl[self.ctrlnum][self.active_row].smooth = 0
+				self.trk.ctrl[self.ctrlnum][self.active_row].linked = 0
+				self.active_row = r
+				lrow = self.trk.ctrl[self.ctrlnum][self.active_row]
+				
+			if r == self.active_row:
+				self.trk.ctrl[self.ctrlnum][self.active_row].velocity = v
+				self.trk.ctrl[self.ctrlnum][self.active_row].anchor = anchor
+				self.trk.ctrl[self.ctrlnum][self.active_row].smooth = smooth
+				self.trk.ctrl[self.ctrlnum][self.active_row].linked = linked
+				self.trk.ctrl[self.ctrlnum].refresh()
+				
+				self.env = self.trk.get_envelope(self.ctrlnum)
+				self.redraw_env()
+				self.tv.redraw(controller = self.ctrlnum)
 					
 		l_act_node = self.active_node
+		l_act_row = self.active_row
 				
 		if self.env:
 			ns2 = self.node_size
 			self.active_node = -1
+			self.active_row = -1
 			
 			for n, node in enumerate(self.env):
 				v = max(min(((event.x - (self.x_from + self.txt_width)) / xw) * 127, 127), 0)
 				r = event.y / self.tv.txt_height
 				
 				if abs(node["x"] - v) < ns2 and abs(node["y"] * self.tv.txt_height - r * self.tv.txt_height) < ns2:
-					self.active_node = n
+					if self.moving:
+						if lrow == self.trk.ctrl[self.ctrlnum][int(node["y"])]:
+							self.active_node = n
+							self.active_row = int(node["y"])
+					else:
+						self.active_node = n
+						self.active_row = int(node["y"])
 
 			if self.moving and self.active_node == -1:
+				self.active_row = l_act_row
 				self.active_node = l_act_node
-				
+							
 			if l_act_node != self.active_node:
 				self.redraw_env()
 				if l_act_node != -1:
@@ -464,22 +520,19 @@ class ControllerEditor():
 		if self.active_node == -1:
 			return False
 		
-		z = self.env[self.active_node]["z"]
-		
-		if event.delta_y > 0:
-			z = z + .05
+		smth = self.trk.ctrl[self.ctrlnum][self.active_row].smooth
 		
 		if event.delta_y < 0:
-			z = z - .05
+			smth = smth + 1
 		
-		if z < 0:
-			z = 0
+		if event.delta_y > 0:
+			smth = smth - 1
+		
+		smth = min(max(smth, 0), 9)
 			
-		if z > 1:
-			z = 1;
-			
-		self.trk.env_set_node(self.ctrlnum, self.active_node, self.env[self.active_node]["x"], self.env[self.active_node]["y"], z)
+		self.trk.ctrl[self.ctrlnum][self.active_row].smooth = smth
+		self.trk.ctrl[self.ctrlnum].refresh()
 		self.env = self.trk.get_envelope(self.ctrlnum)
 		self.redraw_env()
-		self.tv.redraw()
+		self.tv.redraw(controller = self.ctrlnum)
 		return True

@@ -30,6 +30,11 @@ int ctrlrow_get_smooth(ctrlrow *crw) {
 	return crw->smooth;
 }
 
+int ctrlrow_get_anchor(ctrlrow *crw) {
+	return crw->anchor;
+}
+
+
 void ctrlrow_set_velocity(ctrlrow *crw, int velocity) {
 	crw->velocity = velocity;
 }
@@ -42,8 +47,13 @@ void ctrlrow_set_smooth(ctrlrow *crw, int smooth) {
 	crw->smooth = smooth;
 }
 
-void ctrlrow_set(ctrlrow *crw, int velocity, int linked, int smooth) {
+void ctrlrow_set_anchor(ctrlrow *crw, int anchor) {
+	crw->anchor = anchor;
+}
+
+void ctrlrow_set(ctrlrow *crw, int velocity, int linked, int smooth, int anchor) {
 	crw->velocity = velocity;
 	crw->linked = linked;
 	crw->smooth = smooth;
+	crw->anchor = anchor;
 }

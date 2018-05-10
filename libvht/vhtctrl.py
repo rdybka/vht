@@ -25,6 +25,7 @@ class VHTCtrl(Iterable):
 		self[itm].velocity = val[0]
 		self[itm].linked = val[1]
 		self[itm].smooth = val[2]
+		self[itm].anchor = val[3]
 
 	def __getitem__(self, itm):
 		if itm >= self.__len__():

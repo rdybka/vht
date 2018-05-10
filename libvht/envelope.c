@@ -236,9 +236,6 @@ void envelope_refresh(envelope *env) {
 				lnode = n;
 		} else {
 			if (lnode > n) {
-				// even out zds
-
-
 				envelope_draw_cluster(env, n, lnode);
 				lnode = -1;
 			}
@@ -253,10 +250,17 @@ void envelope_regenerate(envelope *env, ctrlrow *rows) {
 		free(env->nodes);
 
 	env->nnodes = 0;
+	env->nodes = 0;
 
 	for (int r = 0; r < env->nrows; r++) {
 		if (rows[r].velocity > -1) {
-			envelope_add_node(env, rows[r].velocity, r, rows[r].smooth, rows[r].linked);
+			float smth = (((float)rows[r].smooth) / 9.0);
+
+			if (rows[r].anchor == 0) {
+				envelope_add_node(env, rows[r].velocity, r, smth, rows[r].linked);
+			} else {
+				envelope_add_node(env, rows[r].velocity, (float)((r + 1)) - .01, smth, rows[r].linked);
+			}
 		}
 	}
 	envelope_refresh(env);

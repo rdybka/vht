@@ -444,6 +444,10 @@ def ctrlrow_get_smooth(crw):
     return _libcvht.ctrlrow_get_smooth(crw)
 ctrlrow_get_smooth = _libcvht.ctrlrow_get_smooth
 
+def ctrlrow_get_anchor(crw):
+    return _libcvht.ctrlrow_get_anchor(crw)
+ctrlrow_get_anchor = _libcvht.ctrlrow_get_anchor
+
 def ctrlrow_set_velocity(crw, v):
     return _libcvht.ctrlrow_set_velocity(crw, v)
 ctrlrow_set_velocity = _libcvht.ctrlrow_set_velocity
@@ -456,8 +460,12 @@ def ctrlrow_set_smooth(crw, s):
     return _libcvht.ctrlrow_set_smooth(crw, s)
 ctrlrow_set_smooth = _libcvht.ctrlrow_set_smooth
 
-def ctrlrow_set(crw, v, l, s):
-    return _libcvht.ctrlrow_set(crw, v, l, s)
+def ctrlrow_set_anchor(crw, a):
+    return _libcvht.ctrlrow_set_anchor(crw, a)
+ctrlrow_set_anchor = _libcvht.ctrlrow_set_anchor
+
+def ctrlrow_set(crw, v, l, s, a):
+    return _libcvht.ctrlrow_set(crw, v, l, s, a)
 ctrlrow_set = _libcvht.ctrlrow_set
 
 def parse_note(arg1):

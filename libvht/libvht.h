@@ -143,11 +143,14 @@ extern void row_set(row *rw, int type, int note, int velocity, int delay);
 extern int ctrlrow_get_velocity(ctrlrow *crw);
 extern int ctrlrow_get_linked(ctrlrow *crw);
 extern int ctrlrow_get_smooth(ctrlrow *crw);
+extern int ctrlrow_get_anchor(ctrlrow *crw);
 
 extern void ctrlrow_set_velocity(ctrlrow *crw, int v);
 extern void ctrlrow_set_linked(ctrlrow *crw, int l);
 extern void ctrlrow_set_smooth(ctrlrow *crw, int s);
-extern void ctrlrow_set(ctrlrow *crw, int v, int l, int s);
+extern void ctrlrow_set_anchor(ctrlrow *crw, int a);
+
+extern void ctrlrow_set(ctrlrow *crw, int v, int l, int s, int a);
 
 extern int parse_note(char *);
 #endif //__LIBVHT_H__

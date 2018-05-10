@@ -22,16 +22,20 @@
 typedef struct ctrlrow_t {
 	int velocity;
 	int linked;
-	int smooth;
+	int smooth;		// 0 - sharp, 9 - smooth
+	int anchor;		// 0 - top, 1 - bottom
 } ctrlrow;
 
 int ctrlrow_get_velocity(ctrlrow *crw);
 int ctrlrow_get_linked(ctrlrow *crw);
 int ctrlrow_get_smooth(ctrlrow *crw);
+int ctrlrow_get_anchor(ctrlrow *crw);
 
 void ctrlrow_set_velocity(ctrlrow *crw, int velocity);
 void ctrlrow_set_linked(ctrlrow *crw, int linked);
 void ctrlrow_set_smooth(ctrlrow *crw, int smooth);
-void ctrlrow_set(ctrlrow *crw, int velocity, int linked, int smooth);
+void ctrlrow_set_anchor(ctrlrow *crw, int anchor);
+
+void ctrlrow_set(ctrlrow *crw, int velocity, int linked, int smooth, int anchor);
 
 #endif //__CTRLROW_H__
