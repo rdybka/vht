@@ -107,6 +107,8 @@ extern void track_del_ctrl(track *trk, int c);
 extern void track_swap_ctrl(track *trk, int c, int c2);
 extern void track_set_ctrl(track *trk, int c, int n, int val);
 extern char *track_get_ctrl(track *tkl, int c, int n);
+extern char *track_get_ctrl_rec(track *tkl, int c, int n);
+extern char *track_get_ctrl_env(track *tkl, int c, int n);
 extern char *track_get_ctrl_nums(track *trk);
 extern void track_set_ctrl_num(track *trk, int c, int v);
 extern int track_get_lctrlval(track *trk, int c);

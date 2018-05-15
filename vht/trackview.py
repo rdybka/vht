@@ -77,7 +77,7 @@ class TrackView(Gtk.DrawingArea):
 		
 		self.show_notes = True
 		self.show_timeshift = False
-		self.show_pitchwheel = True
+		self.show_pitchwheel = False
 		self.show_controllers = False
 					
 		if trk:

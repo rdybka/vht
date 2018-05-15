@@ -28,6 +28,7 @@
 #define TRIGGER_NORMAL 	1
 #define TRIGGER_HOLD	2
 
+
 #define TRACK_DEFAULT_CONTROLS_PER_ROW	16
 
 struct rec_update_t {
@@ -96,6 +97,9 @@ void track_ctrl_refresh_envelope(track *trk, int c);
 
 void track_set_ctrl(track *trk, int c, int n, int val);
 char *track_get_ctrl(track *tkl, int c, int n);
+
+char *track_get_ctrl_rec(track *tkl, int c, int n);
+char *track_get_ctrl_env(track *tkl, int c, int n);
 
 void track_set_ctrl_num(track *trk, int c, int v);
 void track_set_ctrl_row(track *trk, int c, int r, int val, int linked, int smooth);
