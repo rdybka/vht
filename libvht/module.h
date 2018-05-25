@@ -52,17 +52,17 @@ struct module_t {
 extern struct module_t module;
 
 void module_advance(jack_nframes_t curr_frames);
-void module_new();
-void module_free();
-void module_mute();
+void module_new(void);
+void module_free(void);
+void module_mute(void);
 void module_dump_notes(int n);
 
-void module_excl_in();
-void module_excl_out();
+void module_excl_in(void);
+void module_excl_out(void);
 
 void module_add_sequence(sequence *seq);
 void module_del_sequence(int s);
 void module_swap_sequence(int s1, int s2);
-char *modue_get_time();
+char *modue_get_time(void);
 
 #endif //__MODULE_H__

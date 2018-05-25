@@ -68,7 +68,7 @@ int env_get_v(envelope *env, int res, float y) {
 }
 
 int env_node_compare(const void *a, const void *b) {
-	return (int)(420 * ((float)((env_node *)a)->y - (float)((env_node *)b)->y));
+	return (int)((float)((env_node *)a)->y - (float)((env_node *)b)->y);
 }
 
 void envelope_sort_nodes(envelope *env) {
@@ -217,14 +217,15 @@ void envelope_refresh(envelope *env) {
 	// single nodes
 	for (int n = 0; n < env->nnodes; n++) {
 		if (!env->nodes[n].linked) {
-			if (n < env->nnodes - 1) {
-				if (!env->nodes[n + 1].linked)
-					env->bzspace[y2bz(env, env->nodes[n].y)] = env->nodes[n].x;
-			} else { // last node
-				env->bzspace[y2bz(env, env->nodes[n].y)] = env->nodes[n].x;
+			if (n <= env->nnodes - 1) {
+				if ((n == env->nnodes -1) || (!env->nodes[n + 1].linked)) {
+					int yy = y2bz(env, env->nodes[n].y);
+					env->bzspace[yy] = env->nodes[n].x;
+				}
 			}
 		}
 	}
+
 	// find clusters
 	int lnode = -1;
 	for (int n = env->nnodes - 1; n >= 0; n--) {

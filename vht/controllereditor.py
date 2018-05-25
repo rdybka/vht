@@ -72,8 +72,8 @@ class ControllerEditor():
 		if not len(self.env):
 			self.trk.ctrl[0][0] = [127, 0, 0, 0]
 			self.trk.ctrl[0][12] = [0, 1, 8, 0]
-			self.trk.ctrl[0][22] = [64, 1, 0, 0]
-			self.trk.ctrl[0][25] = [127, 1, 0, 1]
+			self.trk.ctrl[0][14] = [64, 1, 0, 0]
+			self.trk.ctrl[0][16] = [127, 1, 0, 1]
 			self.trk.ctrl[0].refresh()
 			self.env = self.trk.get_envelope(self.ctrlnum)
 	
@@ -194,7 +194,7 @@ class ControllerEditor():
 				if self.active_node == n:
 					cr.set_source_rgba(*(col * cfg.intensity_lines * 4 for col in cfg.star_colour), 1)
 
-				cr.arc((x0 + xx), node["y"] * self.tv.txt_height + (((node_size / size_div) / 2)), node_size / size_div, 0, 2*math.pi)
+				cr.arc((x0 + xx), node["y"] * self.tv.txt_height - ((node_size / size_div) / 4), node_size / size_div, 0, 2 * math.pi)
 				
 				if node["l"]:
 					cr.fill()
@@ -211,7 +211,6 @@ class ControllerEditor():
 			return
 				
 		yh = self.tv.txt_height
-		y0 = r * yh
 		
 		xw = self.x_to - (self.x_from + self.txt_width)
 		x0 = self.x_from + self.txt_width + (xw / 2)
@@ -248,13 +247,31 @@ class ControllerEditor():
 			cr.stroke()
 			return
 		
-		ctrl = self.trk.get_ctrl(self.ctrlnum, r)
-		if not len(ctrl):
-			return
-			
+		ctrl = self.trk.get_ctrl_rec(self.ctrlnum, r)
 		yp = yh / len(ctrl)
+		y0 = r * yh
+		
+		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.record_colour), .4)
+		for v in ctrl:
+			xx = (v / 127) - 64
+			xx = xx * ((xw / 2) / 64)
+			
+			if v == -1:
+				xx = 0
+				
+			if x0 + xx > self.x_to:
+				xx = self.x_to - x0
 
-		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), .7)
+			cr.rectangle(x0, y0, xx, yp)
+			cr.fill()
+			
+			y0 = y0 + yp
+
+		ctrl = self.trk.get_ctrl_env(self.ctrlnum, r)
+		yp = yh / len(ctrl)
+		y0 = r * yh
+		
+		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), .4)
 		for v in ctrl:
 			xx = (v / 127) - 64
 			xx = xx * ((xw / 2) / 64)
@@ -312,8 +329,10 @@ class ControllerEditor():
 			node = self.env[self.active_node]
 
 			if event.button == cfg.delete_button:
-				#r = int(node["y"])
-				self.trk.env_del_node(self.ctrlnum, self.active_node)
+				r = int(node["y"])
+				
+				self.trk.ctrl[self.ctrlnum][r].clear()
+				self.trk.ctrl[self.ctrlnum].refresh()
 				self.active_node = -1
 				self.env = self.trk.get_envelope(self.ctrlnum)
 				self.redraw_env()
@@ -322,6 +341,8 @@ class ControllerEditor():
 			
 			if event.button == cfg.select_button:
 				if event.type == Gdk.EventType._2BUTTON_PRESS or event.type == Gdk.EventType._3BUTTON_PRESS:
+					r = int(node["y"])
+					
 					l = node["l"]
 
 					if l == 0:
@@ -329,10 +350,15 @@ class ControllerEditor():
 					else:
 						l = 0
 									
-					self.trk.env_set_node(self.ctrlnum, self.active_node, node["x"], node["y"], node["z"], l)
+					
+					self.trk.ctrl[self.ctrlnum][r].linked = l
+					
 					self.env = self.trk.get_envelope(self.ctrlnum)
+					self.on_motion(widget, event)
 					self.redraw_env()
 					self.tv.redraw(controller = self.ctrlnum)
+					
+					return True
 				else:
 					self.moving = True
 				
@@ -349,19 +375,34 @@ class ControllerEditor():
 			self.last_r = -1
 			self.last_x = -1
 			self.on_motion(widget, event)
-			
+		
+		# add node	
 		if ctrl:
-			xw = self.x_to - self.x_from
+			xw = self.x_to - (self.x_from + self.txt_width)
 			x0 = self.x_from + (xw / 2)
-			v = max(min(((event.x - self.x_from) / xw) * 127, 127), 0)
+			v = max(min(((event.x - (self.x_from + self.txt_width)) / xw) * 127, 127), 0)
 			
-			self.trk.env_add_node(self.ctrlnum, v, event.y / self.tv.txt_height, 0, 1)
+			r = event.y / self.tv.txt_height
+			
+			if self.trk.ctrl[self.ctrlnum][int(r)].velocity != -1:
+				return
+			
+			self.trk.ctrl[self.ctrlnum][int(r)].velocity = v
+			self.trk.ctrl[self.ctrlnum][int(r)].smooth = 0
+			self.trk.ctrl[self.ctrlnum][int(r)].linked = 1
+			anchor = 0
+			if r - int(r) > .5:
+				anchor = 1
+			
+			self.trk.ctrl[self.ctrlnum][int(r)].anchor = anchor
+			
+
+			self.trk.ctrl[self.ctrlnum].refresh()
 			self.env = self.trk.get_envelope(self.ctrlnum)
 
 			self.on_motion(widget, event)
 			self.moving = True
 			self.redraw_env()
-			
 			self.tv.redraw(controller = self.ctrlnum)
 			
 		return True
@@ -375,7 +416,7 @@ class ControllerEditor():
 
 		if self.moving:
 			self.moving = False
-			self.active_node = -1
+			self.on_motion(widget, event)
 			self.redraw_env()
 			self.tv.redraw(controller = self.ctrlnum)
 			
@@ -450,14 +491,16 @@ class ControllerEditor():
 			r = min(event.y / self.tv.txt_height, self.trk.nrows)
 
 			lr = self.env[self.active_node]["y"]
+			if (r - int(r)) > .5:
+				anchor = 1
+			else:
+				anchor = 0
 			
 			if self.snap:
 				v = min(round(v / 8) * 8, 127)
-				r = round(r)
-
+			
 			r = int(min(r, self.trk.nrows))
 
-			anchor = self.trk.ctrl[self.ctrlnum][self.active_row].anchor
 			smooth = self.trk.ctrl[self.ctrlnum][self.active_row].smooth
 			linked = self.trk.ctrl[self.ctrlnum][self.active_row].linked
 			
@@ -505,7 +548,7 @@ class ControllerEditor():
 				self.active_row = l_act_row
 				self.active_node = l_act_node
 							
-			if l_act_node != self.active_node:
+			if l_act_node != self.active_node: 
 				self.redraw_env()
 				if l_act_node != -1:
 					r = int(self.env[l_act_node]["y"])

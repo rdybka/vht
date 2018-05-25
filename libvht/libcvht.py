@@ -340,6 +340,14 @@ def track_get_ctrl(tkl, c, n):
     return _libcvht.track_get_ctrl(tkl, c, n)
 track_get_ctrl = _libcvht.track_get_ctrl
 
+def track_get_ctrl_rec(tkl, c, n):
+    return _libcvht.track_get_ctrl_rec(tkl, c, n)
+track_get_ctrl_rec = _libcvht.track_get_ctrl_rec
+
+def track_get_ctrl_env(tkl, c, n):
+    return _libcvht.track_get_ctrl_env(tkl, c, n)
+track_get_ctrl_env = _libcvht.track_get_ctrl_env
+
 def track_get_ctrl_nums(trk):
     return _libcvht.track_get_ctrl_nums(trk)
 track_get_ctrl_nums = _libcvht.track_get_ctrl_nums

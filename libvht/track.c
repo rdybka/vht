@@ -190,13 +190,13 @@ char *track_get_ctrl(track *trk, int c, int n) {
 		for (int nn = n * trk->ctrlpr; nn < (n + 1) * trk->ctrlpr; nn++) {
 			char buff[32];
 
-			int v = env_get_v(trk->env[c],  trk->ctrlpr, (float)nn / (float)trk->ctrlpr);
+			int v = trk->ctrl[c][nn];
 
-			if ((v > -1) && (c == 0)) // pitchwheel
-				v *= 128;
-
-			if (v == -1)
-				v = trk->ctrl[c][nn];
+			if (v == -1) {
+				v = env_get_v(trk->env[c],  trk->ctrlpr, (float)nn / (float)trk->ctrlpr);
+				if ((v > -1) && (c == 0)) // pitchwheel
+					v *= 128;
+			}
 
 			sprintf(buff, "%d, ", v);
 			strcat(rc, buff);
@@ -207,6 +207,54 @@ char *track_get_ctrl(track *trk, int c, int n) {
 	pthread_mutex_unlock(&trk->exclctrl);
 	return rc;
 }
+
+char *track_get_ctrl_rec(track *trk, int c, int n) {
+	static char rc[256];
+	pthread_mutex_lock(&trk->exclctrl);
+
+	sprintf(rc, "[");
+
+	if (trk->nctrl > 0) {
+		for (int nn = n * trk->ctrlpr; nn < (n + 1) * trk->ctrlpr; nn++) {
+			char buff[32];
+
+			int v = trk->ctrl[c][nn];
+
+			sprintf(buff, "%d, ", v);
+			strcat(rc, buff);
+		}
+	}
+
+	strcat(rc, "]");
+	pthread_mutex_unlock(&trk->exclctrl);
+	return rc;
+}
+
+char *track_get_ctrl_env(track *trk, int c, int n) {
+	static char rc[256];
+	pthread_mutex_lock(&trk->exclctrl);
+
+	sprintf(rc, "[");
+
+	if (trk->nctrl > 0) {
+		for (int nn = n * trk->ctrlpr; nn < (n + 1) * trk->ctrlpr; nn++) {
+			char buff[32];
+
+			int v = env_get_v(trk->env[c],  trk->ctrlpr, (float)nn / (float)trk->ctrlpr);
+
+			if ((v > -1) && (c == 0)) // pitchwheel
+				v *= 128;
+
+			sprintf(buff, "%d, ", v);
+			strcat(rc, buff);
+		}
+	}
+
+	strcat(rc, "]");
+	pthread_mutex_unlock(&trk->exclctrl);
+	return rc;
+}
+
 
 void track_free(track *trk) {
 	pthread_mutex_destroy(&trk->excl);
@@ -505,12 +553,12 @@ void track_advance(track *trk, double speriod) {
 			int ctrl = trk->ctrlnum[c];
 
 			int data = env_get_v(trk->env[c],  trk->ctrlpr, (float)rr / (float)trk->ctrlpr);
-
 			if ((data > -1) && (c == 0)) // pitchwheel
 				data *= 128;
 
-			if (data == -1)
+			if (data == -1) {
 				data = trk->ctrl[c][rr];
+			}
 
 			if (data > -1) {
 				midi_event evt;

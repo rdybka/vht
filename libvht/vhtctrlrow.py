@@ -23,7 +23,6 @@ class VHTCtrlRow():
 		if self._anchor != other._anchor:
 			return False
 			
-			
 		return True
 
 	def update_strrep(self):
@@ -49,7 +48,7 @@ class VHTCtrlRow():
 		self.linked = 0
 		self.smooth = 0
 		self.anchor = 0
-		handle.ctrlrow_set(self._crowptr, -1, 0, 0)
+		self._vht_handle.ctrlrow_set(self._crowptr, -1, 0, 0, 0)
 		self.update_strrep()
 						
 	@property

@@ -58,17 +58,17 @@ extern int curr_midi_in_event;
 
 void midi_in_buffer_add(midi_event evt);
 
-void midi_buff_excl_in();
-void midi_buff_excl_out();
+void midi_buff_excl_in(void);
+void midi_buff_excl_out(void);
 
-void midi_buffer_clear();
-void midi_buffer_flush();
+void midi_buffer_clear(void);
+void midi_buffer_flush(void);
 void midi_buffer_add(int port, midi_event evt);
 
 extern int curr_midi_ignore_event;
 extern midi_event midi_ignore_buffer[EVT_BUFFER_LENGTH];
-void midi_ignore_buff_excl_in();
-void midi_ignore_buff_excl_out();
+void midi_ignore_buff_excl_in(void);
+void midi_ignore_buff_excl_out(void);
 
 
 #endif //__MIDI_EVENT_H__ 

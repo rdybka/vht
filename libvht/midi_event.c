@@ -38,16 +38,16 @@ int curr_midi_queue_event[JACK_CLIENT_MAX_PORTS];
 
 pthread_mutex_t midi_buff_exl;
 
-void midi_buff_excl_in() {
+void midi_buff_excl_in(void) {
 	pthread_mutex_lock(&midi_buff_exl);
 }
 
-void midi_buff_excl_out() {
+void midi_buff_excl_out(void) {
 	pthread_mutex_unlock(&midi_buff_exl);
 }
 
 pthread_mutex_t midi_ignore_buff_exl;
-void midi_ignore_buff_excl_in() {
+void midi_ignore_buff_excl_in(void) {
 	pthread_mutex_lock(&midi_ignore_buff_exl);
 }
 void midi_ignore_buff_excl_out() {
@@ -55,10 +55,10 @@ void midi_ignore_buff_excl_out() {
 }
 
 pthread_mutex_t midi_in_buff_exl;
-void midi_in_buff_excl_in() {
+void midi_in_buff_excl_in(void) {
 	pthread_mutex_lock(&midi_in_buff_exl);
 }
-void midi_in_buff_excl_out() {
+void midi_in_buff_excl_out(void) {
 	pthread_mutex_unlock(&midi_in_buff_exl);
 }
 
@@ -167,7 +167,7 @@ char *i2n(unsigned char i) {
 	return buff;
 }
 
-void midi_buffer_clear() {
+void midi_buffer_clear(void) {
 	for (int i = 0; i < JACK_CLIENT_MAX_PORTS; i++)
 		curr_midi_event[i] = 0;
 }
@@ -215,7 +215,7 @@ void midi_buffer_flush_port(int port) {
 	}
 }
 
-void midi_buffer_flush() {
+void midi_buffer_flush(void) {
 	for (int p = 0; p < JACK_CLIENT_MAX_PORTS; p++) {
 		if (jack_output_ports[p])
 			midi_buffer_flush_port(p);
@@ -308,7 +308,7 @@ void midi_in_buffer_add(midi_event evt) {
 	midi_in_buff_excl_out();
 }
 
-char *midi_in_get_event() {
+char *midi_in_get_event(void) {
 	if (curr_midi_in_event == 0)
 		return NULL;
 
@@ -321,13 +321,13 @@ char *midi_in_get_event() {
 	return buff;
 }
 
-void midi_in_clear_events() {
+void midi_in_clear_events(void) {
 	midi_in_buff_excl_in();
 	curr_midi_in_event = 0;
 	midi_in_buff_excl_out();
 }
 
-void midi_ignore_buffer_clear() {
+void midi_ignore_buffer_clear(void) {
 	midi_ignore_buff_excl_in();
 	curr_midi_ignore_event = 0;
 	midi_ignore_buff_excl_out();

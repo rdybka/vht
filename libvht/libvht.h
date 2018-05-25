@@ -29,33 +29,33 @@
 #include "module.h"
 
 extern int start(char *name);
-extern void stop();
+extern void stop(void);
 
-extern char *get_jack_error();
-extern char *module_get_time();
-extern int get_jack_max_ports();
+extern char *get_jack_error(void);
+extern char *module_get_time(void);
+extern int get_jack_max_ports(void);
 
 // module
-extern void module_new();
-extern void module_free();
+extern void module_new(void);
+extern void module_free(void);
 extern void module_play(int);
-extern int module_is_playing();
+extern int module_is_playing(void);
 extern void module_record(int);
-extern int module_is_recording();
+extern int module_is_recording(void);
 
-extern void module_reset();
+extern void module_reset(void);
 
-extern int module_get_bpm();
+extern int module_get_bpm(void);
 extern void module_set_bpm(int);
 
-extern int module_get_nports();
+extern int module_get_nports(void);
 
-extern int module_get_nseq();
+extern int module_get_nseq(void);
 extern sequence *module_get_seq(int);
 extern void module_add_sequence(sequence *seq);
 extern void module_del_sequence(int s);
 extern void module_swap_sequence(int s1, int s2);
-extern int module_get_curr_seq();
+extern int module_get_curr_seq(void);
 extern void module_dump_notes(int);
 
 extern void queue_midi_note_on(sequence *seq, int port, int chn, int note, int velocity);
@@ -64,10 +64,10 @@ extern void queue_midi_note_off(sequence *seq, int port, int chn, int note);
 extern char *track_get_rec_update(track *trk);
 extern void track_clear_updates(track *trk);
 
-extern char *midi_in_get_event();
-extern void midi_in_clear_events();
+extern char *midi_in_get_event(void);
+extern void midi_in_clear_events(void);
 
-extern void midi_ignore_buffer_clear();
+extern void midi_ignore_buffer_clear(void);
 extern void midi_ignore_buffer_add(int channel, int type, int note);
 
 extern void set_default_midi_port(int port);
@@ -107,6 +107,8 @@ extern void track_del_ctrl(track *trk, int c);
 extern void track_swap_ctrl(track *trk, int c, int c2);
 extern void track_set_ctrl(track *trk, int c, int n, int val);
 extern char *track_get_ctrl(track *tkl, int c, int n);
+extern char *track_get_ctrl_rec(track *tkl, int c, int n);
+extern char *track_get_ctrl_env(track *tkl, int c, int n);
 extern char *track_get_ctrl_nums(track *trk);
 extern void track_set_ctrl_num(track *trk, int c, int v);
 extern int track_get_lctrlval(track *trk, int c);

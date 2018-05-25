@@ -34,8 +34,8 @@ jack_nframes_t jack_last_frame;
 extern char *jack_error;
 
 int jack_start(char *clt_name);
-void jack_stop();
-void jack_synch_output_ports();
+void jack_stop(void);
+void jack_synch_output_ports(void);
 extern int default_midi_port;
 
 

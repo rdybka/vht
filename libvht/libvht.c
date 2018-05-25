@@ -56,7 +56,7 @@ void module_reset() {
 		track_reset(module.seq[0]->trk[t]);
 }
 
-struct module_t *get_module() {
+struct module_t *get_module(void) {
 	return &module;
 }
 

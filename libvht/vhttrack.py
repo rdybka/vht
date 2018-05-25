@@ -120,9 +120,17 @@ class VHTTrack(Iterable):
 	def set_ctrl(self, c, r, val):
 		return self._vht_handle.track_set_ctrl(self._trk_handle, c, r, val)
 
-	# gets all controls for given row
+	# gets all controls for given row (as they will be played)
 	def get_ctrl(self, c, r):
 		return eval(self._vht_handle.track_get_ctrl(self._trk_handle, c, r))
+
+	# gets all controls for given row (recorded/rendered part)
+	def get_ctrl_rec(self, c, r):
+		return eval(self._vht_handle.track_get_ctrl_rec(self._trk_handle, c, r))
+
+	# gets all controls for given row (env part)
+	def get_ctrl_env(self, c, r):
+		return eval(self._vht_handle.track_get_ctrl_env(self._trk_handle, c, r))
 
 	# gets last sent controller value
 	def get_lctrlval(self, c):
