@@ -499,8 +499,12 @@ class ControllerEditor():
 			if self.snap:
 				v = min(round(v / 8) * 8, 127)
 			
-			r = int(min(r, self.trk.nrows))
+			if (r >= self.trk.nrows):
+				anchor = 1
+				
+			r = int(min(r, self.trk.nrows -1))
 
+			print(r)
 			smooth = self.trk.ctrl[self.ctrlnum][self.active_row].smooth
 			linked = self.trk.ctrl[self.ctrlnum][self.active_row].linked
 			
@@ -518,36 +522,48 @@ class ControllerEditor():
 				self.trk.ctrl[self.ctrlnum][self.active_row].smooth = smooth
 				self.trk.ctrl[self.ctrlnum][self.active_row].linked = linked
 				self.trk.ctrl[self.ctrlnum].refresh()
-				
 				self.env = self.trk.get_envelope(self.ctrlnum)
+				
+				for n, node in enumerate(self.env):
+					ns2 = self.node_size
+					r = event.y / self.tv.txt_height
+					v = ((event.x - (self.x_from + self.txt_width)) / xw) * 127
+					v = max(min(v, 127), 0)
+					if abs(node["x"] - v) < ns2 and abs(node["y"] * self.tv.txt_height - r * self.tv.txt_height) < ns2:
+						self.active_node = n
+
+
 				self.redraw_env()
 				self.tv.redraw(controller = self.ctrlnum)
-					
+				return True
+			
 		l_act_node = self.active_node
 		l_act_row = self.active_row
-				
+
 		if self.env:
 			ns2 = self.node_size
 			self.active_node = -1
 			self.active_row = -1
 			
 			for n, node in enumerate(self.env):
-				v = max(min(((event.x - (self.x_from + self.txt_width)) / xw) * 127, 127), 0)
 				r = event.y / self.tv.txt_height
+				v = ((event.x - (self.x_from + self.txt_width)) / xw) * 127
 				
-				if abs(node["x"] - v) < ns2 and abs(node["y"] * self.tv.txt_height - r * self.tv.txt_height) < ns2:
-					if self.moving:
+				if self.moving:
+					v = max(min(v, 127), 0)
+					if abs(node["x"] - v) < ns2 and abs(node["y"] * self.tv.txt_height - r * self.tv.txt_height) < ns2:
 						if lrow == self.trk.ctrl[self.ctrlnum][int(node["y"])]:
 							self.active_node = n
 							self.active_row = int(node["y"])
-					else:
+				else:
+					if abs(node["x"] - v) < ns2 and abs(node["y"] * self.tv.txt_height - r * self.tv.txt_height) < ns2:
 						self.active_node = n
 						self.active_row = int(node["y"])
 
 			if self.moving and self.active_node == -1:
 				self.active_row = l_act_row
 				self.active_node = l_act_node
-							
+										
 			if l_act_node != self.active_node: 
 				self.redraw_env()
 				if l_act_node != -1:
@@ -557,6 +573,7 @@ class ControllerEditor():
 				if self.active_node != -1:
 					r = int(self.env[self.active_node]["y"])
 					self.tv.redraw(r - 1, r + 1)
+					
 		return True
 
 	def on_scroll(self, event):

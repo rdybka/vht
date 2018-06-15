@@ -5,12 +5,11 @@ JACK/Yoshimi/Hydrogen/Calf setup. It relies 100% on JACK for timing
 which allows sample-exact synchronisation and in future, 
 asynchronous rendering.
 
-## installation
+## installation on Fedora
+`[sudo] dnf install jack-audio-connection-kit-devel python3-devel swig astyle git rpm-devel`
+`git clone https://github.com/rdybka/vht`
+`cd vht`
 `./setup.py install --user`
-
-## dependencies
-- python3-gobject
-- jack-audio-connection-kit-devel
 
 ## roadmap before a file release
 - [x] record/edit notes
