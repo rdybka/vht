@@ -97,10 +97,6 @@ class VHTModule(Iterable):
 		return libcvht.get_jack_error()
 	
 	@property
-	def playing(self):
-		return libcvht.module_is_playing()
-	
-	@property
 	def play(self):
 		return libcvht.module_is_playing()
 		

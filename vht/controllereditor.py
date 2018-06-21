@@ -38,11 +38,13 @@ class ControllerEditor():
 		self.empty_pattern = None
 		self.empty_pattern_surface = None
 		
+		self.edit_row = None
+		
 	def precalc(self, cr, x_from):
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
 		self.width = cfg.pitchwheel_editor_char_width * width
 		w1 = width
-		(x, y, width, height, dx, dy) = cr.text_extents("000 0 0|")
+		(x, y, width, height, dx, dy) = cr.text_extents("0000")
 		self.txt_width = width
 		self.width = self.width + self.txt_width
 		reconf = False
@@ -128,7 +130,7 @@ class ControllerEditor():
 			cr.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
 			cr.set_font_size(cfg.seq_font_size)
 			
-			(x, y, width, height, dx, dy) = cr.text_extents("000 0 0")	
+			(x, y, width, height, dx, dy) = cr.text_extents("0000")	
 							
 			self.txt_height = height
 			self.txt_x = x
@@ -148,7 +150,7 @@ class ControllerEditor():
 
 				yy = (r + 1) * self.tv.txt_height - ((self.tv.txt_height - height) / 2.0)
 				cr.move_to(x, yy)
-				cr.show_text("--- - -")
+				cr.show_text("---")
 									
 			self.empty_pattern = cairo.SurfacePattern(self.empty_pattern_surface)
 			self.empty_pattern.set_extend(cairo.Extend.REPEAT)
@@ -231,9 +233,13 @@ class ControllerEditor():
 			else:
 				cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
 
+			lnkchar = " "
+			if row.linked:
+				lnkchar = "↓"
+
 			yy = (r + 1) * self.tv.txt_height - ((self.tv.txt_height - self.txt_height) / 2.0)
 			cr.move_to(self.x_from + self.txt_x, yy)
-			cr.show_text(str(row))
+			cr.show_text("%03d%c" % (row.velocity, lnkchar))
 		
 		cr.set_line_width(1.0)
 		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), .2)
@@ -349,8 +355,7 @@ class ControllerEditor():
 						l = 1
 					else:
 						l = 0
-									
-					
+														
 					self.trk.ctrl[self.ctrlnum][r].linked = l
 					
 					self.env = self.trk.get_envelope(self.ctrlnum)
@@ -504,7 +509,6 @@ class ControllerEditor():
 				
 			r = int(min(r, self.trk.nrows -1))
 
-			print(r)
 			smooth = self.trk.ctrl[self.ctrlnum][self.active_row].smooth
 			linked = self.trk.ctrl[self.ctrlnum][self.active_row].linked
 			
@@ -531,7 +535,6 @@ class ControllerEditor():
 					v = max(min(v, 127), 0)
 					if abs(node["x"] - v) < ns2 and abs(node["y"] * self.tv.txt_height - r * self.tv.txt_height) < ns2:
 						self.active_node = n
-
 
 				self.redraw_env()
 				self.tv.redraw(controller = self.ctrlnum)

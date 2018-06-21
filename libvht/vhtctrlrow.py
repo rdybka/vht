@@ -31,9 +31,9 @@ class VHTCtrlRow():
 			lnk = "L"
 
 		if self._velocity > -1:
-			self._strrep = "%3d %s %d" % (self._velocity, lnk, self._smooth) 
+			self._strrep = "%3d %s %d %d" % (self._velocity, lnk, self._smooth, self._anchor) 
 		else:
-			self._strrep = "--- - -" + lnk
+			self._strrep = "--- - - -"
 	
 	def copy(self, row):
 		self._velocity = row._velocity

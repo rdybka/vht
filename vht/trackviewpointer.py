@@ -23,7 +23,7 @@ class trackviewpointer():
 		self.gradient = None
 
 	def draw(self, pos):
-		if not mod.playing and pos == 0:
+		if not mod.play and pos == 0:
 			if self.stopped:
 				return
 			

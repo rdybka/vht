@@ -39,7 +39,6 @@
 	- gui in track props
 	- resolution
 	- envelopes
-		* show coordinates on mouse over
 		* snapping
 		- doodle/envelope weigth
 - auto-scroll
