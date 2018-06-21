@@ -1,9 +1,8 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gdk, Gtk, Gio
-import cairo
+from gi.repository import Gtk
 
-from vht import *
+from vht import cfg
 
 class BlackLabel(Gtk.Label):
 	def __init__(self, txt):
@@ -14,11 +13,11 @@ class BlackLabel(Gtk.Label):
 		self.set_margin_left(3)
 		self.set_margin_bottom(3)
 		self.set_margin_right(3)
-		
+
 	def on_draw(self, widget, cr):
 		w = widget.get_allocated_width()
 		h = widget.get_allocated_height()
-		
+
 		cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
