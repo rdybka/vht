@@ -1,4 +1,4 @@
-from vht import *
+from vht import mod
 
 def track_fill(trk, note = "c3", skip = 2, velocity = 100):
 	for r in range(len(trk[0])):

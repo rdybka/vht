@@ -15,8 +15,8 @@ class Configuration():
 		self.seq_line_width = 1.0
 		self.seq_spacing = 1.05
 		#self.colour = (.5, .5, 1)
-		self.colour = (.3, 1.0, 1.0)
-		self.star_colour = (.5, .5, 0)			
+		self.colour = (0, .7, .7)
+		self.star_colour = (1, 1, 0)			
 		self.record_colour = (1.0, 0, 0)
 
 		self.intensity_background = .2

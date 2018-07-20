@@ -20,6 +20,10 @@ class ControllerEditor():
 		self.deleting = False
 		self.drawing = False
 		self.moving = False
+		self.selecting = False
+		self.last_selected = -1
+		self.moving_selection_start = -1
+		self.ignore_x = False
 		self.last_r = -1
 		self.last_x = -1
 		self.snap = False
@@ -37,7 +41,8 @@ class ControllerEditor():
 		self.empty_pattern = None
 		self.empty_pattern_surface = None
 
-		self.edit_row = None
+		self.selection = None
+		self.moving_rows = False
 
 	def precalc(self, cr, x_from):
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
@@ -218,12 +223,30 @@ class ControllerEditor():
 
 		row = self.ctrlrows[r]
 
+		#cr.set_source_rgb(*(col * cfg.intensity_select for col in cfg.colour))
+		select = False
+		if self.selection:
+			if r >= self.selection[0] and r<= self.selection[1]:
+				select = True
+				cr.set_source_rgb(*(col * cfg.intensity_select for col in cfg.colour))
+			
 		if row.velocity == -1:		# empty row
-			cr.set_source(self.empty_pattern)
+			if not select:
+				cr.set_source(self.empty_pattern)
 			cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
 			cr.fill()
+			if select:
+				if cfg.highlight > 1 and (r) % cfg.highlight == 0:
+					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
+				else:
+					cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
+				yy = (r + 1) * self.tv.txt_height - ((self.tv.txt_height - self.txt_height) / 2.0)
+				cr.move_to(self.x_from + self.txt_x, yy)
+				cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
+				cr.show_text("---")
 		else:
-			cr.set_source(self.zero_pattern)
+			if not select:
+				cr.set_source(self.zero_pattern)
 			cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
 			cr.fill()
 
@@ -231,6 +254,9 @@ class ControllerEditor():
 				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
 			else:
 				cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
+
+			if select:
+				cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 
 			lnkchar = " "
 			if row.linked:
@@ -325,8 +351,60 @@ class ControllerEditor():
 		if event.x < self.x_from or event.x > self.x_to:
 			return
 
-		ctrl = False
+		self.ignore_x = False
 
+		# handle clicks in left pane
+		if event.x < self.x_from + self.txt_width:
+			self.ignore_x = True
+			shift = False
+			if event.state & Gdk.ModifierType.SHIFT_MASK:
+				shift = True
+				
+			r = min(int(event.y / self.tv.txt_height), self.trk.nrows - 1)
+			
+			right = False
+			if event.button == cfg.delete_button:
+				right = True
+				
+			if not right and not shift:
+				# move selection?
+				if self.selection:
+					if r >= self.selection[0] and r <= self.selection[1]:
+						self.moving_selection_start = r
+						return
+		
+				self.selection = (r, r)
+				self.active_row = r
+				self.last_selected = r
+					
+				if self.trk.ctrl[self.ctrlnum][int(r)].velocity is -1:
+					self.selecting = True
+				else:
+					self.moving = True
+				
+				self.tv.redraw(controller = self.ctrlnum)
+			
+			# expand selection
+			if shift:
+				if self.selection is not None:
+					if r > self.last_selected:
+						self.selection = (self.last_selected, r)
+						
+					if r < self.last_selected:
+						self.selection = (r, self.last_selected)
+					
+					self.selecting = True
+					self.tv.redraw(controller = self.ctrlnum)
+		
+			# delete row or clear selection
+			if right:
+				if self.trk.ctrl[self.ctrlnum][int(r)].velocity == -1:
+					self.selection = None
+					self.tv.redraw(controller = self.ctrlnum)
+			return
+
+		# right pane
+		ctrl = False
 		if event.state & Gdk.ModifierType.CONTROL_MASK:
 			ctrl = True
 
@@ -417,6 +495,11 @@ class ControllerEditor():
 
 		if event.button == cfg.select_button:
 			self.drawing = False
+			self.selecting = False
+			self.moving_selection_start = -1
+			if self.moving_rows:
+				self.moving_rows = False
+				# add undo
 
 		if self.moving:
 			self.moving = False
@@ -430,7 +513,7 @@ class ControllerEditor():
 		if self.ctrlnum == None:
 			return
 
-		if not self.drawing and not self.deleting and not self.moving:
+		if not self.drawing and not self.deleting and not self.moving and not self.selecting and self.moving_selection_start == -1:
 			if event.x < self.x_from or event.x > self.x_to:
 				return
 
@@ -491,9 +574,13 @@ class ControllerEditor():
 		if self.moving:
 			xw = self.x_to - (self.x_from + self.txt_width)
 			x0 = self.x_from + self.txt_width + (xw / 2)
-			v = round(max(min(((event.x - (self.x_from + self.txt_width)) / xw) * 127, 127), 0))
+			
 			r = min(event.y / self.tv.txt_height, self.trk.nrows)
 
+			v = round(max(min(((event.x - (self.x_from + self.txt_width)) / xw) * 127, 127), 0))
+			if self.ignore_x:
+				v = self.trk.ctrl[self.ctrlnum][self.active_row].velocity
+				
 			lr = self.env[self.active_node]["y"]
 			if (r - int(r)) > .5:
 				anchor = 1
@@ -517,6 +604,7 @@ class ControllerEditor():
 				self.trk.ctrl[self.ctrlnum][self.active_row].smooth = 0
 				self.trk.ctrl[self.ctrlnum][self.active_row].linked = 0
 				self.active_row = r
+				self.selection = (r, r)
 				lrow = self.trk.ctrl[self.ctrlnum][self.active_row]
 
 			if r == self.active_row:
@@ -529,15 +617,30 @@ class ControllerEditor():
 
 				for n, node in enumerate(self.env):
 					ns2 = self.node_size
-					r = event.y / self.tv.txt_height
+					r = int(event.y / self.tv.txt_height)
 					v = ((event.x - (self.x_from + self.txt_width)) / xw) * 127
 					v = max(min(v, 127), 0)
 					if abs(node["x"] - v) < ns2 and abs(node["y"] * self.tv.txt_height - r * self.tv.txt_height) < ns2:
 						self.active_node = n
-
+						self.selection = (r, r)
+				
 				self.redraw_env()
 				self.tv.redraw(controller = self.ctrlnum)
 				return True
+
+		if self.selecting:
+			r = min(int(event.y / self.tv.txt_height), self.trk.nrows - 1)
+			if r > self.last_selected:
+				self.selection = (self.last_selected, r)
+						
+			if r <= self.last_selected:
+				self.selection = (r, self.last_selected)
+					
+			self.tv.redraw(controller = self.ctrlnum)
+			return
+
+		if self.moving_selection_start > -1:
+			pass
 
 		l_act_node = self.active_node
 		l_act_row = self.active_row

@@ -41,6 +41,7 @@
 	- envelopes
 		* snapping
 		- doodle/envelope weigth
+- make trackview selecting consistent with controllereditor
 - auto-scroll
 	- fix with visible controllers
 	- inhibit while moving notes
