@@ -35,12 +35,13 @@
 	- minimise mode
 * trackpropviewpopover on_enter bug
 - controllers
-	- refactor pitchwheeleditor into controllereditor
+	* refactor pitchwheeleditor into controllereditor
+	- cursor movement
+	- ctrl+x,c,v,b - cut, copy, paste, render doodles
 	- gui in track props
 	- resolution
 	- envelopes
 		* snapping
-		- doodle/envelope weigth
 - make trackview selecting consistent with controllereditor
 - auto-scroll
 	- fix with visible controllers
@@ -55,4 +56,3 @@
 - split filename in title
 - magic transposing
 - shpoingliness
-- 3d

@@ -7,7 +7,7 @@ from vht import *
 
 class SequencePropViewPopover(Gtk.Popover):
 	def __init__(self, parent, seq):
-		super(Gtk.Popover, self).__init__()
+		super(SequencePropViewPopover, self).__init__()
 		self.set_relative_to(parent)
 
 		self.set_events(Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.ENTER_NOTIFY_MASK)

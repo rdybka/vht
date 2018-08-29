@@ -41,6 +41,7 @@ class ControllerEditor():
 		self.empty_pattern = None
 		self.empty_pattern_surface = None
 
+		self.edit = None
 		self.selection = None
 		self.moving_rows = False
 

@@ -15,6 +15,7 @@ class TrackView(Gtk.DrawingArea):
 	track_views = []
 	clipboard = {}
 	
+	@staticmethod
 	def leave_all():
 		for wdg in TrackView.track_views:
 			redr = False

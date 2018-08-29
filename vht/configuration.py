@@ -2,7 +2,7 @@ import gi
 gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk
 
-from vht import *
+#from vht import *
 
 class Configuration():
 	def __init__(self):

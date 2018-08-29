@@ -71,10 +71,6 @@ class PropView(Gtk.ScrolledWindow):
 	def move_last(self, trk):
 		self.move_track(trk, (len(self.seq) - 1)- trk.index)
 
-	def build(self):
-		for trk in self.seq:
-			self.add_track(trk)
-			
 	def clear_popups(self):
 		for wdg in self._track_box.get_children() + [self.seqview._side_prop]:
 			wdg.popover.popdown()
