@@ -21,6 +21,13 @@ class TrackView(Gtk.DrawingArea):
 			redr = False
 			if wdg.hover or wdg.edit or wdg.select_start:
 				redr = True
+			
+			if wdg.pitchwheel_editor:
+				if wdg.pitchwheel_editor.edit > -1 or wdg.pitchwheel_editor.selection:
+					redr = True
+					
+				wdg.pitchwheel_editor.selection = None
+				wdg.pitchwheel_editor.edit = -1
 				
 			wdg.hover = None
 			wdg.edit = None
@@ -532,6 +539,19 @@ class TrackView(Gtk.DrawingArea):
 		rw.copy(rw2)
 		rw2.copy(rw3)
 		
+	def on_scroll(self, event):
+		if self.edit:
+			old = self.edit[1]
+			self.edit = int(self.edit[0]), int(min(max(0, self.edit[1] + event.delta_y), self.trk.nrows - 1))
+			
+			self.redraw(old)
+			self.redraw(self.edit[1])
+			return True
+
+		if self.show_pitchwheel:
+			return self.pitchwheel_editor.on_scroll(event)	
+		
+		
 	def on_motion(self, widget, event):
 		if not self.trk:
 			return False
@@ -671,10 +691,7 @@ class TrackView(Gtk.DrawingArea):
 			if self.trk[col][row].type == 0:
 				trk = mod.active_track
 				if trk:
-					trk.edit = None
-					trk.select_start = None
-					trk.select_end = None
-					trk.redraw()
+					self.leave_all()
 					
 				self.parent.change_active_track(self)
 				return True
@@ -1121,8 +1138,13 @@ class TrackView(Gtk.DrawingArea):
 			if event.state & Gdk.ModifierType.MOD1_MASK:
 				alt = True
 	
+		if cfg.key["exit_edit"].matches(event):
+			self.leave_all()
+			return True
+	
 		if self.show_pitchwheel:
-			self.pitchwheel_editor.on_key_press(widget, event)	
+			if self.pitchwheel_editor.on_key_press(widget, event):
+				return True
 		
 		if self.velocity_editor:
 			self.velocity_editor.on_key_press(widget, event)
@@ -1216,10 +1238,6 @@ class TrackView(Gtk.DrawingArea):
 		
 		redr = False
 		old = self.edit
-				
-		if self.edit and cfg.key["exit_edit"].matches(event):
-			self.edit = None
-			redr = True
 
 		sel = self.selection()
 		if self.edit:
@@ -1547,9 +1565,10 @@ class TrackView(Gtk.DrawingArea):
 					self.select_start = None
 					self.select_end = None
 				
-				self.edit = self.edit[0], 0
-				self.redraw(*(old))
-				self.redraw(self.edit[1])
+				if self.edit:
+					self.edit = self.edit[0], 0
+					self.redraw(*(old))
+					self.redraw(self.edit[1])
 				return True
 			
 			if shift:
@@ -1576,9 +1595,10 @@ class TrackView(Gtk.DrawingArea):
 					self.select_start = None
 					self.select_end = None
 				
-				self.edit = self.edit[0], self.trk.nrows - 1
-				self.redraw(*(old))
-				self.redraw(self.edit[1])
+				if self.edit:
+					self.edit = self.edit[0], self.trk.nrows - 1
+					self.redraw(*(old))
+					self.redraw(self.edit[1])
 				return True
 			
 			if shift:

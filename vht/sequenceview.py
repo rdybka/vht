@@ -181,8 +181,8 @@ class SequenceView(Gtk.Box):
 
 		if cfg.key["exit_edit"].matches(event):
 			if mod.active_track:
-				if mod.active_track.edit:
-					return mod.active_track.on_key_press(widget, event)
+				#if mod.active_track.edit:
+				return mod.active_track.on_key_press(widget, event)
 
 		if cfg.key["reset"].matches(event):
 			if not mod.play:
@@ -360,6 +360,7 @@ class SequenceView(Gtk.Box):
 				self.seq[t].trigger()
 				self._prop_view.redraw()
 
+		"""
 		# do we enter editing mode?
 		if not mod.active_track:
 			vals = [65364, 65362, 65363, 65361, 65366, 65365, 65360, 65367]
@@ -371,20 +372,21 @@ class SequenceView(Gtk.Box):
 						mod.active_track.edit = 0, 0
 						mod.active_track.redraw(0)
 						return True
-
+		"""
 		if mod.active_track:
-			if not mod.active_track.edit:
-				vals = [65364, 65362, 65363, 65361, 65366, 65365, 65360, 65367]
-
-				for v in vals:
-					if event.keyval == v:
-						if not mod.active_track.select_start:
-							mod.active_track.edit = 0, 0
-							mod.active_track.redraw(0)
-							return True
-
 			return mod.active_track.on_key_press(widget, event)
 
+#			if not mod.active_track.edit:
+#				vals = [65364, 65362, 65363, 65361, 65366, 65365, 65360, 65367]
+
+#				for v in vals:
+#					if event.keyval == v:
+#						if not mod.active_track.select_start:
+#							mod.active_track.edit = 0, 0
+#							mod.active_track.redraw(0)
+#							return True
+
+#			return mod.active_track.on_key_press(widget, event)
 
 		return False
 
@@ -423,23 +425,7 @@ class SequenceView(Gtk.Box):
 			return True
 
 		if mod.active_track:
-			if mod.active_track.edit:
-				old = mod.active_track.edit[1]
-
-				mod.active_track.edit = int(mod.active_track.edit[0]), int(mod.active_track.edit[1] + event.delta_y)
-
-				if mod.active_track.edit[1] >= mod.active_track.trk.nrows:
-					mod.active_track.edit = mod.active_track.edit[0], mod.active_track.trk.nrows - 1
-
-				if mod.active_track.edit[1] < 0:
-					mod.active_track.edit = mod.active_track.edit[0], 0
-
-				mod.active_track.redraw(old)
-				mod.active_track.redraw(mod.active_track.edit[1])
-				return True
-
-			if mod.active_track.show_pitchwheel:
-				return mod.active_track.pitchwheel_editor.on_scroll(event)
+			return mod.active_track.on_scroll(event)
 
 		return False
 

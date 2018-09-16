@@ -1,3 +1,44 @@
+- controllers
+	* refactor pitchwheeleditor into controllereditor
+	- cursor movement
+	- ctrl+x,c,v,b - cut, copy, paste, render doodles
+	- gui in track props
+	- resolution
+	- envelopes
+		* snapping
+- timed note-offs
+- make trackview selecting consistent with controllereditor
+- make bpm a float
+- move selection with keyboard
+- note-off follows note-on
+- fixed status bar size
+- clone - ctrl-n
+- gui magic
+	- stretching (new bpm suggestion)
+	- rotation
+	- move/resize tracks with mouse
+- get rid of overshoot thingys
+- move menu in fullscreen
+- disable menu when no jack
+- deleting track mutes it
+- metronome?
+- extended view
+	* show/hide timeshift
+	- disable notes hiding when controllers off
+	- minimise mode
+- auto-scroll
+	- fix with visible controllers
+	- inhibit while moving notes
+- optimise zooming / redrawing of empties
+- triggers
+- timeline
+- configuration
+- about
+	- version from setup.py
+- save notification
+- split filename in title
+- magic transposing
+- shpoingliness
 * sort out icon
 * popup timeout
 * refactor editors out of trackview
@@ -16,43 +57,4 @@
 * midi_in ignoring
 * midi_in routing to other ports
 * multi-track-recording in empty seq
-- make bpm a float
-- move selection with keyboard
-- note-off follows note-on
-- clone - ctrl-n
-- gui magic
-	- stretching (new bpm suggestion)
-	- rotation
-	- move/resize tracks with mouse
-- get rid of overshoot thingys
-- move menu in fullscreen
-- disable menu when no jack
-- deleting track mutes it
-- metronome?
-- extended view
-	* show/hide timeshift
-	- disable notes hiding when controllers off
-	- minimise mode
 * trackpropviewpopover on_enter bug
-- controllers
-	* refactor pitchwheeleditor into controllereditor
-	- cursor movement
-	- ctrl+x,c,v,b - cut, copy, paste, render doodles
-	- gui in track props
-	- resolution
-	- envelopes
-		* snapping
-- make trackview selecting consistent with controllereditor
-- auto-scroll
-	- fix with visible controllers
-	- inhibit while moving notes
-- optimise zooming / redrawing of empties
-- triggers
-- timeline
-- configuration
-- about
-	- version from setup.py
-- save notification
-- split filename in title
-- magic transposing
-- shpoingliness

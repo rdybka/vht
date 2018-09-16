@@ -4,7 +4,7 @@ from gi.repository import Gdk
 import cairo
 import math
 
-from vht import cfg
+from vht import cfg, mod
 
 class ControllerEditor():
 	def __init__(self, tv, ctrlnum = 0):
@@ -41,7 +41,7 @@ class ControllerEditor():
 		self.empty_pattern = None
 		self.empty_pattern_surface = None
 
-		self.edit = None
+		self.edit = -1
 		self.selection = None
 		self.moving_rows = False
 
@@ -230,12 +230,20 @@ class ControllerEditor():
 			if r >= self.selection[0] and r<= self.selection[1]:
 				select = True
 				cr.set_source_rgb(*(col * cfg.intensity_select for col in cfg.colour))
+
+			if self.selection[0] == self.selection[1] and self.edit == r:
+				if mod.record == 0:
+					cr.set_source_rgb(*(cfg.record_colour))
+				else:
+					cr.set_source_rgb(*(cfg.colour))
 			
 		if row.velocity == -1:		# empty row
 			if not select:
 				cr.set_source(self.empty_pattern)
+			
 			cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
 			cr.fill()
+			
 			if select:
 				if cfg.highlight > 1 and (r) % cfg.highlight == 0:
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
@@ -248,6 +256,7 @@ class ControllerEditor():
 		else:
 			if not select:
 				cr.set_source(self.zero_pattern)
+			
 			cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
 			cr.fill()
 
@@ -339,9 +348,78 @@ class ControllerEditor():
 			cr.fill()
 
 	def on_key_press(self, widget, event):
+		shift = False
+		ctrl = False
+		alt = False
+		
+		if event.state:
+			if event.state & Gdk.ModifierType.SHIFT_MASK:
+				shift = True
+
+			if event.state & Gdk.ModifierType.CONTROL_MASK:
+				ctrl = True
+
+			if event.state & Gdk.ModifierType.MOD1_MASK:
+				alt = True
+				
 		if cfg.key["node_snap"].matches(event):
 			self.snap = True
-		return True
+		
+		if self.edit != -1:
+			olded = self.edit
+			if event.keyval == 65364:						# down
+				self.edit = self.edit + 1
+				if self.edit >= self.trk.nrows:
+					self.edit = 0
+			
+			if event.keyval == 65362:						# up
+				self.edit = self.edit - 1
+				if self.edit == -1:
+					self.edit = self.trk.nrows - 1
+			
+			if event.keyval == 65363:						# right
+				pass
+				
+			if event.keyval == 65361:						# left
+				pass
+				
+			if event.keyval == 65360:						# home
+				self.edit = 0
+			
+			if event.keyval == 65367:						# end	
+				self.edit = self.trk.nrows -1
+
+			if event.keyval == 65365:						# page-up
+				self.edit = self.edit - 1
+				while not self.edit % cfg.highlight == 0:
+					self.edit = self.edit - 1
+				if self.edit < 0:
+					self.edit = 0
+				
+			if event.keyval == 65366:						# page-down
+				self.edit = self.edit + 1
+				while not self.edit % cfg.highlight == 0:
+					self.edit = self.edit + 1
+				if self.edit >= self.trk.nrows:
+					self.edit = self.trk.nrows -1
+				
+			if event.keyval == 65056:						# shift-tab
+				pass
+		
+			if event.keyval == 65289:						# tab
+				pass
+			
+			print("edit %d -> %d" % (olded, self.edit))
+			
+			if self.edit != olded:
+				if not shift:
+					self.selection = [self.edit] * 2
+			
+				self.tv.redraw(olded, controller = self.ctrlnum)
+				self.tv.redraw(self.edit, controller = self.ctrlnum)
+				return True
+			
+		return False
 
 	def on_key_release(self, widget, event):
 		if cfg.key["node_snap"].matches(event):
@@ -351,6 +429,8 @@ class ControllerEditor():
 	def on_button_press(self, widget, event):
 		if event.x < self.x_from or event.x > self.x_to:
 			return
+
+		mod.clear_popups()
 
 		self.ignore_x = False
 
@@ -366,7 +446,7 @@ class ControllerEditor():
 			right = False
 			if event.button == cfg.delete_button:
 				right = True
-				
+			
 			if not right and not shift:
 				# move selection?
 				if self.selection:
@@ -374,6 +454,10 @@ class ControllerEditor():
 						self.moving_selection_start = r
 						return
 		
+				if self.edit != r:
+					self.edit = r
+					self.tv.edit = None
+					
 				self.selection = (r, r)
 				self.active_row = r
 				self.last_selected = r
@@ -400,7 +484,9 @@ class ControllerEditor():
 			# delete row or clear selection
 			if right:
 				if self.trk.ctrl[self.ctrlnum][int(r)].velocity == -1:
+					self.tv.leave_all()
 					self.selection = None
+					self.edit = -1
 					self.tv.redraw(controller = self.ctrlnum)
 			return
 
@@ -683,6 +769,14 @@ class ControllerEditor():
 		return True
 
 	def on_scroll(self, event):
+		if self.edit != - 1:
+			old = self.edit
+			self.edit = int(min(max(0, self.edit + event.delta_y), self.trk.nrows - 1))
+			self.selection = [self.edit] * 2
+			self.tv.redraw(old)
+			self.tv.redraw(self.edit)
+			return True
+		
 		if self.active_node == -1:
 			return False
 

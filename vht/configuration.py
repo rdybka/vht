@@ -11,7 +11,7 @@ class Configuration():
 											# bad design
 		#self.seq_font = "Ubuntu Mono"
 		self.seq_font = "Monospace"
-		self.seq_font_size = 16
+		self.seq_font_size = 12
 		self.seq_line_width = 1.0
 		self.seq_spacing = 1.05
 		#self.colour = (.5, .5, 1)
