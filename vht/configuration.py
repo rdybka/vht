@@ -11,9 +11,10 @@ class Configuration():
 											# bad design
 		#self.seq_font = "Ubuntu Mono"
 		self.seq_font = "Monospace"
-		self.seq_font_size = 12
+		self.seq_font_size = 16
 		self.seq_line_width = 1.0
 		self.seq_spacing = 1.05
+		self.status_bar_font_size = 18
 		#self.colour = (.5, .5, 1)
 		self.colour = (0, .7, .7)
 		self.star_colour = (1, 1, 0)			

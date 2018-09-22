@@ -195,7 +195,8 @@ class StatusBar(Gtk.DrawingArea):
 
 		self._context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)	
 		
-		fs = cfg.seq_font_size
+
+		fs = cfg.status_bar_font_size	
 		fits = False
 		while not fits:
 			self._context.set_font_size(fs)
