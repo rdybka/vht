@@ -44,6 +44,11 @@ class ControllerEditor():
 		self.edit = -1
 		self.selection = None
 		self.moving_rows = False
+		self.drag = False
+		self.drag_content = None
+		self.drag_static = None
+		self.drag_selection_offset = -1
+		self.drag_start = -1
 
 	def precalc(self, cr, x_from):
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
@@ -226,18 +231,32 @@ class ControllerEditor():
 
 		#cr.set_source_rgb(*(col * cfg.intensity_select for col in cfg.colour))
 		select = False
+		empty = False
+
 		if self.selection:
 			if r >= self.selection[0] and r<= self.selection[1]:
 				select = True
 				cr.set_source_rgb(*(col * cfg.intensity_select for col in cfg.colour))
+				if self.drag:
+					row_drag = self.drag_content[r - self.selection[0]]
+					if row_drag.velocity > -1:
+						row = row_drag
+					else:
+						if r >= self.drag_start and r < self.drag_start + len(self.drag_content):
+							empty = True
 
-			if self.selection[0] == self.selection[1] and self.edit == r:
-				if mod.record == 0:
-					cr.set_source_rgb(*(cfg.record_colour))
-				else:
-					cr.set_source_rgb(*(cfg.colour))
+		if self.drag and not select:
+				if r >= self.drag_start and r < self.drag_start + len(self.drag_content):
+					empty = True
+
+		if self.edit == r:
+			select = True
+			if mod.record == 0:
+				cr.set_source_rgb(*(cfg.record_colour))
+			else:
+				cr.set_source_rgb(*(cfg.colour))
 			
-		if row.velocity == -1:		# empty row
+		if row.velocity == -1 or empty:		# empty row
 			if not select:
 				cr.set_source(self.empty_pattern)
 			
@@ -270,7 +289,7 @@ class ControllerEditor():
 
 			lnkchar = " "
 			if row.linked:
-				lnkchar = "↓"
+				lnkchar = "L"
 
 			yy = (r + 1) * self.tv.txt_height - ((self.tv.txt_height - self.txt_height) / 2.0)
 			cr.move_to(self.x_from + self.txt_x, yy)
@@ -361,6 +380,9 @@ class ControllerEditor():
 
 			if event.state & Gdk.ModifierType.MOD1_MASK:
 				alt = True
+		
+		if shift and self.selection:
+			self.selecting = True
 				
 		if cfg.key["node_snap"].matches(event):
 			self.snap = True
@@ -409,19 +431,57 @@ class ControllerEditor():
 			if event.keyval == 65289:						# tab
 				pass
 			
-			print("edit %d -> %d" % (olded, self.edit))
-			
 			if self.edit != olded:
+				oldsel = self.selection
 				if not shift:
-					self.selection = [self.edit] * 2
-			
-				self.tv.redraw(olded, controller = self.ctrlnum)
-				self.tv.redraw(self.edit, controller = self.ctrlnum)
+					if self.selection: 						# remove selection?
+						self.selection = None
+						self.tv.redraw(oldsel[0], oldsel[1], controller = self.ctrlnum)
+				else: 										# expand selection
+					if self.edit > olded: 					# going down
+						if self.selection:
+							if self.edit > self.selection[1]:
+								if olded < self.selection[1]: 	# jump up and get down
+									self.selection = self.selection[1], self.edit
+								else:
+									self.selection = self.selection[0], self.edit
+							else:
+								if (self.edit <= self.selection[1] and
+								self.edit > self.selection[0]):
+									self.selection = self.edit, self.selection[1]
+						else: # no selection
+							self.selection = olded, self.edit
+							oldsel = self.selection
+					else: 									# going up
+						if self.selection:
+							if self.edit < self.selection[0]:
+								if olded > self.selection[0]: 	# jump around, jump around
+									self.selection = self.edit, self.selection[0]
+								else:
+									self.selection = self.edit, self.selection[1]
+							else:
+								if (self.edit >= self.selection[0] and
+								self.edit < self.selection[1]):
+									self.selection = self.selection[0], self.edit
+						else: # no selection
+							self.selection = self.edit, olded
+							oldsel = self.selection
+					
+				if self.selection:
+					updsel = min(oldsel[0], self.selection[0]), max(oldsel[1], self.selection[1])
+					self.tv.redraw(updsel[0], updsel[1], controller = self.ctrlnum)
+				else:
+					self.tv.redraw(olded, controller = self.ctrlnum)
+					self.tv.redraw(self.edit, controller = self.ctrlnum)
 				return True
 			
 		return False
 
 	def on_key_release(self, widget, event):
+		if event.state:
+			if event.state & Gdk.ModifierType.SHIFT_MASK:
+				self.selecting = False
+
 		if cfg.key["node_snap"].matches(event):
 			self.snap = False
 		return True
@@ -451,14 +511,23 @@ class ControllerEditor():
 				# move selection?
 				if self.selection:
 					if r >= self.selection[0] and r <= self.selection[1]:
-						self.moving_selection_start = r
+						self.drag = True
+						self.drag_content = []
+						self.drag_static = []
+						self.drag_selection_offset = r - self.selection[0]
+						self.drag_start = self.selection[0]
+				
+						for rr, row in enumerate(self.trk.ctrl[self.ctrlnum]):
+							self.drag_static.append(row)
+							if rr >= self.selection[0] and rr <= self.selection[1]:
+								self.drag_content.append(row)
 						return
-		
+
 				if self.edit != r:
 					self.edit = r
+					self.selection = None
 					self.tv.edit = None
 					
-				self.selection = (r, r)
 				self.active_row = r
 				self.last_selected = r
 					
@@ -471,15 +540,14 @@ class ControllerEditor():
 			
 			# expand selection
 			if shift:
-				if self.selection is not None:
-					if r > self.last_selected:
-						self.selection = (self.last_selected, r)
+				if r > self.last_selected:
+					self.selection = (self.last_selected, r)
 						
-					if r < self.last_selected:
-						self.selection = (r, self.last_selected)
+				if r < self.last_selected:
+					self.selection = (r, self.last_selected)
 					
-					self.selecting = True
-					self.tv.redraw(controller = self.ctrlnum)
+				self.selecting = True
+				self.tv.redraw(controller = self.ctrlnum)
 		
 			# delete row or clear selection
 			if right:
@@ -593,14 +661,19 @@ class ControllerEditor():
 			self.on_motion(widget, event)
 			self.redraw_env()
 			self.tv.redraw(controller = self.ctrlnum)
-
+		
+		if self.drag:
+			self.drag = False
+			self.redraw_env()
+			self.tv.redraw(controller = self.ctrlnum)
+		
 		return True
 
 	def on_motion(self, widget, event):
 		if self.ctrlnum == None:
 			return
 
-		if not self.drawing and not self.deleting and not self.moving and not self.selecting and self.moving_selection_start == -1:
+		if not self.drag and not self.drawing and not self.deleting and not self.moving and not self.selecting and self.moving_selection_start == -1:
 			if event.x < self.x_from or event.x > self.x_to:
 				return
 
@@ -691,7 +764,7 @@ class ControllerEditor():
 				self.trk.ctrl[self.ctrlnum][self.active_row].smooth = 0
 				self.trk.ctrl[self.ctrlnum][self.active_row].linked = 0
 				self.active_row = r
-				self.selection = (r, r)
+				self.edit = r
 				lrow = self.trk.ctrl[self.ctrlnum][self.active_row]
 
 			if r == self.active_row:
@@ -709,7 +782,7 @@ class ControllerEditor():
 					v = max(min(v, 127), 0)
 					if abs(node["x"] - v) < ns2 and abs(node["y"] * self.tv.txt_height - r * self.tv.txt_height) < ns2:
 						self.active_node = n
-						self.selection = (r, r)
+						self.edit = r
 				
 				self.redraw_env()
 				self.tv.redraw(controller = self.ctrlnum)
@@ -726,8 +799,14 @@ class ControllerEditor():
 			self.tv.redraw(controller = self.ctrlnum)
 			return
 
-		if self.moving_selection_start > -1:
-			pass
+		if self.drag:
+			r = min(int(event.y / self.tv.txt_height), self.trk.nrows - 1)
+			if r != (self.selection[0] + self.drag_selection_offset):
+				l = self.selection[1] - self.selection[0]
+				s = r - self.drag_selection_offset
+				self.edit = -1
+				self.selection = s, s + l
+				self.tv.redraw(controller = self.ctrlnum)
 
 		l_act_node = self.active_node
 		l_act_row = self.active_row

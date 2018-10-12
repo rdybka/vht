@@ -34,7 +34,7 @@ class VHTApp(Gtk.Application):
 		
 	def do_startup(self):
 		Gtk.Application.do_startup(self)
-		
+
 		action = Gio.SimpleAction.new("quit", None)
 		action.connect("activate", self.on_quit)
 		self.add_action(action)

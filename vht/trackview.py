@@ -830,7 +830,6 @@ class TrackView(Gtk.DrawingArea):
 				self.redraw(olded[1])
 			return True		
 		
-		
 		return True
 		
 	def on_button_release(self, widget, event):

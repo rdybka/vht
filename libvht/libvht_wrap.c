@@ -1608,6 +1608,14 @@ SwigPyObject_repr(SwigPyObject *v, PyObject *args)
   return repr;  
 }
 
+/* We need a version taking two PyObject* parameters so it's a valid
+ * PyCFunction to use in swigobject_methods[]. */
+SWIGRUNTIME PyObject *
+SwigPyObject_repr2(PyObject *v, PyObject *SWIGUNUSEDPARM(args))
+{
+  return SwigPyObject_repr((SwigPyObject*)v);
+}
+
 SWIGRUNTIME int
 SwigPyObject_compare(SwigPyObject *v, SwigPyObject *w)
 {
@@ -1737,11 +1745,7 @@ SwigPyObject_append(PyObject* v, PyObject* next)
 }
 
 SWIGRUNTIME PyObject* 
-#ifdef METH_NOARGS
-SwigPyObject_next(PyObject* v)
-#else
 SwigPyObject_next(PyObject* v, PyObject *SWIGUNUSEDPARM(args))
-#endif
 {
   SwigPyObject *sobj = (SwigPyObject *) v;
   if (sobj->next) {    
@@ -1775,6 +1779,20 @@ SwigPyObject_acquire(PyObject* v, PyObject *SWIGUNUSEDPARM(args))
   sobj->own = SWIG_POINTER_OWN;
   return SWIG_Py_Void();
 }
+
+#ifdef METH_NOARGS
+static PyObject*
+SwigPyObject_disown2(PyObject* v, PyObject *SWIGUNUSEDPARM(args))
+{
+  return SwigPyObject_disown(v);
+}
+
+static PyObject*
+SwigPyObject_acquire2(PyObject* v, PyObject *SWIGUNUSEDPARM(args))
+{
+  return SwigPyObject_acquire(v);
+}
+#endif
 
 SWIGINTERN PyObject*
 SwigPyObject_own(PyObject *v, PyObject *args)
@@ -1816,12 +1834,12 @@ SwigPyObject_own(PyObject *v, PyObject *args)
 #ifdef METH_O
 static PyMethodDef
 swigobject_methods[] = {
-  {(char *)"disown",  (PyCFunction)SwigPyObject_disown,  METH_NOARGS,  (char *)"releases ownership of the pointer"},
-  {(char *)"acquire", (PyCFunction)SwigPyObject_acquire, METH_NOARGS,  (char *)"acquires ownership of the pointer"},
+  {(char *)"disown",  (PyCFunction)SwigPyObject_disown2, METH_NOARGS,  (char *)"releases ownership of the pointer"},
+  {(char *)"acquire", (PyCFunction)SwigPyObject_acquire2,METH_NOARGS,  (char *)"acquires ownership of the pointer"},
   {(char *)"own",     (PyCFunction)SwigPyObject_own,     METH_VARARGS, (char *)"returns/sets ownership of the pointer"},
   {(char *)"append",  (PyCFunction)SwigPyObject_append,  METH_O,       (char *)"appends another 'this' object"},
   {(char *)"next",    (PyCFunction)SwigPyObject_next,    METH_NOARGS,  (char *)"returns the next 'this' object"},
-  {(char *)"__repr__",(PyCFunction)SwigPyObject_repr,    METH_NOARGS,  (char *)"returns object representation"},
+  {(char *)"__repr__",(PyCFunction)SwigPyObject_repr2,   METH_NOARGS,  (char *)"returns object representation"},
   {0, 0, 0, 0}  
 };
 #else
@@ -1832,7 +1850,7 @@ swigobject_methods[] = {
   {(char *)"own",     (PyCFunction)SwigPyObject_own,     METH_VARARGS,  (char *)"returns/sets ownership of the pointer"},
   {(char *)"append",  (PyCFunction)SwigPyObject_append,  METH_VARARGS,  (char *)"appends another 'this' object"},
   {(char *)"next",    (PyCFunction)SwigPyObject_next,    METH_VARARGS,  (char *)"returns the next 'this' object"},
-  {(char *)"__repr__",(PyCFunction)SwigPyObject_repr,   METH_VARARGS,  (char *)"returns object representation"},
+  {(char *)"__repr__",(PyCFunction)SwigPyObject_repr,    METH_VARARGS,  (char *)"returns object representation"},
   {0, 0, 0, 0}  
 };
 #endif
@@ -2430,22 +2448,25 @@ SWIG_Python_ConvertFunctionPtr(PyObject *obj, void **ptr, swig_type_info *ty) {
     return SWIG_ConvertPtr(obj, ptr, ty, 0);
   } else {
     void *vptr = 0;
-    swig_cast_info *tc;
-
+    
     /* here we get the method pointer for callbacks */
     const char *doc = (((PyCFunctionObject *)obj) -> m_ml -> ml_doc);
     const char *desc = doc ? strstr(doc, "swig_ptr: ") : 0;
     if (desc)
       desc = ty ? SWIG_UnpackVoidPtr(desc + 10, &vptr, ty->name) : 0;
-    if (!desc)
+    if (!desc) 
       return SWIG_ERROR;
-    tc = SWIG_TypeCheck(desc,ty);
-    if (tc) {
-      int newmemory = 0;
-      *ptr = SWIG_TypeCast(tc,vptr,&newmemory);
-      assert(!newmemory); /* newmemory handling not yet implemented */
+    if (ty) {
+      swig_cast_info *tc = SWIG_TypeCheck(desc,ty);
+      if (tc) {
+        int newmemory = 0;
+        *ptr = SWIG_TypeCast(tc,vptr,&newmemory);
+        assert(!newmemory); /* newmemory handling not yet implemented */
+      } else {
+        return SWIG_ERROR;
+      }
     } else {
-      return SWIG_ERROR;
+      *ptr = vptr;
     }
     return SWIG_OK;
   }
@@ -5873,103 +5894,103 @@ fail:
 
 
 static PyMethodDef SwigMethods[] = {
-	 { (char *)"SWIG_PyInstanceMethod_New", (PyCFunction)SWIG_PyInstanceMethod_New, METH_O, NULL},
-	 { (char *)"start", _wrap_start, METH_VARARGS, NULL},
-	 { (char *)"stop", _wrap_stop, METH_VARARGS, NULL},
-	 { (char *)"get_jack_error", _wrap_get_jack_error, METH_VARARGS, NULL},
-	 { (char *)"module_get_time", _wrap_module_get_time, METH_VARARGS, NULL},
-	 { (char *)"get_jack_max_ports", _wrap_get_jack_max_ports, METH_VARARGS, NULL},
-	 { (char *)"module_new", _wrap_module_new, METH_VARARGS, NULL},
-	 { (char *)"module_free", _wrap_module_free, METH_VARARGS, NULL},
-	 { (char *)"module_play", _wrap_module_play, METH_VARARGS, NULL},
-	 { (char *)"module_is_playing", _wrap_module_is_playing, METH_VARARGS, NULL},
-	 { (char *)"module_record", _wrap_module_record, METH_VARARGS, NULL},
-	 { (char *)"module_is_recording", _wrap_module_is_recording, METH_VARARGS, NULL},
-	 { (char *)"module_reset", _wrap_module_reset, METH_VARARGS, NULL},
-	 { (char *)"module_get_bpm", _wrap_module_get_bpm, METH_VARARGS, NULL},
-	 { (char *)"module_set_bpm", _wrap_module_set_bpm, METH_VARARGS, NULL},
-	 { (char *)"module_get_nports", _wrap_module_get_nports, METH_VARARGS, NULL},
-	 { (char *)"module_get_nseq", _wrap_module_get_nseq, METH_VARARGS, NULL},
-	 { (char *)"module_get_seq", _wrap_module_get_seq, METH_VARARGS, NULL},
-	 { (char *)"module_add_sequence", _wrap_module_add_sequence, METH_VARARGS, NULL},
-	 { (char *)"module_del_sequence", _wrap_module_del_sequence, METH_VARARGS, NULL},
-	 { (char *)"module_swap_sequence", _wrap_module_swap_sequence, METH_VARARGS, NULL},
-	 { (char *)"module_get_curr_seq", _wrap_module_get_curr_seq, METH_VARARGS, NULL},
-	 { (char *)"module_dump_notes", _wrap_module_dump_notes, METH_VARARGS, NULL},
-	 { (char *)"queue_midi_note_on", _wrap_queue_midi_note_on, METH_VARARGS, NULL},
-	 { (char *)"queue_midi_note_off", _wrap_queue_midi_note_off, METH_VARARGS, NULL},
-	 { (char *)"track_get_rec_update", _wrap_track_get_rec_update, METH_VARARGS, NULL},
-	 { (char *)"track_clear_updates", _wrap_track_clear_updates, METH_VARARGS, NULL},
-	 { (char *)"midi_in_get_event", _wrap_midi_in_get_event, METH_VARARGS, NULL},
-	 { (char *)"midi_in_clear_events", _wrap_midi_in_clear_events, METH_VARARGS, NULL},
-	 { (char *)"midi_ignore_buffer_clear", _wrap_midi_ignore_buffer_clear, METH_VARARGS, NULL},
-	 { (char *)"midi_ignore_buffer_add", _wrap_midi_ignore_buffer_add, METH_VARARGS, NULL},
-	 { (char *)"set_default_midi_port", _wrap_set_default_midi_port, METH_VARARGS, NULL},
-	 { (char *)"sequence_new", _wrap_sequence_new, METH_VARARGS, NULL},
-	 { (char *)"sequence_get_ntrk", _wrap_sequence_get_ntrk, METH_VARARGS, NULL},
-	 { (char *)"sequence_get_length", _wrap_sequence_get_length, METH_VARARGS, NULL},
-	 { (char *)"sequence_set_length", _wrap_sequence_set_length, METH_VARARGS, NULL},
-	 { (char *)"sequence_get_trk", _wrap_sequence_get_trk, METH_VARARGS, NULL},
-	 { (char *)"sequence_add_track", _wrap_sequence_add_track, METH_VARARGS, NULL},
-	 { (char *)"sequence_del_track", _wrap_sequence_del_track, METH_VARARGS, NULL},
-	 { (char *)"sequence_swap_track", _wrap_sequence_swap_track, METH_VARARGS, NULL},
-	 { (char *)"sequence_get_pos", _wrap_sequence_get_pos, METH_VARARGS, NULL},
-	 { (char *)"sequence_set_midi_focus", _wrap_sequence_set_midi_focus, METH_VARARGS, NULL},
-	 { (char *)"track_get_row_ptr", _wrap_track_get_row_ptr, METH_VARARGS, NULL},
-	 { (char *)"track_get_ctrlrow_ptr", _wrap_track_get_ctrlrow_ptr, METH_VARARGS, NULL},
-	 { (char *)"track_get_length", _wrap_track_get_length, METH_VARARGS, NULL},
-	 { (char *)"track_get_ncols", _wrap_track_get_ncols, METH_VARARGS, NULL},
-	 { (char *)"track_get_port", _wrap_track_get_port, METH_VARARGS, NULL},
-	 { (char *)"track_get_channel", _wrap_track_get_channel, METH_VARARGS, NULL},
-	 { (char *)"track_get_nrows", _wrap_track_get_nrows, METH_VARARGS, NULL},
-	 { (char *)"track_get_nsrows", _wrap_track_get_nsrows, METH_VARARGS, NULL},
-	 { (char *)"track_get_playing", _wrap_track_get_playing, METH_VARARGS, NULL},
-	 { (char *)"track_get_pos", _wrap_track_get_pos, METH_VARARGS, NULL},
-	 { (char *)"track_set_port", _wrap_track_set_port, METH_VARARGS, NULL},
-	 { (char *)"track_set_channel", _wrap_track_set_channel, METH_VARARGS, NULL},
-	 { (char *)"track_set_nrows", _wrap_track_set_nrows, METH_VARARGS, NULL},
-	 { (char *)"track_set_nsrows", _wrap_track_set_nsrows, METH_VARARGS, NULL},
-	 { (char *)"track_set_playing", _wrap_track_set_playing, METH_VARARGS, NULL},
-	 { (char *)"track_add_ctrl", _wrap_track_add_ctrl, METH_VARARGS, NULL},
-	 { (char *)"track_del_ctrl", _wrap_track_del_ctrl, METH_VARARGS, NULL},
-	 { (char *)"track_swap_ctrl", _wrap_track_swap_ctrl, METH_VARARGS, NULL},
-	 { (char *)"track_set_ctrl", _wrap_track_set_ctrl, METH_VARARGS, NULL},
-	 { (char *)"track_get_ctrl", _wrap_track_get_ctrl, METH_VARARGS, NULL},
-	 { (char *)"track_get_ctrl_rec", _wrap_track_get_ctrl_rec, METH_VARARGS, NULL},
-	 { (char *)"track_get_ctrl_env", _wrap_track_get_ctrl_env, METH_VARARGS, NULL},
-	 { (char *)"track_get_ctrl_nums", _wrap_track_get_ctrl_nums, METH_VARARGS, NULL},
-	 { (char *)"track_set_ctrl_num", _wrap_track_set_ctrl_num, METH_VARARGS, NULL},
-	 { (char *)"track_get_lctrlval", _wrap_track_get_lctrlval, METH_VARARGS, NULL},
-	 { (char *)"track_ctrl_refresh_envelope", _wrap_track_ctrl_refresh_envelope, METH_VARARGS, NULL},
-	 { (char *)"track_get_nctrl", _wrap_track_get_nctrl, METH_VARARGS, NULL},
-	 { (char *)"track_get_ctrlpr", _wrap_track_get_ctrlpr, METH_VARARGS, NULL},
-	 { (char *)"track_get_envelope", _wrap_track_get_envelope, METH_VARARGS, NULL},
-	 { (char *)"track_add_col", _wrap_track_add_col, METH_VARARGS, NULL},
-	 { (char *)"track_del_col", _wrap_track_del_col, METH_VARARGS, NULL},
-	 { (char *)"track_swap_col", _wrap_track_swap_col, METH_VARARGS, NULL},
-	 { (char *)"track_resize", _wrap_track_resize, METH_VARARGS, NULL},
-	 { (char *)"track_trigger", _wrap_track_trigger, METH_VARARGS, NULL},
-	 { (char *)"track_kill_notes", _wrap_track_kill_notes, METH_VARARGS, NULL},
-	 { (char *)"track_new", _wrap_track_new, METH_VARARGS, NULL},
-	 { (char *)"row_get_type", _wrap_row_get_type, METH_VARARGS, NULL},
-	 { (char *)"row_get_note", _wrap_row_get_note, METH_VARARGS, NULL},
-	 { (char *)"row_get_velocity", _wrap_row_get_velocity, METH_VARARGS, NULL},
-	 { (char *)"row_get_delay", _wrap_row_get_delay, METH_VARARGS, NULL},
-	 { (char *)"row_set_type", _wrap_row_set_type, METH_VARARGS, NULL},
-	 { (char *)"row_set_note", _wrap_row_set_note, METH_VARARGS, NULL},
-	 { (char *)"row_set_velocity", _wrap_row_set_velocity, METH_VARARGS, NULL},
-	 { (char *)"row_set_delay", _wrap_row_set_delay, METH_VARARGS, NULL},
-	 { (char *)"row_set", _wrap_row_set, METH_VARARGS, NULL},
-	 { (char *)"ctrlrow_get_velocity", _wrap_ctrlrow_get_velocity, METH_VARARGS, NULL},
-	 { (char *)"ctrlrow_get_linked", _wrap_ctrlrow_get_linked, METH_VARARGS, NULL},
-	 { (char *)"ctrlrow_get_smooth", _wrap_ctrlrow_get_smooth, METH_VARARGS, NULL},
-	 { (char *)"ctrlrow_get_anchor", _wrap_ctrlrow_get_anchor, METH_VARARGS, NULL},
-	 { (char *)"ctrlrow_set_velocity", _wrap_ctrlrow_set_velocity, METH_VARARGS, NULL},
-	 { (char *)"ctrlrow_set_linked", _wrap_ctrlrow_set_linked, METH_VARARGS, NULL},
-	 { (char *)"ctrlrow_set_smooth", _wrap_ctrlrow_set_smooth, METH_VARARGS, NULL},
-	 { (char *)"ctrlrow_set_anchor", _wrap_ctrlrow_set_anchor, METH_VARARGS, NULL},
-	 { (char *)"ctrlrow_set", _wrap_ctrlrow_set, METH_VARARGS, NULL},
-	 { (char *)"parse_note", _wrap_parse_note, METH_VARARGS, NULL},
+	 { "SWIG_PyInstanceMethod_New", SWIG_PyInstanceMethod_New, METH_O, NULL},
+	 { "start", _wrap_start, METH_VARARGS, NULL},
+	 { "stop", _wrap_stop, METH_VARARGS, NULL},
+	 { "get_jack_error", _wrap_get_jack_error, METH_VARARGS, NULL},
+	 { "module_get_time", _wrap_module_get_time, METH_VARARGS, NULL},
+	 { "get_jack_max_ports", _wrap_get_jack_max_ports, METH_VARARGS, NULL},
+	 { "module_new", _wrap_module_new, METH_VARARGS, NULL},
+	 { "module_free", _wrap_module_free, METH_VARARGS, NULL},
+	 { "module_play", _wrap_module_play, METH_VARARGS, NULL},
+	 { "module_is_playing", _wrap_module_is_playing, METH_VARARGS, NULL},
+	 { "module_record", _wrap_module_record, METH_VARARGS, NULL},
+	 { "module_is_recording", _wrap_module_is_recording, METH_VARARGS, NULL},
+	 { "module_reset", _wrap_module_reset, METH_VARARGS, NULL},
+	 { "module_get_bpm", _wrap_module_get_bpm, METH_VARARGS, NULL},
+	 { "module_set_bpm", _wrap_module_set_bpm, METH_VARARGS, NULL},
+	 { "module_get_nports", _wrap_module_get_nports, METH_VARARGS, NULL},
+	 { "module_get_nseq", _wrap_module_get_nseq, METH_VARARGS, NULL},
+	 { "module_get_seq", _wrap_module_get_seq, METH_VARARGS, NULL},
+	 { "module_add_sequence", _wrap_module_add_sequence, METH_VARARGS, NULL},
+	 { "module_del_sequence", _wrap_module_del_sequence, METH_VARARGS, NULL},
+	 { "module_swap_sequence", _wrap_module_swap_sequence, METH_VARARGS, NULL},
+	 { "module_get_curr_seq", _wrap_module_get_curr_seq, METH_VARARGS, NULL},
+	 { "module_dump_notes", _wrap_module_dump_notes, METH_VARARGS, NULL},
+	 { "queue_midi_note_on", _wrap_queue_midi_note_on, METH_VARARGS, NULL},
+	 { "queue_midi_note_off", _wrap_queue_midi_note_off, METH_VARARGS, NULL},
+	 { "track_get_rec_update", _wrap_track_get_rec_update, METH_VARARGS, NULL},
+	 { "track_clear_updates", _wrap_track_clear_updates, METH_VARARGS, NULL},
+	 { "midi_in_get_event", _wrap_midi_in_get_event, METH_VARARGS, NULL},
+	 { "midi_in_clear_events", _wrap_midi_in_clear_events, METH_VARARGS, NULL},
+	 { "midi_ignore_buffer_clear", _wrap_midi_ignore_buffer_clear, METH_VARARGS, NULL},
+	 { "midi_ignore_buffer_add", _wrap_midi_ignore_buffer_add, METH_VARARGS, NULL},
+	 { "set_default_midi_port", _wrap_set_default_midi_port, METH_VARARGS, NULL},
+	 { "sequence_new", _wrap_sequence_new, METH_VARARGS, NULL},
+	 { "sequence_get_ntrk", _wrap_sequence_get_ntrk, METH_VARARGS, NULL},
+	 { "sequence_get_length", _wrap_sequence_get_length, METH_VARARGS, NULL},
+	 { "sequence_set_length", _wrap_sequence_set_length, METH_VARARGS, NULL},
+	 { "sequence_get_trk", _wrap_sequence_get_trk, METH_VARARGS, NULL},
+	 { "sequence_add_track", _wrap_sequence_add_track, METH_VARARGS, NULL},
+	 { "sequence_del_track", _wrap_sequence_del_track, METH_VARARGS, NULL},
+	 { "sequence_swap_track", _wrap_sequence_swap_track, METH_VARARGS, NULL},
+	 { "sequence_get_pos", _wrap_sequence_get_pos, METH_VARARGS, NULL},
+	 { "sequence_set_midi_focus", _wrap_sequence_set_midi_focus, METH_VARARGS, NULL},
+	 { "track_get_row_ptr", _wrap_track_get_row_ptr, METH_VARARGS, NULL},
+	 { "track_get_ctrlrow_ptr", _wrap_track_get_ctrlrow_ptr, METH_VARARGS, NULL},
+	 { "track_get_length", _wrap_track_get_length, METH_VARARGS, NULL},
+	 { "track_get_ncols", _wrap_track_get_ncols, METH_VARARGS, NULL},
+	 { "track_get_port", _wrap_track_get_port, METH_VARARGS, NULL},
+	 { "track_get_channel", _wrap_track_get_channel, METH_VARARGS, NULL},
+	 { "track_get_nrows", _wrap_track_get_nrows, METH_VARARGS, NULL},
+	 { "track_get_nsrows", _wrap_track_get_nsrows, METH_VARARGS, NULL},
+	 { "track_get_playing", _wrap_track_get_playing, METH_VARARGS, NULL},
+	 { "track_get_pos", _wrap_track_get_pos, METH_VARARGS, NULL},
+	 { "track_set_port", _wrap_track_set_port, METH_VARARGS, NULL},
+	 { "track_set_channel", _wrap_track_set_channel, METH_VARARGS, NULL},
+	 { "track_set_nrows", _wrap_track_set_nrows, METH_VARARGS, NULL},
+	 { "track_set_nsrows", _wrap_track_set_nsrows, METH_VARARGS, NULL},
+	 { "track_set_playing", _wrap_track_set_playing, METH_VARARGS, NULL},
+	 { "track_add_ctrl", _wrap_track_add_ctrl, METH_VARARGS, NULL},
+	 { "track_del_ctrl", _wrap_track_del_ctrl, METH_VARARGS, NULL},
+	 { "track_swap_ctrl", _wrap_track_swap_ctrl, METH_VARARGS, NULL},
+	 { "track_set_ctrl", _wrap_track_set_ctrl, METH_VARARGS, NULL},
+	 { "track_get_ctrl", _wrap_track_get_ctrl, METH_VARARGS, NULL},
+	 { "track_get_ctrl_rec", _wrap_track_get_ctrl_rec, METH_VARARGS, NULL},
+	 { "track_get_ctrl_env", _wrap_track_get_ctrl_env, METH_VARARGS, NULL},
+	 { "track_get_ctrl_nums", _wrap_track_get_ctrl_nums, METH_VARARGS, NULL},
+	 { "track_set_ctrl_num", _wrap_track_set_ctrl_num, METH_VARARGS, NULL},
+	 { "track_get_lctrlval", _wrap_track_get_lctrlval, METH_VARARGS, NULL},
+	 { "track_ctrl_refresh_envelope", _wrap_track_ctrl_refresh_envelope, METH_VARARGS, NULL},
+	 { "track_get_nctrl", _wrap_track_get_nctrl, METH_VARARGS, NULL},
+	 { "track_get_ctrlpr", _wrap_track_get_ctrlpr, METH_VARARGS, NULL},
+	 { "track_get_envelope", _wrap_track_get_envelope, METH_VARARGS, NULL},
+	 { "track_add_col", _wrap_track_add_col, METH_VARARGS, NULL},
+	 { "track_del_col", _wrap_track_del_col, METH_VARARGS, NULL},
+	 { "track_swap_col", _wrap_track_swap_col, METH_VARARGS, NULL},
+	 { "track_resize", _wrap_track_resize, METH_VARARGS, NULL},
+	 { "track_trigger", _wrap_track_trigger, METH_VARARGS, NULL},
+	 { "track_kill_notes", _wrap_track_kill_notes, METH_VARARGS, NULL},
+	 { "track_new", _wrap_track_new, METH_VARARGS, NULL},
+	 { "row_get_type", _wrap_row_get_type, METH_VARARGS, NULL},
+	 { "row_get_note", _wrap_row_get_note, METH_VARARGS, NULL},
+	 { "row_get_velocity", _wrap_row_get_velocity, METH_VARARGS, NULL},
+	 { "row_get_delay", _wrap_row_get_delay, METH_VARARGS, NULL},
+	 { "row_set_type", _wrap_row_set_type, METH_VARARGS, NULL},
+	 { "row_set_note", _wrap_row_set_note, METH_VARARGS, NULL},
+	 { "row_set_velocity", _wrap_row_set_velocity, METH_VARARGS, NULL},
+	 { "row_set_delay", _wrap_row_set_delay, METH_VARARGS, NULL},
+	 { "row_set", _wrap_row_set, METH_VARARGS, NULL},
+	 { "ctrlrow_get_velocity", _wrap_ctrlrow_get_velocity, METH_VARARGS, NULL},
+	 { "ctrlrow_get_linked", _wrap_ctrlrow_get_linked, METH_VARARGS, NULL},
+	 { "ctrlrow_get_smooth", _wrap_ctrlrow_get_smooth, METH_VARARGS, NULL},
+	 { "ctrlrow_get_anchor", _wrap_ctrlrow_get_anchor, METH_VARARGS, NULL},
+	 { "ctrlrow_set_velocity", _wrap_ctrlrow_set_velocity, METH_VARARGS, NULL},
+	 { "ctrlrow_set_linked", _wrap_ctrlrow_set_linked, METH_VARARGS, NULL},
+	 { "ctrlrow_set_smooth", _wrap_ctrlrow_set_smooth, METH_VARARGS, NULL},
+	 { "ctrlrow_set_anchor", _wrap_ctrlrow_set_anchor, METH_VARARGS, NULL},
+	 { "ctrlrow_set", _wrap_ctrlrow_set, METH_VARARGS, NULL},
+	 { "parse_note", _wrap_parse_note, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
 };
 
@@ -6606,8 +6627,8 @@ SWIG_init(void) {
     (char *)"this", &SwigPyBuiltin_ThisClosure, NULL, NULL, NULL
   };
   static SwigPyGetSet thisown_getset_closure = {
-    (PyCFunction) SwigPyObject_own,
-    (PyCFunction) SwigPyObject_own
+    SwigPyObject_own,
+    SwigPyObject_own
   };
   static PyGetSetDef thisown_getset_def = {
     (char *)"thisown", SwigPyBuiltin_GetterClosure, SwigPyBuiltin_SetterClosure, NULL, &thisown_getset_closure
