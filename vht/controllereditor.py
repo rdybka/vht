@@ -229,7 +229,6 @@ class ControllerEditor():
 
 		row = self.ctrlrows[r]
 
-		#cr.set_source_rgb(*(col * cfg.intensity_select for col in cfg.colour))
 		select = False
 		empty = False
 
@@ -237,25 +236,14 @@ class ControllerEditor():
 			if r >= self.selection[0] and r<= self.selection[1]:
 				select = True
 				cr.set_source_rgb(*(col * cfg.intensity_select for col in cfg.colour))
-				if self.drag:
-					row_drag = self.drag_content[r - self.selection[0]]
-					if row_drag.velocity > -1:
-						row = row_drag
-					else:
-						if r >= self.drag_start and r < self.drag_start + len(self.drag_content):
-							empty = True
-
-		if self.drag and not select:
-				if r >= self.drag_start and r < self.drag_start + len(self.drag_content):
-					empty = True
 
 		if self.edit == r:
 			select = True
-			if mod.record == 0:
-				cr.set_source_rgb(*(cfg.record_colour))
-			else:
-				cr.set_source_rgb(*(cfg.colour))
 			
+			if mod.record == 0:
+				if not self.selection:
+					cr.set_source_rgb(*(cfg.record_colour))
+					
 		if row.velocity == -1 or empty:		# empty row
 			if not select:
 				cr.set_source(self.empty_pattern)
@@ -517,10 +505,15 @@ class ControllerEditor():
 						self.drag_selection_offset = r - self.selection[0]
 						self.drag_start = self.selection[0]
 				
-						for rr, row in enumerate(self.trk.ctrl[self.ctrlnum]):
-							self.drag_static.append(row)
+						for rr, row in enumerate(self.trk.ctrl[self.ctrlnum]):						
+							rd = row.dummy()
+							
 							if rr >= self.selection[0] and rr <= self.selection[1]:
 								self.drag_content.append(row)
+								rd.clear()
+
+							self.drag_static.append(rd)
+
 						return
 
 				if self.edit != r:
@@ -806,7 +799,19 @@ class ControllerEditor():
 				s = r - self.drag_selection_offset
 				self.edit = -1
 				self.selection = s, s + l
+
+				for r in range(len(self.trk.ctrl[self.ctrlnum])):
+					self.trk.ctrl[self.ctrlnum][r].copy(self.drag_static[r])
+					
+					if r >= self.selection[0] and r <= self.selection[1]:
+						if self.drag_content[r - self.selection[0]].velocity > -1:
+							self.trk.ctrl[self.ctrlnum][r].copy(self.drag_content[r - self.selection[0]])
+		
+				self.trk.ctrl[self.ctrlnum].refresh()
+				self.env = self.trk.get_envelope(self.ctrlnum)
+				self.redraw_env()
 				self.tv.redraw(controller = self.ctrlnum)
+				return
 
 		l_act_node = self.active_node
 		l_act_row = self.active_row

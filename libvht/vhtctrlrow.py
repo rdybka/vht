@@ -1,13 +1,15 @@
 
 class VHTCtrlRow():
-	def __init__(self, vht, crowptr):
+	def __init__(self, vht, crowptr, dummy = False):
 		self._vht_handle = vht
 		self._crowptr = crowptr
+		self._dummy = dummy
 
 		self._velocity = vht.ctrlrow_get_velocity(self._crowptr)		
 		self._linked = vht.ctrlrow_get_linked(self._crowptr)
 		self._smooth = vht.ctrlrow_get_smooth(self._crowptr)
 		self._anchor = vht.ctrlrow_get_anchor(self._crowptr)
+
 		self.update_strrep()
 		
 	def __eq__(self, other):
@@ -40,7 +42,8 @@ class VHTCtrlRow():
 		self._linked = row._linked
 		self._smooth = row._smooth
 		self._anchor = row._anchor
-		self._vht_handle.ctrlrow_set(self._crowptr, self._velocity, self._linked, self._smooth, self.anchor)
+		if not self._dummy:
+			self._vht_handle.ctrlrow_set(self._crowptr, self._velocity, self._linked, self._smooth, self.anchor)
 		self.update_strrep()
 		
 	def clear(self):
@@ -48,8 +51,12 @@ class VHTCtrlRow():
 		self.linked = 0
 		self.smooth = 0
 		self.anchor = 0
-		self._vht_handle.ctrlrow_set(self._crowptr, -1, 0, 0, 0)
+		if not self._dummy:
+			self._vht_handle.ctrlrow_set(self._crowptr, -1, 0, 0, 0)
 		self.update_strrep()
+
+	def dummy(self):
+		return VHTCtrlRow(self._vht_handle, self._crowptr, True)
 						
 	@property
 	def velocity(self):
@@ -58,7 +65,9 @@ class VHTCtrlRow():
 	@velocity.setter
 	def velocity(self, value):
 		self._velocity = int(value)
-		self._vht_handle.ctrlrow_set_velocity(self._crowptr, self._velocity)
+
+		if not self._dummy:
+			self._vht_handle.ctrlrow_set_velocity(self._crowptr, self._velocity)
 
 	@property
 	def linked(self):
@@ -67,7 +76,8 @@ class VHTCtrlRow():
 	@linked.setter
 	def linked(self, value):
 		self._linked = int(value)
-		self._vht_handle.ctrlrow_set_linked(self._crowptr, self._linked)
+		if not self._dummy:
+			self._vht_handle.ctrlrow_set_linked(self._crowptr, self._linked)
 
 	@property
 	def smooth(self):
@@ -76,7 +86,8 @@ class VHTCtrlRow():
 	@smooth.setter
 	def smooth(self, value):
 		self._smooth = int(value)
-		self._vht_handle.ctrlrow_set_smooth(self._crowptr, self._smooth)
+		if not self._dummy:
+			self._vht_handle.ctrlrow_set_smooth(self._crowptr, self._smooth)
 
 	@property
 	def anchor(self):
@@ -85,7 +96,8 @@ class VHTCtrlRow():
 	@anchor.setter
 	def anchor(self, value):
 		self._anchor = int(value)
-		self._vht_handle.ctrlrow_set_anchor(self._crowptr, self._anchor)
+		if not self._dummy:
+			self._vht_handle.ctrlrow_set_anchor(self._crowptr, self._anchor)
 
 	def __str__(self):
 		return self._strrep
