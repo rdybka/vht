@@ -5,8 +5,12 @@ import cairo
 import math
 
 from vht import cfg, mod
+from vht.controllerundobuffer import ControllerUndoBuffer
 
 class ControllerEditor():
+	clipboard = []
+	doodle_clipboard = []
+	
 	def __init__(self, tv, ctrlnum = 0):
 		self.tv = tv
 		self.trk = tv.trk
@@ -49,6 +53,8 @@ class ControllerEditor():
 		self.drag_static = None
 		self.drag_selection_offset = -1
 		self.drag_start = -1
+		
+		self.undo_buff = ControllerUndoBuffer(self.trk, self.ctrlnum)
 
 	def precalc(self, cr, x_from):
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
@@ -79,15 +85,6 @@ class ControllerEditor():
 
 		if not found:
 			raise KeyError("controller %d not found" % self.ctrlnum)
-
-		# some test data
-		if not len(self.env):
-			self.trk.ctrl[0][0] = [127, 0, 0, 0]
-			self.trk.ctrl[0][12] = [0, 1, 8, 0]
-			self.trk.ctrl[0][14] = [64, 1, 0, 0]
-			self.trk.ctrl[0][16] = [127, 1, 0, 1]
-			self.trk.ctrl[0].refresh()
-			self.env = self.trk.get_envelope(self.ctrlnum)
 
 		recr_cr = False
 
@@ -171,6 +168,7 @@ class ControllerEditor():
 			self.empty_pattern.set_matrix(matrix)
 
 			self.redraw_env()
+			self.undo_buff.add_state()
 
 	def redraw_env(self):
 		cr = self.env_cr
@@ -233,25 +231,25 @@ class ControllerEditor():
 		empty = False
 
 		if self.selection:
-			if r >= self.selection[0] and r<= self.selection[1]:
-				select = True
-				cr.set_source_rgb(*(col * cfg.intensity_select for col in cfg.colour))
+			if self.selection[1] - self.selection[0] > 0:
+				if r >= self.selection[0] and r<= self.selection[1]:
+					select = True
+					cr.set_source_rgb(*(col * cfg.intensity_select for col in cfg.colour))
 
 		if self.edit == r:
-			select = True
-			
 			if mod.record == 0:
-				if not self.selection:
+				if not select:
 					cr.set_source_rgb(*(cfg.record_colour))
+					select = True
 					
 		if row.velocity == -1 or empty:		# empty row
 			if not select:
 				cr.set_source(self.empty_pattern)
-			
+				
 			cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
 			cr.fill()
 			
-			if select:
+			if select or self.edit == r:
 				if cfg.highlight > 1 and (r) % cfg.highlight == 0:
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
 				else:
@@ -299,7 +297,7 @@ class ControllerEditor():
 		yp = yh / len(ctrl)
 		y0 = r * yh
 
-		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.record_colour), .4)
+		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.record_colour), .7)
 		for v in ctrl:
 			xx = (v / 127) - 64
 			xx = xx * ((xw / 2) / 64)
@@ -375,6 +373,178 @@ class ControllerEditor():
 		if cfg.key["node_snap"].matches(event):
 			self.snap = True
 		
+		handled = False
+		
+		if self.selection:
+			if cfg.key["delete"].matches(event):
+				for r in range((self.selection[1] - self.selection[0]) + 1):
+					self.trk.ctrl[self.ctrlnum][r + self.selection[0]].clear()
+
+				self.trk.ctrl[self.ctrlnum].refresh()
+				handled = True
+				
+		# link / delete / value
+		sel = False
+		if self.selection:
+			if (self.selection[1] - self.selection[0]) > 0:
+				sel = True
+
+		key = Gdk.keyval_name(Gdk.keyval_to_lower(event.keyval))
+		if self.edit != -1 and not sel:
+			if cfg.key["link"].matches(event):
+				l = self.trk.ctrl[self.ctrlnum][self.edit].linked
+				if l == 0:
+					l = 1
+				else:
+					l = 0
+				self.trk.ctrl[self.ctrlnum][self.edit].linked = l
+				handled = True
+
+			if cfg.key["delete"].matches(event):
+				self.trk.ctrl[self.ctrlnum][self.edit].clear()
+				handled = True
+		
+			if not shift and not ctrl and not alt:
+				f = cfg.velocity_keys.find(key)
+				val = -1
+				if f > -1:
+					val = int(f * (127 / (len(cfg.velocity_keys) - 1)))
+					
+					if f == 0:
+						val = 0
+						
+					if f == len(cfg.velocity_keys) - 1:
+						val = 127
+			
+					if f == math.floor(len(cfg.velocity_keys) / 2):
+						val = 64
+					
+					if self.trk.ctrl[self.ctrlnum][self.edit].velocity == -1:
+						self.trk.ctrl[self.ctrlnum][self.edit].linked = 0
+						self.trk.ctrl[self.ctrlnum][self.edit].anchor = 0
+						self.trk.ctrl[self.ctrlnum][self.edit].smooth = 0
+						
+					self.trk.ctrl[self.ctrlnum][self.edit].velocity = val
+					handled = True
+
+		if cfg.key["undo"].matches(event):
+			self.undo_buff.restore()
+			handled = True
+
+		if cfg.key["select_all"].matches(event):
+			if not self.selection and self.edit == -1:
+				return False
+			
+			self.tv.leave_all()
+			self.selection = (0, self.trk.nrows -1)
+			self.edit = self.selection[1]
+			handled = True
+
+		if cfg.key["doodle_cut"].matches(event):
+			if not self.selection and self.edit == -1:
+				return False
+
+			s = max(self.edit, -1)
+			e = s
+			if self.selection:
+				s = self.selection[0]
+				e = self.selection[1]
+			
+			if s == -1:
+				return False
+			
+			self.to_clipboard(True)
+
+			for r in range(s, min(e + 1, self.trk.nrows)):
+				offs = self.trk.ctrlpr * r
+				for rr in range(self.trk.ctrlpr):
+					self.trk.set_ctrl(self.ctrlnum, offs + rr, -1)
+			
+			handled = True
+
+		if cfg.key["cut"].matches(event):
+			if not self.selection and self.edit == -1:
+				return False
+
+			s = max(self.edit, -1)
+			e = s
+			if self.selection:
+				s = self.selection[0]
+				e = self.selection[1]
+			
+			if s == -1:
+				return False
+			
+			self.to_clipboard()
+
+			for r in range(s, min(e + 1, self.trk.nrows)):
+				self.trk.ctrl[self.ctrlnum][r].clear()
+			
+			handled = True
+
+		if cfg.key["doodle_delete"].matches(event):
+			if not self.selection and self.edit == -1:
+				return False
+
+			s = max(self.edit, -1)
+			e = s
+			if self.selection:
+				s = self.selection[0]
+				e = self.selection[1]
+			
+			if s == -1:
+				return False
+
+			for r in range(s, min(e + 1, self.trk.nrows)):
+				offs = self.trk.ctrlpr * r
+				for rr in range(self.trk.ctrlpr):
+					self.trk.set_ctrl(self.ctrlnum, offs + rr, -1)
+
+			return True
+
+		if cfg.key["doodle_copy"].matches(event):
+			if not self.selection and self.edit == -1:
+				return False
+
+			self.to_clipboard(True)
+			return True
+
+		if cfg.key["copy"].matches(event):
+			if not self.selection and self.edit == -1:
+				return False
+
+			self.to_clipboard()
+			return True
+
+		if cfg.key["doodle_paste"].matches(event):
+			if not self.selection and self.edit == -1:
+				return False
+
+			self.from_clipboard(True)
+			handled = True
+
+		if cfg.key["doodle_render"].matches(event):
+			if not self.selection and self.edit == -1:
+				return False
+
+			self.render_doodles()
+			handled = True
+
+		if cfg.key["paste"].matches(event):
+			if not self.selection and self.edit == -1:
+				return False
+
+			self.from_clipboard()
+			handled = True
+
+		if handled:
+			self.trk.ctrl[self.ctrlnum].refresh()
+			self.env = self.trk.get_envelope(self.ctrlnum)
+			self.redraw_env()
+			self.tv.redraw(controller = self.ctrlnum)
+			self.undo_buff.add_state()
+			return True	
+				
 		if self.edit != -1:
 			olded = self.edit
 			if event.keyval == 65364:						# down
@@ -517,6 +687,7 @@ class ControllerEditor():
 						return
 
 				if self.edit != r:
+					self.tv.leave_all()
 					self.edit = r
 					self.selection = None
 					self.tv.edit = None
@@ -549,6 +720,12 @@ class ControllerEditor():
 					self.selection = None
 					self.edit = -1
 					self.tv.redraw(controller = self.ctrlnum)
+				else:
+					self.trk.ctrl[self.ctrlnum][int(r)].clear()
+					self.trk.ctrl[self.ctrlnum].refresh()
+					self.env = self.trk.get_envelope(self.ctrlnum)
+					self.redraw_env()
+					self.tv.redraw(controller = self.ctrlnum)				
 			return
 
 		# right pane
@@ -586,6 +763,7 @@ class ControllerEditor():
 					self.env = self.trk.get_envelope(self.ctrlnum)
 					self.on_motion(widget, event)
 					self.redraw_env()
+					self.edit = -1
 					self.tv.redraw(controller = self.ctrlnum)
 
 					return True
@@ -626,7 +804,6 @@ class ControllerEditor():
 
 			self.trk.ctrl[self.ctrlnum][int(r)].anchor = anchor
 
-
 			self.trk.ctrl[self.ctrlnum].refresh()
 			self.env = self.trk.get_envelope(self.ctrlnum)
 
@@ -647,7 +824,9 @@ class ControllerEditor():
 			self.moving_selection_start = -1
 			if self.moving_rows:
 				self.moving_rows = False
-				# add undo
+
+			if self.selection:
+				self.selection = (max(self.selection[0], 0), min(self.selection[1], len(self.trk.ctrl[self.ctrlnum]) - 1))
 
 		if self.moving:
 			self.moving = False
@@ -660,6 +839,7 @@ class ControllerEditor():
 			self.redraw_env()
 			self.tv.redraw(controller = self.ctrlnum)
 		
+		self.undo_buff.add_state()
 		return True
 
 	def on_motion(self, widget, event):
@@ -788,9 +968,9 @@ class ControllerEditor():
 						
 			if r <= self.last_selected:
 				self.selection = (r, self.last_selected)
-					
+			
 			self.tv.redraw(controller = self.ctrlnum)
-			return
+			return True
 
 		if self.drag:
 			r = min(int(event.y / self.tv.txt_height), self.trk.nrows - 1)
@@ -853,15 +1033,16 @@ class ControllerEditor():
 		return True
 
 	def on_scroll(self, event):
-		if self.edit != - 1:
-			old = self.edit
-			self.edit = int(min(max(0, self.edit + event.delta_y), self.trk.nrows - 1))
-			self.selection = [self.edit] * 2
-			self.tv.redraw(old)
-			self.tv.redraw(self.edit)
-			return True
+		if self.selection:
+			return False
 		
 		if self.active_node == -1:
+			if self.edit != - 1:
+				old = self.edit
+				self.edit = int(min(max(0, self.edit + event.delta_y), self.trk.nrows - 1))
+				self.tv.redraw(old, controller = self.ctrlnum)
+				self.tv.redraw(self.edit, controller = self.ctrlnum)
+				return True
 			return False
 
 		smth = self.trk.ctrl[self.ctrlnum][self.active_row].smooth
@@ -879,4 +1060,74 @@ class ControllerEditor():
 		self.env = self.trk.get_envelope(self.ctrlnum)
 		self.redraw_env()
 		self.tv.redraw(controller = self.ctrlnum)
+		self.undo_buff.add_state()
 		return True
+
+	def to_clipboard(self, doodles = False):
+		if not self.selection and not self.edit != -1:
+			return
+		
+		if not self.selection:
+			self.selection = (self.edit, self.edit)
+		
+		d = ControllerEditor.clipboard
+		if doodles:
+			d = ControllerEditor.doodle_clipboard
+		
+		d.clear()
+		for r in range((self.selection[1] - self.selection[0]) + 1):
+			if doodles:
+				d.append(self.trk.get_ctrl_rec(self.ctrlnum, r + self.selection[0]))
+			else:
+				d.append(self.trk.ctrl[self.ctrlnum][r + self.selection[0]].dummy())
+
+	def from_clipboard(self, doodles = False):
+		d = ControllerEditor.clipboard
+		if doodles:
+			d = ControllerEditor.doodle_clipboard
+			
+		if not len(d):
+			return
+
+		s = max(-1, self.edit)
+		e = s + len(d)
+		if self.selection:
+			s = self.selection[0]
+			e = self.selection[1]
+		
+		e = min(e, self.trk.nrows)
+		
+		if s == -1:
+			return
+		
+		p = s
+		dpr = self.trk.ctrlpr 	# doodles per row 
+		while(p <= e):
+			for r in d:
+				if p <= e:
+					if doodles:
+						for i, val in enumerate(r):
+							self.trk.set_ctrl(self.ctrlnum, (dpr * p) + i, val)
+					else:
+						if self.trk.ctrl[self.ctrlnum][p].velocity == -1:
+							self.trk.ctrl[self.ctrlnum][p].copy(r)
+				p += 1
+		
+		if not self.selection:
+			self.edit = min(e, self.trk.nrows - 1)
+
+	def render_doodles(self):
+		s = max(-1, self.edit)
+		e = s
+		if self.selection:
+			s = self.selection[0]
+			e = self.selection[1]
+		
+		e = min(e, self.trk.nrows)
+		
+		dpr = self.trk.ctrlpr
+		for r in range(s, e + 1):
+			cenv = self.trk.get_ctrl_env(self.ctrlnum, r)
+			for y, rr in enumerate(cenv):
+				if rr != -1:
+					self.trk.set_ctrl(self.ctrlnum, (dpr * r) + y, rr)

@@ -107,6 +107,14 @@ class Configuration():
 			"port_down":		cfgkey("none",			True, False, True),
 			"hold_editor":		cfgkey("Control_L",		False, False, False),
 			"node_snap":		cfgkey("Control_L",		False, False, False),
+			
+			# controllereditor
+			"link":				cfgkey("l",				False, False, False),
+			"doodle_copy":		cfgkey("c",				True, True, False), 
+			"doodle_cut":		cfgkey("x",				True, True, False), 
+			"doodle_paste":		cfgkey("v",				True, True, False), 
+			"doodle_delete":	cfgkey("Delete",		True, True, False),
+			"doodle_render":	cfgkey("d",				True, True, False), 
 		}
 
 		self.midi_in = {
@@ -115,6 +123,10 @@ class Configuration():
 			"reset": [16, 4, 116, 127],
 			"track_clear": [16, 4, 113, 127],
 		}
+		
+		self.velocity_keys = "zxcvbnm"
+		self.piano_white_keys = "zxcvbnmqwertyu"
+		self.piano_black_keys = "sdghj23567"
 		
 	@property
 	def highlight(self):
