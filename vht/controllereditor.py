@@ -44,6 +44,7 @@ class ControllerEditor():
 		self.zero_pattern_surface = None
 		self.empty_pattern = None
 		self.empty_pattern_surface = None
+		self.zero_pattern_highlight = -1
 
 		self.edit = -1
 		self.selection = None
@@ -76,15 +77,10 @@ class ControllerEditor():
 		if self.x_to == 0:
 			return
 
-		found = False
-		for c, ct in enumerate(self.trk.ctrls):
-			if ct == self.ctrlnum or (ct == -1 and self.ctrlnum == 0):
-				self.env = self.trk.get_envelope(c)
-				self.ctrlrows = self.trk.ctrl[self.ctrlnum]
-				found = True
-
-		if not found:
-			raise KeyError("controller %d not found" % self.ctrlnum)
+		if not self.trk.ctrls:
+			return
+		
+		self.ctrlrows = self.trk.ctrl[self.ctrlnum]
 
 		recr_cr = False
 
@@ -93,8 +89,13 @@ class ControllerEditor():
 				recr_cr = True
 			if self.env_cr.get_target().get_height() != self.tv._back_surface.get_height():
 				recr_cr = True
-		else:
+
+		if not self.zero_pattern_surface:
 			recr_cr = True
+
+		if self.zero_pattern_highlight != cfg.highlight:
+			 self.zero_pattern_highlight = cfg.highlight
+			 recr_cr = True
 
 		if recr_cr:
 			if self.env_sf:
@@ -131,7 +132,10 @@ class ControllerEditor():
 			self.zero_pattern.set_matrix(matrix)
 
 			# empty pattern
-			self.empty_pattern_surface = self.tv._back_surface.create_similar(cairo.CONTENT_COLOR_ALPHA, int(self.x_to - self.x_from), round(self.tv.txt_height * cfg.highlight))
+			empl = self.zero_pattern_highlight
+			empl *= 1 + empl % 2 						# oh yeah
+
+			self.empty_pattern_surface = self.tv._back_surface.create_similar(cairo.CONTENT_COLOR_ALPHA, int(self.x_to - self.x_from), round(self.tv.txt_height * empl))
 			cr = cairo.Context(self.empty_pattern_surface)
 
 			cr.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
@@ -141,16 +145,17 @@ class ControllerEditor():
 
 			self.txt_height = height
 			self.txt_x = x
-			for r in range(cfg.highlight):
+			
+			for r in range(empl):
 				even_high = cfg.even_highlight
-				if r % 2 == 0:
+				if not r % 2:
 					even_high = 1.0
 
 				cr.set_source_rgb(*(col * cfg.intensity_background * even_high for col in cfg.colour))
 				cr.rectangle(0, r * self.tv.txt_height, self.width, self.tv.txt_height)
 				cr.fill()
 
-				if cfg.highlight > 1 and (r) % cfg.highlight == 0:
+				if self.zero_pattern_highlight > 1 and (r) % cfg.highlight == 0:
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
 				else:
 					cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
@@ -164,10 +169,11 @@ class ControllerEditor():
 			matrix = cairo.Matrix()
 			matrix.translate(-self.x_from, 0)
 			# because rowheight is float
-			matrix.scale(1.0, round(self.tv.txt_height * cfg.highlight) / (self.tv.txt_height * cfg.highlight))
+			matrix.scale(1.0, round(self.tv.txt_height * self.zero_pattern_highlight) / (self.tv.txt_height * self.zero_pattern_highlight))
 			self.empty_pattern.set_matrix(matrix)
 
 			self.redraw_env()
+			self.tv.redraw(controller = self.ctrlnum)
 			self.undo_buff.add_state()
 
 	def redraw_env(self):
@@ -250,7 +256,7 @@ class ControllerEditor():
 			cr.fill()
 			
 			if select or self.edit == r:
-				if cfg.highlight > 1 and (r) % cfg.highlight == 0:
+				if self.zero_pattern_highlight > 1 and (r) % self.zero_pattern_highlight == 0:
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
 				else:
 					cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
@@ -265,7 +271,7 @@ class ControllerEditor():
 			cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
 			cr.fill()
 
-			if cfg.highlight > 1 and (r) % cfg.highlight == 0:
+			if self.zero_pattern_highlight > 1 and (r) % self.zero_pattern_highlight == 0:
 				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
 			else:
 				cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))

@@ -117,7 +117,14 @@ class TrackView(Gtk.DrawingArea):
 			else:
 				self._pointer.draw(self.seq.pos)
 			return True
-				
+	
+	def configure(self):
+		self._back_context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+		self._back_context.set_font_size(cfg.seq_font_size)
+		
+		if self.pitchwheel_editor:
+			self.pitchwheel_editor.configure()
+	
 	def on_configure(self, wdg, event):
 		if self._surface:
 			self._surface.finish()
@@ -139,8 +146,7 @@ class TrackView(Gtk.DrawingArea):
 		self._back_context = cairo.Context(self._back_surface)
 		self._back_context.set_antialias(cairo.ANTIALIAS_NONE)
 				
-		if self.pitchwheel_editor:
-			self.pitchwheel_editor.configure()
+		self.configure()
 		
 		self.redraw()
 		self.tick()
@@ -227,9 +233,6 @@ class TrackView(Gtk.DrawingArea):
 						
 		w = self.get_allocated_width()
 		h = self.get_allocated_height()
-		
-		self._back_context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-		self._back_context.set_font_size(cfg.seq_font_size)
 		
 		wnd = self.get_window()
 		ir = Gdk.Rectangle()
@@ -550,8 +553,7 @@ class TrackView(Gtk.DrawingArea):
 
 		if self.show_pitchwheel:
 			return self.pitchwheel_editor.on_scroll(event)	
-		
-		
+
 	def on_motion(self, widget, event):
 		if not self.trk:
 			return False

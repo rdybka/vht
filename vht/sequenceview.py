@@ -528,6 +528,7 @@ class SequenceView(Gtk.Box):
 					if wdg.trk.index == trk.index:
 						rdr = True
 			if rdr:
+				wdg.configure()
 				wdg.redraw()
 
 		self.queue_draw()

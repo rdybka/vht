@@ -125,8 +125,8 @@ class VHTModule(Iterable):
 
 	@property
 	def dump_notes(self):
-		return 0	# we need write-only properties in python :)
-					# ...or I need to learn to code
+		return 0	# what is this?
+		
 	@dump_notes.setter
 	def dump_notes(self, n):
 		libcvht.module_dump_notes(n)
