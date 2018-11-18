@@ -6,10 +6,10 @@ class VHTRow():
 
 		self._type = vht.row_get_type(self._rowptr)
 		self._note = vht.row_get_note(self._rowptr)
-		self._velocity = vht.row_get_velocity(self._rowptr)		
+		self._velocity = vht.row_get_velocity(self._rowptr)
 		self._delay = vht.row_get_delay(self._rowptr)
 		self.update_strrep()
-		
+
 	def __eq__(self, other):
 		if self._type != other._type:
 			return False
@@ -19,7 +19,7 @@ class VHTRow():
 			return False
 		if self._delay != other._delay:
 			return False
-			
+
 		return True
 
 	def update_strrep(self):
@@ -32,13 +32,13 @@ class VHTRow():
 			else:
 				self._strrep = notes[note]+'A'
 			return
-			
+
 		if self._type == 2: #note_off
-			self._strrep = "  ===" 
+			self._strrep = "  ==="
 			return
-		
+
 		self._strrep = "---"
-	
+
 	def copy(self, row):
 		self._type = row._type
 		self._note = row._note
@@ -46,7 +46,7 @@ class VHTRow():
 		self._delay = row._delay
 		self._vht_handle.row_set(self._rowptr, self._type, self._note, self._velocity, self._delay)
 		self.update_strrep()
-		
+
 	def clear(self):
 		self._type = 0
 		self._note = 0
@@ -54,11 +54,11 @@ class VHTRow():
 		self._delay = 0
 		self._vht_handle.row_set(self._rowptr, 0, 0, 0, 0)
 		self.update_strrep()
-	
+
 	@property
 	def type(self):
 		return self._type
-	
+
 	@type.setter
 	def type(self, value):
 		self._type = value
@@ -67,26 +67,26 @@ class VHTRow():
 	@property
 	def note(self):
 		return self._note
-	
+
 	@note.setter
 	def note(self, value):
 		if isinstance(value, int):
 			self._note = value
 			self._vht_handle.row_set_note(self._rowptr, self._note)
-		
+
 		if isinstance(value, str):
 			self._note = self._vht_handle.parse_note(value)
 			self._vht_handle.row_set_note(self._rowptr, self._note)
 			self.type = 1
 			if self.velocity == 0:
 				self.velocity = 100
-		
+
 		self.update_strrep()
-						
+
 	@property
 	def velocity(self):
 		return self._velocity
-	
+
 	@velocity.setter
 	def velocity(self, value):
 		self._velocity = int(value)
@@ -95,7 +95,7 @@ class VHTRow():
 	@property
 	def delay(self):
 		return self._delay
-	
+
 	@delay.setter
 	def delay(self, value):
 		self._delay = int(value)

@@ -95,6 +95,41 @@ except __builtin__.Exception:
         pass
     _newclass = 0
 
+class int_array(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, int_array, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, int_array, name)
+    __repr__ = _swig_repr
+
+    def __init__(self, nelements):
+        this = _libcvht.new_int_array(nelements)
+        try:
+            self.this.append(this)
+        except __builtin__.Exception:
+            self.this = this
+    __swig_destroy__ = _libcvht.delete_int_array
+    __del__ = lambda self: None
+
+    def __getitem__(self, index):
+        return _libcvht.int_array___getitem__(self, index)
+
+    def __setitem__(self, index, value):
+        return _libcvht.int_array___setitem__(self, index, value)
+
+    def cast(self):
+        return _libcvht.int_array_cast(self)
+    if _newclass:
+        frompointer = staticmethod(_libcvht.int_array_frompointer)
+    else:
+        frompointer = _libcvht.int_array_frompointer
+int_array_swigregister = _libcvht.int_array_swigregister
+int_array_swigregister(int_array)
+
+def int_array_frompointer(t):
+    return _libcvht.int_array_frompointer(t)
+int_array_frompointer = _libcvht.int_array_frompointer
+
 
 def start(name):
     return _libcvht.start(name)
@@ -336,16 +371,16 @@ def track_set_ctrl(trk, c, n, val):
     return _libcvht.track_set_ctrl(trk, c, n, val)
 track_set_ctrl = _libcvht.track_set_ctrl
 
-def track_get_ctrl(tkl, c, n):
-    return _libcvht.track_get_ctrl(tkl, c, n)
+def track_get_ctrl(tkl, ret, l, c, n):
+    return _libcvht.track_get_ctrl(tkl, ret, l, c, n)
 track_get_ctrl = _libcvht.track_get_ctrl
 
-def track_get_ctrl_rec(tkl, c, n):
-    return _libcvht.track_get_ctrl_rec(tkl, c, n)
+def track_get_ctrl_rec(tkl, ret, l, c, n):
+    return _libcvht.track_get_ctrl_rec(tkl, ret, l, c, n)
 track_get_ctrl_rec = _libcvht.track_get_ctrl_rec
 
-def track_get_ctrl_env(tkl, c, n):
-    return _libcvht.track_get_ctrl_env(tkl, c, n)
+def track_get_ctrl_env(tkl, ret, l, c, n):
+    return _libcvht.track_get_ctrl_env(tkl, ret, l, c, n)
 track_get_ctrl_env = _libcvht.track_get_ctrl_env
 
 def track_get_ctrl_nums(trk):

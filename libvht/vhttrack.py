@@ -8,7 +8,7 @@ class VHTTrack(Iterable):
 		self._trk_handle = trk;
 		self.index = index
 		super()
-	
+
 	def __len__(self):
 		return self._vht_handle.track_get_ncols(self._trk_handle)
 
@@ -19,11 +19,11 @@ class VHTTrack(Iterable):
 	def clear(self):
 		for col in self:
 			col.clear()
-	
+
 	def __getitem__(self, itm):
 		if itm >= self.__len__():
 			raise IndexError()
-			
+
 		if itm < 0:
 			raise IndexError()
 
@@ -38,7 +38,7 @@ class VHTTrack(Iterable):
 	def add_column(self):
 		self._vht_handle.track_add_col(self._trk_handle)
 		return self[self.__len__() - 1]
-		
+
 	def swap_column(self, c1, c2):
 		self._vht_handle.track_swap_col(self._trk_handle, c1, c2)
 
@@ -54,7 +54,7 @@ class VHTTrack(Iterable):
 	@property
 	def port(self):
 		return self._vht_handle.track_get_port(self._trk_handle)
-		
+
 	@port.setter
 	def port(self, value):
 		self.kill_notes()
@@ -63,7 +63,7 @@ class VHTTrack(Iterable):
 	@property
 	def channel(self):
 		return self._vht_handle.track_get_channel(self._trk_handle)
-		
+
 	@channel.setter
 	def channel(self, value):
 		self.kill_notes()
@@ -72,27 +72,27 @@ class VHTTrack(Iterable):
 	@property
 	def nrows(self):
 		return self._vht_handle.track_get_nrows(self._trk_handle)
-		
+
 	@nrows.setter
 	def nrows(self, value):
 		self._vht_handle.track_set_nrows(self._trk_handle, value)
-	
+
 	@property
 	def nsrows(self):
 		return self._vht_handle.track_get_nsrows(self._trk_handle)
-		
+
 	@nsrows.setter
 	def nsrows(self, value):
 		self._vht_handle.track_set_nsrows(self._trk_handle, value)
-	
+
 	@property
 	def playing(self):
 		return self._vht_handle.track_get_playing(self._trk_handle)
-	
+
 	@playing.setter
 	def playing(self, value):
 		self._vht_handle.track_set_playing(self._trk_handle, value)
-		
+
 	@property
 	def pos(self):
 		return self._vht_handle.track_get_pos(self._trk_handle)
@@ -106,7 +106,7 @@ class VHTTrack(Iterable):
 	def nctrl(self):
 		return self._vht_handle.track_get_nctrl(self._trk_handle)
 
-	# controller rows per row 
+	# controller rows per row
 	@property
 	def ctrlpr(self):
 		return self._vht_handle.track_get_ctrlpr(self._trk_handle)
@@ -122,15 +122,39 @@ class VHTTrack(Iterable):
 
 	# gets all controls for given row (as they will be played)
 	def get_ctrl(self, c, r):
-		return eval(self._vht_handle.track_get_ctrl(self._trk_handle, c, r))
+		lpr = self.ctrlpr
+		ret_arr = self._vht_handle.int_array(lpr)
+		self._vht_handle.track_get_ctrl(self._trk_handle, ret_arr, lpr, c, r)
 
-	# gets all controls for given row (recorded/rendered part)
+		ret_lst = []
+		for i in range(lpr):
+			ret_lst.append(ret_arr[i])
+
+		return ret_lst
+
+	# gets all controls for given row (recorded/rendered part/doodles)
 	def get_ctrl_rec(self, c, r):
-		return eval(self._vht_handle.track_get_ctrl_rec(self._trk_handle, c, r))
+		lpr = self.ctrlpr
+		ret_arr = self._vht_handle.int_array(lpr)
+		self._vht_handle.track_get_ctrl_rec(self._trk_handle, ret_arr, lpr, c, r)
+
+		ret_lst = []
+		for i in range(lpr):
+			ret_lst.append(ret_arr[i])
+
+		return ret_lst
 
 	# gets all controls for given row (env part)
 	def get_ctrl_env(self, c, r):
-		return eval(self._vht_handle.track_get_ctrl_env(self._trk_handle, c, r))
+		lpr = self.ctrlpr
+		ret_arr = self._vht_handle.int_array(lpr)
+		self._vht_handle.track_get_ctrl_env(self._trk_handle, ret_arr, lpr, c, r)
+
+		ret_lst = []
+		for i in range(lpr):
+			ret_lst.append(ret_arr[i])
+
+		return ret_lst
 
 	# gets last sent controller value
 	def get_lctrlval(self, c):
@@ -139,13 +163,13 @@ class VHTTrack(Iterable):
 	# get envelope for ctrl c
 	def env(self, c):
 		return eval(self._vht_handle.track_get_envelope(self._trk_handle, c))
-		
+
 	def env_del_node(self, c, n):
 		self._vht_handle.track_envelope_del_node(self._trk_handle, c, n)
-		
+
 	def env_add_node(self, c, x, y, z, linked):
 		self._vht_handle.track_envelope_add_node(self._trk_handle, c, x, y, z, linked)
-	
+
 	def env_set_node(self, c, n, x, y, z, linked = -1):
 		self._vht_handle.track_envelope_set_node(self._trk_handle, c, n, x, y, z, linked)
 
@@ -162,16 +186,16 @@ class VHTTrack(Iterable):
 			for c in range(len(self)):
 				rw = self[c][r]
 				ret = ret + "| "
-				ret = ret + str(rw) + " " 
-				
+				ret = ret + str(rw) + " "
+
 				if (rw.type == 1):
 					ret = ret + ("%03d " % (rw.velocity))
 				else:
 					ret = ret + "    "
-			
+
 			ret = ret + "|"
 			ret = ret + "\n"
-			
+
 		return ret
 
 	def clear_updates(self):

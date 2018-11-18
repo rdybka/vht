@@ -18,6 +18,7 @@
 
 import sys, os
 import gi
+import pkg_resources
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, Gtk, Gio
 
@@ -27,11 +28,11 @@ from vht.mainwin import MainWin
 
 class VHTApp(Gtk.Application):
 	def __init__(self):
-		Gtk.Application.__init__(self, application_id = "com.github.rdybka.vht", 
+		Gtk.Application.__init__(self, application_id = "com.github.rdybka.vht",
 			flags = Gio.ApplicationFlags.NON_UNIQUE)
-			
+
 		self.main_win = None
-		
+
 	def do_startup(self):
 		Gtk.Application.do_startup(self)
 
@@ -57,15 +58,15 @@ class VHTApp(Gtk.Application):
 
 	def do_activate(self):
 		self.main_win = MainWin(self)
-		
+
 		if mod.start_error:
 			self.quit()
-			
+
 		self.add_window(self.main_win)
 		self.main_win.show_all()
-		
+
 		mod.play = True
-		
+
 	def on_quit(self, action, param):
 		self.quit()
 
@@ -84,7 +85,7 @@ class VHTApp(Gtk.Application):
 
 
 		dialog.destroy()
-		
+
 	def save_with_dialog(self):
 		if not self.main_win.last_filename:
 			dialog = Gtk.FileChooserDialog("Please choose a file", self.get_active_window(),
@@ -100,15 +101,15 @@ class VHTApp(Gtk.Application):
 				self.main_win.last_filename = dialog.get_filename()
 				mod.save(self.main_win.last_filename)
 				self.main_win.hb.set_title(self.main_win.last_filename)
-			dialog.destroy()	
+			dialog.destroy()
 			return
-		
+
 		if self.main_win.last_filename:
 			mod.save(self.main_win.last_filename)
-	
+
 	def on_save(self, action, param):
 		self.save_with_dialog()
-		
+
 	def on_save_as(self, action, param):
 		fn = self.main_win.last_filename
 		self.main_win.last_filename = None
@@ -126,8 +127,10 @@ class VHTApp(Gtk.Application):
 		filter_any.set_name("Any files")
 		filter_any.add_pattern("*")
 		dialog.add_filter(filter_any)
-	
+
 def run():
+	pkg = pkg_resources.require("vht")[0]
+	print("Valhalla Tracker %s" % (pkg.version))
 	mod.start_error = None
 	if mod.jack_start() != 0:
 		mod.start_error = "you will need JACK for this"
@@ -136,7 +139,7 @@ def run():
 	midig = []
 	for val in cfg.midi_in.values():
 		midig.append(tuple(val[:-1]))
-	
+
 	mod.set_midi_record_ignore(midig)
 	randomcomposer.muzakize()
 	mod.data_path = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "data"))
@@ -147,12 +150,12 @@ def run():
 
 		app.run(sys.argv)
 	except:
-		mod.jack_stop()	
+		mod.jack_stop()
 		sys.exit()
 
 	# is this reliable? should we wait for module.mute == 0?
 	mod.play = False
 	mod.jack_stop()
-	
+
 if __name__ == "__main__":
 	run()

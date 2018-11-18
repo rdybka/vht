@@ -15,7 +15,7 @@ class SequencePropViewPopover(Gtk.Popover):
 		self.connect("enter-notify-event", self.on_enter)
 		self.entered = False
 		self.allow_close = True
-		
+
 		self.parent = parent
 		self.seq = seq
 		self.grid = Gtk.Grid()
@@ -37,7 +37,7 @@ class SequencePropViewPopover(Gtk.Popover):
 		self.length_adj.connect("value-changed", self.on_length_changed)
 
 		self.grid.attach(self.length_button, 0, 1, 1, 1)
-		
+
 		self.grid.show_all()
 		self.add(self.grid)
 
@@ -46,7 +46,7 @@ class SequencePropViewPopover(Gtk.Popover):
 		for trk in self.seq:
 			if trk.nsrows > self.seq.length:
 				trk.nsrows  = self.seq.length
-		
+
 		self.parent.seqview.recalculate_row_spacing()
 		self.parent.seqview.redraw_track()
 		self.parent.seqview.queue_draw()
@@ -70,11 +70,11 @@ class SequencePropViewPopover(Gtk.Popover):
 	def on_add_button_clicked(self, switch):
 		self.parent.add_track()
 		self.parent.seqview.recalculate_row_spacing()
-	
+
 	def on_timeout(self, args):
 		self.allow_close = True
 		return False
-	
+
 	def popup(self):
 		self.allow_close = False
 		GObject.timeout_add(cfg.popover_wait_before_close, self.on_timeout, None)

@@ -510,27 +510,37 @@ class SequenceView(Gtk.Box):
 		ac = mod.active_track
 
 		mod.active_track = trk
+		trk.set_opacity(1)
 		if ac != trk:
 			self.seq.set_midi_focus(trk.trk.index)
 			if ac:
 				ac.pmp.silence()
+				ac.set_opacity(cfg.inactive_opacity)
 
 			if trk._surface:
 				self._prop_view.redraw(trk.trk.index)
 
+	# trk == none - do all
 	def redraw_track(self, trk = None):
+		redr = False
 		for wdg in self.get_tracks(True):
 			rdr = False
+						
 			if not trk:
 				rdr = True
 			else:
 				if wdg.trk:
 					if wdg.trk.index == trk.index:
 						rdr = True
+			
 			if rdr:
-				wdg.configure()
+				w = wdg.width
 				wdg.redraw()
-
+				if trk and w != wdg.width:
+					self._prop_view.redraw(trk.index)
+					
+		if not trk:
+			self._prop_view.redraw()
 		self.queue_draw()
 
 	def build(self):

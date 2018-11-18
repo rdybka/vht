@@ -133,7 +133,7 @@ void envelope_draw_cluster(envelope *env, int nf, int nl) {
 			xx+=dx / env->res;
 		}
 
-		// bezier part
+		// bezierish part
 		if (z + lz > 1) {
 			z = 1 - lz;
 		}
@@ -318,7 +318,7 @@ void track_envelope_set_node(track *trk, int c, int n, float x, float y, float z
 }
 
 char *track_get_envelope(track *trk, int c) {
-	static char ret[(ENV_MAX_NNODES * 40) + 2];
+	static char ret[(ENV_MAX_NNODES * 50) + 2];
 
 	sprintf(ret, "[");
 

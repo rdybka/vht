@@ -14,25 +14,25 @@ class BlackButton(Gtk.Button):
 		self.set_margin_left(3)
 		self.set_margin_bottom(3)
 		self.set_margin_right(3)
-		
+
 	def on_draw(self, widget, cr):
 		state = widget.get_state_flags()
-		
+
 		hover = False
 		if state & Gtk.StateFlags.PRELIGHT:
 			hover = True
-		
+
 		active = False
 		if state & Gtk.StateFlags.ACTIVE:
 			active = True
 
 		w = widget.get_allocated_width()
 		h = widget.get_allocated_height()
-		
+
 		cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 		if active:
 			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
-		
+
 		cr.move_to(0,0)
 		cr.line_to(w, 0)
 		cr.line_to(w, 0)
@@ -47,7 +47,7 @@ class BlackButton(Gtk.Button):
 			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
 
 		if active:
-			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))	
+			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 
 		cr.move_to(0,0)
 		cr.line_to(w, 0)

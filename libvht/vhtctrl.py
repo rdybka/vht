@@ -9,7 +9,7 @@ class VHTCtrl(Iterable):
 		self._ctrlnum = ctrlnum
 		self.on_change = on_change
 		super()
-		
+
 	def __len__(self):
 		return self._vht_handle.track_get_length(self._trk_handle)
 
@@ -30,30 +30,30 @@ class VHTCtrl(Iterable):
 	def __getitem__(self, itm):
 		if itm >= self.__len__():
 			raise IndexError()
-			
+
 		if itm < 0:
 			raise IndexError()
-			
+
 		return VHTCtrlRow(self._vht_handle, self._vht_handle.track_get_ctrlrow_ptr(self._trk_handle, self._ctrl, itm))
-		
+
 	def refresh(self):
 		self._vht_handle.track_ctrl_refresh_envelope(self._trk_handle, self._ctrl)
-		
+
 	@property
 	def ctrlnum(self):
 		return self._ctrlnum
-	
+
 	@ctrlnum.setter
 	def ctrlnum(self, value):
 		if self._ctrlnum == -1:
 			return
-			
+
 		self._ctrlnum = int(value)
 		self._vht_handle.track_set_ctrl_num(self._crowptr, self._velocity)
 		if self.on_change:
 			print("calling upd")
 			self.on_change()
-		
+
 	def __str__(self):
 		ret = "ctrl %d:\n" % self._ctrlnum
 		for r in range(self.__len__()):
@@ -61,4 +61,4 @@ class VHTCtrl(Iterable):
 			ret = ret + "\n"
 
 		return ret
-		
+

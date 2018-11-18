@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -180,16 +181,12 @@ void track_set_ctrl_num(track *trk, int c, int v) {
 	pthread_mutex_unlock(&trk->exclctrl);
 }
 
-char *track_get_ctrl(track *trk, int c, int n) {
-	static char rc[256];
+// as played
+void track_get_ctrl(track *trk, int *ret, int l, int c, int n) {
+	int ll = 0;
 	pthread_mutex_lock(&trk->exclctrl);
-
-	sprintf(rc, "[");
-
 	if (trk->nctrl > 0) {
 		for (int nn = n * trk->ctrlpr; nn < (n + 1) * trk->ctrlpr; nn++) {
-			char buff[32];
-
 			int v = trk->ctrl[c][nn];
 
 			if (v == -1) {
@@ -198,61 +195,48 @@ char *track_get_ctrl(track *trk, int c, int n) {
 					v *= 128;
 			}
 
-			sprintf(buff, "%d, ", v);
-			strcat(rc, buff);
+			if (ll < l)
+				ret[ll++] = v;
 		}
 	}
 
-	strcat(rc, "]");
 	pthread_mutex_unlock(&trk->exclctrl);
-	return rc;
 }
 
-char *track_get_ctrl_rec(track *trk, int c, int n) {
-	static char rc[256];
+// doodles
+void track_get_ctrl_rec(track *trk, int *ret, int l, int c, int n) {
+	int ll = 0;
 	pthread_mutex_lock(&trk->exclctrl);
-
-	sprintf(rc, "[");
 
 	if (trk->nctrl > 0) {
 		for (int nn = n * trk->ctrlpr; nn < (n + 1) * trk->ctrlpr; nn++) {
-			char buff[32];
-
-			int v = trk->ctrl[c][nn];
-
-			sprintf(buff, "%d, ", v);
-			strcat(rc, buff);
+			if (ll < l)
+				ret[ll++] = trk->ctrl[c][nn];
 		}
 	}
 
-	strcat(rc, "]");
 	pthread_mutex_unlock(&trk->exclctrl);
-	return rc;
 }
 
-char *track_get_ctrl_env(track *trk, int c, int n) {
-	static char rc[256];
+// env
+void track_get_ctrl_env(track *trk, int *ret, int l, int c, int n) {
+	int ll = 0;
 	pthread_mutex_lock(&trk->exclctrl);
-
-	sprintf(rc, "[");
 
 	if (trk->nctrl > 0) {
 		for (int nn = n * trk->ctrlpr; nn < (n + 1) * trk->ctrlpr; nn++) {
-			char buff[32];
-
 			int v = env_get_v(trk->env[c],  trk->ctrlpr, (float)nn / (float)trk->ctrlpr);
 
 			if ((v > -1) && (c == 0)) // pitchwheel
 				v *= 128;
 
-			sprintf(buff, "%d, ", v);
-			strcat(rc, buff);
+			if (ll < l)
+				ret[ll++] = v;
+
 		}
 	}
 
-	strcat(rc, "]");
 	pthread_mutex_unlock(&trk->exclctrl);
-	return rc;
 }
 
 
@@ -763,10 +747,18 @@ void track_resize(track *trk, int size) {
 
 	for (int c = 0; c < trk->nctrl; c++) {
 		trk->ctrl[c] = realloc(trk->ctrl[c], sizeof(int) * trk->arows * trk->ctrlpr);
+		trk->crows[c] = realloc(trk->crows[c], sizeof(ctrlrow) * trk->arows);
+		for (int n = trk->nrows; n < trk->arows; n++) {
+			trk->crows[c][n].velocity = -1;
+			trk->crows[c][n].linked = 0;
+			trk->crows[c][n].smooth = 0;
+			trk->crows[c][n].anchor = 0;
+		}
+		
 		envelope_resize(trk->env[c], trk->arows, trk->ctrlpr);
 		for (int n = trk->nrows; n < trk->arows; n++) {
 			for (int nn = 0; nn < trk->ctrlpr; nn++) {
-				trk->ctrl[c][(n * trk->ctrlpr) + nn] = 0;
+				trk->ctrl[c][(n * trk->ctrlpr) + nn] = -1;
 			}
 		}
 	}

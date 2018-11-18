@@ -4,10 +4,10 @@ class ControllerUndoBuffer():
 		self._ctrlnum = ctrlnum
 		self._states = []
 		self._state = {}
-		
+
 		self._dstates = []
 		self._dstate = {}
-		
+
 		self._states.append({})
 		self._dstates.append({})
 
@@ -16,7 +16,7 @@ class ControllerUndoBuffer():
 		for r, rr in enumerate(self._trk.ctrl[self._ctrlnum]):
 			if rr.velocity != -1:
 				state[r] = (rr.velocity, rr.linked, rr.anchor, rr.smooth)
-		
+
 		if len(self._states):
 			s = self._state
 			for k in s.keys():
@@ -25,20 +25,20 @@ class ControllerUndoBuffer():
 						del state[k]
 				else:
 					state[k] = 0
-		
+
 		if len(state):
 			self._states.append(state)
 			self._dstates.append({})
-			
+
 		for k in state.keys():
 			self._state[k] = state[k]
 			if state[k] == 0:
 				del self._state[k]
-		
+
 		dstate = {}
 		for r, rr in enumerate(self._trk.ctrl[self._ctrlnum]):
 			dstate[r] = self._trk.get_ctrl_rec(self._ctrlnum, r)
-		
+
 		if len(self._dstates):
 			s = self._dstate
 			for k in s.keys():
@@ -47,7 +47,7 @@ class ControllerUndoBuffer():
 						del dstate[k]
 				else:
 					dstate[k] = 0
-		
+
 		if len(dstate):
 			self._dstates.append(dstate)
 			self._states.append({})
@@ -56,11 +56,11 @@ class ControllerUndoBuffer():
 			self._dstate[k] = dstate[k]
 			if dstate[k] == 0:
 				del self._dstate[k]
-		
+
 	def restore(self):
 		if len(self._states) > 1:
 			del self._states[-1]
-				
+
 			self._state = {}
 			for s in self._states:
 				for k in s.keys():
@@ -68,7 +68,7 @@ class ControllerUndoBuffer():
 					if s[k] == 0:
 						del self._state[k]
 
-			x = self._ctrlnum	
+			x = self._ctrlnum
 			self._trk.ctrl[x].clear()
 
 			for y, r in enumerate(self._trk.ctrl[x]):
@@ -84,12 +84,12 @@ class ControllerUndoBuffer():
 
 		if len(self._dstates) > 1:
 			del self._dstates[-1]
-					
+
 			self._dstate = {}
 			for s in self._dstates:
 				for k in s.keys():
 					self._dstate[k] = s[k]
-		
+
 			dpr = self._trk.ctrlpr
 
 			for y, r in enumerate(self._trk.ctrl[self._ctrlnum]):
@@ -97,4 +97,4 @@ class ControllerUndoBuffer():
 					r = self._dstate[y]
 					for yy in range(dpr):
 						self._trk.set_ctrl(self._ctrlnum, (dpr * y) + yy, r[yy])
-	
+

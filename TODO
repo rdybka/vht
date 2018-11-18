@@ -17,6 +17,7 @@
 	- stretching (new bpm suggestion)
 	- rotation
 	- move/resize tracks with mouse
+- ctrl up/down - next/prev
 - get rid of overshoot thingys
 - move menu in fullscreen
 - disable menu when no jack

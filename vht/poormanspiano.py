@@ -20,24 +20,24 @@ class PoorMansPiano():
 		for n in self.ringing:
 			self.ringing.remove(n)
 			mod.sneakily_queue_midi_note_off(self.seq._seq_handle, self.trk.port, self.trk.channel, n)
-		
+
 		self.note_on = None
 
 	def key2note(self, key, note_off = False):
 		mnt = -23
 		if key in self.mnotes:
 			mnt = self.mnotes.index(key)
-		
+
 		if key in self.mnotes2:
 			mnt = self.mnotes2.index(key) + 12
-		
+
 		if mnt == -23:
 			return None
-			
+
 		mnt += cfg.octave * 12
 		while mnt > 127:
 			mnt -= 12
-	
+
 		if not note_off:
 			if not self.note_on == mnt:
 				mod.sneakily_queue_midi_note_on(self.seq._seq_handle, self.trk.port, self.trk.channel, mnt, cfg.velocity)
@@ -48,15 +48,15 @@ class PoorMansPiano():
 			mod.sneakily_queue_midi_note_off(self.seq._seq_handle, self.trk.port, self.trk.channel, mnt)
 			while mnt in self.ringing:
 				self.ringing.remove(mnt)
-			
+
 		octave = cfg.octave
 		if key in self.notes:
 			return "%s%d" % (self.notes[key], octave)
-		
+
 		octave = cfg.octave
 		octave += 1
 		if octave > 8:
-			octave = 8	
+			octave = 8
 		if key in self.notes2:
 			return "%s%d" % (self.notes2[key], octave)
 		return None

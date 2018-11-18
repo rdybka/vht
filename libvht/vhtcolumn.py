@@ -7,7 +7,7 @@ class VHTColumn(Iterable):
 		self._trk_handle = trk;
 		self._col = col
 		super()
-		
+
 	def __len__(self):
 		return self._vht_handle.track_get_length(self._trk_handle)
 
@@ -25,12 +25,12 @@ class VHTColumn(Iterable):
 	def __getitem__(self, itm):
 		if itm >= self.__len__():
 			raise IndexError()
-			
+
 		if itm < 0:
 			raise IndexError()
-			
+
 		return VHTRow(self._vht_handle, self._vht_handle.track_get_row_ptr(self._trk_handle, self._col, itm))
-		
+
 	def __str__(self):
 		ret = ""
 		for r in range(self.__len__()):
@@ -38,4 +38,4 @@ class VHTColumn(Iterable):
 			ret = ret + "\n"
 
 		return ret
-		
+

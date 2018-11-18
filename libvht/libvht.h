@@ -21,6 +21,8 @@
 
 #ifdef SWIG
 %module libcvht
+%include "carrays.i"
+%array_class(int, int_array);
 %{
 #include "libvht.h"
 %}
@@ -106,10 +108,12 @@ extern void track_add_ctrl(track *trk, int ctl);
 extern void track_del_ctrl(track *trk, int c);
 extern void track_swap_ctrl(track *trk, int c, int c2);
 extern void track_set_ctrl(track *trk, int c, int n, int val);
-extern char *track_get_ctrl(track *tkl, int c, int n);
-extern char *track_get_ctrl_rec(track *tkl, int c, int n);
-extern char *track_get_ctrl_env(track *tkl, int c, int n);
+
+extern void track_get_ctrl(track *tkl, int *ret, int l, int c, int n);
+extern void track_get_ctrl_rec(track *tkl, int *ret, int l, int c, int n);
+extern void track_get_ctrl_env(track *tkl, int *ret, int l, int c, int n);
 extern char *track_get_ctrl_nums(track *trk);
+
 extern void track_set_ctrl_num(track *trk, int c, int v);
 extern int track_get_lctrlval(track *trk, int c);
 extern void track_ctrl_refresh_envelope(track *trk, int c);

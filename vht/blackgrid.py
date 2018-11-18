@@ -8,9 +8,9 @@ from vht import *
 class BlackGrid(Gtk.Grid):
 	def __init__(self):
 		Gtk.Grid.__init__(self)
-		
+
 		self.connect("draw", self.on_draw)
-		
+
 	def on_draw(self, widget, cr):
 		w = widget.get_allocated_width()
 		h = widget.get_allocated_height()
