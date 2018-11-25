@@ -494,7 +494,6 @@ class SequenceView(Gtk.Box):
 			if restore_edit:
 				mod.active_track.edit = min(restore_edit[0], len(mod.active_track.trk) - 1), min(restore_edit[1], mod.active_track.trk.nrows - 1)
 
-
 		self.recalculate_row_spacing()
 
 	def get_track_view(self, trk):
@@ -503,26 +502,21 @@ class SequenceView(Gtk.Box):
 				return wdg
 
 	def change_active_track(self, trk):
-		if mod.active_track == trk:
-			self._prop_view.redraw()
-			return
-
 		ac = mod.active_track
-
 		mod.active_track = trk
-		trk.set_opacity(1)
+
 		if ac != trk:
 			self.seq.set_midi_focus(trk.trk.index)
 			if ac:
 				ac.pmp.silence()
-				ac.set_opacity(cfg.inactive_opacity)
 
 			if trk._surface:
-				self._prop_view.redraw(trk.trk.index)
+				self._prop_view.redraw()
 
 	# trk == none - do all
 	def redraw_track(self, trk = None):
 		redr = False
+		
 		for wdg in self.get_tracks(True):
 			rdr = False
 						
@@ -541,6 +535,7 @@ class SequenceView(Gtk.Box):
 					
 		if not trk:
 			self._prop_view.redraw()
+		
 		self.queue_draw()
 
 	def build(self):
@@ -672,6 +667,7 @@ class SequenceView(Gtk.Box):
 				redr_props = False
 				r = trk.trk.get_rec_update()
 				while r:
+					trk.configure()
 					trk.redraw(r["row"])
 
 					if mod.record:

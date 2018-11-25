@@ -239,6 +239,7 @@ class TrackPropViewPopover(Gtk.Popover):
 
 		#self.loop_button.set_active(self.trk.loop) // not yet implemented in vhtlib
 		self.show_notes_button.set_sensitive(False)
+		self.set_modal(True)
 		self.refresh()
 		
 	def on_leave(self, wdg, prm):

@@ -54,11 +54,11 @@ track *track_new(int port, int channel, int len, int songlen) {
 	pthread_mutex_init(&trk->exclctrl, NULL);
 
 	trk->rows = malloc(sizeof(row*) * trk->ncols);
+	trk->ring = malloc(sizeof(int) * trk->ncols);
 	for (int c = 0; c < trk->ncols; c++) {
 		trk->rows[c] = malloc(sizeof(row) * trk->nrows);
 		track_clear_rows(trk, c);
 
-		trk->ring = malloc(sizeof(int) * trk->ncols);
 		trk->ring[c] = -1;
 	};
 
@@ -374,7 +374,6 @@ int track_get_wandering_note(track *trk, int c, int pos) {
 
 int col_last_note(track *trk, int col, double pos) {
 	// since we only read, ignore thread safety
-
 	if (col >= trk->ncols)
 		return -1;
 
@@ -754,7 +753,7 @@ void track_resize(track *trk, int size) {
 			trk->crows[c][n].smooth = 0;
 			trk->crows[c][n].anchor = 0;
 		}
-		
+
 		envelope_resize(trk->env[c], trk->arows, trk->ctrlpr);
 		for (int n = trk->nrows; n < trk->arows; n++) {
 			for (int nn = 0; nn < trk->ctrlpr; nn++) {

@@ -227,6 +227,10 @@ def queue_midi_note_off(seq, port, chn, note):
     return _libcvht.queue_midi_note_off(seq, port, chn, note)
 queue_midi_note_off = _libcvht.queue_midi_note_off
 
+def queue_midi_ctrl(seq, trk, val, ctrl):
+    return _libcvht.queue_midi_ctrl(seq, trk, val, ctrl)
+queue_midi_ctrl = _libcvht.queue_midi_ctrl
+
 def track_get_rec_update(trk):
     return _libcvht.track_get_rec_update(trk)
 track_get_rec_update = _libcvht.track_get_rec_update

@@ -29,7 +29,6 @@ class Configuration():
 		self.auto_scroll_delay = .2
 		self.tooltip_markup = """<span font_family="Monospace" size="large">%s</span>"""
 		self.window_opacity = 1
-		self.inactive_opacity = .7
 		self.popover_wait_before_close = 500
 		self.velocity_editor_char_width = 12
 		self.timeshift_editor_char_width = 12

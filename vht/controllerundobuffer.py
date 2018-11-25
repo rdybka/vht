@@ -10,6 +10,7 @@ class ControllerUndoBuffer():
 
 		self._states.append({})
 		self._dstates.append({})
+		self.add_state()
 
 	def add_state(self):
 		state = {}

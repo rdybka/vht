@@ -1,3 +1,8 @@
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gdk
+
+import math
 from vht import *
 
 class PoorMansPiano():
@@ -22,6 +27,28 @@ class PoorMansPiano():
 			mod.sneakily_queue_midi_note_off(self.seq._seq_handle, self.trk.port, self.trk.channel, n)
 
 		self.note_on = None
+
+	def key2ctrl(self, key, ctrl, off = False):
+		f = cfg.velocity_keys.find(Gdk.keyval_name(key))
+		val = -1
+		if f > -1:
+			val = int(f * (127 / (len(cfg.velocity_keys) - 1)))
+
+		if f == 0:
+			val = 0
+
+		if f == len(cfg.velocity_keys) - 1:
+			val = 127
+
+		if f == math.floor(len(cfg.velocity_keys) / 2):
+			val = 64
+		
+		if val > -1:	
+			if not off:
+				mod.sneakily_queue_midi_ctrl(self.seq._seq_handle, self.trk._trk_handle, val, ctrl)
+			return True
+		
+		return False
 
 	def key2note(self, key, note_off = False):
 		mnt = -23

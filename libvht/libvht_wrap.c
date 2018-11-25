@@ -4141,6 +4141,54 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_queue_midi_ctrl(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  track *arg2 = (track *) 0 ;
+  int arg3 ;
+  int arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:queue_midi_ctrl",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "queue_midi_ctrl" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "queue_midi_ctrl" "', argument " "2"" of type '" "track *""'"); 
+  }
+  arg2 = (track *)(argp2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "queue_midi_ctrl" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "queue_midi_ctrl" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = (int)(val4);
+  queue_midi_ctrl(arg1,arg2,arg3,arg4);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_track_get_rec_update(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   track *arg1 = (track *) 0 ;
@@ -6279,6 +6327,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "module_dump_notes", _wrap_module_dump_notes, METH_VARARGS, NULL},
 	 { "queue_midi_note_on", _wrap_queue_midi_note_on, METH_VARARGS, NULL},
 	 { "queue_midi_note_off", _wrap_queue_midi_note_off, METH_VARARGS, NULL},
+	 { "queue_midi_ctrl", _wrap_queue_midi_ctrl, METH_VARARGS, NULL},
 	 { "track_get_rec_update", _wrap_track_get_rec_update, METH_VARARGS, NULL},
 	 { "track_clear_updates", _wrap_track_clear_updates, METH_VARARGS, NULL},
 	 { "midi_in_get_event", _wrap_midi_in_get_event, METH_VARARGS, NULL},

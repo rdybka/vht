@@ -61,6 +61,8 @@ class TrackPropView(Gtk.DrawingArea):
 		self._context = cairo.Context(self._surface)
 		self._context.set_antialias(cairo.ANTIALIAS_NONE)
 		self._context.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
+		self._context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+		self._context.set_font_size(cfg.seq_font_size)
 
 		self.redraw()
 		return True
@@ -130,9 +132,6 @@ class TrackPropView(Gtk.DrawingArea):
 
 		cr = self._context
 
-		self._context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-		self._context.set_font_size(cfg.seq_font_size)
-
 		w = self.get_allocated_width()
 		h = self.get_allocated_height()
 
@@ -142,6 +141,10 @@ class TrackPropView(Gtk.DrawingArea):
 
 		cr.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
 		cr.set_font_size(cfg.seq_font_size)
+
+		active = False
+		if mod.active_track == self.trkview:
+			active = True
 
 		if self.trk == None:
 			(x, y, width, height, dx, dy) = cr.text_extents("000|")
@@ -194,12 +197,17 @@ class TrackPropView(Gtk.DrawingArea):
 		gradient = cairo.LinearGradient(0, 0, 0, h)
 
 		gradient.add_color_stop_rgb(0.0, *(col * cfg.intensity_background for col in cfg.colour))
-		if self.trk.playing:
-			gradient.add_color_stop_rgb(0.1, *(col *  cfg.intensity_txt_highlight for col in cfg.colour))
-		else:
-			gradient.add_color_stop_rgb(0.1, *(col *  cfg.intensity_txt for col in cfg.colour))
 
-		gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_background for col in cfg.colour))
+		colour = cfg.colour
+
+		if self.trk.playing:
+			gradient.add_color_stop_rgb(0.1, *(col *  cfg.intensity_txt_highlight for col in colour))
+			gradient.add_color_stop_rgb(0.4, *(col *  cfg.intensity_txt_highlight for col in colour))
+		else:
+			gradient.add_color_stop_rgb(0.1, *(col *  cfg.intensity_txt for col in colour))
+
+		gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_background for col in colour))
+		
 		cr.set_source(gradient)
 
 		self.set_size_request(self.width, self.txt_height * 2 * cfg.seq_spacing)
@@ -208,6 +216,46 @@ class TrackPropView(Gtk.DrawingArea):
 
 		cr.rectangle(0, 0, self.width - width, h)
 		cr.fill()
+
+		if active:
+			gradient = cairo.LinearGradient(0, 0, 0, self.txt_height * 2)
+			gradient.add_color_stop_rgb(0, *(col *  cfg.intensity_txt_highlight for col in cfg.record_colour))
+			gradient.add_color_stop_rgb(.1, *(col *  cfg.intensity_txt_highlight for col in cfg.record_colour))
+			gradient.add_color_stop_rgb(.8, *(col *  cfg.intensity_txt_highlight * .4 for col in cfg.record_colour))
+			
+			gradient.add_color_stop_rgb(1.0, *(col *  cfg.intensity_background for col in cfg.record_colour))
+			cr.set_source(gradient)
+			
+			yy = 1.3
+			c = len(self.trk)
+			xfrom = - width * 2
+			xto = self.trkview.txt_width * c
+			
+			kf = self.trkview.keyboard_focus
+			if kf:
+				xfrom = kf.x_from
+				xto = kf.x_to + width
+				xfrom -= width
+			
+			cr.move_to(xfrom, self.txt_height * yy * 2.5)
+			cr.curve_to(xfrom + width, self.txt_height * 1.8,
+					xfrom + width, self.txt_height * yy,
+					xfrom + (width * 1.8), self.txt_height * yy)
+			
+			cr.line_to(xto - (width * 1.8), self.txt_height * yy)
+			cr.curve_to(xto - width, self.txt_height * yy,
+						xto - width, self.txt_height * 1.8,
+						xto, self.txt_height * 2.5)
+			
+			cr.line_to(self.width - width, self.txt_height * yy * 10)
+			cr.line_to(-1, self.txt_height * yy * 10)			
+			cr.stroke_preserve()
+			cr.fill()
+
+		if active and self.trkview.keyboard_focus:
+			redfrom = 0
+			redto = 0
+
 
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")
 		if self.trkview.show_timeshift:

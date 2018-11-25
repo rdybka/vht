@@ -268,7 +268,12 @@ void queue_midi_note_on(sequence *seq, int port, int chn, int note, int velocity
 	evt.time = 0;
 
 	if (module.recording && module.playing) {
-		evt.time = jack_frame_time(jack_client) - jack_last_frame;
+		jack_nframes_t jft = jack_frame_time(jack_client);
+		evt.time = jft - jack_last_frame;
+
+		if (jft < jack_last_frame)
+			evt.time = 0;
+
 		if (seq)
 			sequence_handle_record(seq, evt);
 	}
@@ -287,13 +292,52 @@ void queue_midi_note_off(sequence *seq, int port, int chn, int note) {
 	evt.time = 0;
 
 	if (module.recording && module.playing) {
-		evt.time = jack_frame_time(jack_client) - jack_last_frame;
+		jack_nframes_t jft = jack_frame_time(jack_client);
+		evt.time = jft - jack_last_frame;
+
+		if (jft < jack_last_frame) {
+			evt.time = 0;
+		}
+
 		if (seq)
 			sequence_handle_record(seq, evt);
 	}
 
 	midi_buff_excl_in();
 	midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
+	midi_buff_excl_out();
+}
+
+void queue_midi_ctrl(sequence *seq, track *trk, int val, int ctrl) {
+	midi_event evt;
+	evt.type = pitch_wheel;
+	evt.channel = trk->channel;
+	evt.note = 0;
+	evt.velocity = val;
+	evt.time = 0;
+
+	if (ctrl > -1)
+		evt.type = ctrl;
+
+	if (module.recording && module.playing) {
+		jack_nframes_t jft = jack_frame_time(jack_client);
+		evt.time = jft - jack_last_frame;
+
+		if (jft < jack_last_frame)
+			evt.time = 0;
+
+		if (seq)
+			sequence_handle_record(seq, evt);
+	}
+
+	if (ctrl == -1) {
+		trk->lctrlval[0] = val * 127;
+	} else {
+		printf("ctrl:%d - not implemented!!!\n", ctrl);
+	}
+
+	midi_buff_excl_in();
+	midi_queue_buffer[trk->port][curr_midi_queue_event[trk->port]++] = evt;
 	midi_buff_excl_out();
 }
 

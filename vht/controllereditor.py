@@ -22,6 +22,7 @@ class ControllerEditor():
 		self.width = 127
 		self.ctrlnum = ctrlnum
 		self.ctrlrows = self.trk.ctrl[self.ctrlnum]
+		self.midi_ctrlnum = self.trk.ctrls[self.ctrlnum]
 		self.deleting = False
 		self.drawing = False
 		self.moving = False
@@ -245,6 +246,10 @@ class ControllerEditor():
 
 		select = False
 		empty = False
+		hover = False
+		
+		if self.tv.hover and r == self.tv.hover[1]:
+			hover = True
 
 		if self.selection:
 			if self.selection[1] - self.selection[0] > 0:
@@ -259,27 +264,52 @@ class ControllerEditor():
 					select = True
 
 		if row.velocity == -1 or empty:		# empty row
-			if not select:
+			if select:
+				cr.set_source(self.zero_pattern)
+				cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
+				cr.fill()
+			
+				if self.edit == r and not self.selection:
+					cr.set_source_rgb(*(cfg.record_colour))
+					cr.rectangle(self.x_from + self.txt_x, (r * self.tv.txt_height) + yh * .1, (self.x_to - self.x_from) - (self.txt_x * 2), yh * .8)
+				else:
+					cr.set_source_rgb(*(col * cfg.intensity_select for col in cfg.colour))
+					cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
+				
+				cr.fill()
+			else:
 				cr.set_source(self.empty_pattern)
+				cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
+				cr.fill()
 
-			cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
-			cr.fill()
-
-			if select or self.edit == r:
+			if select or self.edit == r or hover:
 				if self.zero_pattern_highlight > 1 and (r) % self.zero_pattern_highlight == 0:
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
 				else:
 					cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
+				
 				yy = (r + 1) * self.tv.txt_height - ((self.tv.txt_height - self.txt_height) / 2.0)
 				cr.move_to(self.x_from + self.txt_x, yy)
-				cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
+				
+				if hover and not select:
+					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight * 1.2 for col in cfg.colour))
+				else:
+					cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 				cr.show_text("---")
 		else:
-			if not select:
-				cr.set_source(self.zero_pattern)
-
+			cr.set_source(self.zero_pattern)
 			cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
 			cr.fill()
+
+			if select:		
+				if self.edit == r and not self.selection:
+					cr.set_source_rgb(*(cfg.record_colour))
+					cr.rectangle(self.x_from + self.txt_x, (r * self.tv.txt_height) + yh * .1, (self.x_to - self.x_from) - (self.txt_x * 2), yh * .8)
+				else:
+					cr.set_source_rgb(*(col * cfg.intensity_select for col in cfg.colour))
+					cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
+				
+				cr.fill()
 
 			if self.zero_pattern_highlight > 1 and (r) % self.zero_pattern_highlight == 0:
 				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
@@ -288,6 +318,9 @@ class ControllerEditor():
 
 			if select:
 				cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
+
+			if hover and not select:
+				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight * 1.2 for col in cfg.colour))
 
 			lnkchar = " "
 			if row.linked:
@@ -386,10 +419,13 @@ class ControllerEditor():
 		if shift and self.selection:
 			self.selecting = True
 
+		handled = False
+
+		if self.tv.pmp.key2ctrl(Gdk.keyval_to_lower(event.keyval), self.midi_ctrlnum):
+			handled = True
+
 		if cfg.key["node_snap"].matches(event):
 			self.snap = True
-
-		handled = False
 
 		if self.selection:
 			if cfg.key["delete"].matches(event):
@@ -448,9 +484,12 @@ class ControllerEditor():
 			handled = True
 
 		if cfg.key["select_all"].matches(event):
-			if not self.selection and self.edit == -1:
-				return False
-
+			if self.selection and self.selection[0] == 0 and self.selection[1] == self.trk.nrows -1:
+				self.selection = None
+				self.edit = -1
+				self.tv.redraw()
+				return True
+				
 			self.tv.leave_all()
 			self.selection = (0, self.trk.nrows -1)
 			self.edit = self.selection[1]
@@ -652,13 +691,19 @@ class ControllerEditor():
 		return False
 
 	def on_key_release(self, widget, event):
+		handled = False
+		
+		if self.tv.pmp.key2ctrl(Gdk.keyval_to_lower(event.keyval), self.midi_ctrlnum, True):
+			handled = True
+		
 		if event.state:
 			if event.state & Gdk.ModifierType.SHIFT_MASK:
 				self.selecting = False
 
 		if cfg.key["node_snap"].matches(event):
 			self.snap = False
-		return True
+		
+		return handled
 
 	def on_button_press(self, widget, event):
 		if event.x < self.x_from or event.x > self.x_to:
@@ -813,9 +858,19 @@ class ControllerEditor():
 			if self.trk.ctrl[self.ctrlnum][int(r)].velocity != -1:
 				return
 
+			empty = True
+			for row in self.trk.ctrl[self.ctrlnum]:
+				if row.velocity != -1:
+					empty = False
+
 			self.trk.ctrl[self.ctrlnum][int(r)].velocity = v
 			self.trk.ctrl[self.ctrlnum][int(r)].smooth = 0
-			self.trk.ctrl[self.ctrlnum][int(r)].linked = 1
+					
+			if empty:
+				self.trk.ctrl[self.ctrlnum][int(r)].linked = 0
+			else:
+				self.trk.ctrl[self.ctrlnum][int(r)].linked = 1
+			
 			anchor = 0
 			if r - int(r) > .5:
 				anchor = 1
@@ -868,6 +923,14 @@ class ControllerEditor():
 			if event.x < self.x_from or event.x > self.x_to:
 				return
 
+		# we'd like the keyboard focus, can we take it?
+		if not self.tv.keyboard_focus:
+			if not self.tv.edit:
+				self.tv.keyboard_focus = self
+		else:
+			if self.tv.keyboard_focus.edit == -1:
+				self.tv.keyboard_focus = self
+				
 		if event.y < 0:
 			return
 
@@ -922,6 +985,7 @@ class ControllerEditor():
 
 		lrow = None
 		# moving node
+		
 		if self.moving:
 			xw = self.x_to - (self.x_from + self.txt_width)
 			x0 = self.x_from + self.txt_width + (xw / 2)

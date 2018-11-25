@@ -317,6 +317,7 @@ void track_envelope_set_node(track *trk, int c, int n, float x, float y, float z
 	envelope_set_node(trk->env[c], n, x, y, z, linked);
 }
 
+// don't do this
 char *track_get_envelope(track *trk, int c) {
 	static char ret[(ENV_MAX_NNODES * 50) + 2];
 

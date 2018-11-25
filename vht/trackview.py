@@ -33,8 +33,6 @@ class TrackView(Gtk.DrawingArea):
 			wdg.edit = None
 			wdg.select_start = None
 			wdg.select_end = None
-			if wdg.trk and wdg != mod.active_track:
-				wdg.set_opacity(cfg.inactive_opacity)
 				
 			if redr:
 				wdg.redraw()
@@ -79,6 +77,8 @@ class TrackView(Gtk.DrawingArea):
 		self.select = False
 		self.select_start = None
 		self.select_end = None
+
+		self.keyboard_focus = None
 
 		self.velocity_editor = None
 		self.timeshift_editor = None
@@ -180,7 +180,6 @@ class TrackView(Gtk.DrawingArea):
 			self.set_size_request(nw, nh)
 			self.width = nw
 		
-
 		if self.pitchwheel_editor:
 			self.pitchwheel_editor.configure()
 
@@ -527,7 +526,7 @@ class TrackView(Gtk.DrawingArea):
 				rw = self.trk[c][r]
 				
 				draw_text = True
-				if rw.type == 0:
+				if rw.type == 0 and not (self.hover and r == self.hover[1] and c == self.hover[0]):
 					cr.set_source(self.empty_pattern)
 					draw_text = False
 				else:
@@ -583,9 +582,9 @@ class TrackView(Gtk.DrawingArea):
 							cr.set_source_rgb(*(cfg.colour))
 
 						if c == len(self.trk) - 1:
-							cr.rectangle(c * self.txt_width + xtraoffs, (r * self.txt_height) + self.txt_height * .1, (self.txt_width / 8.0) * 7.2, self.txt_height * .9)
+							cr.rectangle(c * self.txt_width + xtraoffs, (r * self.txt_height) + self.txt_height * .1, (self.txt_width / 8.0) * 7.2, self.txt_height * .8)
 						else:
-							cr.rectangle(c * self.txt_width + xtraoffs, (r * self.txt_height) + self.txt_height * .1, self.txt_width, self.txt_height * .9)
+							cr.rectangle(c * self.txt_width + xtraoffs, (r * self.txt_height) + self.txt_height * .1, self.txt_width, self.txt_height * .8)
 
 						cr.fill()
 						cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
@@ -700,8 +699,17 @@ class TrackView(Gtk.DrawingArea):
 		if self.timeshift_editor:
 			return self.timeshift_editor.on_motion(widget, event)
 
+		oldf = self.keyboard_focus
+	
+		if event.x < self.width * .9:
+			if self.keyboard_focus:
+				self.keyboard_focus = None
+
 		if self.show_pitchwheel:
 			self.pitchwheel_editor.on_motion(widget, event)
+
+		if oldf != self.keyboard_focus:
+			self.parent._prop_view.redraw(self.trk.index)
 
 		if self.select:
 			if not self.select_start:
@@ -950,7 +958,6 @@ class TrackView(Gtk.DrawingArea):
 
 			TrackView.leave_all()
 			self.parent.change_active_track(self)
-			self.set_opacity(1)
 			olded = self.edit
 			self.edit = col, row
 			self.redraw(row)
@@ -1270,8 +1277,8 @@ class TrackView(Gtk.DrawingArea):
 			self.leave_all()
 			return True
 
-		if self.show_pitchwheel:
-			if self.pitchwheel_editor.on_key_press(widget, event):
+		if self.keyboard_focus != None and self.edit == None and self.select_start == None:
+			if self.keyboard_focus.on_key_press(widget, event):
 				return True
 
 		if self.velocity_editor:
@@ -1326,14 +1333,18 @@ class TrackView(Gtk.DrawingArea):
 				self.edit = None
 				self.redraw()
 			elif self.select_start:
-				if self.select_start[1] == 0 and self.select_end[1] == self.trk.nrows -1:
-					self.select_start = 0, 0
-					self.select_end = len(self.trk) - 1, self.trk.nrows - 1
-					self.redraw()
-				else:
-					self.select_start = self.select_start[0], 0
-					self.select_end = self.select_start[0], self.trk.nrows - 1
-					self.redraw()
+				if self.select_start[1] == 0 and self.select_end[1] == self.trk.nrows - 1:
+					if self.select_start[0] == 0 and self.select_end[0] == len(self.trk) - 1:
+						self.select_start = self.select_end = None
+						self.redraw()
+					else:
+						self.select_start = 0, 0
+						self.select_end = len(self.trk) - 1, self.trk.nrows - 1
+						self.redraw()
+			else:
+				self.select_start = 0, 0
+				self.select_end = len(self.trk) - 1, self.trk.nrows - 1
+				self.redraw()
 
 			return True
 
@@ -1761,8 +1772,11 @@ class TrackView(Gtk.DrawingArea):
 			if sel:
 				for r in sel:
 					r.clear()
-
-				self.trk.kill_notes()
+				
+				if (self.select_start[1] == 0 and self.select_end[1] == self.trk.nrows - 1
+					and self.select_start[0] == 0 and self.select_end[0] == len(self.trk) -1):
+					self.trk.kill_notes()
+			
 				self.undo_buff.add_state()
 				self.redraw()
 				return True
@@ -1831,13 +1845,14 @@ class TrackView(Gtk.DrawingArea):
 		if not self.trk:
 			return
 
-		self.pmp.key2note(Gdk.keyval_to_lower(event.keyval), True)
+		if self.keyboard_focus != None and self.edit == None and self.select_start == None:
+			if self.keyboard_focus.on_key_release(widget, event):
+				return True
 
 		if self.velocity_editor:
 			self.velocity_editor.on_key_release(widget, event)
 
-		if self.show_pitchwheel:
-			self.pitchwheel_editor.on_key_release(widget, event)
+		self.pmp.key2note(Gdk.keyval_to_lower(event.keyval), True)
 
 		return False
 

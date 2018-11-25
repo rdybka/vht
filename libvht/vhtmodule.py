@@ -92,6 +92,9 @@ class VHTModule(Iterable):
 	def sneakily_queue_midi_note_off(self, seq, port, chn, note):
 		libcvht.queue_midi_note_off(seq, port, chn, note)
 
+	def sneakily_queue_midi_ctrl(self, seq, trk, value, ctrl):
+		libcvht.queue_midi_ctrl(seq, trk, value, ctrl)
+
 	@property
 	def jack_error(self):
 		return libcvht.get_jack_error()

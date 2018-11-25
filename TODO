@@ -1,24 +1,23 @@
 - controllers
 	* refactor pitchwheeleditor into controllereditor
 	- cursor movement
-	- ctrl+x,c,v,b - cut, copy, paste, render doodles
+	* ctrl+x,c,v,b - cut, copy, paste, render doodles
 	- gui in track props
-	- resolution
-	- envelopes
+	* envelopes
 		* snapping
 - timed note-offs
 - make trackview selecting consistent with controllereditor
 - make bpm a float
 - move selection with keyboard
 - note-off follows note-on
-- fixed status bar size
+* fixed status bar size
 - clone - ctrl-n
 - gui magic
 	- stretching (new bpm suggestion)
 	- rotation
 	- move/resize tracks with mouse
 - ctrl up/down - next/prev
-- get rid of overshoot thingys
+? get rid of overshoot thingys?
 - move menu in fullscreen
 - disable menu when no jack
 - deleting track mutes it
@@ -30,13 +29,13 @@
 - auto-scroll
 	- fix with visible controllers
 	- inhibit while moving notes
-- optimise zooming / redrawing of empties
+* optimise zooming / redrawing of empties
 - triggers
 - timeline
 - configuration
 - about
-	- version from setup.py
-- save notification
+	* version from setup.py
+? save notification
 - split filename in title
 - magic transposing
 - smart-paste

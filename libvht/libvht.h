@@ -62,6 +62,7 @@ extern void module_dump_notes(int);
 
 extern void queue_midi_note_on(sequence *seq, int port, int chn, int note, int velocity);
 extern void queue_midi_note_off(sequence *seq, int port, int chn, int note);
+extern void queue_midi_ctrl(sequence *seq, track *trk, int val, int ctrl);
 
 extern char *track_get_rec_update(track *trk);
 extern void track_clear_updates(track *trk);
