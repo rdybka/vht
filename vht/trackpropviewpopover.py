@@ -24,7 +24,7 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.connect("motion-notify-event", self.on_motion)
 
 		self.entered = False
-		self.allow_close = True
+		self.allow_close = False
 
 		self.parent = parent
 		self.trk = trk
@@ -110,7 +110,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.show_pitchwheel_button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["toggle_pitch"]))
 			self.show_controllers_button = BlackCheckButton("ctrl")
 			self.show_controllers_button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["toggle_controls"]))
-			
+
 			self.show_notes_button.connect("toggled", self.on_show_notes_toggled)
 			self.show_timeshift_button.connect("toggled", self.on_show_timeshift_toggled)
 			self.show_pitchwheel_button.connect("toggled", self.on_show_pitchwheel_toggled)
@@ -241,7 +241,7 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.show_notes_button.set_sensitive(False)
 		self.set_modal(True)
 		self.refresh()
-		
+
 	def on_leave(self, wdg, prm):
 		#if self.entered:
 			if self.allow_close:

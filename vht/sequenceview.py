@@ -516,26 +516,26 @@ class SequenceView(Gtk.Box):
 	# trk == none - do all
 	def redraw_track(self, trk = None):
 		redr = False
-		
+
 		for wdg in self.get_tracks(True):
 			rdr = False
-						
+
 			if not trk:
 				rdr = True
 			else:
 				if wdg.trk:
 					if wdg.trk.index == trk.index:
 						rdr = True
-			
+
 			if rdr:
 				w = wdg.width
 				wdg.redraw()
 				if trk and w != wdg.width:
 					self._prop_view.redraw(trk.index)
-					
+
 		if not trk:
 			self._prop_view.redraw()
-		
+
 		self.queue_draw()
 
 	def build(self):

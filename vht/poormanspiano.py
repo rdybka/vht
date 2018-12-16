@@ -42,12 +42,12 @@ class PoorMansPiano():
 
 		if f == math.floor(len(cfg.velocity_keys) / 2):
 			val = 64
-		
-		if val > -1:	
+
+		if val > -1:
 			if not off:
 				mod.sneakily_queue_midi_ctrl(self.seq._seq_handle, self.trk._trk_handle, val, ctrl)
 			return True
-		
+
 		return False
 
 	def key2note(self, key, note_off = False):

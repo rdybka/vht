@@ -247,7 +247,7 @@ class ControllerEditor():
 		select = False
 		empty = False
 		hover = False
-		
+
 		if self.tv.hover and r == self.tv.hover[1]:
 			hover = True
 
@@ -268,14 +268,14 @@ class ControllerEditor():
 				cr.set_source(self.zero_pattern)
 				cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
 				cr.fill()
-			
+
 				if self.edit == r and not self.selection:
 					cr.set_source_rgb(*(cfg.record_colour))
 					cr.rectangle(self.x_from + self.txt_x, (r * self.tv.txt_height) + yh * .1, (self.x_to - self.x_from) - (self.txt_x * 2), yh * .8)
 				else:
 					cr.set_source_rgb(*(col * cfg.intensity_select for col in cfg.colour))
 					cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
-				
+
 				cr.fill()
 			else:
 				cr.set_source(self.empty_pattern)
@@ -287,10 +287,10 @@ class ControllerEditor():
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
 				else:
 					cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
-				
+
 				yy = (r + 1) * self.tv.txt_height - ((self.tv.txt_height - self.txt_height) / 2.0)
 				cr.move_to(self.x_from + self.txt_x, yy)
-				
+
 				if hover and not select:
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight * 1.2 for col in cfg.colour))
 				else:
@@ -301,14 +301,14 @@ class ControllerEditor():
 			cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
 			cr.fill()
 
-			if select:		
+			if select:
 				if self.edit == r and not self.selection:
 					cr.set_source_rgb(*(cfg.record_colour))
 					cr.rectangle(self.x_from + self.txt_x, (r * self.tv.txt_height) + yh * .1, (self.x_to - self.x_from) - (self.txt_x * 2), yh * .8)
 				else:
 					cr.set_source_rgb(*(col * cfg.intensity_select for col in cfg.colour))
 					cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
-				
+
 				cr.fill()
 
 			if self.zero_pattern_highlight > 1 and (r) % self.zero_pattern_highlight == 0:
@@ -477,6 +477,9 @@ class ControllerEditor():
 						self.trk.ctrl[self.ctrlnum][self.edit].smooth = 0
 
 					self.trk.ctrl[self.ctrlnum][self.edit].velocity = val
+					self.edit += cfg.skip
+					if self.edit > self.trk.nrows - 1:
+						self.edit = 0
 					handled = True
 
 		if cfg.key["undo"].matches(event):
@@ -489,7 +492,7 @@ class ControllerEditor():
 				self.edit = -1
 				self.tv.redraw()
 				return True
-				
+
 			self.tv.leave_all()
 			self.selection = (0, self.trk.nrows -1)
 			self.edit = self.selection[1]
@@ -692,23 +695,23 @@ class ControllerEditor():
 
 	def on_key_release(self, widget, event):
 		handled = False
-		
+
 		if self.tv.pmp.key2ctrl(Gdk.keyval_to_lower(event.keyval), self.midi_ctrlnum, True):
 			handled = True
-		
+
 		if event.state:
 			if event.state & Gdk.ModifierType.SHIFT_MASK:
 				self.selecting = False
 
 		if cfg.key["node_snap"].matches(event):
 			self.snap = False
-		
+
 		return handled
 
 	def on_button_press(self, widget, event):
 		if event.x < self.x_from or event.x > self.x_to:
 			return
-		
+
 		mod.clear_popups()
 
 		self.ignore_x = False
@@ -865,12 +868,12 @@ class ControllerEditor():
 
 			self.trk.ctrl[self.ctrlnum][int(r)].velocity = v
 			self.trk.ctrl[self.ctrlnum][int(r)].smooth = 0
-					
+
 			if empty:
 				self.trk.ctrl[self.ctrlnum][int(r)].linked = 0
 			else:
 				self.trk.ctrl[self.ctrlnum][int(r)].linked = 1
-			
+
 			anchor = 0
 			if r - int(r) > .5:
 				anchor = 1
@@ -930,7 +933,7 @@ class ControllerEditor():
 		else:
 			if self.tv.keyboard_focus.edit == -1:
 				self.tv.keyboard_focus = self
-				
+
 		if event.y < 0:
 			return
 
@@ -984,8 +987,7 @@ class ControllerEditor():
 			self.last_x = event.x
 
 		lrow = None
-		# moving node
-		
+
 		if self.moving:
 			xw = self.x_to - (self.x_from + self.txt_width)
 			x0 = self.x_from + self.txt_width + (xw / 2)
@@ -1056,10 +1058,23 @@ class ControllerEditor():
 
 		if self.drag:
 			r = min(int(event.y / self.tv.txt_height), self.trk.nrows - 1)
-			if r != (self.selection[0] + self.drag_selection_offset):
-				l = self.selection[1] - self.selection[0]
-				s = r - self.drag_selection_offset
-				self.edit = -1
+			l = self.selection[1] - self.selection[0]
+			s = r - self.drag_selection_offset
+			self.edit = -1
+
+			if l == self.trk.nrows - 1:
+				self.selection = 0, self.trk.nrows - 1
+					
+				for r in range(len(self.trk.ctrl[self.ctrlnum])):
+					rr = r - s
+						
+					if rr > self.trk.nrows -1:
+						rr -= self.trk.nrows
+					if rr < 0:
+						rr += self.trk.nrows
+						
+					self.trk.ctrl[self.ctrlnum][r].copy(self.drag_content[rr])
+			elif r != (self.selection[0] + self.drag_selection_offset):
 				self.selection = s, s + l
 
 				for r in range(len(self.trk.ctrl[self.ctrlnum])):
@@ -1069,11 +1084,11 @@ class ControllerEditor():
 						if self.drag_content[r - self.selection[0]].velocity > -1:
 							self.trk.ctrl[self.ctrlnum][r].copy(self.drag_content[r - self.selection[0]])
 
-				self.trk.ctrl[self.ctrlnum].refresh()
-				self.env = self.trk.get_envelope(self.ctrlnum)
-				self.redraw_env()
-				self.tv.redraw(controller = self.ctrlnum)
-				return
+			self.trk.ctrl[self.ctrlnum].refresh()
+			self.env = self.trk.get_envelope(self.ctrlnum)
+			self.redraw_env()
+			self.tv.redraw(controller = self.ctrlnum)
+			return
 
 		l_act_node = self.active_node
 		l_act_row = self.active_row

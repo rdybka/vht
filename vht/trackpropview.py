@@ -128,8 +128,6 @@ class TrackPropView(Gtk.DrawingArea):
 			self.redraw()
 
 	def redraw(self):
-		self.queue_draw()
-
 		cr = self._context
 
 		w = self.get_allocated_width()
@@ -207,7 +205,7 @@ class TrackPropView(Gtk.DrawingArea):
 			gradient.add_color_stop_rgb(0.1, *(col *  cfg.intensity_txt for col in colour))
 
 		gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_background for col in colour))
-		
+
 		cr.set_source(gradient)
 
 		self.set_size_request(self.width, self.txt_height * 2 * cfg.seq_spacing)
@@ -218,44 +216,44 @@ class TrackPropView(Gtk.DrawingArea):
 		cr.fill()
 
 		if active:
+			alpha = .8
 			gradient = cairo.LinearGradient(0, 0, 0, self.txt_height * 2)
-			gradient.add_color_stop_rgb(0, *(col *  cfg.intensity_txt_highlight for col in cfg.record_colour))
-			gradient.add_color_stop_rgb(.1, *(col *  cfg.intensity_txt_highlight for col in cfg.record_colour))
-			gradient.add_color_stop_rgb(.8, *(col *  cfg.intensity_txt_highlight * .4 for col in cfg.record_colour))
-			
-			gradient.add_color_stop_rgb(1.0, *(col *  cfg.intensity_background for col in cfg.record_colour))
+			gradient.add_color_stop_rgba(0, *(col *  cfg.intensity_txt_highlight for col in cfg.record_colour), alpha)
+			gradient.add_color_stop_rgba(.1, *(col *  cfg.intensity_txt_highlight for col in cfg.record_colour), alpha)
+			gradient.add_color_stop_rgba(.8, *(col *  cfg.intensity_txt_highlight * .4 for col in cfg.record_colour), alpha)
+
+			gradient.add_color_stop_rgba(1.0, *(col *  cfg.intensity_background for col in cfg.record_colour), alpha)
 			cr.set_source(gradient)
-			
+
 			yy = 1.3
 			c = len(self.trk)
 			xfrom = - width * 2
 			xto = self.trkview.txt_width * c
-			
+
 			kf = self.trkview.keyboard_focus
 			if kf:
 				xfrom = kf.x_from
 				xto = kf.x_to + width
 				xfrom -= width
-			
+
 			cr.move_to(xfrom, self.txt_height * yy * 2.5)
 			cr.curve_to(xfrom + width, self.txt_height * 1.8,
 					xfrom + width, self.txt_height * yy,
 					xfrom + (width * 1.8), self.txt_height * yy)
-			
+
 			cr.line_to(xto - (width * 1.8), self.txt_height * yy)
 			cr.curve_to(xto - width, self.txt_height * yy,
-						xto - width, self.txt_height * 1.8,
-						xto, self.txt_height * 2.5)
-			
+					xto - width, self.txt_height * 1.8,
+					xto, self.txt_height * 2.5)
+
 			cr.line_to(self.width - width, self.txt_height * yy * 10)
-			cr.line_to(-1, self.txt_height * yy * 10)			
+			cr.line_to(-1, self.txt_height * yy * 10)
 			cr.stroke_preserve()
 			cr.fill()
 
 		if active and self.trkview.keyboard_focus:
 			redfrom = 0
 			redto = 0
-
 
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")
 		if self.trkview.show_timeshift:
@@ -301,7 +299,7 @@ class TrackPropView(Gtk.DrawingArea):
 		cr.move_to(self.width - (width / 2), self.txt_height * cfg.seq_spacing * .3)
 		cr.line_to(self.width - (width / 2), 2 * self.txt_height * cfg.seq_spacing)
 		cr.stroke()
-		
+
 		if self.trk:
 			self.popover.refresh()
 		self.queue_draw()

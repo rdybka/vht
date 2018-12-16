@@ -108,7 +108,7 @@ class Configuration():
 			"toggle_mini": cfgkey("1", False, True, False),
 			"toggle_time": cfgkey("2", False, True, False),
 			"toggle_pitch": cfgkey("3", False, True, False),
-			"toggle_controls": cfgkey("4", False, True, False),			
+			"toggle_controls": cfgkey("4", False, True, False),
 
 			# controllereditor
 			"link": cfgkey("l", False, False, False),
