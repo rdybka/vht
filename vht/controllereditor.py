@@ -479,7 +479,10 @@ class ControllerEditor():
 					self.trk.ctrl[self.ctrlnum][self.edit].velocity = val
 					self.edit += cfg.skip
 					if self.edit > self.trk.nrows - 1:
-						self.edit = 0
+						self.edit -= self.trk.nrows
+					if self.edit < 0:
+						self.edit += self.trk.nrows
+						
 					handled = True
 
 		if cfg.key["undo"].matches(event):
