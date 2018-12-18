@@ -52,6 +52,7 @@ class ControllerEditor():
 		self.selection = None
 		self.moving_rows = False
 		self.drag = False
+		self.dragged = False    
 		self.drag_content = None
 		self.drag_static = None
 		self.drag_selection_offset = -1
@@ -736,7 +737,9 @@ class ControllerEditor():
 				# move selection?
 				if self.selection:
 					if r >= self.selection[0] and r <= self.selection[1]:
+						self.edit = r
 						self.drag = True
+						self.dragged = False
 						self.drag_content = []
 						self.drag_static = []
 						self.drag_selection_offset = r - self.selection[0]
@@ -750,7 +753,6 @@ class ControllerEditor():
 								rd.clear()
 
 							self.drag_static.append(rd)
-
 						return
 
 				if self.edit != r:
@@ -915,6 +917,9 @@ class ControllerEditor():
 
 		if self.drag:
 			self.drag = False
+			if not self.dragged:
+				self.selection = None
+			
 			self.redraw_env()
 			self.tv.redraw(controller = self.ctrlnum)
 
@@ -1065,6 +1070,9 @@ class ControllerEditor():
 			s = r - self.drag_selection_offset
 			self.edit = -1
 
+			if s != 0:
+				self.dragged = True
+				
 			if l == self.trk.nrows - 1:
 				self.selection = 0, self.trk.nrows - 1
 					

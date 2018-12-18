@@ -6,8 +6,8 @@
 	* envelopes
 		* snapping
 * timed note-offs
-- make trackview selecting consistent with controllereditor
-	- unselect
+* make trackview selecting consistent with controllereditor
+	* unselect
 - make bpm a float
 - move selection with keyboard
 - note-off follows note-on
