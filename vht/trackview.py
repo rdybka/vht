@@ -594,14 +594,14 @@ class TrackView(Gtk.DrawingArea):
 					yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2)
 					cr.move_to((c * self.txt_width) + x + xtraoffs, yy)
 
+					ts_sign = '0'
+					if rw.delay > 0:
+						ts_sign = '+'
+					if rw.delay < 0:
+						ts_sign = '-'
+
 					if rw.type == 1: #note_on
 						if self.show_timeshift:
-							ts_sign = '0'
-							if rw.delay > 0:
-								ts_sign = '+'
-							if rw.delay < 0:
-								ts_sign = '-'
-
 							if not self.velocity_editor:
 								cr.show_text("%3s %03d %c%02d" % (str(rw), rw.velocity, ts_sign, abs(rw.delay)))
 							else:
@@ -612,7 +612,10 @@ class TrackView(Gtk.DrawingArea):
 							cr.show_text("%3s %03d" % (str(rw), rw.velocity))
 
 					if rw.type == 2: #note_off
-						cr.show_text("%3s" % (str(rw)))
+						if self.show_timeshift:
+							cr.show_text("%3s   %c%02d" % (str(rw), ts_sign, abs(rw.delay)))
+						else:
+							cr.show_text("%3s" % (str(rw)))
 
 					if rw.type == 0: #none
 						cr.show_text("---    ")
@@ -622,7 +625,7 @@ class TrackView(Gtk.DrawingArea):
 				if veled and rw.type == 1:
 					self.velocity_editor.draw(cr, c, r, rw)
 
-				if tsed and rw.type == 1:
+				if tsed and 0 < rw.type < 3:
 					self.timeshift_editor.draw(cr, c, r, rw)
 
 				if self.show_pitchwheel:
@@ -952,7 +955,7 @@ class TrackView(Gtk.DrawingArea):
 		if offs < fldwidth:	# edit note
 			enter_edit = True
 		else: 							# edit velocity or timeshift
-			if not shift and self.trk[col][row].type == 1:
+			if not shift and 0 < self.trk[col][row].type < 3:
 				enter_edit = False
 				self.drag = False
 
