@@ -10,7 +10,6 @@
 	* unselect
 - make bpm a float
 - move selection with keyboard
-- note-off follows note-on
 * fixed status bar size
 - clone - ctrl-n
 - gui magic

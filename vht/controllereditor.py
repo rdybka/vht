@@ -451,6 +451,11 @@ class ControllerEditor():
 				else:
 					l = 0
 				self.trk.ctrl[self.ctrlnum][self.edit].linked = l
+				self.edit += cfg.skip
+				if self.edit > self.trk.nrows - 1:
+					self.edit -= self.trk.nrows
+				if self.edit < 0:
+					self.edit += self.trk.nrows
 				handled = True
 
 			if cfg.key["delete"].matches(event):
