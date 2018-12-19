@@ -46,8 +46,6 @@ class TrackPropView(Gtk.DrawingArea):
 			self.popover = SequencePropViewPopover(self, seq)
 
 		self.popover.set_position(Gtk.PositionType.BOTTOM)
-		self.popover.set_modal(False)
-
 		self.popped = False
 
 	def on_configure(self, wdg, event):
@@ -62,8 +60,7 @@ class TrackPropView(Gtk.DrawingArea):
 		self._context.set_antialias(cairo.ANTIALIAS_NONE)
 		self._context.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
 		self._context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-		self._context.set_font_size(cfg.seq_font_size)
-
+		
 		self.redraw()
 		return True
 
@@ -97,9 +94,12 @@ class TrackPropView(Gtk.DrawingArea):
 			if data.x <= self.button_rect.x + self.button_rect.width:
 				if data.y >= self.button_rect.y:
 					if data.y <= self.button_rect.y + self.button_rect.height:
-
-						self.button_highlight = True
-						self.redraw()
+						if not self.popped:
+							mod.clear_popups()
+							self.popover.popup()
+							self.popped = True
+							self.button_highlight = True
+							self.redraw()
 						return
 
 		self.button_highlight = False

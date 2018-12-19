@@ -16,12 +16,10 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.set_relative_to(parent)
 
 		self.set_events(Gdk.EventMask.LEAVE_NOTIFY_MASK
-						| Gdk.EventMask.ENTER_NOTIFY_MASK
-						| Gdk.EventMask.POINTER_MOTION_MASK)
+						| Gdk.EventMask.ENTER_NOTIFY_MASK)
 
 		self.connect("leave-notify-event", self.on_leave)
 		self.connect("enter-notify-event", self.on_enter)
-		self.connect("motion-notify-event", self.on_motion)
 
 		self.entered = False
 		self.allow_close = False
@@ -214,6 +212,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.grid.show_all()
 			#self.extend_grid.hide()
 			self.add(self.grid)
+			self.set_modal(False)
 
 	def on_timeout(self, args):
 		self.allow_close = True
@@ -239,32 +238,26 @@ class TrackPropViewPopover(Gtk.Popover):
 
 		#self.loop_button.set_active(self.trk.loop) // not yet implemented in vhtlib
 		self.show_notes_button.set_sensitive(False)
-		self.set_modal(True)
 		self.refresh()
 
 	def on_leave(self, wdg, prm):
-		#if self.entered:
+		if self.entered:
 			if self.allow_close:
-				if prm.detail == Gdk.NotifyType.NONLINEAR:
-					wdg.popdown()
-					self.entered = False
-					self.parent.popped = False
-					self.parent.button_highlight = False
-					self.parent.redraw()
+				if prm.window == self.get_window():
+					if prm.detail == Gdk.NotifyType.NONLINEAR:
+						wdg.popdown()
+						self.entered = False
+						self.parent.popped = False
+						self.parent.button_highlight = False
+						self.parent.redraw()
 
 	def on_enter(self, wdg, prm):
-		if prm.detail == Gdk.NotifyType.NONLINEAR:
-			if self.entered == False:
-				self.entered = True
-				self.parent.button_highlight = False
-				self.parent.redraw()
-
-	def on_motion(self, wdg, evt):
-			if self.entered == False:
-				self.entered = True
-				self.parent.button_highlight = False
-				self.parent.redraw()
-
+		if not self.entered:
+			if prm.window == self.get_window():
+				if prm.detail == Gdk.NotifyType.NONLINEAR:
+					self.entered = True
+					self.parent.button_highlight = False
+					self.parent.redraw()
 
 	def on_show_notes_toggled(self, wdg):
 		if not self.entered:

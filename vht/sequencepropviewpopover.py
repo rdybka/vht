@@ -40,6 +40,7 @@ class SequencePropViewPopover(Gtk.Popover):
 
 		self.grid.show_all()
 		self.add(self.grid)
+		self.set_modal(False)
 
 	def on_length_changed(self, adj):
 		self.seq.length = int(adj.get_value())
@@ -52,20 +53,22 @@ class SequencePropViewPopover(Gtk.Popover):
 		self.parent.seqview.queue_draw()
 
 	def on_leave(self, wdg, prm):
-		if prm.detail == Gdk.NotifyType.NONLINEAR:
-			if self.allow_close and self.entered:
-				wdg.popdown()
-				self.entered = False
-				self.parent.popped = False
-				self.parent.button_highlight = False
-				self.parent.redraw()
+		if self.allow_close and self.entered:
+			if prm.window == self.get_window():
+				if prm.detail == Gdk.NotifyType.NONLINEAR:
+					wdg.popdown()
+					self.entered = False
+					self.parent.popped = False
+					self.parent.button_highlight = False
+					self.parent.redraw()
 
 	def on_enter(self, wdg, prm):
-		if prm.detail == Gdk.NotifyType.NONLINEAR:
-			if self.entered == 0:
-				self.entered = True
-				self.parent.button_highlight = False
-				self.parent.redraw()
+		if not self.entered:
+			if prm.detail == Gdk.NotifyType.NONLINEAR:
+				if prm.window == self.get_window():			
+					self.entered = True
+					self.parent.button_highlight = False
+					self.parent.redraw()
 
 	def on_add_button_clicked(self, switch):
 		self.parent.add_track()
@@ -76,6 +79,7 @@ class SequencePropViewPopover(Gtk.Popover):
 		return False
 
 	def popup(self):
+		super().popup()
 		self.allow_close = False
 		GObject.timeout_add(cfg.popover_wait_before_close, self.on_timeout, None)
-		super().popup()
+
