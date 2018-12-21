@@ -1906,10 +1906,16 @@ class TrackView(Gtk.DrawingArea):
 			return True
 
 		if event.keyval == 65056:			# shift-tab
+			if not self.edit:
+				return True
+				
 			self.go_left(True)
 			return True
 
 		if event.keyval == 65289:			# tab
+			if not self.edit:
+				return True
+				
 			self.go_right(True)
 			return True
 

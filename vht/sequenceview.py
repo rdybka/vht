@@ -32,6 +32,8 @@ class SequenceView(Gtk.Box):
 		self._sv.connect("enter-notify-event", self.on_enter)
 
 		self._sv.set_can_focus(True)
+		self._sv.set_overlay_scrolling(True)
+		
 		self.add_tick_callback(self.tick)
 
 		self.seq = seq;
@@ -512,6 +514,8 @@ class SequenceView(Gtk.Box):
 
 			if trk._surface:
 				self._prop_view.redraw()
+				
+			#mod.clear_popups()
 
 	# trk == none - do all
 	def redraw_track(self, trk = None):
@@ -569,7 +573,7 @@ class SequenceView(Gtk.Box):
 				spc = wdg.trk.nsrows / wdg.trk.nrows
 			wdg.spacing = spc
 
-			if spc < minspc:
+			if 0 < spc < minspc:
 				minspc = spc
 
 		if minspc < 1.0:

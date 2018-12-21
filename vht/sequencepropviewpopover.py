@@ -10,11 +10,8 @@ class SequencePropViewPopover(Gtk.Popover):
 		super(SequencePropViewPopover, self).__init__()
 		self.set_relative_to(parent)
 
-		self.set_events(Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.ENTER_NOTIFY_MASK)
+		self.set_events(Gdk.EventMask.LEAVE_NOTIFY_MASK)
 		self.connect("leave-notify-event", self.on_leave)
-		self.connect("enter-notify-event", self.on_enter)
-		self.entered = False
-		self.allow_close = True
 
 		self.parent = parent
 		self.seq = seq
@@ -53,33 +50,21 @@ class SequencePropViewPopover(Gtk.Popover):
 		self.parent.seqview.queue_draw()
 
 	def on_leave(self, wdg, prm):
-		if self.allow_close and self.entered:
-			if prm.window == self.get_window():
-				if prm.detail == Gdk.NotifyType.NONLINEAR:
-					wdg.popdown()
-					self.entered = False
-					self.parent.popped = False
-					self.parent.button_highlight = False
-					self.parent.redraw()
-
-	def on_enter(self, wdg, prm):
-		if not self.entered:
-			if prm.detail == Gdk.NotifyType.NONLINEAR:
-				if prm.window == self.get_window():			
-					self.entered = True
-					self.parent.button_highlight = False
-					self.parent.redraw()
+		if prm.window == self.get_window():
+			if prm.detail != Gdk.NotifyType.INFERIOR:
+				self.popdown()
+		
+	def popdown(self):
+		self.hide()
+				
+		self.parent.popped = False
+		self.parent.button_highlight = False
+		self.parent.redraw()
 
 	def on_add_button_clicked(self, switch):
 		self.parent.add_track()
 		self.parent.seqview.recalculate_row_spacing()
 
-	def on_timeout(self, args):
-		self.allow_close = True
-		return False
-
 	def popup(self):
-		super().popup()
-		self.allow_close = False
-		GObject.timeout_add(cfg.popover_wait_before_close, self.on_timeout, None)
+		self.show()
 
