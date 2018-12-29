@@ -1076,7 +1076,6 @@ class TrackView(Gtk.DrawingArea):
 			self.parent._prop_view.redraw()
 			self.undo_buff.add_state()
 
-
 		return False
 
 	def on_leave(self, wdg, prm):
@@ -1088,7 +1087,6 @@ class TrackView(Gtk.DrawingArea):
 	def on_enter(self, wdg, prm):
 		pass
 
-	# sheer madness :)
 	def go_right(self, skip_track = False, rev = False):
 		old = self.edit[1]
 		inc = 1
@@ -1139,7 +1137,8 @@ class TrackView(Gtk.DrawingArea):
 			trk.redraw(min(trk.edit[1], trk.trk.nrows - 1))
 
 			self.redraw(old[1])
-
+	
+	#;)
 	def go_left(self, skip_track = False, rev = True):
 		self.go_right(skip_track, rev)
 

@@ -6,10 +6,10 @@ which allows sample-exact synchronisation and in future,
 asynchronous rendering.
 
 ## installation on Fedora
-`[sudo] dnf install jack-audio-connection-kit-devel python3-devel swig astyle git rpm-devel`
-`git clone https://github.com/rdybka/vht`
-`cd vht`
-`./setup.py install --user`
+`[sudo] dnf install jack-audio-connection-kit-devel python3-devel swig astyle git rpm-devel
+git clone https://github.com/rdybka/vht
+cd vht
+./setup.py install --user`
 
 ## roadmap before a file release
 - [x] record/edit notes

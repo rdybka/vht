@@ -41,9 +41,8 @@ class PropView(Gtk.ScrolledWindow):
 
 	def reindex_tracks(self):
 		i = 0
-		for wdg in self.seqview.get_tracks():
+		for i, wdg in enumerate(self.seqview.get_tracks()):
 			wdg.trk.index = i
-			i += 1
 
 	def move_track(self, trk, offs):
 		wdg = self._track_box.get_children()[trk.index]
@@ -66,18 +65,18 @@ class PropView(Gtk.ScrolledWindow):
 		self.move_track(trk, 1)
 
 	def move_first(self, trk):
-		self.move_track(trk, trk.index * -1)
+		for i in range(trk.index):
+			self.move_track(trk, -1)
 
 	def move_last(self, trk):
-		self.move_track(trk, (len(self.seq) - 1)- trk.index)
+		for i in range((len(self.seq) - 1)- trk.index):
+			self.move_track(trk, 1)
 
 	def clear_popups(self):
 		for wdg in self._track_box.get_children() + [self.seqview._side_prop]:
 			if wdg.get_realized():
 				wdg.popover.popdown()
 				wdg.redraw()
-
-		#self.seqview._side_prop.popover.popdown()
 
 	def redraw(self, index = -1):
 		for wdg in self._track_box.get_children():

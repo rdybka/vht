@@ -60,7 +60,7 @@ track *track_new(int port, int channel, int len, int songlen) {
 		track_clear_rows(trk, c);
 
 		trk->ring[c] = -1;
-	};
+	}
 
 	trk->ctrlpr = TRACK_DEFAULT_CONTROLS_PER_ROW;
 	trk->nctrl = 0;

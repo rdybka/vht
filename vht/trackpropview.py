@@ -10,7 +10,7 @@ from vht.trackview import TrackView
 
 class TrackPropView(Gtk.DrawingArea):
 	def __init__(self, trk = None, trkview = None, seq = None, seqview = None, propview = None):
-		Gtk.DrawingArea.__init__(self)
+		super(TrackPropView, self).__init__()
 
 		self.set_events(Gdk.EventMask.POINTER_MOTION_MASK |
 			Gdk.EventMask.SCROLL_MASK |
@@ -60,7 +60,7 @@ class TrackPropView(Gtk.DrawingArea):
 		self._context.set_antialias(cairo.ANTIALIAS_NONE)
 		self._context.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
 		self._context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-		
+
 		self.redraw()
 		return True
 
@@ -133,12 +133,10 @@ class TrackPropView(Gtk.DrawingArea):
 		w = self.get_allocated_width()
 		h = self.get_allocated_height()
 
+		self._context.set_font_size(cfg.seq_font_size)
 		cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
-
-		cr.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-		cr.set_font_size(cfg.seq_font_size)
 
 		active = False
 		if mod.active_track == self.trkview:
@@ -158,7 +156,7 @@ class TrackPropView(Gtk.DrawingArea):
 			if self.popped or self.button_highlight:
 				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 			else:
-				cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.star_colour))
+				cr.set_source_rgb(*(col * cfg.intensity_txt / 2 for col in cfg.star_colour))
 
 			cr.move_to(x, self.txt_height * cfg.seq_spacing)
 			cr.show_text("vht")
@@ -284,7 +282,7 @@ class TrackPropView(Gtk.DrawingArea):
 		if self.popped or self.button_highlight:
 			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 		else:
-			cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.star_colour))
+			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 
 		(x, y, width, height, dx, dy) = cr.text_extents("*** ")
 

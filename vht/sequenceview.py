@@ -45,7 +45,7 @@ class SequenceView(Gtk.Box):
 		self._track_box = Gtk.Box()
 		self._track_box.set_spacing(0)
 
-		self._sv.add_with_viewport(self._track_box)
+		self._sv.add(self._track_box)
 
 		self._side = Gtk.ScrolledWindow()
 		self._side.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.EXTERNAL)

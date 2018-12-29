@@ -7,13 +7,14 @@ class Configuration():
 		self._highlight = 4
 		self.on_highlight = []  # add callbacks here
 
-		#self.seq_font = "Ubuntu Mono"
-		self.seq_font = "Monospace"
+		self.seq_font = "Ubuntu Mono"
+		#self.seq_font = "Monospace"
+		self.gui_font_size = 16
 		self.seq_font_size = 16
 		self.seq_line_width = 1.0
 		self.seq_spacing = 1.05
 		self.status_bar_font_size = 24
-		# self.colour = (.5, .5, 1)
+		#self.colour = (.5, .5, 1)
 		self.colour = (0, .7, .7)
 		self.star_colour = (1, 1, 0)
 		self.record_colour = (1.0, 0, 0)
@@ -141,7 +142,6 @@ class Configuration():
 			for cb in self.on_highlight:
 				cb()
 
-
 key_aliases = {"KP_Add": "keypad +",
 				"KP_Subtract": "keypad -",
 				"KP_Multiply": "keypad *",
@@ -154,7 +154,6 @@ key_aliases = {"KP_Add": "keypad +",
 ignore_modifiers = {
 	"Control_L",
 }
-
 
 class cfgkey():
 	def __init__(self, key, shift, ctrl, alt):
