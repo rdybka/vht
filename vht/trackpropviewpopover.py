@@ -242,6 +242,7 @@ class TrackPropViewPopover(Gtk.Popover):
 				
 		self.parent.popped = False
 		self.parent.button_highlight = False
+		self.ctrlsview.capturing = False
 		self.parent.redraw()
 
 	def on_show_notes_toggled(self, wdg):

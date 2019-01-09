@@ -34,6 +34,7 @@ class SequenceView(Gtk.Box):
 		self._sv.set_can_focus(True)
 		self._sv.set_overlay_scrolling(True)
 		
+		mod.gui_midi_capture = False
 		self.add_tick_callback(self.tick)
 
 		self.seq = seq;
@@ -630,41 +631,42 @@ class SequenceView(Gtk.Box):
 				if wdg.edit and wdg.trk:
 					self.auto_scroll(wdg)
 
-		midin = mod.get_midi_in_event()
-		while(midin):
-			if mod.active_track:
-				mod.active_track.midi_in(midin)
-
-			#print(midin)
-
-			for k in cfg.midi_in.keys():
-				m = cfg.midi_in[k]
-				if midin["channel"] == m[0]:
-					if midin["type"] == m[1]:
-						if midin["note"] == m[2]:
-							if midin["velocity"] == m[3]:
-								class kbd_evt():
-									pass
-
-								cfg_evt = cfg.key[k]
-
-								kev = kbd_evt()
-
-								kev.keyval = Gdk.keyval_from_name(cfg_evt.key)
-								kev.state = Gdk.ModifierType.META_MASK
-
-								if cfg_evt.shift:
-									kev.state = kev.state | Gdk.ModifierType.SHIFT_MASK
-
-								if cfg_evt.ctrl:
-									kev.state = kev.state | Gdk.ModifierType.CONTROL_MASK
-
-								if cfg_evt.alt:
-									kev.state = kev.state | Gdk.ModifierType.MOD1_MASK
-
-								self.on_key_press(self, kev)
-
+		if not mod.gui_midi_capture:
 			midin = mod.get_midi_in_event()
+			while(midin):
+				if mod.active_track:
+					mod.active_track.midi_in(midin)
+
+				#print(midin)
+
+				for k in cfg.midi_in.keys():
+					m = cfg.midi_in[k]
+					if midin["channel"] == m[0]:
+						if midin["type"] == m[1]:
+							if midin["note"] == m[2]:
+								if midin["velocity"] == m[3]:
+									class kbd_evt():
+										pass
+
+									cfg_evt = cfg.key[k]
+
+									kev = kbd_evt()
+
+									kev.keyval = Gdk.keyval_from_name(cfg_evt.key)
+									kev.state = Gdk.ModifierType.META_MASK
+
+									if cfg_evt.shift:
+										kev.state = kev.state | Gdk.ModifierType.SHIFT_MASK
+
+									if cfg_evt.ctrl:
+										kev.state = kev.state | Gdk.ModifierType.CONTROL_MASK
+
+									if cfg_evt.alt:
+										kev.state = kev.state | Gdk.ModifierType.MOD1_MASK
+
+									self.on_key_press(self, kev)
+
+				midin = mod.get_midi_in_event()
 
 		if mod.record > -1:
 			for trk in self.get_tracks():
@@ -696,7 +698,7 @@ class SequenceView(Gtk.Box):
 					if not found:
 						self.add_track(trk)
 
-		return 1
+		return True
 
 	def on_draw(self, widget, cr):
 		w = widget.get_allocated_width()
