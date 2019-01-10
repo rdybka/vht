@@ -1,10 +1,9 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gdk, Gtk, Gio, GObject
-import cairo
+from gi.repository import Gtk, Gio
 
 from vht import *
-from vht.controlrow import ControlRow
+from vht.controllersviewrow import ControllersViewRow
 
 class ControllersView(Gtk.Box):
 	def __init__(self, trk, trkview):
@@ -56,7 +55,7 @@ class ControllersView(Gtk.Box):
 		self.new_ctrl.pack_start(self.new_ctrl_button)
 
 		self.pack_end(self.new_ctrl, False, False, 0)
-		
+		self.rebuild()
 		self.show_all()
 
 	def on_capture_toggled(self, wdg):
@@ -88,10 +87,10 @@ class ControllersView(Gtk.Box):
 		
 		for i, c in enumerate(self.trk.ctrls):
 			if c != -1:
-				rw = ControlRow(self, self.trk, c, i)
+				rw = ControllersViewRow(self, self.trk, c, i)
 				self.box.pack_start(rw, False, False, 0)
 					
 	def on_add_clicked(self, wdg):
 		self.trk.ctrl.add(int(self.new_ctrl_adj.get_value()))
 		self.rebuild()
-		
+

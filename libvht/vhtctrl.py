@@ -49,9 +49,8 @@ class VHTCtrl(Iterable):
 			return
 
 		self._ctrlnum = int(value)
-		self._vht_handle.track_set_ctrl_num(self._crowptr, self._velocity)
+		self._vht_handle.track_set_ctrl_num(self._trk_handle, self._ctrl, self._ctrlnum)
 		if self.on_change:
-			print("calling upd")
 			self.on_change()
 
 	def __str__(self):
@@ -62,3 +61,5 @@ class VHTCtrl(Iterable):
 
 		return ret
 
+	def swap(self, c1, c2):
+		self._vht_handle.track_swap_ctrl(self._trk_handle, c1, c2)

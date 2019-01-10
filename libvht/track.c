@@ -706,6 +706,11 @@ void track_swap_ctrl(track *trk, int c, int c2) {
 		return;
 	}
 
+	// don't allow swapping with pitch (c == 0)
+	if (c < 1 || c2 < 1) {
+		return;
+	}
+
 	pthread_mutex_lock(&trk->exclctrl);
 
 	int *cc3 = trk->ctrl[c];

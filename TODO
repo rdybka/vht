@@ -36,7 +36,8 @@
 - magic transposing
 * smart-paste
 * sort out icon
-* popup timeout
+* popup delay before closing
+- popup delay before opening
 * refactor editors out of trackview
 * blocks/edit in velocity edit
 * edit delays

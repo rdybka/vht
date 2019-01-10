@@ -34,7 +34,7 @@ class VHTCtrlList(Iterable):
 	def delete(self, ctrl):
 		self._vht_handle.track_del_ctrl(self._trk_handle, ctrl)
 
-	def swap(self, ctrl1, strl2):
+	def swap(self, ctrl1, ctrl2):
 		self._vht_handle.track_swap_ctrl(self._trk_handle, ctrl1, ctrl2)
 
 	def __str__(self):
