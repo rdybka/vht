@@ -10,14 +10,19 @@ class SequencePropViewPopover(Gtk.Popover):
 		super(SequencePropViewPopover, self).__init__()
 		self.set_relative_to(parent)
 
-		self.set_events(Gdk.EventMask.LEAVE_NOTIFY_MASK)
+		self.set_events(Gdk.EventMask.LEAVE_NOTIFY_MASK
+			| Gdk.EventMask.ENTER_NOTIFY_MASK)
+
 		self.connect("leave-notify-event", self.on_leave)
+		self.connect("enter-notify-event", self.on_enter)
 
 		self.parent = parent
 		self.seq = seq
 		self.grid = Gtk.Grid()
 		self.grid.set_column_spacing(3)
 		self.grid.set_row_spacing(3)
+
+		self.entered = False
 
 		button = Gtk.Button()
 		icon = Gio.ThemedIcon(name="list-add")
@@ -50,13 +55,26 @@ class SequencePropViewPopover(Gtk.Popover):
 		self.parent.seqview.queue_draw()
 
 	def on_leave(self, wdg, prm):
+		if not self.entered:
+			return True
+
 		if prm.window == self.get_window():
 			if prm.detail != Gdk.NotifyType.INFERIOR:
-				self.popdown()
-		
-	def popdown(self):
-		self.hide()
-				
+				self.unpop()
+				return True
+
+		return True
+
+	def on_enter(self, wdg, prm):
+		if prm.window == self.get_window():
+			if prm.detail == Gdk.NotifyType.INFERIOR:
+				self.entered = True
+
+		return True
+
+	def unpop(self):
+		self.popdown()
+		self.entered = False
 		self.parent.popped = False
 		self.parent.button_highlight = False
 		self.parent.redraw()
@@ -65,6 +83,7 @@ class SequencePropViewPopover(Gtk.Popover):
 		self.parent.add_track()
 		self.parent.seqview.recalculate_row_spacing()
 
-	def popup(self):
-		self.show()
-
+	def pop(self):
+		mod.clear_popups(self)
+		self.popup()
+		self.entered = False

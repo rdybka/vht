@@ -102,7 +102,6 @@ class TimeshiftEditor():
 			vel = min(max(((event.x - self.x_from) / self.x_to) * 98.0, 0), 98)
 			vel = vel - 49
 
-
 		if self.lock:
 			vel = self.locked
 

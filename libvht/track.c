@@ -511,6 +511,7 @@ void track_advance(track *trk, double speriod) {
 				if ((delay >= 0) && (delay < tperiod)) {
 					if (trk->playing) {
 						track_play_row(trk, nn, c, delay * tmul);
+						//printf("note: %f %f %f %d %d\n", trigger_time, trk->pos, delay, row_start, row_end);
 					}
 				}
 			}
@@ -525,19 +526,21 @@ void track_advance(track *trk, double speriod) {
 
 	double cper = tperiod / (ctrlto - ctrlfrom);
 	for (int c = 0; c < trk->nctrl; c++) {
-		double delay = 0;
-
-		for (int r = ctrlfrom; r < ctrlto; r++) {
+		for (int r = ctrlfrom; r <= ctrlto; r++) {
 			int rr = r;
 
 			while(rr >= trk->nrows * trk->ctrlpr)
 				rr -= trk->nrows * trk->ctrlpr;
 
+			double delay = ((double)r / trk->ctrlpr) - trk->pos;
+
 			int ctrl = trk->ctrlnum[c];
 
-			int data = env_get_v(trk->env[c],  trk->ctrlpr, (float)rr / (float)trk->ctrlpr);
+			float dt = env_get_v(trk->env[c],  trk->ctrlpr, (float)rr / (float)trk->ctrlpr);
+			int data = dt;
+
 			if ((data > -1) && (c == 0)) // pitchwheel
-				data *= 128;
+				data = dt * 128;
 
 			if (data == -1) {
 				data = trk->ctrl[c][rr];
@@ -552,16 +555,18 @@ void track_advance(track *trk, double speriod) {
 				evt.control = ctrl;
 				evt.data = data;
 
-				trk->lctrlval[c] = data;
-
 				if (ctrl == -1) {
 					evt.type = pitch_wheel;
 					evt.msb = data / 128;
 					evt.lsb = data - (evt.msb * 128);
 				}
 
-				if (trk->playing) {
-					midi_buffer_add(trk->port, evt);
+				if ((delay >= 0) && (delay < tperiod)) {
+					if (trk->playing)
+						if (data != trk->lctrlval[c]) {
+							trk->lctrlval[c] = data;
+							midi_buffer_add(trk->port, evt);
+						}
 				}
 			}
 
@@ -627,7 +632,11 @@ void track_add_ctrl(track *trk, int c) {
 	trk->ctrlnum = realloc(trk->ctrlnum, sizeof(int) * trk->nctrl);
 	trk->ctrlnum[trk->nctrl -1] = c;
 	trk->lctrlval = realloc(trk->lctrlval, sizeof(int) * trk->nctrl);
-	trk->lctrlval[trk->nctrl -1] = 64 * 127;
+	if (c == 0) {
+		trk->lctrlval[trk->nctrl -1] = 64 * 127;
+	} else {
+		trk->lctrlval[trk->nctrl -1] = -1;
+	}
 	trk->env = realloc(trk->env, sizeof(envelope *) * trk->nctrl);
 	trk->env[trk->nctrl -1] = envelope_new(trk->nrows, trk->ctrlpr);
 
@@ -670,21 +679,22 @@ void track_del_ctrl(track *trk, int c) {
 
 	pthread_mutex_lock(&trk->exclctrl);
 
+	free(trk->crows[c]);
+	free(trk->ctrl[c]);
+	envelope_free(trk->env[c]);
+
 	for (int cc = c; cc < trk->nctrl - 1; cc++) {
 		trk->ctrl[cc] = trk->ctrl[cc+1];
 		trk->ctrlnum[cc] = trk->ctrlnum[cc+1];
 		trk->env[cc] = trk->env[cc+1];
+		trk->crows[cc] = trk->crows[cc + 1];
 	}
 
 	trk->nctrl--;
 
-	free(trk->crows[trk->nctrl]);
 	trk->crows = realloc(trk->crows, sizeof(ctrlrow *) * trk->nctrl);
-
 	trk->ctrl = realloc(trk->ctrl, sizeof(int*) * trk->nctrl * trk->ctrlpr);
-	trk->ring = realloc(trk->ring, sizeof(int) * trk->nctrl);
 	trk->env = realloc(trk->env, sizeof(envelope *) * trk->nctrl);
-
 
 	pthread_mutex_unlock(&trk->exclctrl);
 }
@@ -720,6 +730,14 @@ void track_swap_ctrl(track *trk, int c, int c2) {
 	int c3 = trk->ctrlnum[c];
 	trk->ctrlnum[c] = trk->ctrlnum[c2];
 	trk->ctrlnum[c2] = c3;
+
+	ctrlrow *cr3 = trk->crows[c];
+	trk->crows[c] = trk->crows[c2];
+	trk->crows[c2] = cr3;
+
+	envelope *env3 = trk->env[c];
+	trk->env[c] = trk->env[c2];
+	trk->env[c2] = env3;
 
 	pthread_mutex_unlock(&trk->exclctrl);
 }

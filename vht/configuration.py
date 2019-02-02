@@ -7,13 +7,13 @@ class Configuration():
 		self._highlight = 4
 		self.on_highlight = []  # add callbacks here
 
-		self.seq_font = "Ubuntu Mono"
-		#self.seq_font = "Monospace"
+		#self.seq_font = "Ubuntu Mono"
+		self.seq_font = "Monospace"
 		self.gui_font_size = 16
 		self.seq_font_size = 16
 		self.seq_line_width = 1.0
 		self.seq_spacing = 1.05
-		self.status_bar_font_size = 24
+		self.status_bar_font_size = 32
 		#self.colour = (.5, .5, 1)
 		self.colour = (0, .7, .7)
 		self.star_colour = (1, 1, 0)
@@ -30,10 +30,10 @@ class Configuration():
 		self.auto_scroll_delay = .2
 		self.tooltip_markup = """<span font_family="Monospace" size="large">%s</span>"""
 		self.window_opacity = 1
-		
-		self.velocity_editor_char_width = 12
-		self.timeshift_editor_char_width = 12
-		self.pitchwheel_editor_char_width = 12
+
+		self.velocity_editor_char_width = 8
+		self.timeshift_editor_char_width = 8
+		self.controllereditor_char_width = 8
 		self.editor_row_height = .5
 
 		self.drag_edit_divisor = 1.5
@@ -106,7 +106,7 @@ class Configuration():
 			"port_down": cfgkey("none", True, False, True),
 			"hold_editor": cfgkey("Control_L", False, False, False),
 			"node_snap": cfgkey("Control_L", False, False, False),
-			"toggle_mini": cfgkey("1", False, True, False),
+			"toggle_notes": cfgkey("1", False, True, False),
 			"toggle_time": cfgkey("2", False, True, False),
 			"toggle_pitch": cfgkey("3", False, True, False),
 			"toggle_controls": cfgkey("4", False, True, False),

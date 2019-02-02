@@ -1,15 +1,20 @@
+- newly added tracks on left
 - controllers
 	* refactor pitchwheeleditor into controllereditor
 	* cursor movement
 	* ctrl+x,c,v,b - cut, copy, paste, render doodles
 	- gui in track props
+		- showing in trackview/trackpropview
 	* envelopes
 		* snapping
-* timed note-offs
-* make trackview selecting consistent with controllereditor
-	* unselect
-- make bpm a float
-* fixed status bar size
+- trackview redraw(controller) situation
+- right click
+	- stop recording
+	- reset velocity to set vel
+- indicate recording in statusbar
+- track names
+- entering velocityeditor from note-offs
+- make bpm a float!!!!!!!!!!!!!
 - clone - ctrl-n
 - gui magic
 	* rotation
@@ -21,11 +26,9 @@
 - extended view
 	* show/hide timeshift
 	- disable notes hiding when controllers off
-	- minimise mode
 - auto-scroll
 	- fix with visible controllers
 	- inhibit while moving notes
-* optimise zooming / redrawing of empties
 - triggers
 - timeline
 - configuration
@@ -34,25 +37,5 @@
 ? save notification
 - split filename in title
 - magic transposing
-* smart-paste
-* sort out icon
 * popup delay before closing
 - popup delay before opening
-* refactor editors out of trackview
-* blocks/edit in velocity edit
-* edit delays
-* keep stars lit while menu open
-- constant star size
-* lines when moving blocks
-* lit controls in progressbar
-* moving between tracks if different lengths
-* recording
-	* undo every note
-	* wandering notes
-* libvht
-	* timeshifts
-* delete all mutes track
-* midi_in ignoring
-* midi_in routing to other ports
-* multi-track-recording in empty seq
-* trackpropviewpopover on_enter bug

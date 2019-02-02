@@ -97,7 +97,6 @@ class VelocityEditor():
 		if self.tv.trk[self.col][self.row].type != 1:
 			return False
 
-
 		y1 = new_hover_row * self.tv.txt_height
 		y2 = y1 + self.tv.txt_height
 
@@ -111,7 +110,7 @@ class VelocityEditor():
 			vel = self.locked
 
 		if self.clearing:
-			vel = cfg.default_velocity
+			vel = cfg.velocity
 
 		if new_hover_row > -1:
 			if not self.lock and self.tv.trk[self.col][new_hover_row].type == 1:

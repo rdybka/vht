@@ -2,6 +2,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk
 import cairo
+#import inspect
 
 from vht import mod, cfg
 from vht.trackviewpointer import trackviewpointer
@@ -28,6 +29,13 @@ class TrackView(Gtk.DrawingArea):
 
 				wdg.pitchwheel_editor.selection = None
 				wdg.pitchwheel_editor.edit = -1
+
+			for ctrl in wdg.controller_editors:
+				if ctrl.edit > -1 or ctrl.selection:
+					redr = True
+
+				ctrl.selection = None
+				ctrl.edit = -1
 
 			wdg.hover = None
 			wdg.edit = None
@@ -82,21 +90,18 @@ class TrackView(Gtk.DrawingArea):
 
 		self.velocity_editor = None
 		self.timeshift_editor = None
-
-		if self.trk:
-			self.pitchwheel_editor = ControllerEditor(self, 0)
-		else:
-			self.pitchwheel_editor = None
-
-		self.controller_editor = None
+		self.pitchwheel_editor = None
+		self.controller_editors = []
 
 		self.show_notes = True
 		self.show_timeshift = False
-		self.show_pitchwheel = False#True
-		self.show_controllers = False
+		self.show_pitchwheel = True
+		self.show_controllers = True
 
 		if trk:
 			self.undo_buff = TrackUndoBuffer(trk)
+			self.trk.ctrl.add(12)
+			self.trk.ctrl.add(13)
 
 		self._surface = None
 		self._context = None
@@ -131,6 +136,14 @@ class TrackView(Gtk.DrawingArea):
 		return True
 
 	def configure(self):
+		if self.trk and not self.controller_editors:
+			for cn, ctrl in enumerate(self.trk.ctrls):
+				if ctrl == -1:
+					if not self.pitchwheel_editor:
+						self.pitchwheel_editor = ControllerEditor(self, cn)
+				else:
+					self.controller_editors.append(ControllerEditor(self, cn))
+
 		self._back_context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
 		self._back_context.set_font_size(cfg.seq_font_size)
 
@@ -176,12 +189,20 @@ class TrackView(Gtk.DrawingArea):
 				if self.show_pitchwheel:
 					nw = nw + self.pitchwheel_editor.width
 
+			if self.show_controllers:
+				for ctrl in self.controller_editors:
+					ctrl.precalc(cr, nw)
+					nw = nw + ctrl.width
+
 			nh = (self.txt_height * self.trk.nrows) + 5
 			self.set_size_request(nw, nh)
 			self.width = nw
 
 		if self.pitchwheel_editor:
 			self.pitchwheel_editor.configure()
+
+		for ctrl in self.controller_editors:
+			ctrl.configure()
 
 		recr_cr = False
 
@@ -374,6 +395,32 @@ class TrackView(Gtk.DrawingArea):
 			crf.paint()
 			self.queue_draw()
 
+	# reconfigure and redraw trackpropview
+	def redraw_full(self):
+		# may be called before realising
+		if not self._back_context:
+			return
+
+		oldw = self.keyboard_focus
+
+		self.keyboard_focus = None
+		self.controller_editors = []
+		self.configure()
+		self.redraw()
+
+		if oldw:
+			fnum = oldw.ctrlnum
+
+			for w in self.controller_editors:
+				if w.ctrlnum == fnum:
+					self.keyboard_focus = w
+
+		# who's calling?
+		#cf = inspect.currentframe()
+		#of = inspect.getouterframes(cf, 2)
+		#print("redraw full", of[1][3], of[1][2], of[1][1])
+		self.queue_draw()
+
 	def redraw(self, from_row = -666, to_row = -666, controller = None):
 		cr = self._back_context
 		crf = self._context
@@ -482,7 +529,7 @@ class TrackView(Gtk.DrawingArea):
 			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 			cr.rectangle(0, 0, w, h)
 			cr.fill()
-			self.configure()
+			#self.configure()
 			self.trk.clear_updates()
 
 		last_c = len(self.trk) - 1
@@ -631,6 +678,10 @@ class TrackView(Gtk.DrawingArea):
 				if self.show_pitchwheel:
 					self.pitchwheel_editor.draw(cr, r)
 
+				if self.show_controllers:
+					for ctrl in self.controller_editors:
+						ctrl.draw(cr, r)
+
 				if not complete:
 					if c == last_c:
 						(x, y, width, height, dx, dy) = cr.text_extents("0")
@@ -681,7 +732,13 @@ class TrackView(Gtk.DrawingArea):
 			return True
 
 		if self.show_pitchwheel:
-			return self.pitchwheel_editor.on_scroll(event)
+			if self.pitchwheel_editor.on_scroll(event):
+				return True
+
+		if self.show_controllers:
+			for ctrl in self.controller_editors:
+				if ctrl.on_scroll(event):
+					return True
 
 	def on_motion(self, widget, event):
 		if not self.trk:
@@ -693,9 +750,6 @@ class TrackView(Gtk.DrawingArea):
 		new_hover_row = max(new_hover_row, 0)
 		new_hover_column = max(new_hover_column, 0)
 
-		#if event.y > 50:
-		#	mod.clear_popups()
-
 		if self.velocity_editor:
 			return self.velocity_editor.on_motion(widget, event)
 
@@ -704,15 +758,24 @@ class TrackView(Gtk.DrawingArea):
 
 		oldf = self.keyboard_focus
 
-		if event.x < self.width * .9:
+		if event.x < self.txt_width * len(self.trk):
 			if self.keyboard_focus:
-				self.keyboard_focus = None
+				if self.keyboard_focus.edit == -1:
+					self.keyboard_focus = None
+
+				if self.keyboard_focus:
+					if self.keyboard_focus.selection:
+						self.keyboard_focus = None
 
 		if self.show_pitchwheel:
 			self.pitchwheel_editor.on_motion(widget, event)
 
+		if self.show_controllers:
+			for ctrl in self.controller_editors:
+				ctrl.on_motion(widget, event)
+
 		if oldf != self.keyboard_focus:
-			self.parent._prop_view.redraw(self.trk.index)
+			self.parent.prop_view.redraw(self.trk.index)
 
 		if self.select:
 			if not self.select_start:
@@ -824,8 +887,13 @@ class TrackView(Gtk.DrawingArea):
 			self.redraw(self.hover[1])
 
 		if mod.active_track:
-			if not mod.active_track.edit:
-				self.parent.change_active_track(self)
+			if not mod.active_track == self:
+				if not mod.active_track.edit:
+					for c in mod.active_track.controller_editors + [mod.active_track.pitchwheel_editor]:
+						if c.edit > -1 and not c.selection:
+							return False
+
+					self.parent.change_active_track(self)
 		else:
 			self.parent.change_active_track(self)
 
@@ -850,6 +918,11 @@ class TrackView(Gtk.DrawingArea):
 			if self.show_pitchwheel:
 				if event.x > self.pitchwheel_editor.x_from and event.x < self.pitchwheel_editor.x_to:
 					self.pitchwheel_editor.on_button_press(widget, event)
+
+			if self.show_controllers:
+				for ctrl in self.controller_editors:
+					if event.x > ctrl.x_from and event.x < ctrl.x_to:
+						ctrl.on_button_press(widget, event)
 			return
 
 		if event.button == cfg.delete_button:
@@ -871,10 +944,11 @@ class TrackView(Gtk.DrawingArea):
 				if self.trk[col][row].type == 1:
 					self.velocity_editor = VelocityEditor(self, col, row, event)
 					self.velocity_editor.clearing = True
-					self.trk[col][row].velocity = cfg.default_velocity
+					self.trk[col][row].velocity = cfg.velocity
 
+					self.configure()
 					self.redraw()
-					self.parent._prop_view.redraw()
+					self.parent.prop_view.redraw()
 					self.undo_buff.add_state()
 					return True
 
@@ -885,8 +959,9 @@ class TrackView(Gtk.DrawingArea):
 						self.timeshift_editor.clearing = True
 						self.trk[col][row].delay = 0
 
+						self.configure()
 						self.redraw()
-						self.parent._prop_view.redraw()
+						self.parent.prop_view.redraw()
 						self.undo_buff.add_state()
 						return True
 
@@ -966,8 +1041,9 @@ class TrackView(Gtk.DrawingArea):
 					if offs > fldwidth * 2 and offs < fldwidth * 3:
 						self.timeshift_editor = TimeshiftEditor(self, col, row, event)
 
+				self.configure()
 				self.redraw()
-				self.parent._prop_view.redraw()
+				self.parent.prop_view.redraw()
 				self.undo_buff.add_state()
 
 		if enter_edit:
@@ -986,6 +1062,8 @@ class TrackView(Gtk.DrawingArea):
 
 			TrackView.leave_all()
 			self.parent.change_active_track(self)
+			self.keyboard_focus = None
+			self.parent.prop_view.redraw(self.trk.index)
 			olded = self.edit
 			self.edit = col, row
 			self.redraw(row)
@@ -1000,6 +1078,10 @@ class TrackView(Gtk.DrawingArea):
 		# pitchwheel/controllers
 		if self.show_pitchwheel:
 			self.pitchwheel_editor.on_button_release(widget, event)
+
+		if self.show_controllers:
+			for ctrl in self.controller_editors:
+				ctrl.on_button_release(widget, event)
 
 		if self.sel_drag and event.button == cfg.select_button:
 			if self.sel_dragged:
@@ -1066,14 +1148,16 @@ class TrackView(Gtk.DrawingArea):
 
 		if self.velocity_editor:
 			self.velocity_editor = None
+			self.configure()
 			self.redraw()
-			self.parent._prop_view.redraw()
+			self.parent.prop_view.redraw()
 			self.undo_buff.add_state()
 
 		if self.timeshift_editor:
 			self.timeshift_editor = None
+			self.configure()
 			self.redraw()
-			self.parent._prop_view.redraw()
+			self.parent.prop_view.redraw()
 			self.undo_buff.add_state()
 
 		return False
@@ -1137,7 +1221,7 @@ class TrackView(Gtk.DrawingArea):
 			trk.redraw(min(trk.edit[1], trk.trk.nrows - 1))
 
 			self.redraw(old[1])
-	
+
 	#;)
 	def go_left(self, skip_track = False, rev = True):
 		self.go_right(skip_track, rev)
@@ -1378,6 +1462,11 @@ class TrackView(Gtk.DrawingArea):
 			self.parent.redraw_track(self.trk)
 			return True
 
+		if cfg.key["toggle_controls"].matches(event):
+			self.show_controllers = not self.show_controllers
+			self.parent.redraw_track(self.trk)
+			return True
+
 		if cfg.key["track_clear"].matches(event):
 			self.undo_buff.restore()
 			self.trk.clear()
@@ -1389,6 +1478,7 @@ class TrackView(Gtk.DrawingArea):
 			self.undo_buff.restore()
 			self.optimise()
 			self.trk.kill_notes()
+			self.redraw()
 			self.parent.redraw_track(self.trk)
 			return True
 
@@ -1407,7 +1497,7 @@ class TrackView(Gtk.DrawingArea):
 			self.paste()
 			self.redraw()
 			self.undo_buff.add_state()
-			self.parent._prop_view.redraw(self.trk.index)
+			self.parent.prop_view.redraw(self.trk.index)
 			return True
 
 		if cfg.key["select_all"].matches(event):
@@ -1907,14 +1997,14 @@ class TrackView(Gtk.DrawingArea):
 		if event.keyval == 65056:			# shift-tab
 			if not self.edit:
 				return True
-				
+
 			self.go_left(True)
 			return True
 
 		if event.keyval == 65289:			# tab
 			if not self.edit:
 				return True
-				
+
 			self.go_right(True)
 			return True
 
@@ -1940,12 +2030,39 @@ class TrackView(Gtk.DrawingArea):
 		if not self.trk:
 			return
 
+		shift = False
+		ctrl = False
+		alt = False
+
+		if event.state:
+			if event.state & Gdk.ModifierType.SHIFT_MASK:
+				shift = True
+
+			if event.state & Gdk.ModifierType.CONTROL_MASK:
+				ctrl = True
+
+			if event.state & Gdk.ModifierType.MOD1_MASK:
+				alt = True
+
+
 		if self.keyboard_focus != None and self.edit == None and self.select_start == None:
 			if self.keyboard_focus.on_key_release(widget, event):
 				return True
 
 		if self.velocity_editor:
 			self.velocity_editor.on_key_release(widget, event)
+
+		if cfg.key["toggle_time"].matches(event):
+			return True
+
+		if cfg.key["toggle_pitch"].matches(event):
+			return True
+
+		if cfg.key["toggle_controls"].matches(event):
+			return True
+
+		if shift or ctrl or alt:
+			return True
 
 		self.pmp.key2note(Gdk.keyval_to_lower(event.keyval), True)
 

@@ -1,10 +1,8 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import GObject, Gdk, Gtk, Gio
-import cairo
+from gi.repository import Gdk, Gtk, Gio
 
-from vht import *
-from vht.trackview import TrackView
+from vht import cfg, mod
 from vht.controllersview import ControllersView
 
 class TrackPropViewPopover(Gtk.Popover):
@@ -12,16 +10,20 @@ class TrackPropViewPopover(Gtk.Popover):
 		super(TrackPropViewPopover, self).__init__()
 		self.set_relative_to(parent)
 
-		self.set_events(Gdk.EventMask.LEAVE_NOTIFY_MASK)
+		self.set_events(Gdk.EventMask.LEAVE_NOTIFY_MASK
+			| Gdk.EventMask.ENTER_NOTIFY_MASK)
 
 		self.connect("leave-notify-event", self.on_leave)
-		
+		self.connect("enter-notify-event", self.on_enter)
+
 		self.parent = parent
 		self.trk = trk
 		self.trkview = parent.trkview
 		self.grid = Gtk.Grid()
 		self.grid.set_column_spacing(3)
 		self.grid.set_row_spacing(3)
+
+		self.entered = False
 
 		if trk:
 			button = Gtk.Button()
@@ -92,8 +94,8 @@ class TrackPropViewPopover(Gtk.Popover):
 			grid.set_column_spacing(2)
 			grid.set_row_spacing(2)
 
-			self.show_notes_button = Gtk.ToggleButton("mini")
-			self.show_notes_button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["toggle_mini"]))
+			self.show_notes_button = Gtk.ToggleButton("notes")
+			self.show_notes_button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["toggle_notes"]))
 			self.show_timeshift_button = Gtk.ToggleButton("time")
 			self.show_timeshift_button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["toggle_time"]))
 			self.show_pitchwheel_button = Gtk.ToggleButton("pitch")
@@ -122,20 +124,20 @@ class TrackPropViewPopover(Gtk.Popover):
 
 			self.extend_controllers_grid = Gtk.Grid()
 			grid = self.extend_controllers_grid
-			
+
 			grid.set_column_homogeneous(True)
 			grid.set_row_homogeneous(True)
 			grid.set_column_spacing(2)
 			grid.set_row_spacing(2)
-			
-			self.ctrlsview = ControllersView(self.trk, self.trkview)
-			
+
+			self.ctrlsview = ControllersView(self.trk, self.trkview, self)
+
 			self.extend_triggers_grid = Gtk.Grid()
 
 			self.extend_notebook = Gtk.Notebook()
 			self.extend_notebook.set_hexpand(True)
 			self.extend_notebook.set_vexpand(True)
-			
+
 			self.extend_notebook.append_page(self.extend_track_grid, Gtk.Label("track"))
 			self.extend_notebook.append_page(self.ctrlsview, Gtk.Label("controllers"))
 			self.extend_notebook.append_page(self.extend_triggers_grid, Gtk.Label("triggers"))
@@ -205,8 +207,8 @@ class TrackPropViewPopover(Gtk.Popover):
 
 			self.grid.show_all()
 			self.add(self.grid)
-			
-			self.extend_notebook.set_current_page(1)
+
+			self.extend_notebook.set_current_page(0)
 			self.set_modal(False)
 
 	def refresh(self):
@@ -215,7 +217,8 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.show_pitchwheel_button.set_active(self.trkview.show_pitchwheel)
 		self.show_controllers_button.set_active(self.trkview.show_controllers)
 
-	def popup(self):
+	def pop(self):
+		mod.clear_popups(self)
 		self.channel_adj.set_value(self.trk.channel)
 		self.port_adj.set_value(self.trk.port)
 		self.nsrows_adj.set_upper(self.parent.seq.length)
@@ -226,23 +229,32 @@ class TrackPropViewPopover(Gtk.Popover):
 		#self.loop_button.set_active(self.trk.loop) // not yet implemented in vhtlib
 		self.show_notes_button.set_sensitive(False)
 		self.refresh()
-		self.show()
-	
-	def on_notebook_enter(self, wfg, prm):
-		print("enter!!", prm)
-	
+		self.popup()
+		self.entered = False
+
 	def on_leave(self, wdg, prm):
+		if not self.entered:
+			return True
+
 		if prm.window == self.get_window():
 			if prm.detail != Gdk.NotifyType.INFERIOR:
-				self.popdown()
+				self.unpop()
 				return True
 
-	def popdown(self):
-		self.hide()
-				
-		self.parent.popped = False
+		return True
+
+	def on_enter(self, wdg, prm):
+		if prm.window == self.get_window():
+			if prm.detail == Gdk.NotifyType.INFERIOR:
+				self.entered = True
+
+		return True
+
+	def unpop(self):
+		self.popdown()
 		self.parent.button_highlight = False
 		self.ctrlsview.capturing = False
+		self.parent.popped = False
 		self.parent.redraw()
 
 	def on_show_notes_toggled(self, wdg):
@@ -254,24 +266,30 @@ class TrackPropViewPopover(Gtk.Popover):
 
 	def on_show_timeshift_toggled(self, wdg):
 		self.trkview.show_timeshift = wdg.get_active()
-		self.trkview.redraw()
-		self.parent.redraw()
+		if self.parent.popped:
+			self.trkview.redraw_full()
+			self.parent.redraw()
 
 	def on_show_pitchwheel_toggled(self, wdg):
 		self.trkview.show_pitchwheel = wdg.get_active()
-		self.trkview.redraw()
+		if self.parent.popped:
+			self.trkview.redraw_full()
+			self.parent.redraw()
+
 		self.parent.redraw()
 
 	def on_show_controllers_toggled(self, wdg):
 		if wdg.get_active():
-			self.show_notes_button.set_sensitive(True)
+			if self.trk.nctrl > 1:
+				self.show_notes_button.set_sensitive(True)
 		else:
 			self.show_notes_button.set_active(True)
 			self.show_notes_button.set_sensitive(False)
 
 		self.trkview.show_controllers = wdg.get_active()
-		self.trkview.redraw()
-		self.parent.redraw()
+		if self.entered:
+			self.trkview.redraw_full()
+			self.parent.redraw()
 
 	def on_remove_button_clicked(self, switch):
 		self.parent.del_track()
@@ -304,7 +322,7 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.parent.seqview.recalculate_row_spacing()
 
 	def on_nrows_toggled(self, wdg):
-		if (wdg.get_active()):
+		if wdg.get_active():
 			self.nrows_button.set_sensitive(True)
 			self.nsrows_check_button.set_sensitive(True)
 		else:
@@ -313,7 +331,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.nrows_adj.set_value(self.nsrows_adj.get_value())
 
 	def on_nsrows_toggled(self, wdg):
-		if (wdg.get_active()):
+		if wdg.get_active():
 			self.nsrows_button.set_sensitive(True)
 			self.nrows_check_button.set_sensitive(True)
 		else:

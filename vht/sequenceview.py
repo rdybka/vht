@@ -33,7 +33,7 @@ class SequenceView(Gtk.Box):
 
 		self._sv.set_can_focus(True)
 		self._sv.set_overlay_scrolling(True)
-		
+
 		mod.gui_midi_capture = False
 		self.add_tick_callback(self.tick)
 
@@ -68,8 +68,8 @@ class SequenceView(Gtk.Box):
 		self.set_orientation(Gtk.Orientation.VERTICAL)
 
 		hbox = Gtk.Box()
-		self._prop_view = PropView(self)
-		hbox.pack_end(self._prop_view, True, True, 0)
+		self.prop_view = PropView(self)
+		hbox.pack_end(self.prop_view, True, True, 0)
 
 		self._side_prop = TrackPropView(None, None, self.seq, self, None)
 		hbox.pack_start(self._side_prop, False, True, 0)
@@ -94,13 +94,13 @@ class SequenceView(Gtk.Box):
 		self._sv_hadj = self._sv.get_hadjustment()
 
 		self._side_vadj = self._side.get_vadjustment()
-		self._prop_view_hadj = self._prop_view.get_hadjustment()
+		self.prop_view_hadj = self.prop_view.get_hadjustment()
 
 		self._sv_vadj.connect("value-changed", self.on_sv_vadj_changed)
 		self._side_vadj.connect("value-changed", self.on_sv_vadj_changed)
 
 		self._sv_hadj.connect("value-changed", self.on_sv_hadj_changed)
-		self._prop_view_hadj.connect("value-changed", self.on_sv_hadj_changed)
+		self.prop_view_hadj.connect("value-changed", self.on_sv_hadj_changed)
 
 		self.build()
 
@@ -119,7 +119,7 @@ class SequenceView(Gtk.Box):
 	def on_sv_hadj_changed(self, adj):
 		dest_adj = None
 		if adj is self._sv_hadj:
-			dest_adj = self._prop_view_hadj
+			dest_adj = self.prop_view_hadj
 		else:
 			dest_adj = self._sv_hadj
 
@@ -132,21 +132,21 @@ class SequenceView(Gtk.Box):
 			# play/stop
 			if mod.play:
 				mod.play = 0
-				self._prop_view.redraw()
+				self.prop_view.redraw()
 			else:
 				mod.play = 1
 
 		if cfg.key["multi_record"].matches(event):
 			if mod.record == 2:
 				mod.record = 0
-				self._prop_view.redraw()
+				self.prop_view.redraw()
 				for trk in self.get_tracks():
 					trk.undo_buff.add_state()
 					trk.optimise()
 				return
 
 			mod.record = 2
-			self._prop_view.redraw()
+			self.prop_view.redraw()
 			for trk in self.get_tracks():
 				trk.undo_buff.add_state()
 
@@ -159,13 +159,13 @@ class SequenceView(Gtk.Box):
 			# play/stop
 			if mod.record:
 				mod.record = 0
-				self._prop_view.redraw()
+				self.prop_view.redraw()
 				for trk in self.get_tracks():
 					trk.undo_buff.add_state()
 					trk.optimise()
 			else:
 				mod.record = 1
-				self._prop_view.redraw()
+				self.prop_view.redraw()
 				for trk in self.get_tracks():
 					trk.undo_buff.add_state()
 					trk.optimise()
@@ -208,25 +208,25 @@ class SequenceView(Gtk.Box):
 		if cfg.key["channel_up"].matches(event):
 			if mod.active_track:
 				mod.active_track.trk.channel = min(mod.active_track.trk.channel + 1, 16)
-				self._prop_view.redraw()
+				self.prop_view.redraw()
 			return True
 
 		if cfg.key["channel_down"].matches(event):
 			if mod.active_track:
 				mod.active_track.trk.channel = max(mod.active_track.trk.channel - 1, 1)
-				self._prop_view.redraw()
+				self.prop_view.redraw()
 			return True
 
 		if cfg.key["port_up"].matches(event):
 			if mod.active_track:
 				mod.active_track.trk.port = min(mod.active_track.trk.port + 1, mod.nports - 1)
-				self._prop_view.redraw()
+				self.prop_view.redraw()
 			return True
 
 		if cfg.key["port_down"].matches(event):
 			if mod.active_track:
 				mod.active_track.trk.port = max(mod.active_track.trk.port - 1, 0)
-				self._prop_view.redraw()
+				self.prop_view.redraw()
 			return True
 
 		if cfg.key["def_port_up"].matches(event):
@@ -260,22 +260,22 @@ class SequenceView(Gtk.Box):
 
 		if cfg.key["track_move_left"].matches(event):
 			if mod.active_track:
-				self._prop_view.move_left(mod.active_track.trk)
+				self.prop_view.move_left(mod.active_track.trk)
 			return True
 
 		if cfg.key["track_move_right"].matches(event):
 			if mod.active_track:
-				self._prop_view.move_right(mod.active_track.trk)
+				self.prop_view.move_right(mod.active_track.trk)
 			return True
 
 		if cfg.key["track_move_first"].matches(event):
 			if mod.active_track:
-				self._prop_view.move_first(mod.active_track.trk)
+				self.prop_view.move_first(mod.active_track.trk)
 			return True
 
 		if cfg.key["track_move_last"].matches(event):
 			if mod.active_track:
-				self._prop_view.move_last(mod.active_track.trk)
+				self.prop_view.move_last(mod.active_track.trk)
 			return True
 
 		if cfg.key["skip_up"].matches(event):
@@ -361,7 +361,7 @@ class SequenceView(Gtk.Box):
 			t = event.keyval - 65470
 			if t < len(self.seq):
 				self.seq[t].trigger()
-				self._prop_view.redraw()
+				self.prop_view.redraw()
 
 		"""
 		# do we enter editing mode?
@@ -414,7 +414,7 @@ class SequenceView(Gtk.Box):
 		cfg.pointer_height = .7 * cfg.seq_font_size
 		self.redraw_track(None)
 		self._side_prop.redraw()
-		self._prop_view.redraw()
+		self.prop_view.redraw()
 		self._status_bar.queue_resize()
 
 	def on_scroll(self, widget, event):
@@ -445,7 +445,7 @@ class SequenceView(Gtk.Box):
 			self._side_box.pack_start(t, False, True, 0)
 
 		if trk:
-			self._prop_view.add_track(trk, t)
+			self.prop_view.add_track(trk, t)
 			self.change_active_track(t)
 
 		t.show()
@@ -453,7 +453,7 @@ class SequenceView(Gtk.Box):
 	def expand_track(self, trk):
 		trk.add_column()
 		self.redraw_track(trk)
-		self._prop_view.redraw()
+		self.prop_view.redraw()
 
 	def shrink_track(self, trk):
 		trk.del_column()
@@ -464,7 +464,7 @@ class SequenceView(Gtk.Box):
 					wdg.edit = min(wdg.edit[0], len(trk) -1), wdg.edit[1]
 
 		self.redraw_track(trk)
-		self._prop_view.redraw()
+		self.prop_view.redraw()
 
 	def del_track(self, trk):
 		restore_track_index = None
@@ -476,7 +476,7 @@ class SequenceView(Gtk.Box):
 
 		TrackView.leave_all()
 		mod.active_track = None
-		self._prop_view.del_track(trk)
+		self.prop_view.del_track(trk)
 
 		w = None
 		for wdg in self.get_tracks():
@@ -514,11 +514,12 @@ class SequenceView(Gtk.Box):
 				ac.pmp.silence()
 
 			if trk._surface:
-				self._prop_view.redraw()
-				
+				self.prop_view.redraw()
+
 			#mod.clear_popups()
 
 	# trk == none - do all
+
 	def redraw_track(self, trk = None):
 		redr = False
 
@@ -533,18 +534,21 @@ class SequenceView(Gtk.Box):
 						rdr = True
 
 			if rdr:
-				w = wdg.width
-				wdg.redraw()
-				if trk and w != wdg.width:
-					self._prop_view.redraw(trk.index)
+				wdg.redraw_full()
+				if trk:
+					self.prop_view.redraw(trk.index)
+				#w = wdg.width
+
+				#if trk and w != wdg.width:
+				#	self.prop_view.redraw(trk.index)
 
 		if not trk:
-			self._prop_view.redraw()
+			self.prop_view.redraw()
 
 		self.queue_draw()
 
 	def build(self):
-		self._prop_view.seq = self.seq
+		self.prop_view.seq = self.seq
 		self._side_prop.seq = self.seq
 		self._side_prop.popover.seq = self.seq
 
@@ -683,7 +687,7 @@ class SequenceView(Gtk.Box):
 					r = trk.trk.get_rec_update()
 
 				if redr_props:
-					self._prop_view.redraw(trk.trk.index)
+					self.prop_view.redraw(trk.trk.index)
 					trk.show_timeshift = True
 					trk.tick()
 					#trk.undo_buff.add_state()

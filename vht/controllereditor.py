@@ -3,6 +3,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk
 import cairo
 import math
+import string
 
 from vht import cfg, mod
 from vht.controllerundobuffer import ControllerUndoBuffer
@@ -19,7 +20,7 @@ class ControllerEditor():
 		self.l_x_from = 0
 		self.x_to = 0
 		self.txt_width = 0
-		self.width = 127
+		self.width = 64
 		self.ctrlnum = ctrlnum
 		self.ctrlrows = self.trk.ctrl[self.ctrlnum]
 		self.midi_ctrlnum = self.trk.ctrls[self.ctrlnum]
@@ -49,10 +50,11 @@ class ControllerEditor():
 		self.zero_pattern_highlight = -1
 
 		self.edit = -1
+		self.last_keyboard_edit = -1
 		self.selection = None
 		self.moving_rows = False
 		self.drag = False
-		self.dragged = False    
+		self.dragged = False
 		self.drag_content = None
 		self.drag_static = None
 		self.drag_selection_offset = -1
@@ -62,7 +64,7 @@ class ControllerEditor():
 
 	def precalc(self, cr, x_from):
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
-		self.width = cfg.pitchwheel_editor_char_width * width
+		self.width = cfg.controllereditor_char_width * width
 		w1 = width
 		(x, y, width, height, dx, dy) = cr.text_extents("0000")
 		self.txt_width = width
@@ -193,6 +195,8 @@ class ControllerEditor():
 		cr.set_operator(cairo.Operator.CLEAR)
 		self.env_cr.paint()
 		cr.set_operator(cairo.Operator.OVER)
+
+		self.env = self.env = self.trk.get_envelope(self.ctrlnum)
 
 		if self.env:
 			if len(self.env):
@@ -349,7 +353,11 @@ class ControllerEditor():
 
 		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.record_colour), .7)
 		for v in ctrl:
-			xx = (v / 127) - 64
+			if self.ctrlnum == 0:
+				xx = (v / 127) - 64
+			else:
+				xx = v - 64
+
 			xx = xx * ((xw / 2) / 64)
 
 			if v == -1:
@@ -358,7 +366,12 @@ class ControllerEditor():
 			if x0 + xx > self.x_to:
 				xx = self.x_to - x0
 
-			cr.rectangle(x0, y0, xx, yp)
+			if self.ctrlnum == 0:
+				cr.rectangle(x0, y0, xx, yp)
+			else:
+				if v != -1:
+					cr.rectangle(self.x_from + self.txt_width, y0, (xw / 2) + xx, yp)
+
 			cr.fill()
 
 			y0 = y0 + yp
@@ -369,7 +382,11 @@ class ControllerEditor():
 
 		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), .4)
 		for v in ctrl:
-			xx = (v / 127) - 64
+			if self.ctrlnum == 0:
+				xx = (v / 127) - 64
+			else:
+				xx = v - 64
+
 			xx = xx * ((xw / 2) / 64)
 
 			if v == -1:
@@ -378,7 +395,12 @@ class ControllerEditor():
 			if x0 + xx > self.x_to:
 				xx = self.x_to - x0
 
-			cr.rectangle(x0, y0, xx, yp)
+			if self.ctrlnum == 0:
+				cr.rectangle(x0, y0, xx, yp)
+			else:
+				if v != -1:
+					cr.rectangle(self.x_from + self.txt_width, y0, (xw / 2) + xx, yp)
+
 			y0 = y0 + yp
 
 		cr.fill()
@@ -422,8 +444,9 @@ class ControllerEditor():
 
 		handled = False
 
-		if self.tv.pmp.key2ctrl(Gdk.keyval_to_lower(event.keyval), self.midi_ctrlnum):
-			handled = True
+		if not shift and not ctrl and not alt:
+			if self.tv.pmp.key2ctrl(Gdk.keyval_to_lower(event.keyval), self.midi_ctrlnum):
+				handled = True
 
 		if cfg.key["node_snap"].matches(event):
 			self.snap = True
@@ -460,6 +483,9 @@ class ControllerEditor():
 
 			if cfg.key["delete"].matches(event):
 				self.trk.ctrl[self.ctrlnum][self.edit].clear()
+				self.edit = self.edit + cfg.skip
+				if self.edit >= self.trk.nrows:
+					self.edit = 0
 				handled = True
 
 			if not shift and not ctrl and not alt:
@@ -488,8 +514,27 @@ class ControllerEditor():
 						self.edit -= self.trk.nrows
 					if self.edit < 0:
 						self.edit += self.trk.nrows
-						
+
 					handled = True
+
+			if key in string.digits:
+				val = self.trk.ctrl[self.ctrlnum][self.edit].velocity
+				self.undo_buff.add_state()
+
+				if self.edit != self.last_keyboard_edit:
+					val = 0
+					self.last_keyboard_edit = self.edit
+
+				if val <= 0:
+					val = int(key)
+				else:
+					s = "%d%d" % (val, int(key))
+					val = int(s[-3:])
+					if val > 127:
+						val = int(s[-1:])
+
+				self.trk.ctrl[self.ctrlnum][self.edit].velocity = val
+				handled = True
 
 		if cfg.key["undo"].matches(event):
 			self.undo_buff.restore()
@@ -658,6 +703,8 @@ class ControllerEditor():
 
 			if self.edit != olded:
 				oldsel = self.selection
+				self.last_keyboard_edit = -1
+
 				if not shift:
 					if self.selection: 						# remove selection?
 						self.selection = None
@@ -721,7 +768,17 @@ class ControllerEditor():
 		if event.x < self.x_from or event.x > self.x_to:
 			return
 
-		mod.clear_popups()
+		if event.button == cfg.select_button:
+			if not self.tv.keyboard_focus:
+					self.tv.keyboard_focus = self
+					self.tv.parent.prop_view.redraw()
+			else:
+				if self.tv.keyboard_focus != self or mod.active_track != self.tv:
+					self.tv.keyboard_focus = self
+					self.tv.leave_all()
+					self.tv.parent.change_active_track(self.tv)
+					self.tv.parent.prop_view.redraw()
+
 
 		self.ignore_x = False
 
@@ -758,6 +815,7 @@ class ControllerEditor():
 								rd.clear()
 
 							self.drag_static.append(rd)
+
 						return
 
 				if self.edit != r:
@@ -765,6 +823,7 @@ class ControllerEditor():
 					self.tv.set_opacity(1)
 					self.edit = r
 					self.selection = None
+					self.last_keyboard_edit = -1
 					self.tv.edit = None
 
 				self.active_row = r
@@ -792,7 +851,6 @@ class ControllerEditor():
 			if right:
 				if self.trk.ctrl[self.ctrlnum][int(r)].velocity == -1:
 					self.tv.leave_all()
-					self.tv.set_opacity(1)
 					self.selection = None
 					self.edit = -1
 					self.tv.redraw(controller = self.ctrlnum)
@@ -844,6 +902,7 @@ class ControllerEditor():
 
 					return True
 				else:
+					self.tv.leave_all()
 					self.moving = True
 
 				return True
@@ -924,7 +983,7 @@ class ControllerEditor():
 			self.drag = False
 			if not self.dragged:
 				self.selection = None
-			
+
 			self.redraw_env()
 			self.tv.redraw(controller = self.ctrlnum)
 
@@ -944,7 +1003,7 @@ class ControllerEditor():
 			if not self.tv.edit:
 				self.tv.keyboard_focus = self
 		else:
-			if self.tv.keyboard_focus.edit == -1:
+			if self.tv.keyboard_focus.edit == -1 or self.tv.keyboard_focus.selection:
 				self.tv.keyboard_focus = self
 
 		if event.y < 0:
@@ -984,13 +1043,21 @@ class ControllerEditor():
 
 		for rr in range(l):
 			if self.deleting:
-				self.trk.set_ctrl(self.ctrlnum, rr + sr, 64 * 128)
+				if self.ctrlnum == 0:
+					self.trk.set_ctrl(self.ctrlnum, rr + sr, 64 * 128)
+				else:
+					self.trk.set_ctrl(self.ctrlnum, rr + sr, -1)
 
 			if self.drawing:
 				x0 = self.x_from + self.txt_width + (xw / 2)
 
 				v = max(min(round(((x - (self.x_from + self.txt_width)) / xw) * 127), 127), 0)
-				self.trk.set_ctrl(self.ctrlnum, rr + sr, round(v * 129))
+				if self.ctrlnum == 0:
+					self.trk.set_ctrl(self.ctrlnum, rr + sr, round(v * 129))
+				else:
+					self.trk.set_ctrl(self.ctrlnum, rr + sr, round(v))
+
+
 				x = x + delta
 
 		self.last_r = r
@@ -1077,18 +1144,18 @@ class ControllerEditor():
 
 			if s != 0:
 				self.dragged = True
-				
+
 			if l == self.trk.nrows - 1:
 				self.selection = 0, self.trk.nrows - 1
-					
+
 				for r in range(len(self.trk.ctrl[self.ctrlnum])):
 					rr = r - s
-						
+
 					if rr > self.trk.nrows -1:
 						rr -= self.trk.nrows
 					if rr < 0:
 						rr += self.trk.nrows
-						
+
 					self.trk.ctrl[self.ctrlnum][r].copy(self.drag_content[rr])
 			elif r != (self.selection[0] + self.drag_selection_offset):
 				self.selection = s, s + l

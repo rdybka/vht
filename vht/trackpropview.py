@@ -28,6 +28,8 @@ class TrackPropView(Gtk.DrawingArea):
 		self.connect("draw", self.on_draw)
 		self.connect("configure-event", self.on_configure)
 
+		self.add_tick_callback(self.tick)
+
 		self.seq = seq
 		self.trk = trk
 		self.trkview = trkview
@@ -48,19 +50,28 @@ class TrackPropView(Gtk.DrawingArea):
 		self.popover.set_position(Gtk.PositionType.BOTTOM)
 		self.popped = False
 
-	def on_configure(self, wdg, event):
+
+	def configure(self):
 		if self._surface:
 			self._surface.finish()
 
-		self._surface = wdg.get_window().create_similar_surface(cairo.CONTENT_COLOR,
-			wdg.get_allocated_width(),
-			wdg.get_allocated_height())
+		if self.trkview:
+			self._surface = self.get_window().create_similar_surface(cairo.CONTENT_COLOR,
+				self.trkview.width,
+				self.get_allocated_height())
+
+			self.set_size_request(self.trkview.width, self.txt_height * 2 * cfg.seq_spacing)
+		else:
+			self._surface = self.get_window().create_similar_surface(cairo.CONTENT_COLOR,
+				self.get_allocated_width(),
+				self.get_allocated_height())
 
 		self._context = cairo.Context(self._surface)
 		self._context.set_antialias(cairo.ANTIALIAS_NONE)
 		self._context.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
 		self._context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
 
+	def on_configure(self, wdg, event):
 		self.redraw()
 		return True
 
@@ -95,8 +106,7 @@ class TrackPropView(Gtk.DrawingArea):
 				if data.y >= self.button_rect.y:
 					if data.y <= self.button_rect.y + self.button_rect.height:
 						if not self.popped:
-							mod.clear_popups()
-							self.popover.popup()
+							self.popover.pop()
 							self.popped = True
 							self.button_highlight = True
 							self.redraw()
@@ -114,12 +124,12 @@ class TrackPropView(Gtk.DrawingArea):
 				if data.y >= self.button_rect.y:
 					if data.y <= self.button_rect.y + self.button_rect.height:
 						if self.popped:
-							self.popover.popdown()
+							self.popover.unpop()
 							self.popped = False
 							return
 						else:
 							mod.clear_popups()
-							self.popover.popup()
+							self.popover.pop()
 							self.popped = True
 							return
 
@@ -128,10 +138,14 @@ class TrackPropView(Gtk.DrawingArea):
 			self.redraw()
 
 	def redraw(self):
+		self.configure()
 		cr = self._context
 
 		w = self.get_allocated_width()
 		h = self.get_allocated_height()
+
+		if self.trk:
+			w = self.trkview.width
 
 		self._context.set_font_size(cfg.seq_font_size)
 		cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
@@ -188,7 +202,7 @@ class TrackPropView(Gtk.DrawingArea):
 
 		self.txt_height = height
 		self.txt_width = int(dx)
-		self.width = max(self.txt_width * len(self.trk), self.trkview.width)
+		self.width = self.trkview.width
 
 		gradient = cairo.LinearGradient(0, 0, 0, h)
 
@@ -205,8 +219,6 @@ class TrackPropView(Gtk.DrawingArea):
 		gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_background for col in colour))
 
 		cr.set_source(gradient)
-
-		self.set_size_request(self.width, self.txt_height * 2 * cfg.seq_spacing)
 
 		(x, y, width, height, dx, dy) = cr.text_extents("0")
 
@@ -315,4 +327,8 @@ class TrackPropView(Gtk.DrawingArea):
 	def on_draw(self, widget, cr):
 		cr.set_source_surface(self._surface, 0, 0)
 		cr.paint()
+		return False
+
+	def tick(self, wdg, param):
+		self.redraw()
 		return False

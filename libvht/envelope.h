@@ -36,7 +36,7 @@ typedef struct envelope_t {
 	int nrows;
 	int res;
 	pthread_mutex_t excl;
-	int *bzspace;
+	float *bzspace;
 } envelope;
 
 envelope *envelope_new(int nrows, int ctrlpr);
@@ -48,6 +48,6 @@ void envelope_resize(envelope *env, int nrows, int res);
 void envelope_refresh(envelope *env);
 void envelope_regenerate(envelope *env, ctrlrow *rows);
 
-int env_get_v(envelope *env, int res, float y);
+float env_get_v(envelope *env, int res, float y);
 
 #endif //__ENVELOPE_H__

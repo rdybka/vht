@@ -316,8 +316,10 @@ void queue_midi_ctrl(sequence *seq, track *trk, int val, int ctrl) {
 	evt.velocity = val;
 	evt.time = 0;
 
-	if (ctrl > -1)
-		evt.type = ctrl;
+	if (ctrl > -1) {
+		evt.type = control_change;
+		evt.note = ctrl;
+	}
 
 	if (module.recording && module.playing) {
 		jack_nframes_t jft = jack_frame_time(jack_client);
@@ -333,7 +335,7 @@ void queue_midi_ctrl(sequence *seq, track *trk, int val, int ctrl) {
 	if (ctrl == -1) {
 		trk->lctrlval[0] = val * 127;
 	} else {
-		printf("ctrl:%d - not implemented!!!\n", ctrl);
+		trk->lctrlval[0] = val;
 	}
 
 	midi_buff_excl_in();

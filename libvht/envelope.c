@@ -60,7 +60,7 @@ void envelope_resize(envelope *env, int nrows, int res) {
 	pthread_mutex_unlock(&env->excl);
 }
 
-int env_get_v(envelope *env, int res, float y) {
+float env_get_v(envelope *env, int res, float y) {
 	if (!env->nnodes)
 		return -1;
 
@@ -239,6 +239,8 @@ void envelope_refresh(envelope *env) {
 		} else {
 			if (lnode > n) {
 				envelope_draw_cluster(env, n, lnode);
+				int yy = y2bz(env, env->nodes[lnode].y);
+				env->bzspace[yy] = env->nodes[lnode].x;
 				lnode = -1;
 			}
 		}

@@ -19,21 +19,21 @@ class ControllersViewRow(Gtk.ActionBar):
 		button.add(image)
 		button.connect("clicked", self.on_go_up_clicked)
 		self.pack_start(button)
-		
+
 		button = Gtk.Button()
 		icon = Gio.ThemedIcon(name="go-down")
 		image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
 		button.add(image)
 		button.connect("clicked", self.on_go_down_clicked)
 		self.pack_start(button)
-		
+
 		self.ctrl_adj = Gtk.Adjustment(1, 1, 127, 1.0, 1.0)
 		self.ctrl_button = Gtk.SpinButton()
 		self.ctrl_button.set_adjustment(self.ctrl_adj)
 		self.ctrl_adj.set_value(self.ctrlnum)
 		self.ctrl_adj.connect("value-changed", self.on_num_changed)
 		self.pack_start(self.ctrl_button)
-		
+
 		button = Gtk.Button()
 		icon = Gio.ThemedIcon(name="edit-delete")
 

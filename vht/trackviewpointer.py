@@ -150,7 +150,7 @@ class trackviewpointer():
 					cr.rectangle(x, y, (self._parent.txt_width / 12.0) * 3.2, self.height)
 					cr.fill()
 
-		if self._parent.show_pitchwheel:
+		if self._parent.show_pitchwheel or self._parent.show_controllers:
 			for c, cc in enumerate(self.trk.ctrls):
 				v = self.trk.get_lctrlval(c)
 
@@ -160,6 +160,9 @@ class trackviewpointer():
 				if cc == -1:
 					x = self._parent.pitchwheel_editor.x_from
 					xx = self._parent.pitchwheel_editor.x_to - x
+				else:
+					x = self._parent.controller_editors[c - 1].x_from
+					xx = self._parent.controller_editors[c - 1].x_to - x
 
 				cl = cfg.colour
 				if mod.active_track:
@@ -167,9 +170,6 @@ class trackviewpointer():
 						cl = cfg.record_colour
 
 				i = .5
-
-				if v != 8192 and v != -1:
-					i = 1
 
 				gradient = cairo.LinearGradient(x, y, x, y + self.height)
 				gradient.add_color_stop_rgba(0.0, *(col * i for col in cl), 0)
@@ -181,6 +181,8 @@ class trackviewpointer():
 				cr.set_source(gradient)
 				cr.rectangle(x, y, xx, self.height)
 				cr.fill()
+
+				xw = 0
 
 				if cc == -1:
 					xw = self._parent.pitchwheel_editor.x_to \
@@ -196,10 +198,23 @@ class trackviewpointer():
 
 					if x0 + xx > self._parent.pitchwheel_editor.x_to:
 						xx = self._parent.pitchwheel_editor.x_to - x0
+				else:
+					xw = self._parent.controller_editors[c - 1].x_to \
+					- (self._parent.controller_editors[c - 1].x_from \
+					+ self._parent.controller_editors[c - 1].txt_width)
 
-					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
-					cr.rectangle(x0, y + (self.height / 2) - 1, xx, 2)
-					cr.fill()
+					xx = v
+					xx = xx * ((xw / 2) / 64)
+					x0 = self._parent.controller_editors[c - 1].x_from + self._parent.controller_editors[c - 1].txt_width
+					if v == -1:
+						xx = 0
+
+					if x0 + xx > self._parent.controller_editors[c - 1].x_to:
+						xx = self._parent.controller_editors[c - 1].x_to - x0
+
+				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
+				cr.rectangle(x0, y + (self.height / 2) - 1, xx, 2)
+				cr.fill()
 
 		if int(pos) == 0:
 			self._parent.reblit(self.trk.nrows -1)
