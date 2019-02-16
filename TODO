@@ -10,7 +10,7 @@
 - trackview redraw(controller) situation
 - right click
 	- stop recording
-	- reset velocity to set vel
+	* reset velocity to set vel
 - indicate recording in statusbar
 - track names
 - entering velocityeditor from note-offs

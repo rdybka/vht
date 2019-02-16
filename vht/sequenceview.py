@@ -335,8 +335,10 @@ class SequenceView(Gtk.Box):
 		ed = False
 		if mod.active_track:
 			if mod.active_track.edit:
-				if mod.active_track.trk[mod.active_track.edit[0]][mod.active_track.edit[1]].type == 1:
-					ed = True
+				if mod.active_track.edit[0] < len(mod.active_track.trk):
+					if	mod.active_track.trk[min(mod.active_track.edit[0], len(mod.active_track.trk))]\
+														[mod.active_track.edit[1]].type == 1:
+						ed = True
 			if mod.active_track.select_end:
 				ed = True
 
@@ -446,7 +448,7 @@ class SequenceView(Gtk.Box):
 
 		if trk:
 			self.prop_view.add_track(trk, t)
-			self.change_active_track(t)
+			#self.change_active_track(t)
 
 		t.show()
 

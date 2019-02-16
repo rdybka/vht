@@ -63,7 +63,6 @@ class TrackView(Gtk.DrawingArea):
 		self.connect("button-release-event", self.on_button_release)
 		self.connect("key-press-event", self.on_key_press)
 		self.connect("key-release-event", self.on_key_release)
-		self.connect("enter-notify-event", self.on_enter)
 		self.connect("leave-notify-event", self.on_leave)
 
 		self.seq = seq
@@ -95,13 +94,11 @@ class TrackView(Gtk.DrawingArea):
 
 		self.show_notes = True
 		self.show_timeshift = False
-		self.show_pitchwheel = True
-		self.show_controllers = True
+		self.show_pitchwheel = False
+		self.show_controllers = False
 
 		if trk:
 			self.undo_buff = TrackUndoBuffer(trk)
-			self.trk.ctrl.add(12)
-			self.trk.ctrl.add(13)
 
 		self._surface = None
 		self._context = None
@@ -1168,8 +1165,16 @@ class TrackView(Gtk.DrawingArea):
 			self.hover = None
 			self.redraw(oh[1])
 
-	def on_enter(self, wdg, prm):
-		pass
+	@staticmethod
+	def recalc_edit(trk):
+		if trk.show_pitchwheel:
+			if trk.pitchwheel_editor.edit > -1:
+				trk.edit = len(trk.trk), trk.pitchwheel_editor.edit
+
+		if trk.show_controllers:
+			for c, wdg in enumerate(trk.controller_editors):
+				if wdg.edit > -1:
+					trk.edit = c + (1 if trk.show_pitchwheel else 0) + len(trk.trk), wdg.edit
 
 	def go_right(self, skip_track = False, rev = False):
 		old = self.edit[1]
@@ -1180,7 +1185,9 @@ class TrackView(Gtk.DrawingArea):
 		if not skip_track:
 			self.edit = self.edit[0] + inc, self.edit[1]
 
-			if self.edit[0] >= len(self.trk):
+			if self.edit[0] >= (len(self.trk) +
+					(1 if self.show_pitchwheel else 0) +
+					(self.trk.nctrl - 1 if self.show_controllers else 0)):
 				self.go_right(True)
 				mod.active_track.edit = 0, min(mod.active_track.edit[1], mod.active_track.trk.nrows - 1)
 				mod.active_track.redraw()
@@ -1188,14 +1195,53 @@ class TrackView(Gtk.DrawingArea):
 
 			if self.edit[0] < 0:
 				self.go_left(True)
-				mod.active_track.edit = len(mod.active_track.trk) - 1, min(mod.active_track.edit[1], mod.active_track.trk.nrows - 1)
+				mod.active_track.edit = (len(mod.active_track.trk) - 1 +
+					(1 if mod.active_track.show_pitchwheel else 0) +
+					(mod.active_track.trk.nctrl - 1 if mod.active_track.show_controllers else 0)), min(mod.active_track.edit[1], mod.active_track.trk.nrows - 1)
+
+				e = mod.active_track.edit
+				TrackView.leave_all()
+				mod.active_track.edit = e
+				self.recalc_edit(mod.active_track)
 				mod.active_track.redraw()
-				return
+				mod.active_track.parent.prop_view.redraw()
+
+			if mod.active_track.show_pitchwheel:
+				if mod.active_track.edit[0] == len(mod.active_track.trk):
+					ed = mod.active_track.edit
+					TrackView.leave_all()
+					mod.active_track.edit = ed
+					mod.active_track.pitchwheel_editor.edit = mod.active_track.edit[1]
+					mod.active_track.keyboard_focus = mod.active_track.pitchwheel_editor
+					self.recalc_edit(mod.active_track)
+					mod.active_track.parent.prop_view.redraw()
+
+			if mod.active_track.show_controllers:
+				c = mod.active_track.edit[0] - (len(mod.active_track.trk) +
+						(1 if self.show_pitchwheel else 0))
+				if c > -1 and mod.active_track.edit:
+					e = mod.active_track.edit
+					TrackView.leave_all()
+					mod.active_track.edit = e
+					mod.active_track.controller_editors[c].edit = mod.active_track.edit[1]
+					mod.active_track.keyboard_focus = mod.active_track.controller_editors[c]
+					mod.active_track.redraw()
+					self.recalc_edit(mod.active_track)
+					self.parent.prop_view.redraw()
+
+			# did we leave controllers?
+			if self.edit and old >= len(self.trk) and self.edit[0] < len(self.trk):
+				e = self.edit
+				TrackView.leave_all()
+				self.edit = e
+				self.keyboard_focus = None
+				self.parent.prop_view.redraw(self.trk.index)
 
 			self.redraw(old)
-			self.redraw(self.edit[1])
+			if self.edit:
+				self.redraw(self.edit[1])
 			return
-		else:
+		else:		# skipping track
 			curr = None
 			for i, trk, in enumerate(self.seq):
 				if trk.index == self.trk.index:
@@ -1210,12 +1256,18 @@ class TrackView(Gtk.DrawingArea):
 
 			trk = self.parent.get_tracks()[curr]
 
-			if trk == self:
-				return
+			if trk != self:
+				self.pmp.silence()
 
 			old = self.edit
 			self.edit = None
+			TrackView.leave_all()
+
+			self.keyboard_focus = None
 			self.parent.change_active_track(trk)
+
+			self.parent.seq.set_midi_focus(trk.trk.index)
+			self.parent.prop_view.redraw()
 
 			trk.edit = 0, int(round((old[1] * self.spacing) / trk.spacing))
 			trk.redraw(min(trk.edit[1], trk.trk.nrows - 1))
@@ -1445,7 +1497,7 @@ class TrackView(Gtk.DrawingArea):
 			self.leave_all()
 			return True
 
-		if self.keyboard_focus != None and self.edit == None and self.select_start == None:
+		if self.keyboard_focus != None and self.select_start == None:
 			if self.keyboard_focus.on_key_press(widget, event):
 				return True
 
@@ -1568,7 +1620,7 @@ class TrackView(Gtk.DrawingArea):
 		old = self.edit
 
 		sel = self.selection()
-		if self.edit:
+		if self.edit and self.edit[0] < len(self.trk):
 			sel = []
 			sel.append(self.trk[self.edit[0]][self.edit[1]])
 

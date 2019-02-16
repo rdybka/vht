@@ -22,10 +22,10 @@ class VHTTrack(Iterable):
 
 	def __getitem__(self, itm):
 		if itm >= self.__len__():
-			raise IndexError()
+			raise IndexError(itm, "always look on...")
 
 		if itm < 0:
-			raise IndexError()
+			raise IndexError(itm, "...the bright side of life")
 
 		return VHTColumn(self._vht_handle, self._trk_handle, itm)
 

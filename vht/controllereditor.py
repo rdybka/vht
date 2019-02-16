@@ -536,7 +536,7 @@ class ControllerEditor():
 				self.trk.ctrl[self.ctrlnum][self.edit].velocity = val
 				handled = True
 
-		if cfg.key["undo"].matches(event):
+		if cfg.key["undo"].matches(event) and not self.moving and not self.drag:
 			self.undo_buff.restore()
 			handled = True
 
@@ -739,6 +739,7 @@ class ControllerEditor():
 							self.selection = self.edit, olded
 							oldsel = self.selection
 
+				self.tv.recalc_edit(self.tv)
 				if self.selection:
 					updsel = min(oldsel[0], self.selection[0]), max(oldsel[1], self.selection[1])
 					self.tv.redraw(updsel[0], updsel[1], controller = self.ctrlnum)
@@ -815,7 +816,6 @@ class ControllerEditor():
 								rd.clear()
 
 							self.drag_static.append(rd)
-
 						return
 
 				if self.edit != r:
@@ -824,7 +824,7 @@ class ControllerEditor():
 					self.edit = r
 					self.selection = None
 					self.last_keyboard_edit = -1
-					self.tv.edit = None
+					self.tv.recalc_edit(self.tv)
 
 				self.active_row = r
 				self.last_selected = r
@@ -1068,7 +1068,7 @@ class ControllerEditor():
 
 		lrow = None
 
-		if self.moving:
+		if self.moving and self.active_row > -1:
 			xw = self.x_to - (self.x_from + self.txt_width)
 			x0 = self.x_from + self.txt_width + (xw / 2)
 
