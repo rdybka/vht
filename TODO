@@ -3,8 +3,7 @@
 	* refactor pitchwheeleditor into controllereditor
 	* cursor movement
 	* ctrl+x,c,v,b - cut, copy, paste, render doodles
-	- gui in track props
-		- showing in trackview/trackpropview
+	* gui in track props
 	* envelopes
 		* snapping
 - trackview redraw(controller) situation

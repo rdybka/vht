@@ -229,6 +229,7 @@ class TrackPropViewPopover(Gtk.Popover):
 		#self.loop_button.set_active(self.trk.loop) // not yet implemented in vhtlib
 		self.show_notes_button.set_sensitive(False)
 		self.refresh()
+		self.ctrlsview.rebuild()
 		self.popup()
 		self.entered = False
 

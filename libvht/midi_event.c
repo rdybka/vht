@@ -332,11 +332,18 @@ void queue_midi_ctrl(sequence *seq, track *trk, int val, int ctrl) {
 			sequence_handle_record(seq, evt);
 	}
 
+	// update lctrlvals in track
+	pthread_mutex_lock(&trk->exclctrl);
 	if (ctrl == -1) {
 		trk->lctrlval[0] = val * 127;
 	} else {
-		trk->lctrlval[0] = val;
+		for (int c = 0; c < trk->nctrl; c++) {
+			if (trk->ctrlnum[c] == ctrl)
+				trk->lctrlval[c] = val;
+		}
 	}
+
+	pthread_mutex_unlock(&trk->exclctrl);
 
 	midi_buff_excl_in();
 	midi_queue_buffer[trk->port][curr_midi_queue_event[trk->port]++] = evt;

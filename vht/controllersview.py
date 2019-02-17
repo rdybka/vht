@@ -76,7 +76,7 @@ class ControllersView(Gtk.Box):
 
 		return True
 
-	def rebuild(self):
+	def rebuild(self, just_gui = False):
 		for wdg in self.box.get_children():
 			self.box.remove(wdg)
 
@@ -85,7 +85,9 @@ class ControllersView(Gtk.Box):
 				rw = ControllersViewRow(self, self.trk, c, i)
 				self.box.pack_start(rw, False, False, 0)
 
-		self.trkview.redraw_full()
+		if not just_gui:
+			self.trkview.redraw_full()
+
 		if self.get_realized():
 			self.parent.parent.redraw()
 

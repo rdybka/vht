@@ -155,7 +155,7 @@ void track_set_ctrl(track *trk, int c, int n, int val) {
 
 	pthread_mutex_unlock(&trk->exclctrl);
 
-	track_insert_rec_update(trk, c, n / trk->ctrlpr);
+	track_insert_rec_update(trk, c + trk->ncols, n / trk->ctrlpr);
 }
 
 char *track_get_ctrl_nums(track *trk) {

@@ -60,6 +60,10 @@ class ControllerEditor():
 		self.drag_selection_offset = -1
 		self.drag_start = -1
 
+		self.doodle_hint_row = -1
+		self.doodle_hint_address = -1
+		self.doodle_hint = 0
+
 		self.undo_buff = ControllerUndoBuffer(self.trk, self.ctrlnum)
 
 	def precalc(self, cr, x_from):
@@ -250,7 +254,6 @@ class ControllerEditor():
 		row = self.ctrlrows[r]
 
 		select = False
-		empty = False
 		hover = False
 
 		if self.tv.hover and r == self.tv.hover[1]:
@@ -268,7 +271,7 @@ class ControllerEditor():
 					cr.set_source_rgb(*(cfg.record_colour))
 					select = True
 
-		if row.velocity == -1 or empty:		# empty row
+		if row.velocity == -1:		# empty row
 			if select:
 				cr.set_source(self.zero_pattern)
 				cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
@@ -282,12 +285,16 @@ class ControllerEditor():
 					cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
 
 				cr.fill()
-			else:
+			elif r != self.doodle_hint_row:
 				cr.set_source(self.empty_pattern)
 				cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
 				cr.fill()
+			else:
+				cr.set_source(self.zero_pattern)
+				cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
+				cr.fill()
 
-			if select or self.edit == r or hover:
+			if select or self.edit == r or hover or r == self.doodle_hint_row:
 				if self.zero_pattern_highlight > 1 and (r) % self.zero_pattern_highlight == 0:
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
 				else:
@@ -300,7 +307,12 @@ class ControllerEditor():
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight * 1.2 for col in cfg.colour))
 				else:
 					cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
-				cr.show_text("---")
+
+				if r == self.doodle_hint_row:
+					cr.set_source_rgb(*(col * cfg.intensity_txt * .5 for col in cfg.colour))
+					cr.show_text("%03d" % (self.doodle_hint))
+				else:
+					cr.show_text("---")
 		else:
 			cr.set_source(self.zero_pattern)
 			cr.rectangle(self.x_from, r * self.tv.txt_height, self.x_to - self.x_from, yh)
@@ -351,7 +363,9 @@ class ControllerEditor():
 		yp = yh / len(ctrl)
 		y0 = r * yh
 
+		# doodles
 		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.record_colour), .7)
+		rr = 0
 		for v in ctrl:
 			if self.ctrlnum == 0:
 				xx = (v / 127) - 64
@@ -375,6 +389,26 @@ class ControllerEditor():
 			cr.fill()
 
 			y0 = y0 + yp
+			rr += 1
+
+		# doodle hint
+		if r == self.doodle_hint_row:
+			cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.star_colour), .7)
+			xx = self.doodle_hint - 64
+
+			xx = xx * ((xw / 2) / 64)
+
+			y0 = r * yh + yp * self.doodle_hint_offs
+
+			if x0 + xx > self.x_to:
+				xx = self.x_to - x0
+
+			if self.ctrlnum == 0:
+				cr.rectangle(x0, y0, xx, yp)
+			else:
+				cr.rectangle(self.x_from + self.txt_width, y0, (xw / 2) + xx, yp)
+
+			cr.fill()
 
 		ctrl = self.trk.get_ctrl_env(self.ctrlnum, r)
 		yp = yh / len(ctrl)
@@ -670,10 +704,10 @@ class ControllerEditor():
 					self.edit = self.trk.nrows - 1
 
 			if event.keyval == 65363:						# right
-				pass
+				return shift
 
 			if event.keyval == 65361:						# left
-				pass
+				return shift
 
 			if event.keyval == 65360:						# home
 				self.edit = 0
@@ -779,7 +813,6 @@ class ControllerEditor():
 					self.tv.leave_all()
 					self.tv.parent.change_active_track(self.tv)
 					self.tv.parent.prop_view.redraw()
-
 
 		self.ignore_x = False
 
@@ -924,8 +957,10 @@ class ControllerEditor():
 			xw = self.x_to - (self.x_from + self.txt_width)
 			x0 = self.x_from + (xw / 2)
 			v = max(min(((event.x - (self.x_from + self.txt_width)) / xw) * 127, 127), 0)
-
 			r = event.y / self.tv.txt_height
+
+			if self.doodle_hint_row == int(r):
+				v = self.doodle_hint
 
 			if self.trk.ctrl[self.ctrlnum][int(r)].velocity != -1:
 				return
@@ -1057,7 +1092,6 @@ class ControllerEditor():
 				else:
 					self.trk.set_ctrl(self.ctrlnum, rr + sr, round(v))
 
-
 				x = x + delta
 
 		self.last_r = r
@@ -1126,14 +1160,15 @@ class ControllerEditor():
 				return True
 
 		if self.selecting:
-			r = min(int(event.y / self.tv.txt_height), self.trk.nrows - 1)
-			if r > self.last_selected:
-				self.selection = (self.last_selected, r)
+			if not event.state & Gdk.ModifierType.SHIFT_MASK:
+				r = min(int(event.y / self.tv.txt_height), self.trk.nrows - 1)
+				if r > self.last_selected:
+					self.selection = (self.last_selected, r)
 
-			if r <= self.last_selected:
-				self.selection = (r, self.last_selected)
+				if r <= self.last_selected:
+					self.selection = (r, self.last_selected)
 
-			self.tv.redraw(controller = self.ctrlnum)
+				self.tv.redraw(controller = self.ctrlnum)
 			return True
 
 		if self.drag:
@@ -1210,6 +1245,29 @@ class ControllerEditor():
 					r = int(self.env[self.active_node]["y"])
 					self.tv.redraw(r - 1, r + 1)
 
+		# handle doodle-hint
+		r = int(min(event.y / (self.tv.txt_height * self.trk.nrows),1) * (self.trk.nrows * self.trk.ctrlpr))
+		rr = r % self.trk.ctrlpr
+		r = r // self.trk.ctrlpr
+
+		v = self.trk.get_ctrl_rec(self.ctrlnum, r)[rr]
+		if v != -1:
+			if self.doodle_hint_row != r:
+				if self.doodle_hint_row > -1:
+					dh = self.doodle_hint_row
+					self_doodle_hint_row = -1
+					self.tv.redraw(dh, controller = self.ctrlnum)
+
+			self.doodle_hint_row = r
+			self.doodle_hint_offs = rr
+			self.doodle_hint = v / 129 if self.ctrlnum == 0 else v
+			self.tv.redraw(r, controller = self.ctrlnum)
+		else:
+			if self.doodle_hint_row != -1 and self.doodle_hint_row != r:
+				dh = self.doodle_hint_row
+				self.doodle_hint_row = -1
+				self.tv.redraw(dh, controller = self.ctrlnum)
+
 		return True
 
 	def on_scroll(self, event):
@@ -1270,7 +1328,7 @@ class ControllerEditor():
 			return
 
 		s = max(-1, self.edit)
-		e = s + len(d)
+		e = s + len(d) - 1
 		if self.selection:
 			s = self.selection[0]
 			e = self.selection[1]
@@ -1294,7 +1352,7 @@ class ControllerEditor():
 				p += 1
 
 		if not self.selection:
-			self.edit = min(e, self.trk.nrows - 1)
+			self.edit = min(e + 1, self.trk.nrows - 1)
 
 	def render_doodles(self):
 		s = max(-1, self.edit)

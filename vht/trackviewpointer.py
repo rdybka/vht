@@ -151,13 +151,13 @@ class trackviewpointer():
 					cr.fill()
 
 		if self._parent.show_pitchwheel or self._parent.show_controllers:
-			for c, cc in enumerate(self.trk.ctrls):
+			for c, cc in enumerate([self._parent.pitchwheel_editor, *(self._parent.controller_editors)]):
 				v = self.trk.get_lctrlval(c)
 
 				x = 0
 				xx = 0
 
-				if cc == -1:
+				if c == 0:
 					x = self._parent.pitchwheel_editor.x_from
 					xx = self._parent.pitchwheel_editor.x_to - x
 				else:
@@ -184,7 +184,7 @@ class trackviewpointer():
 
 				xw = 0
 
-				if cc == -1:
+				if c == 0:
 					xw = self._parent.pitchwheel_editor.x_to \
 					- (self._parent.pitchwheel_editor.x_from \
 					+ self._parent.pitchwheel_editor.txt_width)

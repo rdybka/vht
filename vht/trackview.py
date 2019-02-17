@@ -27,15 +27,23 @@ class TrackView(Gtk.DrawingArea):
 				if wdg.pitchwheel_editor.edit > -1 or wdg.pitchwheel_editor.selection:
 					redr = True
 
+				if wdg.pitchwheel_editor.doodle_hint_row > -1:
+					redr = True
+
 				wdg.pitchwheel_editor.selection = None
 				wdg.pitchwheel_editor.edit = -1
+				wdg.pitchwheel_editor.doodle_hint_row = -1
 
 			for ctrl in wdg.controller_editors:
 				if ctrl.edit > -1 or ctrl.selection:
 					redr = True
 
+				if ctrl.doodle_hint_row > -1:
+					redr = True
+
 				ctrl.selection = None
 				ctrl.edit = -1
+				ctrl.doodle_hint_row = -1
 
 			wdg.hover = None
 			wdg.edit = None
@@ -772,6 +780,11 @@ class TrackView(Gtk.DrawingArea):
 				ctrl.on_motion(widget, event)
 
 		if oldf != self.keyboard_focus:
+			if oldf:
+				dh = oldf.doodle_hint_row
+				oldf.doodle_hint_row = -1
+				self.redraw(dh, controller = oldf.ctrlnum)
+
 			self.parent.prop_view.redraw(self.trk.index)
 
 		if self.select:
@@ -1218,15 +1231,15 @@ class TrackView(Gtk.DrawingArea):
 
 			if mod.active_track.show_controllers:
 				c = mod.active_track.edit[0] - (len(mod.active_track.trk) +
-						(1 if self.show_pitchwheel else 0))
+						(1 if mod.active_track.show_pitchwheel else 0))
 				if c > -1 and mod.active_track.edit:
 					e = mod.active_track.edit
 					TrackView.leave_all()
 					mod.active_track.edit = e
 					mod.active_track.controller_editors[c].edit = mod.active_track.edit[1]
 					mod.active_track.keyboard_focus = mod.active_track.controller_editors[c]
-					mod.active_track.redraw()
 					self.recalc_edit(mod.active_track)
+					mod.active_track.redraw()
 					self.parent.prop_view.redraw()
 
 			# did we leave controllers?
@@ -2096,10 +2109,10 @@ class TrackView(Gtk.DrawingArea):
 			if event.state & Gdk.ModifierType.MOD1_MASK:
 				alt = True
 
+		self.pitchwheel_editor.on_key_release(widget, event)
 
-		if self.keyboard_focus != None and self.edit == None and self.select_start == None:
-			if self.keyboard_focus.on_key_release(widget, event):
-				return True
+		for c in self.controller_editors:
+			c.on_key_release(widget, event)
 
 		if self.velocity_editor:
 			self.velocity_editor.on_key_release(widget, event)
@@ -2116,7 +2129,8 @@ class TrackView(Gtk.DrawingArea):
 		if shift or ctrl or alt:
 			return True
 
-		self.pmp.key2note(Gdk.keyval_to_lower(event.keyval), True)
+		if self.keyboard_focus == None:
+			self.pmp.key2note(Gdk.keyval_to_lower(event.keyval), True)
 
 		return False
 

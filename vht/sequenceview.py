@@ -686,11 +686,14 @@ class SequenceView(Gtk.Box):
 						trk.undo_buff.add_state()
 						redr_props = True
 
+						ctr = r["col"] - len(trk.trk)
+						if ctr > len(trk.controller_editors):
+							trk.redraw_full()
+
 					r = trk.trk.get_rec_update()
 
 				if redr_props:
 					self.prop_view.redraw(trk.trk.index)
-					trk.show_timeshift = True
 					trk.tick()
 					#trk.undo_buff.add_state()
 
