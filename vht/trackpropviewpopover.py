@@ -217,6 +217,19 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.show_pitchwheel_button.set_active(self.trkview.show_pitchwheel)
 		self.show_controllers_button.set_active(self.trkview.show_controllers)
 
+		if self.trkview.trk.nctrl == 1:
+			self.show_controllers_button.set_sensitive(False)
+		else:
+			self.show_controllers_button.set_sensitive(True)
+			
+		if not self.trkview.show_notes:
+			self.show_controllers_button.set_sensitive(False)
+
+		if not self.show_controllers_button.get_active():
+			self.show_notes_button.set_sensitive(False)
+		else:
+			self.show_notes_button.set_sensitive(True)
+
 	def pop(self):
 		mod.clear_popups(self)
 		self.channel_adj.set_value(self.trk.channel)
@@ -227,7 +240,7 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.port_adj.set_upper(mod.nports - 1)
 
 		#self.loop_button.set_active(self.trk.loop) // not yet implemented in vhtlib
-		self.show_notes_button.set_sensitive(False)
+		#self.show_notes_button.set_sensitive(False)
 		self.refresh()
 		self.ctrlsview.rebuild()
 		self.popup()
@@ -259,6 +272,9 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.parent.redraw()
 
 	def on_show_notes_toggled(self, wdg):
+		if self.trkview.show_notes != wdg.get_active():
+			self.trkview.toggle_notes()
+
 		if wdg.get_active():
 			self.show_controllers_button.set_sensitive(True)
 		else:
@@ -272,12 +288,12 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.parent.redraw()
 
 	def on_show_pitchwheel_toggled(self, wdg):
-		self.trkview.show_pitchwheel = wdg.get_active()
+		if self.trkview.show_pitchwheel != wdg.get_active():
+			self.trkview.toggle_pitch()
+		
 		if self.parent.popped:
 			self.trkview.redraw_full()
 			self.parent.redraw()
-
-		self.parent.redraw()
 
 	def on_show_controllers_toggled(self, wdg):
 		if wdg.get_active():
@@ -287,7 +303,9 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.show_notes_button.set_active(True)
 			self.show_notes_button.set_sensitive(False)
 
-		self.trkview.show_controllers = wdg.get_active()
+		if self.trkview.show_controllers != wdg.get_active():
+			self.trkview.toggle_controls()
+		
 		if self.entered:
 			self.trkview.redraw_full()
 			self.parent.redraw()

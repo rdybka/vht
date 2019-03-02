@@ -107,6 +107,8 @@ class TrackView(Gtk.DrawingArea):
 
 		if trk:
 			self.undo_buff = TrackUndoBuffer(trk)
+			self.trk.ctrl.add(22)
+			self.trk.ctrl.add(23)
 
 		self._surface = None
 		self._context = None
@@ -159,7 +161,6 @@ class TrackView(Gtk.DrawingArea):
 		crf = self._context
 		crf.set_source_surface(self._back_surface)
 
-		# --------------  track --------------
 		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")
 		if self.show_timeshift:
 			(x, y, width, height, dx, dy) = cr.text_extents("000 000 000|")
@@ -178,7 +179,8 @@ class TrackView(Gtk.DrawingArea):
 			self.set_size_request(nw, nh)
 			self.width = nw
 		else:
-			if self.trk:
+			nw = 0
+			if self.show_notes:
 				nw = self.txt_width * len(self.trk)
 
 			if self.velocity_editor:
@@ -407,6 +409,9 @@ class TrackView(Gtk.DrawingArea):
 			return
 
 		oldw = self.keyboard_focus
+		oldr = -1
+		if oldw:
+			oldr = oldw.edit
 
 		self.keyboard_focus = None
 		self.controller_editors = []
@@ -416,9 +421,10 @@ class TrackView(Gtk.DrawingArea):
 		if oldw:
 			fnum = oldw.ctrlnum
 
-			for w in self.controller_editors:
+			for w in self.controller_editors + [self.pitchwheel_editor]:
 				if w.ctrlnum == fnum:
 					self.keyboard_focus = w
+					self.keyboard_focus.edit = oldr
 
 		# who's calling?
 		#cf = inspect.currentframe()
@@ -626,7 +632,7 @@ class TrackView(Gtk.DrawingArea):
 						cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 
 				if show_selection and not self.select_start and not self.select_end:
-					if self.edit and r == self.edit[1] and c == self.edit[0]:
+					if self.show_notes and self.edit and r == self.edit[1] and c == self.edit[0]:
 						draw_text = True
 						if mod.record == 0:
 							cr.set_source_rgb(*(cfg.record_colour))
@@ -652,18 +658,18 @@ class TrackView(Gtk.DrawingArea):
 					if rw.delay < 0:
 						ts_sign = '-'
 
-					if rw.type == 1: #note_on
-						if self.show_timeshift:
-							if not self.velocity_editor:
-								cr.show_text("%3s %03d %c%02d" % (str(rw), rw.velocity, ts_sign, abs(rw.delay)))
+					if self.show_notes and rw.type == 1: #note_on
+							if self.show_timeshift:
+								if not self.velocity_editor:
+									cr.show_text("%3s %03d %c%02d" % (str(rw), rw.velocity, ts_sign, abs(rw.delay)))
+								else:
+									cr.show_text("%3s %03d" % (str(rw), rw.velocity))
+									cr.move_to((c * self.txt_width) + dx + xtraoffs + self.velocity_editor.width, yy)
+									cr.show_text("%c%02d" % (ts_sign, abs(rw.delay)))
 							else:
 								cr.show_text("%3s %03d" % (str(rw), rw.velocity))
-								cr.move_to((c * self.txt_width) + dx + xtraoffs + self.velocity_editor.width, yy)
-								cr.show_text("%c%02d" % (ts_sign, abs(rw.delay)))
-						else:
-							cr.show_text("%3s %03d" % (str(rw), rw.velocity))
 
-					if rw.type == 2: #note_off
+					if self.show_notes and rw.type == 2: #note_off
 						if self.show_timeshift:
 							cr.show_text("%3s   %c%02d" % (str(rw), ts_sign, abs(rw.delay)))
 						else:
@@ -728,7 +734,7 @@ class TrackView(Gtk.DrawingArea):
 		rw2.copy(rw3)
 
 	def on_scroll(self, event):
-		if self.edit:
+		if self.show_notes and not self.keyboard_focus and self.edit:
 			old = self.edit[1]
 			self.edit = int(self.edit[0]), int(min(max(0, self.edit[1] + event.delta_y), self.trk.nrows - 1))
 
@@ -924,7 +930,7 @@ class TrackView(Gtk.DrawingArea):
 		offs = int(event.x) % int(self.txt_width)
 
 		# pitchwheel/controllers
-		if col >= len(self.trk):
+		if col >= len(self.trk) or self.show_notes == False:
 			if self.show_pitchwheel:
 				if event.x > self.pitchwheel_editor.x_from and event.x < self.pitchwheel_editor.x_to:
 					self.pitchwheel_editor.on_button_press(widget, event)
@@ -1182,12 +1188,12 @@ class TrackView(Gtk.DrawingArea):
 	def recalc_edit(trk):
 		if trk.show_pitchwheel:
 			if trk.pitchwheel_editor.edit > -1:
-				trk.edit = len(trk.trk), trk.pitchwheel_editor.edit
+				trk.edit = len(trk.trk) if trk.show_notes else 0, trk.pitchwheel_editor.edit
 
 		if trk.show_controllers:
 			for c, wdg in enumerate(trk.controller_editors):
 				if wdg.edit > -1:
-					trk.edit = c + (1 if trk.show_pitchwheel else 0) + len(trk.trk), wdg.edit
+					trk.edit = c + (1 if trk.show_pitchwheel else 0) + (len(trk.trk) if trk.show_notes else 0), wdg.edit
 
 	def go_right(self, skip_track = False, rev = False):
 		old = self.edit[1]
@@ -1198,17 +1204,19 @@ class TrackView(Gtk.DrawingArea):
 		if not skip_track:
 			self.edit = self.edit[0] + inc, self.edit[1]
 
-			if self.edit[0] >= (len(self.trk) +
+			# are we past last col?
+			if self.edit[0] >= ((len(self.trk) if self.show_notes else 0) +
 					(1 if self.show_pitchwheel else 0) +
 					(self.trk.nctrl - 1 if self.show_controllers else 0)):
 				self.go_right(True)
 				mod.active_track.edit = 0, min(mod.active_track.edit[1], mod.active_track.trk.nrows - 1)
+				self.recalc_edit(mod.active_track)
 				mod.active_track.redraw()
-				return
 
-			if self.edit[0] < 0:
+			# do we wrap over to last col?
+			if self.edit and self.edit[0] < 0:
 				self.go_left(True)
-				mod.active_track.edit = (len(mod.active_track.trk) - 1 +
+				mod.active_track.edit = (((len(mod.active_track.trk) -1) if mod.active_track.show_notes else 0) +
 					(1 if mod.active_track.show_pitchwheel else 0) +
 					(mod.active_track.trk.nctrl - 1 if mod.active_track.show_controllers else 0)), min(mod.active_track.edit[1], mod.active_track.trk.nrows - 1)
 
@@ -1220,18 +1228,20 @@ class TrackView(Gtk.DrawingArea):
 				mod.active_track.parent.prop_view.redraw()
 
 			if mod.active_track.show_pitchwheel:
-				if mod.active_track.edit[0] == len(mod.active_track.trk):
+				if mod.active_track.edit[0] == (len(mod.active_track.trk) if mod.active_track.show_notes else 0):
 					ed = mod.active_track.edit
 					TrackView.leave_all()
 					mod.active_track.edit = ed
 					mod.active_track.pitchwheel_editor.edit = mod.active_track.edit[1]
 					mod.active_track.keyboard_focus = mod.active_track.pitchwheel_editor
 					self.recalc_edit(mod.active_track)
+					mod.active_track.redraw(mod.active_track.edit[1])
 					mod.active_track.parent.prop_view.redraw()
 
 			if mod.active_track.show_controllers:
-				c = mod.active_track.edit[0] - (len(mod.active_track.trk) +
+				c = mod.active_track.edit[0] - ((len(mod.active_track.trk) if mod.active_track.show_notes else 0) + 
 						(1 if mod.active_track.show_pitchwheel else 0))
+				c = min(c, mod.active_track.trk.nctrl - 2)
 				if c > -1 and mod.active_track.edit:
 					e = mod.active_track.edit
 					TrackView.leave_all()
@@ -1239,11 +1249,11 @@ class TrackView(Gtk.DrawingArea):
 					mod.active_track.controller_editors[c].edit = mod.active_track.edit[1]
 					mod.active_track.keyboard_focus = mod.active_track.controller_editors[c]
 					self.recalc_edit(mod.active_track)
-					mod.active_track.redraw()
 					self.parent.prop_view.redraw()
+					mod.active_track.redraw()
 
 			# did we leave controllers?
-			if self.edit and old >= len(self.trk) and self.edit[0] < len(self.trk):
+			if self.edit and self.show_notes and old >= len(self.trk) and self.edit[0] < len(self.trk):
 				e = self.edit
 				TrackView.leave_all()
 				self.edit = e
@@ -1282,7 +1292,7 @@ class TrackView(Gtk.DrawingArea):
 			self.parent.seq.set_midi_focus(trk.trk.index)
 			self.parent.prop_view.redraw()
 
-			trk.edit = 0, int(round((old[1] * self.spacing) / trk.spacing))
+			trk.edit = (0 if trk.show_notes else len(trk.trk)), int(round((old[1] * self.spacing) / trk.spacing))
 			trk.redraw(min(trk.edit[1], trk.trk.nrows - 1))
 
 			self.redraw(old[1])
@@ -1488,6 +1498,85 @@ class TrackView(Gtk.DrawingArea):
 				self.undo_buff.add_state()
 				return True
 
+	def toggle_time(self):
+		self.show_timeshift = not self.show_timeshift
+		self.parent.redraw_track(self.trk)
+		return True
+
+	def toggle_pitch(self):
+		self.show_pitchwheel = not self.show_pitchwheel
+
+		if not self.show_pitchwheel:
+			if self.keyboard_focus == self.pitchwheel_editor:
+				ed = self.pitchwheel_editor.edit
+				self.pitchwheel_editor.edit = -1
+				
+				if self.show_controllers and self.trk.nctrl > 1:
+					self.controller_editors[0].edit = ed
+					self.keyboard_focus = self.controller_editors[0]
+				elif self.show_notes:
+					self.keyboard_focus = None
+					if ed > -1:
+						self.edit = len(self.trk) - 1, ed
+
+		self.recalc_edit(self)
+		self.parent.redraw_track(self.trk)
+		return True
+
+	def toggle_notes(self):
+		if self.show_notes:
+			if not self.show_controllers or self.trk.nctrl < 2:
+				return True
+		
+		self.show_notes = not self.show_notes
+					
+		# are we editing?
+		if self.edit and self.edit[0] < len(self.trk) and self.keyboard_focus == None:
+			if self.show_pitchwheel:
+				self.pitchwheel_editor.edit = self.edit[1]
+				self.keyboard_focus = self.pitchwheel_editor
+			elif self.show_controllers and self.trk.nctrl > 1:
+				self.keyboard_focus = self.controller_editors[0]
+				self.controller_editors[0].edit = self.edit[1]
+
+		if not self.edit and self.keyboard_focus == None:
+			if self.show_pitchwheel:
+				self.keyboard_focus = self.pitchwheel_editor
+			elif self.show_controllers:
+				self.keyboard_focus = self.controller_editors[0]
+
+		self.recalc_edit(self)
+		self.parent.redraw_track(self.trk)
+		self.parent.prop_view.redraw(self.trk)
+		return True
+
+	def toggle_controls(self):
+		if self.show_controllers:
+			if not self.show_notes:
+				return True
+
+		self.show_controllers = not self.show_controllers
+			
+		r = -1
+		# preserve row
+		if not self.show_controllers:
+			if self.keyboard_focus and self.keyboard_focus != self.pitchwheel_editor:
+				r = self.keyboard_focus.edit
+				self.keyboard_focus.edit = -1
+				
+				if self.show_pitchwheel:
+					self.pitchwheel_editor.edit = r
+					self.keyboard_focus = self.pitchwheel_editor
+				else:
+					if r > -1:
+						self.edit = len(self.trk) - 1, r
+				
+					self.keyboard_focus = None
+
+		self.recalc_edit(self)	
+		self.parent.redraw_track(self.trk)
+		return True
+
 	def on_key_press(self, widget, event):
 		if not self.trk:
 			return
@@ -1510,27 +1599,24 @@ class TrackView(Gtk.DrawingArea):
 			self.leave_all()
 			return True
 
-		if self.keyboard_focus != None and self.select_start == None:
-			if self.keyboard_focus.on_key_press(widget, event):
-				return True
-
 		if self.velocity_editor:
 			self.velocity_editor.on_key_press(widget, event)
 
+		if cfg.key["toggle_notes"].matches(event):
+			return self.toggle_notes()
+			
 		if cfg.key["toggle_time"].matches(event):
-			self.show_timeshift = not self.show_timeshift
-			self.parent.redraw_track(self.trk)
-			return True
+			return self.toggle_time()
 
 		if cfg.key["toggle_pitch"].matches(event):
-			self.show_pitchwheel = not self.show_pitchwheel
-			self.parent.redraw_track(self.trk)
-			return True
+			return self.toggle_pitch()
 
 		if cfg.key["toggle_controls"].matches(event):
-			self.show_controllers = not self.show_controllers
-			self.parent.redraw_track(self.trk)
-			return True
+			return self.toggle_controls()
+
+		if self.keyboard_focus != None and self.select_start == None:
+			if self.keyboard_focus.on_key_press(widget, event):
+				return True
 
 		if cfg.key["track_clear"].matches(event):
 			self.undo_buff.restore()
