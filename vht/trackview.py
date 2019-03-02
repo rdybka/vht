@@ -1239,7 +1239,7 @@ class TrackView(Gtk.DrawingArea):
 					mod.active_track.parent.prop_view.redraw()
 
 			if mod.active_track.show_controllers:
-				c = mod.active_track.edit[0] - ((len(mod.active_track.trk) if mod.active_track.show_notes else 0) + 
+				c = mod.active_track.edit[0] - ((len(mod.active_track.trk) if mod.active_track.show_notes else 0) +
 						(1 if mod.active_track.show_pitchwheel else 0))
 				c = min(c, mod.active_track.trk.nctrl - 2)
 				if c > -1 and mod.active_track.edit:
@@ -1510,7 +1510,7 @@ class TrackView(Gtk.DrawingArea):
 			if self.keyboard_focus == self.pitchwheel_editor:
 				ed = self.pitchwheel_editor.edit
 				self.pitchwheel_editor.edit = -1
-				
+
 				if self.show_controllers and self.trk.nctrl > 1:
 					self.controller_editors[0].edit = ed
 					self.keyboard_focus = self.controller_editors[0]
@@ -1527,9 +1527,9 @@ class TrackView(Gtk.DrawingArea):
 		if self.show_notes:
 			if not self.show_controllers or self.trk.nctrl < 2:
 				return True
-		
+
 		self.show_notes = not self.show_notes
-					
+
 		# are we editing?
 		if self.edit and self.edit[0] < len(self.trk) and self.keyboard_focus == None:
 			if self.show_pitchwheel:
@@ -1556,24 +1556,24 @@ class TrackView(Gtk.DrawingArea):
 				return True
 
 		self.show_controllers = not self.show_controllers
-			
+
 		r = -1
 		# preserve row
 		if not self.show_controllers:
 			if self.keyboard_focus and self.keyboard_focus != self.pitchwheel_editor:
 				r = self.keyboard_focus.edit
 				self.keyboard_focus.edit = -1
-				
+
 				if self.show_pitchwheel:
 					self.pitchwheel_editor.edit = r
 					self.keyboard_focus = self.pitchwheel_editor
 				else:
 					if r > -1:
 						self.edit = len(self.trk) - 1, r
-				
+
 					self.keyboard_focus = None
 
-		self.recalc_edit(self)	
+		self.recalc_edit(self)
 		self.parent.redraw_track(self.trk)
 		return True
 
@@ -1604,7 +1604,7 @@ class TrackView(Gtk.DrawingArea):
 
 		if cfg.key["toggle_notes"].matches(event):
 			return self.toggle_notes()
-			
+
 		if cfg.key["toggle_time"].matches(event):
 			return self.toggle_time()
 

@@ -212,16 +212,17 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.set_modal(False)
 
 	def refresh(self):
+		if self.trkview.trk.nctrl == 1:
+			self.show_controllers_button.set_sensitive(False)
+			self.trkview.show_controllers = False
+		else:
+			self.show_controllers_button.set_sensitive(True)
+
 		self.show_notes_button.set_active(self.trkview.show_notes)
 		self.show_timeshift_button.set_active(self.trkview.show_timeshift)
 		self.show_pitchwheel_button.set_active(self.trkview.show_pitchwheel)
 		self.show_controllers_button.set_active(self.trkview.show_controllers)
 
-		if self.trkview.trk.nctrl == 1:
-			self.show_controllers_button.set_sensitive(False)
-		else:
-			self.show_controllers_button.set_sensitive(True)
-			
 		if not self.trkview.show_notes:
 			self.show_controllers_button.set_sensitive(False)
 
@@ -290,7 +291,7 @@ class TrackPropViewPopover(Gtk.Popover):
 	def on_show_pitchwheel_toggled(self, wdg):
 		if self.trkview.show_pitchwheel != wdg.get_active():
 			self.trkview.toggle_pitch()
-		
+
 		if self.parent.popped:
 			self.trkview.redraw_full()
 			self.parent.redraw()
@@ -305,7 +306,7 @@ class TrackPropViewPopover(Gtk.Popover):
 
 		if self.trkview.show_controllers != wdg.get_active():
 			self.trkview.toggle_controls()
-		
+
 		if self.entered:
 			self.trkview.redraw_full()
 			self.parent.redraw()

@@ -85,6 +85,8 @@ class ControllersView(Gtk.Box):
 				rw = ControllersViewRow(self, self.trk, c, i)
 				self.box.pack_start(rw, False, False, 0)
 
+		self.parent.refresh()
+
 		if not just_gui:
 			self.trkview.redraw_full()
 
