@@ -1031,6 +1031,7 @@ class ControllerEditor():
 
 		if not self.drag and not self.drawing and not self.deleting and not self.moving and not self.selecting and self.moving_selection_start == -1:
 			if event.x < self.x_from or event.x > self.x_to:
+				self.doodle_hint_row = -1
 				return
 
 		# we'd like the keyboard focus, can we take it?

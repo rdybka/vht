@@ -1183,6 +1183,11 @@ class TrackView(Gtk.DrawingArea):
 			oh = self.hover
 			self.hover = None
 			self.redraw(oh[1])
+			
+		if self.keyboard_focus:
+			hr = self.keyboard_focus.doodle_hint_row
+			self.keyboard_focus.doodle_hint_row = -1
+			self.redraw(hr)
 
 	@staticmethod
 	def recalc_edit(trk):
