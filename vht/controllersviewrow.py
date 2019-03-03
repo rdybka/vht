@@ -61,4 +61,4 @@ class ControllersViewRow(Gtk.ActionBar):
 		self.ctrlnum = int(adj.get_value())
 		self.trk.ctrl[self.index].ctrlnum = self.ctrlnum
 		self.parent.rebuild()
-		
+

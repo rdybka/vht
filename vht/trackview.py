@@ -750,6 +750,7 @@ class TrackView(Gtk.DrawingArea):
 
 			self.redraw(old)
 			self.redraw(self.edit[1])
+			self.parent.autoscroll_req = True
 			return True
 
 		if self.show_pitchwheel:
@@ -1087,6 +1088,7 @@ class TrackView(Gtk.DrawingArea):
 			TrackView.leave_all()
 			self.parent.change_active_track(self)
 			self.keyboard_focus = None
+			self.parent.autoscroll_req = True
 			self.parent.prop_view.redraw(self.trk.index)
 			olded = self.edit
 			self.edit = col, row
@@ -1210,6 +1212,8 @@ class TrackView(Gtk.DrawingArea):
 		if rev:
 			inc *= - 1
 
+		self.parent.autoscroll_req = True
+
 		if not skip_track:
 			self.edit = self.edit[0] + inc, self.edit[1]
 
@@ -1262,7 +1266,7 @@ class TrackView(Gtk.DrawingArea):
 					mod.active_track.redraw()
 
 			# did we leave controllers?
-			if self.edit and self.show_notes and old >= len(self.trk) and self.edit[0] < len(self.trk):
+			if self.edit and self.show_notes and self.edit[0] < len(self.trk):
 				e = self.edit
 				TrackView.leave_all()
 				self.edit = e
@@ -1820,6 +1824,7 @@ class TrackView(Gtk.DrawingArea):
 			return True
 
 		if event.keyval == 65364:						# down
+			self.parent.autoscroll_req = True
 			if self.edit:
 				if shift:
 					self.select_start = self.edit
@@ -1854,6 +1859,7 @@ class TrackView(Gtk.DrawingArea):
 				return True
 
 		if event.keyval == 65362:			# up
+			self.parent.autoscroll_req = True
 			if self.edit:
 				if shift:
 					self.select_start = self.edit
@@ -1887,6 +1893,7 @@ class TrackView(Gtk.DrawingArea):
 				return True
 
 		if event.keyval == 65363:			# right
+			self.parent.autoscroll_req = True
 			if not shift:
 				if self.select_start:
 					old = self.select_start[1], self.select_end[1]
@@ -1913,6 +1920,7 @@ class TrackView(Gtk.DrawingArea):
 					return True
 
 		if event.keyval == 65361:			# left
+			self.parent.autoscroll_req = True
 			if not shift:
 				if self.select_start:
 					old = self.select_start[1], self.select_end[1]
@@ -1939,6 +1947,7 @@ class TrackView(Gtk.DrawingArea):
 					return True
 
 		if event.keyval == 65366:			# page-down
+			self.parent.autoscroll_req = True
 			if not shift:
 				old = None
 				if self.edit:
@@ -1986,6 +1995,7 @@ class TrackView(Gtk.DrawingArea):
 				return True
 
 		if event.keyval == 65365:			# page-up
+			self.parent.autoscroll_req = True
 			if not shift:
 				old = None
 				if self.edit:
@@ -2031,6 +2041,7 @@ class TrackView(Gtk.DrawingArea):
 				return True
 
 		if event.keyval == 65360:			# home
+			self.parent.autoscroll_req = True
 			if not shift:
 				if self.edit:
 					old = self.edit[1], self.edit[1]
@@ -2061,6 +2072,7 @@ class TrackView(Gtk.DrawingArea):
 				return True
 
 		if event.keyval == 65367:			# end
+			self.parent.autoscroll_req = True
 			if not shift:
 				if self.edit:
 					old = self.edit[1], self.edit[1]

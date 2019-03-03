@@ -102,6 +102,9 @@ class SequenceView(Gtk.Box):
 		self._sv_hadj.connect("value-changed", self.on_sv_hadj_changed)
 		self.prop_view_hadj.connect("value-changed", self.on_sv_hadj_changed)
 
+		self.autoscroll_req = False
+		self.last_autoscroll_r = -1
+
 		self.build()
 
 		self.show_all()
@@ -597,6 +600,14 @@ class SequenceView(Gtk.Box):
 		hadj = self._sv.get_hadjustment()
 		vadj = self._sv.get_vadjustment()
 
+		if self.last_autoscroll_r == -1 and not self.autoscroll_req:
+			return
+
+		r = self.last_autoscroll_r
+
+		if not self.autoscroll_req:
+			return
+
 		r = trk.edit[1]
 		if trk.keyboard_focus:
 			r = trk.keyboard_focus.edit
@@ -611,6 +622,7 @@ class SequenceView(Gtk.Box):
 		if vtarget > trk_height - h:
 			vtarget = trk_height - h
 
+		vt = vtarget
 		vtarget = vadj.get_value() + ((vtarget - vadj.get_value()) * cfg.auto_scroll_delay)
 
 		vadj.set_value(vtarget)
@@ -632,7 +644,12 @@ class SequenceView(Gtk.Box):
 		if htarget > self._track_box.get_allocated_width() - w:
 			htarget = self._track_box.get_allocated_width() - w
 
+		ht = htarget
 		htarget = hadj.get_value() + ((htarget - hadj.get_value()) * cfg.auto_scroll_delay)
+
+		if abs(vt - vtarget) < .001 and abs(ht - htarget) < .001:
+			self.autoscroll_req = False
+			self.last_autoscroll_r = r
 
 		hadj.set_value(htarget)
 
@@ -641,9 +658,9 @@ class SequenceView(Gtk.Box):
 
 	def tick(self, wdg, param):
 		for wdg in self.get_tracks(True):
-				wdg.tick()
-				if wdg.edit and wdg.trk:
-					self.auto_scroll(wdg)
+			wdg.tick()
+			if wdg.edit and wdg.trk:
+				self.auto_scroll(wdg)
 
 		if not mod.gui_midi_capture:
 			midin = mod.get_midi_in_event()

@@ -81,7 +81,7 @@ class ControllersView(Gtk.Box):
 
 		if len(self.box.get_children()) == self.trk.nctrl - 1:
 			reuse = True
-		
+
 		if not reuse:
 			for wdg in self.box.get_children():
 				self.box.remove(wdg)

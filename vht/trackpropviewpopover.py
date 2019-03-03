@@ -122,10 +122,10 @@ class TrackPropViewPopover(Gtk.Popover):
 
 			self.name_entry = Gtk.Entry()
 			self.name_entry.connect("changed", self.on_name_changed)
-			
+
 			self.name_entry.set_text(self.trk.name)
 			self.name_entry.set_activates_default(False)
-			
+
 			grid.attach(self.name_entry, 1, 4, 4, 1)
 			grid.attach(Gtk.Label("name:"), 0, 4, 1, 1)
 
@@ -294,7 +294,7 @@ class TrackPropViewPopover(Gtk.Popover):
 	def on_name_changed(self, wdg):
 		self.trk.name = wdg.get_text()
 		self.parent.redraw()
-		
+
 	def on_show_timeshift_toggled(self, wdg):
 		self.trkview.show_timeshift = wdg.get_active()
 		if self.parent.popped:

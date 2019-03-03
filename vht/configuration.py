@@ -27,7 +27,7 @@ class Configuration():
 		self.intensity_select = .7
 		self.pointer_opacity = .7
 		self.pointer_width = 5
-		self.auto_scroll_delay = .2
+		self.auto_scroll_delay = .1
 		self.tooltip_markup = """<span font_family="Monospace" size="large">%s</span>"""
 		self.window_opacity = 1
 

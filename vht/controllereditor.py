@@ -755,6 +755,7 @@ class ControllerEditor():
 				pass
 
 			if self.edit != olded:
+				self.tv.parent.autoscroll_req = True
 				oldsel = self.selection
 				self.last_keyboard_edit = -1
 
@@ -873,6 +874,7 @@ class ControllerEditor():
 				if self.edit != r:
 					self.tv.leave_all()
 					self.tv.set_opacity(1)
+					self.tv.parent.autoscroll_req = True
 					self.edit = r
 					self.selection = None
 					self.last_keyboard_edit = -1
@@ -1172,6 +1174,7 @@ class ControllerEditor():
 
 				self.redraw_env()
 				self.tv.redraw()
+				self.tv.parent.autoscroll_req = True
 				return
 
 		if self.selecting:
@@ -1295,6 +1298,7 @@ class ControllerEditor():
 				self.edit = int(min(max(0, self.edit + event.delta_y), self.trk.nrows - 1))
 				self.tv.redraw(old)
 				self.tv.redraw(self.edit)
+				self.tv.parent.autoscroll_req = True
 				return True
 			return False
 
