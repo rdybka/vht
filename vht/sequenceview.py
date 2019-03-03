@@ -597,7 +597,11 @@ class SequenceView(Gtk.Box):
 		hadj = self._sv.get_hadjustment()
 		vadj = self._sv.get_vadjustment()
 
-		vtarget = (trk.edit[1] * trk.txt_height) + trk.txt_height / 2.0
+		r = trk.edit[1]
+		if trk.keyboard_focus:
+			r = trk.keyboard_focus.edit
+
+		vtarget = (r * trk.txt_height) + trk.txt_height / 2.0
 		trk_height = trk.txt_height * trk.trk.nrows
 		vtarget = vtarget - (h / 2.0)
 
@@ -611,9 +615,13 @@ class SequenceView(Gtk.Box):
 
 		vadj.set_value(vtarget)
 
-		htarget = (trk.edit[0] * trk.txt_width) + trk.txt_width / 2.0
+		hextra = 0#trk.width / 2
+		htarget = (trk.edit[0] * trk.txt_width) + hextra
+		if trk.keyboard_focus:
+			htarget = trk.keyboard_focus.x_from + hextra
+
 		for wdg in self.get_tracks()[:trk.trk.index]:
-			htarget += wdg.txt_width * len(wdg.trk)
+			htarget += wdg.width
 
 		trk_width = trk.txt_width * len(trk.trk)
 		htarget = htarget - (w / 2.0)

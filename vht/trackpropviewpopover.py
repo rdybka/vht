@@ -90,7 +90,7 @@ class TrackPropViewPopover(Gtk.Popover):
 
 			grid = Gtk.Grid()
 			grid.set_column_homogeneous(True)
-			#grid.set_row_homogeneous(True)
+			grid.set_row_homogeneous(True)
 			grid.set_column_spacing(2)
 			grid.set_row_spacing(2)
 
@@ -119,6 +119,15 @@ class TrackPropViewPopover(Gtk.Popover):
 
 			self.clone_button = Gtk.Button("clone")
 			grid.attach(self.clone_button, 4, 2, 1, 1)
+
+			self.name_entry = Gtk.Entry()
+			self.name_entry.connect("changed", self.on_name_changed)
+			
+			self.name_entry.set_text(self.trk.name)
+			self.name_entry.set_activates_default(False)
+			
+			grid.attach(self.name_entry, 1, 4, 4, 1)
+			grid.attach(Gtk.Label("name:"), 0, 4, 1, 1)
 
 			self.extend_track_grid = grid
 
@@ -154,8 +163,8 @@ class TrackPropViewPopover(Gtk.Popover):
 			lbl = Gtk.Label("port:")
 			lbl.set_xalign(1.0)
 
-			self.grid.attach(lbl, 0, 3, 1, 1)
-			self.grid.attach(self.port_button, 1, 3, 2, 1)
+			self.grid.attach(lbl, 0, 2, 1, 1)
+			self.grid.attach(self.port_button, 1, 2, 2, 1)
 
 			self.channel_adj = Gtk.Adjustment(1, 1, 16, 1.0, 1.0)
 			self.channel_button = Gtk.SpinButton()
@@ -166,8 +175,8 @@ class TrackPropViewPopover(Gtk.Popover):
 			lbl = Gtk.Label("channel:")
 			lbl.set_xalign(1.0)
 
-			self.grid.attach(lbl, 0, 2, 1, 1)
-			self.grid.attach(self.channel_button, 1, 2, 2, 1)
+			self.grid.attach(lbl, 0, 3, 1, 1)
+			self.grid.attach(self.channel_button, 1, 3, 2, 1)
 
 			self.nsrows_adj = Gtk.Adjustment(1, 1, self.parent.seq.length, 1.0, 1.0)
 			self.nsrows_button = Gtk.SpinButton()
@@ -282,6 +291,10 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.show_controllers_button.set_active(True)
 			self.show_controllers_button.set_sensitive(False)
 
+	def on_name_changed(self, wdg):
+		self.trk.name = wdg.get_text()
+		self.parent.redraw()
+		
 	def on_show_timeshift_toggled(self, wdg):
 		self.trkview.show_timeshift = wdg.get_active()
 		if self.parent.popped:

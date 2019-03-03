@@ -1,5 +1,5 @@
 - newly added tracks on left
-- controllers
+* controllers
 	* refactor pitchwheeleditor into controllereditor
 	* cursor movement
 	* ctrl+x,c,v,b - cut, copy, paste, render doodles

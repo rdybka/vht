@@ -27,7 +27,7 @@ class ControllersViewRow(Gtk.ActionBar):
 		button.connect("clicked", self.on_go_down_clicked)
 		self.pack_start(button)
 
-		self.ctrl_adj = Gtk.Adjustment(1, 1, 127, 1.0, 1.0)
+		self.ctrl_adj = Gtk.Adjustment(1, 1, 127, 1.0, 10.0)
 		self.ctrl_button = Gtk.SpinButton()
 		self.ctrl_button.set_adjustment(self.ctrl_adj)
 		self.ctrl_adj.set_value(self.ctrlnum)
@@ -60,3 +60,5 @@ class ControllersViewRow(Gtk.ActionBar):
 	def on_num_changed(self, adj):
 		self.ctrlnum = int(adj.get_value())
 		self.trk.ctrl[self.index].ctrlnum = self.ctrlnum
+		self.parent.rebuild()
+		

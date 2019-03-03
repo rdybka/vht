@@ -29,7 +29,7 @@
 #define TRIGGER_HOLD	2
 
 
-#define TRACK_DEFAULT_CONTROLS_PER_ROW	16
+#define TRACK_CONTROLS_PER_ROW	16
 
 struct rec_update_t {
 	int col;

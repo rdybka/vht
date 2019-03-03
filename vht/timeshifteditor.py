@@ -1,9 +1,21 @@
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, Gdk, Gtk, Gio
-import cairo
+# Valhalla Tracker
+# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# @schtixfnord
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from vht import *
+from vht import cfg
 
 class TimeshiftEditor():
 	def __init__(self, tv, col, row, event):
@@ -64,6 +76,8 @@ class TimeshiftEditor():
 		if self.confirmed:
 			self.lock = False
 
+		return False
+
 	def on_motion(self, widget, event):
 		# edit single velocity in place
 		if not self.clearing and not self.confirmed and not self.lock:
@@ -87,7 +101,6 @@ class TimeshiftEditor():
 				return False
 
 		new_hover_row = min(int(event.y / self.tv.txt_height), self.tv.trk.nrows - 1)
-		new_hover_column = min(int(event.x / self.tv.txt_width), len(self.tv.trk) -1)
 
 		if self.tv.trk[self.col][self.row].type != 1:
 			return False
@@ -97,7 +110,6 @@ class TimeshiftEditor():
 
 		vel = 0
 
-		yy = (self.tv.txt_height - cfg.editor_row_height * self.tv.txt_height) / 2.0
 		if event.y > y1 and event.y < y2:
 			vel = min(max(((event.x - self.x_from) / self.x_to) * 98.0, 0), 98)
 			vel = vel - 49

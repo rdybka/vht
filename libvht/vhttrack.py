@@ -7,6 +7,7 @@ class VHTTrack(Iterable):
 		self._vht_handle = vht
 		self._trk_handle = trk;
 		self.index = index
+		self.name = ""
 		super()
 
 	def __len__(self):

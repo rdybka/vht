@@ -201,6 +201,7 @@ class VHTModule(Iterable):
 				t["nrows"] = trk.nrows
 				t["nsrows"] = trk.nsrows
 				t["playing"] = trk.playing
+				t["name"] = trk.name
 				t["col"] = []
 
 				for col in trk:
@@ -234,6 +235,7 @@ class VHTModule(Iterable):
 				for trk in seq["trk"]:
 					t = s.add_track(trk["port"], trk["channel"], trk["nrows"], trk["nsrows"])
 					t.playing = trk["playing"]
+					t.name = trk["name"]
 					for cc, col in enumerate(trk["col"]):
 						if cc == 0:
 							c = t[0]

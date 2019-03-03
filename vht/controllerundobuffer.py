@@ -1,3 +1,20 @@
+# Valhalla Tracker
+# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# @schtixfnord
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 class ControllerUndoBuffer():
 	def __init__(self, trk, ctrlnum):
 		self._trk = trk
@@ -18,20 +35,20 @@ class ControllerUndoBuffer():
 			if rr.velocity != -1:
 				state[r] = (rr.velocity, rr.linked, rr.anchor, rr.smooth)
 
-		if len(self._states):
+		if self._states:
 			s = self._state
-			for k in s.keys():
+			for k in s:
 				if k in state:
 					if state[k] == s[k]:
 						del state[k]
 				else:
 					state[k] = 0
 
-		if len(state):
+		if state:
 			self._states.append(state)
 			self._dstates.append({})
 
-		for k in state.keys():
+		for k in state:
 			self._state[k] = state[k]
 			if state[k] == 0:
 				del self._state[k]
@@ -40,20 +57,20 @@ class ControllerUndoBuffer():
 		for r, rr in enumerate(self._trk.ctrl[self._ctrlnum]):
 			dstate[r] = self._trk.get_ctrl_rec(self._ctrlnum, r)
 
-		if len(self._dstates):
+		if self._dstates:
 			s = self._dstate
-			for k in s.keys():
+			for k in s:
 				if k in dstate:
 					if dstate[k] == s[k]:
 						del dstate[k]
 				else:
 					dstate[k] = 0
 
-		if len(dstate):
+		if dstate:
 			self._dstates.append(dstate)
 			self._states.append({})
 
-		for k in dstate.keys():
+		for k in dstate:
 			self._dstate[k] = dstate[k]
 			if dstate[k] == 0:
 				del self._dstate[k]
@@ -98,4 +115,3 @@ class ControllerUndoBuffer():
 					r = self._dstate[y]
 					for yy in range(dpr):
 						self._trk.set_ctrl(self._ctrlnum, (dpr * y) + yy, r[yy])
-

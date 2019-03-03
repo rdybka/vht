@@ -1,3 +1,20 @@
+# Valhalla Tracker
+# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# @schtixfnord
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk
@@ -5,7 +22,7 @@ import cairo
 #import inspect
 
 from vht import mod, cfg
-from vht.trackviewpointer import trackviewpointer
+from vht.trackviewpointer import TrackviewPointer
 from vht.trackundobuffer import TrackUndoBuffer
 from vht.poormanspiano import PoorMansPiano
 from vht.velocityeditor import VelocityEditor
@@ -76,7 +93,7 @@ class TrackView(Gtk.DrawingArea):
 		self.seq = seq
 		self.trk = trk
 		self.parent = parent
-		self._pointer = trackviewpointer(self, trk, seq)
+		self._pointer = TrackviewPointer(self, trk, seq)
 		self.txt_width = 0
 		self.txt_height = 0
 		self.width = 0
@@ -107,8 +124,6 @@ class TrackView(Gtk.DrawingArea):
 
 		if trk:
 			self.undo_buff = TrackUndoBuffer(trk)
-			self.trk.ctrl.add(22)
-			self.trk.ctrl.add(23)
 
 		self._surface = None
 		self._context = None
@@ -118,6 +133,9 @@ class TrackView(Gtk.DrawingArea):
 		self.zero_pattern_surface = None
 		self.empty_pattern_surface = None
 		self.zero_pattern_highlight = -1
+
+		self.zero_pattern = None
+		self.empty_pattern = None
 
 		self.hover = None
 		self.edit = None
@@ -331,12 +349,10 @@ class TrackView(Gtk.DrawingArea):
 		return True
 
 	def reblit(self, from_row = -666, to_row = -666):
-		cr = self._back_context
 		crf = self._context
 		crf.set_source_surface(self._back_surface)
 
 		w = self.get_allocated_width()
-		h = self.get_allocated_height()
 
 		wnd = self.get_window()
 		ir = Gdk.Rectangle()
@@ -432,7 +448,7 @@ class TrackView(Gtk.DrawingArea):
 		#print("redraw full", of[1][3], of[1][2], of[1][1])
 		self.queue_draw()
 
-	def redraw(self, from_row = -666, to_row = -666, controller = None):
+	def redraw(self, from_row = -666, to_row = -666):
 		cr = self._back_context
 		crf = self._context
 		crf.set_source_surface(self._back_surface)
@@ -554,9 +570,6 @@ class TrackView(Gtk.DrawingArea):
 					if from_row <= r <= to_row:
 						rows_to_draw.append(r)
 
-			if rows_to_draw:
-				last_r = rows_to_draw[-1]
-
 			for r in rows_to_draw:
 				veled = 0
 				tsed = 0
@@ -590,8 +603,9 @@ class TrackView(Gtk.DrawingArea):
 				else:
 					cr.set_source(self.zero_pattern)
 
-				cr.rectangle(c * self.txt_width + xtraoffs, r * self.txt_height, self.txt_width + 5 + ed_width, self.txt_height)
-				cr.fill()
+				if self.show_notes:
+					cr.rectangle(c * self.txt_width + xtraoffs, r * self.txt_height, self.txt_width + 5 + ed_width, self.txt_height)
+					cr.fill()
 
 				if self.hover and r == self.hover[1] and c == self.hover[0]:
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight * 1.2 for col in cfg.colour))
@@ -605,23 +619,19 @@ class TrackView(Gtk.DrawingArea):
 				if self.velocity_editor or self.timeshift_editor:
 					show_selection = False
 
-				if show_selection and self.select_start and self.select_end:
+				if self.show_notes and show_selection and self.select_start and self.select_end:
 					ssx = self.select_start[0]
 					ssy = self.select_start[1]
 					sex = self.select_end[0]
 					sey = self.select_end[1]
 
 					if sex < ssx:
-						xxx = sex
-						sex	= ssx
-						ssx = xxx
+						sex, ssx = ssx, sex
 
 					if sey < ssy:
-						yyy = sey
-						sey = ssy
-						ssy = yyy
+						sey, ssy = ssy, sey
 
-					if c >= ssx and c <= sex and r >= ssy and r <= sey:
+					if ssx <= c <= sex and ssy <= r <= sey:
 						draw_text = True
 						cr.set_source_rgb(*(col * cfg.intensity_select for col in cfg.colour))
 						if c == len(self.trk) - 1:
@@ -691,7 +701,7 @@ class TrackView(Gtk.DrawingArea):
 
 				if self.show_controllers:
 					for ctrl in self.controller_editors:
-						ctrl.draw(cr, r)
+							ctrl.draw(cr, r)
 
 				if not complete:
 					if c == last_c:
@@ -751,6 +761,8 @@ class TrackView(Gtk.DrawingArea):
 				if ctrl.on_scroll(event):
 					return True
 
+		return False
+
 	def on_motion(self, widget, event):
 		if not self.trk:
 			return False
@@ -789,7 +801,7 @@ class TrackView(Gtk.DrawingArea):
 			if oldf:
 				dh = oldf.doodle_hint_row
 				oldf.doodle_hint_row = -1
-				self.redraw(dh, controller = oldf.ctrlnum)
+				self.redraw(dh)
 
 			self.parent.prop_view.redraw(self.trk.index)
 
@@ -840,7 +852,7 @@ class TrackView(Gtk.DrawingArea):
 						self.trk[nc[0]][nc[1]].delay = rr[3]
 
 					self.redraw()
-					return
+					return False
 
 			if dx or dy:
 				self.sel_dragged = True
@@ -917,7 +929,7 @@ class TrackView(Gtk.DrawingArea):
 
 	def on_button_press(self, widget, event):
 		if not self.trk:
-			return
+			return False
 
 		mod.clear_popups()
 
@@ -930,7 +942,7 @@ class TrackView(Gtk.DrawingArea):
 		offs = int(event.x) % int(self.txt_width)
 
 		# pitchwheel/controllers
-		if col >= len(self.trk) or self.show_notes == False:
+		if col >= len(self.trk) or self.show_notes is False:
 			if self.show_pitchwheel:
 				if event.x > self.pitchwheel_editor.x_from and event.x < self.pitchwheel_editor.x_to:
 					self.pitchwheel_editor.on_button_press(widget, event)
@@ -939,7 +951,7 @@ class TrackView(Gtk.DrawingArea):
 				for ctrl in self.controller_editors:
 					if event.x > ctrl.x_from and event.x < ctrl.x_to:
 						ctrl.on_button_press(widget, event)
-			return
+			return False
 
 		if event.button == cfg.delete_button:
 			if self.trk[col][row].type == 0:
@@ -956,7 +968,7 @@ class TrackView(Gtk.DrawingArea):
 
 			fldwidth =  self.txt_width / flds
 
-			if offs > fldwidth and offs < fldwidth * 2:	# reset velocity
+			if fldwidth  < offs < fldwidth * 2:	# reset velocity
 				if self.trk[col][row].type == 1:
 					self.velocity_editor = VelocityEditor(self, col, row, event)
 					self.velocity_editor.clearing = True
@@ -969,7 +981,7 @@ class TrackView(Gtk.DrawingArea):
 					return True
 
 			if self.show_timeshift:
-				if offs > fldwidth * 2 and offs < fldwidth * 3:	# reset timeshift
+				if fldwidth * 2 < offs < fldwidth * 3:	# reset timeshift
 					if self.trk[col][row].type == 1:
 						self.timeshift_editor = TimeshiftEditor(self, col, row, event)
 						self.timeshift_editor.clearing = True
@@ -1000,17 +1012,13 @@ class TrackView(Gtk.DrawingArea):
 			sey = self.select_end[1]
 
 			if sex < ssx:
-				xxx = sex
-				sex	= ssx
-				ssx = xxx
+				sex, ssx = ssx, sex
 
 			if sey < ssy:
-				yyy = sey
-				sey = ssy
-				ssy = yyy
+				sey, ssy = ssy, sey
 
-			if col >= ssx and col <= sex:
-				if row >= ssy and row <= sey:
+			if ssx <= col <= sex:
+				if ssy <= row <= sey:
 					self.sel_drag = True
 					self.sel_drag_prev = col, row
 
@@ -1050,11 +1058,11 @@ class TrackView(Gtk.DrawingArea):
 				enter_edit = False
 				self.drag = False
 
-				if offs > fldwidth and offs < fldwidth * 2:
+				if fldwidth < offs < fldwidth * 2:
 					self.velocity_editor = VelocityEditor(self, col, row, event)
 
 				if self.show_timeshift:
-					if offs > fldwidth * 2 and offs < fldwidth * 3:
+					if fldwidth * 2 < offs < fldwidth * 3:
 						self.timeshift_editor = TimeshiftEditor(self, col, row, event)
 
 				self.configure()
@@ -1146,14 +1154,10 @@ class TrackView(Gtk.DrawingArea):
 				sey = self.select_end[1]
 
 				if sex < ssx:
-					xxx = sex
-					sex	= ssx
-					ssx = xxx
+					sex, ssx = ssx, sex
 
 				if sey < ssy:
-					yyy = sey
-					sey = ssy
-					ssy = yyy
+					sey, ssy = ssy, sey
 
 				self.select_start = ssx, ssy
 				self.select_end = sex, sey
@@ -1183,7 +1187,7 @@ class TrackView(Gtk.DrawingArea):
 			oh = self.hover
 			self.hover = None
 			self.redraw(oh[1])
-			
+
 		if self.keyboard_focus:
 			hr = self.keyboard_focus.doodle_hint_row
 			self.keyboard_focus.doodle_hint_row = -1
@@ -1269,38 +1273,39 @@ class TrackView(Gtk.DrawingArea):
 			if self.edit:
 				self.redraw(self.edit[1])
 			return
-		else:		# skipping track
-			curr = None
-			for i, trk, in enumerate(self.seq):
-				if trk.index == self.trk.index:
-					curr = i
 
-			curr += inc
-			if curr >= len(self.seq):
-				curr = 0
+		# skipping track
+		curr = None
+		for i, trk, in enumerate(self.seq):
+			if trk.index == self.trk.index:
+				curr = i
 
-			if curr < 0:
-				curr = len(self.seq) - 1
+		curr += inc
+		if curr >= len(self.seq):
+			curr = 0
 
-			trk = self.parent.get_tracks()[curr]
+		if curr < 0:
+			curr = len(self.seq) - 1
 
-			if trk != self:
-				self.pmp.silence()
+		trk = self.parent.get_tracks()[curr]
 
-			old = self.edit
-			self.edit = None
-			TrackView.leave_all()
+		if trk != self:
+			self.pmp.silence()
 
-			self.keyboard_focus = None
-			self.parent.change_active_track(trk)
+		old = self.edit
+		self.edit = None
+		TrackView.leave_all()
 
-			self.parent.seq.set_midi_focus(trk.trk.index)
-			self.parent.prop_view.redraw()
+		self.keyboard_focus = None
+		self.parent.change_active_track(trk)
 
-			trk.edit = (0 if trk.show_notes else len(trk.trk)), int(round((old[1] * self.spacing) / trk.spacing))
-			trk.redraw(min(trk.edit[1], trk.trk.nrows - 1))
+		self.parent.seq.set_midi_focus(trk.trk.index)
+		self.parent.prop_view.redraw()
 
-			self.redraw(old[1])
+		trk.edit = (0 if trk.show_notes else len(trk.trk)), int(round((old[1] * self.spacing) / trk.spacing))
+		trk.redraw(min(trk.edit[1], trk.trk.nrows - 1))
+
+		self.redraw(old[1])
 
 	#;)
 	def go_left(self, skip_track = False, rev = True):
@@ -1316,14 +1321,10 @@ class TrackView(Gtk.DrawingArea):
 		sey = self.select_end[1]
 
 		if sex < ssx:
-			xxx = sex
-			sex	= ssx
-			ssx = xxx
+			sex, ssx = ssx, sex
 
 		if sey < ssy:
-			yyy = sey
-			sey = ssy
-			ssy = yyy
+			sey, ssy = ssy, sey
 
 		ret = []
 		for x in range(ssx, sex + 1):
@@ -1365,19 +1366,15 @@ class TrackView(Gtk.DrawingArea):
 		# single row - don't copy if empty
 		if ssy == sey:
 			if self.trk[ssx][ssy].type == 0:
-				return
+				return None
 
 		if sex < ssx:
-			xxx = sex
-			sex	= ssx
-			ssx = xxx
+			sex, ssx = ssx, sex
 
 		if sey < ssy:
-			yyy = sey
-			sey = ssy
-			ssy = yyy
+			sey, ssy = ssy, sey
 
-		if dest == None:
+		if dest is None:
 			d = TrackView.clipboard
 		else:
 			d = dest
@@ -1414,7 +1411,7 @@ class TrackView(Gtk.DrawingArea):
 		dx = 0
 		dy = 0
 
-		for v in d.keys():
+		for v in d:
 			dx = max(dx, v[0])
 			dy = max(dy, v[1])
 
@@ -1423,7 +1420,7 @@ class TrackView(Gtk.DrawingArea):
 
 		if self.edit:
 			new_y = None
-			for k in d.keys():
+			for k in d:
 				dx = self.edit[0] + k[0]
 				dy = self.edit[1] + k[1]
 				new_y = min(dy + cfg.skip, self.trk.nrows - 1)
@@ -1459,7 +1456,7 @@ class TrackView(Gtk.DrawingArea):
 
 				dd.append(row)
 
-			for k in d.keys():
+			for k in d:
 				r = d[k]
 				dd[k[1]][k[0]] = r
 
@@ -1503,6 +1500,8 @@ class TrackView(Gtk.DrawingArea):
 				self.undo_buff.add_state()
 				return True
 
+		return False
+
 	def toggle_time(self):
 		self.show_timeshift = not self.show_timeshift
 		self.parent.redraw_track(self.trk)
@@ -1536,7 +1535,7 @@ class TrackView(Gtk.DrawingArea):
 		self.show_notes = not self.show_notes
 
 		# are we editing?
-		if self.edit and self.edit[0] < len(self.trk) and self.keyboard_focus == None:
+		if self.edit and self.edit[0] < len(self.trk) and self.keyboard_focus is None:
 			if self.show_pitchwheel:
 				self.pitchwheel_editor.edit = self.edit[1]
 				self.keyboard_focus = self.pitchwheel_editor
@@ -1544,7 +1543,7 @@ class TrackView(Gtk.DrawingArea):
 				self.keyboard_focus = self.controller_editors[0]
 				self.controller_editors[0].edit = self.edit[1]
 
-		if not self.edit and self.keyboard_focus == None:
+		if not self.edit and self.keyboard_focus is None:
 			if self.show_pitchwheel:
 				self.keyboard_focus = self.pitchwheel_editor
 			elif self.show_controllers:
@@ -1584,21 +1583,13 @@ class TrackView(Gtk.DrawingArea):
 
 	def on_key_press(self, widget, event):
 		if not self.trk:
-			return
+			return False
 
 		shift = False
-		ctrl = False
-		alt = False
 
 		if event.state:
 			if event.state & Gdk.ModifierType.SHIFT_MASK:
 				shift = True
-
-			if event.state & Gdk.ModifierType.CONTROL_MASK:
-				ctrl = True
-
-			if event.state & Gdk.ModifierType.MOD1_MASK:
-				alt = True
 
 		if cfg.key["exit_edit"].matches(event):
 			self.leave_all()
@@ -1619,7 +1610,7 @@ class TrackView(Gtk.DrawingArea):
 		if cfg.key["toggle_controls"].matches(event):
 			return self.toggle_controls()
 
-		if self.keyboard_focus != None and self.select_start == None:
+		if self.keyboard_focus is not None and self.select_start is None:
 			if self.keyboard_focus.on_key_press(widget, event):
 				return True
 
@@ -1836,13 +1827,14 @@ class TrackView(Gtk.DrawingArea):
 					self.edit = None
 					self.redraw(self.select_start[1], self.select_end[1])
 					return True
-				else:
-					self.edit = self.edit[0], self.edit[1] + 1
-					if self.edit[1] >= self.trk.nrows:
-						self.edit = self.edit[0], 0
 
-					self.redraw(self.edit[1])
-					redr = True
+
+				self.edit = self.edit[0], self.edit[1] + 1
+				if self.edit[1] >= self.trk.nrows:
+					self.edit = self.edit[0], 0
+
+				self.redraw(self.edit[1])
+				redr = True
 			else:
 				if shift:
 					oldy = self.select_start[1]
@@ -1851,15 +1843,15 @@ class TrackView(Gtk.DrawingArea):
 					self.redraw(oldy, oldyy)
 					self.redraw(self.select_start[1], self.select_end[1])
 					return True
-				else:
-					if self.select_start:
-						old = self.select_start[1], self.select_end[1]
-						self.edit = self.select_end[0], min(self.select_end[1] + 1, self.trk.nrows - 1)
-						self.select_start = None
-						self.select_end = None
-						self.redraw(*(old))
-						self.redraw(self.edit[1])
-					return True
+
+				if self.select_start:
+					old = self.select_start[1], self.select_end[1]
+					self.edit = self.select_end[0], min(self.select_end[1] + 1, self.trk.nrows - 1)
+					self.select_start = None
+					self.select_end = None
+					self.redraw(*(old))
+					self.redraw(self.edit[1])
+				return True
 
 		if event.keyval == 65362:			# up
 			if self.edit:
@@ -1869,13 +1861,13 @@ class TrackView(Gtk.DrawingArea):
 					self.edit = None
 					self.redraw(self.select_start[1], self.select_end[1])
 					return True
-				else:
-					self.edit = self.edit[0], self.edit[1] - 1
-					if self.edit[1] < 0:
-						self.edit = self.edit[0], self.trk.nrows - 1
 
-					self.redraw(self.edit[1])
-					redr = True
+				self.edit = self.edit[0], self.edit[1] - 1
+				if self.edit[1] < 0:
+					self.edit = self.edit[0], self.trk.nrows - 1
+
+				self.redraw(self.edit[1])
+				redr = True
 			else:
 				if shift:
 					oldy = self.select_start[1]
@@ -1884,15 +1876,15 @@ class TrackView(Gtk.DrawingArea):
 					self.redraw(oldy, oldyy)
 					self.redraw(self.select_start[1], self.select_end[1])
 					return True
-				else:
-					if self.select_start:
-						old = self.select_start[1], self.select_end[1]
-						self.edit = self.select_end[0], max(self.select_end[1] - 1, 0)
-						self.select_start = None
-						self.select_end = None
-						self.redraw(*(old))
-						self.redraw(self.edit[1])
-					return True
+
+				if self.select_start:
+					old = self.select_start[1], self.select_end[1]
+					self.edit = self.select_end[0], max(self.select_end[1] - 1, 0)
+					self.select_start = None
+					self.select_end = None
+					self.redraw(*(old))
+					self.redraw(self.edit[1])
+				return True
 
 		if event.keyval == 65363:			# right
 			if not shift:
@@ -2184,7 +2176,7 @@ class TrackView(Gtk.DrawingArea):
 
 	def on_key_release(self, widget, event):
 		if not self.trk:
-			return
+			return False
 
 		shift = False
 		ctrl = False
@@ -2220,7 +2212,7 @@ class TrackView(Gtk.DrawingArea):
 		if shift or ctrl or alt:
 			return True
 
-		if self.keyboard_focus == None:
+		if self.keyboard_focus is None:
 			self.pmp.key2note(Gdk.keyval_to_lower(event.keyval), True)
 
 		return False

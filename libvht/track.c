@@ -62,7 +62,7 @@ track *track_new(int port, int channel, int len, int songlen) {
 		trk->ring[c] = -1;
 	}
 
-	trk->ctrlpr = TRACK_DEFAULT_CONTROLS_PER_ROW;
+	trk->ctrlpr = TRACK_CONTROLS_PER_ROW;
 	trk->nctrl = 0;
 	trk->ctrl = 0;
 	trk->ctrlnum = 0;

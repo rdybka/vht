@@ -1,9 +1,26 @@
+# Valhalla Tracker
+# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# @schtixfnord
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import math
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk
 
-import math
-from vht import *
+from vht import cfg, mod
 
 class PoorMansPiano():
 	def __init__(self, trk, seq):
@@ -66,7 +83,7 @@ class PoorMansPiano():
 			mnt -= 12
 
 		if not note_off:
-			if not self.note_on == mnt:
+			if self.note_on != mnt:
 				mod.sneakily_queue_midi_note_on(self.seq._seq_handle, self.trk.port, self.trk.channel, mnt, cfg.velocity)
 				self.note_on = mnt
 				self.ringing.append(mnt)

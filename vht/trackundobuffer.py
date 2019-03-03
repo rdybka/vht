@@ -1,3 +1,19 @@
+# Valhalla Tracker
+# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# @schtixfnord
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class TrackUndoBuffer():
 	def __init__(self, trk):
@@ -14,19 +30,19 @@ class TrackUndoBuffer():
 				if r.type:
 					state[(x, y)] = (r.type, r.note, r.velocity, r.delay)
 
-		if len(self._states):
+		if self._states:
 			s = self._state
-			for k in s.keys():
+			for k in s:
 				if k in state:
 					if state[k] == s[k]:
 						del state[k]
 				else:
 					state[k] = 0
 
-		if len(state) or add_if_empty:
+		if state or add_if_empty:
 			self._states.append(state)
 
-		for k in state.keys():
+		for k in state:
 			self._state[k] = state[k]
 			if state[k] == 0:
 				del self._state[k]
@@ -45,7 +61,7 @@ class TrackUndoBuffer():
 					del self._state[k]
 
 		cols = 0
-		for k in self._state.keys():
+		for k in self._state:
 			if k[0] > cols:
 				cols = k[0]
 

@@ -77,13 +77,24 @@ class ControllersView(Gtk.Box):
 		return True
 
 	def rebuild(self, just_gui = False):
-		for wdg in self.box.get_children():
-			self.box.remove(wdg)
+		reuse = False
+
+		if len(self.box.get_children()) == self.trk.nctrl - 1:
+			reuse = True
+		
+		if not reuse:
+			for wdg in self.box.get_children():
+				self.box.remove(wdg)
 
 		for i, c in enumerate(self.trk.ctrls):
 			if c != -1:
-				rw = ControllersViewRow(self, self.trk, c, i)
-				self.box.pack_start(rw, False, False, 0)
+				if not reuse:
+					rw = ControllersViewRow(self, self.trk, c, i)
+					self.box.pack_start(rw, False, False, 0)
+				else:
+					rw = self.box.get_children()[i - 1]
+					rw.ctrlnum = c
+					rw.ctrl_adj.set_value(c)
 
 		self.parent.refresh()
 
@@ -95,4 +106,5 @@ class ControllersView(Gtk.Box):
 
 	def on_add_clicked(self, wdg):
 		self.trk.ctrl.add(int(self.new_ctrl_adj.get_value()))
+		self.trkview.show_controllers = True
 		self.rebuild()

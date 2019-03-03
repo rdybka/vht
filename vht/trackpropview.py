@@ -157,7 +157,7 @@ class TrackPropView(Gtk.DrawingArea):
 			active = True
 
 		if self.trk == None:
-			(x, y, width, height, dx, dy) = cr.text_extents("000|")
+			(x, y, width, height, dx, dy) = cr.text_extents("00_|")
 			self.txt_height = height
 			self.txt_width = int(dx)
 
@@ -196,9 +196,9 @@ class TrackPropView(Gtk.DrawingArea):
 			self.queue_draw()
 			return
 
-		(x, y, width, height, dx, dy) = cr.text_extents("000 000|")
+		(x, y, width, height, dx, dy) = cr.text_extents("000 00_|")
 		if self.trkview.show_timeshift:
-			(x, y, width, height, dx, dy) = cr.text_extents("000 000 000|")
+			(x, y, width, height, dx, dy) = cr.text_extents("000 000 00_|")
 
 		self.txt_height = height
 		self.txt_width = int(dx)
@@ -278,9 +278,6 @@ class TrackPropView(Gtk.DrawingArea):
 				if mod.record == 1:
 					cr.set_source_rgb(*(cfg.record_colour))
 
-		cr.move_to(x, self.txt_height * cfg.seq_spacing)
-		cr.show_text("c%02d p%02d" % (self.trk.channel, self.trk.port))
-
 		(x, y, width, height, dx, dy) = cr.text_extents("***!")
 		self.button_rect.height = self.txt_height * cfg.seq_spacing
 		self.button_rect.x = self.trkview.width - (dx + x)
@@ -309,6 +306,43 @@ class TrackPropView(Gtk.DrawingArea):
 		cr.move_to(self.width - (width / 2), self.txt_height * cfg.seq_spacing * .3)
 		cr.line_to(self.width - (width / 2), 2 * self.txt_height * cfg.seq_spacing)
 		cr.stroke()
+
+		# display labels
+		cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
+
+		cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
+		if mod.active_track:
+			if mod.active_track.trk.index == self.trk.index:
+				cr.set_source_rgb(0, 0, 0)
+				if mod.record == 1:
+					cr.set_source_rgb(*(cfg.record_colour))
+		
+		cr.move_to(x, self.txt_height * .95 *  cfg.seq_spacing)
+		if self.trk.name:
+			pref = ""
+			if not self.trkview.show_notes:
+				pref = "%02d:%02d " % (self.trk.port, self.trk.channel)
+				
+			cr.show_text("%s%s" % (pref, self.trk.name))
+		else:
+			cr.show_text("p%02d c%02d" % (self.trk.port, self.trk.channel))
+	
+		self._context.set_font_size(cfg.seq_font_size * .6)
+		cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
+		yadj = 1.7
+		
+		if self.trk.name and self.trkview.show_notes:
+			cr.move_to(0, self.txt_height * yadj* cfg.seq_spacing)
+			cr.show_text("%02d:%02d" % (self.trk.port, self.trk.channel))
+
+		if self.trkview.show_pitchwheel:
+			cr.move_to(self.trkview.pitchwheel_editor.x_from, self.txt_height * yadj * cfg.seq_spacing)
+			cr.show_text(" pitch")
+
+		if self.trkview.show_controllers:
+			for c in self.trkview.controller_editors:
+				cr.move_to(c.x_from, self.txt_height * yadj * cfg.seq_spacing)
+				cr.show_text(" ctrl %d" % self.trkview.trk.ctrls[c.ctrlnum])
 
 		if self.trk:
 			self.popover.refresh()
