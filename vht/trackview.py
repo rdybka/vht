@@ -429,18 +429,28 @@ class TrackView(Gtk.DrawingArea):
 		if oldw:
 			oldr = oldw.edit
 
+		# preserve undos
+		undos = {}		
+		for c in self.controller_editors:
+			undos[c.midi_ctrlnum] = c.undo_buff
+
 		self.keyboard_focus = None
 		self.controller_editors = []
 		self.configure()
 		self.redraw()
 
 		if oldw:
-			fnum = oldw.ctrlnum
+			fnum = oldw.midi_ctrlnum
 
 			for w in self.controller_editors + [self.pitchwheel_editor]:
-				if w.ctrlnum == fnum:
+				if w.midi_ctrlnum == fnum:
 					self.keyboard_focus = w
 					self.keyboard_focus.edit = oldr
+					
+		if undos:
+			for c in self.controller_editors:
+				if c.midi_ctrlnum in undos:
+					c.undo_buff = undos[c.midi_ctrlnum]
 
 		# who's calling?
 		#cf = inspect.currentframe()
