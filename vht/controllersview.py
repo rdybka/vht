@@ -4,6 +4,7 @@ from gi.repository import Gtk, Gio
 
 from vht import cfg, mod
 from vht.controllersviewrow import ControllersViewRow
+from vht.controllereditor import ControllerEditor
 
 class ControllersView(Gtk.Box):
 	def __init__(self, trk, trkview, parent):
@@ -96,6 +97,16 @@ class ControllersView(Gtk.Box):
 					rw.ctrlnum = c
 					rw.ctrl_adj.set_value(c)
 
+		for i, w in enumerate(self.box.get_children()):
+			w.up_button.set_sensitive(True)
+			w.down_button.set_sensitive(True)
+			
+			if i == 0:
+				w.up_button.set_sensitive(False)
+			
+			if i == self.trk.nctrl - 2:
+				w.down_button.set_sensitive(False)
+
 		self.parent.refresh()
 
 		if not just_gui:
@@ -106,5 +117,6 @@ class ControllersView(Gtk.Box):
 
 	def on_add_clicked(self, wdg):
 		self.trk.ctrl.add(int(self.new_ctrl_adj.get_value()))
+		self.trkview.controller_editors.append(ControllerEditor(self.trkview, len(self.trk.ctrl) - 1))
 		self.trkview.show_controllers = True
 		self.rebuild()

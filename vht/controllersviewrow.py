@@ -19,6 +19,7 @@ class ControllersViewRow(Gtk.ActionBar):
 		button.add(image)
 		button.connect("clicked", self.on_go_up_clicked)
 		self.pack_start(button)
+		self.up_button = button
 
 		button = Gtk.Button()
 		icon = Gio.ThemedIcon(name="go-down")
@@ -26,6 +27,7 @@ class ControllersViewRow(Gtk.ActionBar):
 		button.add(image)
 		button.connect("clicked", self.on_go_down_clicked)
 		self.pack_start(button)
+		self.down_button = button
 
 		self.ctrl_adj = Gtk.Adjustment(1, 1, 127, 1.0, 10.0)
 		self.ctrl_button = Gtk.SpinButton()
@@ -43,22 +45,41 @@ class ControllersViewRow(Gtk.ActionBar):
 		self.pack_start(button)
 		self.show_all()
 
+	def reassign_in_tv(self):
+		for c, cc in enumerate(self.parent.trkview.controller_editors):
+			cc.ctrlnum = c + 1
+			cc.ctrlrows = self.trk.ctrl[c + 1]
+			cc.undo_buff._ctrlnum = c + 1
+
 	def on_del_clicked(self, wdg):
+		del self.parent.trkview.controller_editors[self.index - 1]
 		self.trk.ctrl.delete(self.index)
+		self.reassign_in_tv()		
 		self.parent.rebuild()
 
 	def on_go_up_clicked(self, wdg):
 		if self.index > 1:
+			self.parent.trkview.controller_editors[self.index - 2], self.parent.trkview.controller_editors[self.index - 1] = \
+				self.parent.trkview.controller_editors[self.index - 1], self.parent.trkview.controller_editors[self.index - 2]
+
 			self.trk.ctrl.swap(self.index, self.index - 1)
+			self.reassign_in_tv()
+
 		self.parent.rebuild()
 
 	def on_go_down_clicked(self, wdg):
 		if self.index < self.trk.nctrl - 1:
+			self.parent.trkview.controller_editors[self.index], self.parent.trkview.controller_editors[self.index - 1] = \
+				self.parent.trkview.controller_editors[self.index - 1], self.parent.trkview.controller_editors[self.index]
+			
 			self.trk.ctrl.swap(self.index, self.index + 1)
+			self.reassign_in_tv()
+			
 		self.parent.rebuild()
 
 	def on_num_changed(self, adj):
 		self.ctrlnum = int(adj.get_value())
 		self.trk.ctrl[self.index].ctrlnum = self.ctrlnum
+		self.parent.trkview.controller_editors[self.index - 1].midi_ctrlnum = self.ctrlnum
 		self.parent.rebuild()
 

@@ -344,8 +344,6 @@ class TrackPropView(Gtk.DrawingArea):
 				cr.move_to(c.x_from, self.txt_height * yadj * cfg.seq_spacing)
 				cr.show_text(" ctrl %d" % self.trkview.trk.ctrls[c.ctrlnum])
 
-		if self.trk:
-			self.popover.refresh()
 		self.queue_draw()
 
 	def on_enter(self, wdg, prm):
