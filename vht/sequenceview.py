@@ -384,18 +384,6 @@ class SequenceView(Gtk.Box):
 		if mod.active_track:
 			return mod.active_track.on_key_press(widget, event)
 
-#			if not mod.active_track.edit:
-#				vals = [65364, 65362, 65363, 65361, 65366, 65365, 65360, 65367]
-
-#				for v in vals:
-#					if event.keyval == v:
-#						if not mod.active_track.select_start:
-#							mod.active_track.edit = 0, 0
-#							mod.active_track.redraw(0)
-#							return True
-
-#			return mod.active_track.on_key_press(widget, event)
-
 		return False
 
 	def on_key_release(self, widget, event):

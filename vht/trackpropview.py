@@ -42,6 +42,8 @@ class TrackPropView(Gtk.DrawingArea):
 		self._surface = None
 		self._context = None
 
+		self.popped = False
+
 		if trk:
 			self.popover = TrackPropViewPopover(self, trk)
 		else:
@@ -335,7 +337,7 @@ class TrackPropView(Gtk.DrawingArea):
 			cr.move_to(0, self.txt_height * yadj* cfg.seq_spacing)
 			cr.show_text("%02d:%02d" % (self.trk.port, self.trk.channel))
 
-		if self.trkview.show_pitchwheel:
+		if self.trkview.show_pitchwheel and self.trkview.pitchwheel_editor:
 			cr.move_to(self.trkview.pitchwheel_editor.x_from, self.txt_height * yadj * cfg.seq_spacing)
 			cr.show_text(" pitch")
 

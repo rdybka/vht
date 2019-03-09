@@ -100,10 +100,10 @@ class ControllersView(Gtk.Box):
 		for i, w in enumerate(self.box.get_children()):
 			w.up_button.set_sensitive(True)
 			w.down_button.set_sensitive(True)
-			
+
 			if i == 0:
 				w.up_button.set_sensitive(False)
-			
+
 			if i == self.trk.nctrl - 2:
 				w.down_button.set_sensitive(False)
 

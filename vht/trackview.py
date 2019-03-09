@@ -19,7 +19,10 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk
 import cairo
-#import inspect
+
+#  --- not in production
+import inspect
+import time
 
 from vht import mod, cfg
 from vht.trackviewpointer import TrackviewPointer
@@ -119,11 +122,14 @@ class TrackView(Gtk.DrawingArea):
 
 		self.show_notes = True
 		self.show_timeshift = False
-		self.show_pitchwheel = False
-		self.show_controllers = False
+		self.show_pitchwheel = True
+		self.show_controllers = True
 
 		if trk:
 			self.undo_buff = TrackUndoBuffer(trk)
+			self.trk.ctrl.add(23)
+			self.trk.ctrl.add(69)
+			self.trk.ctrl.add(123)
 
 		self._surface = None
 		self._context = None
@@ -695,11 +701,12 @@ class TrackView(Gtk.DrawingArea):
 				if tsed and 0 < rw.type < 3:
 					self.timeshift_editor.draw(cr, c, r, rw)
 
-				if self.show_pitchwheel:
-					self.pitchwheel_editor.draw(cr, r)
+				if c == len(self.trk) - 1:
+					if self.show_pitchwheel:
+						self.pitchwheel_editor.draw(cr, r)
 
-				if self.show_controllers:
-					for ctrl in self.controller_editors:
+					if self.show_controllers:
+						for ctrl in self.controller_editors:
 							ctrl.draw(cr, r)
 
 				if not complete:
@@ -2203,7 +2210,8 @@ class TrackView(Gtk.DrawingArea):
 			if event.state & Gdk.ModifierType.MOD1_MASK:
 				alt = True
 
-		self.pitchwheel_editor.on_key_release(widget, event)
+		if self.pitchwheel_editor:
+			self.pitchwheel_editor.on_key_release(widget, event)
 
 		for c in self.controller_editors:
 			c.on_key_release(widget, event)

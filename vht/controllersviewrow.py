@@ -54,7 +54,7 @@ class ControllersViewRow(Gtk.ActionBar):
 	def on_del_clicked(self, wdg):
 		del self.parent.trkview.controller_editors[self.index - 1]
 		self.trk.ctrl.delete(self.index)
-		self.reassign_in_tv()		
+		self.reassign_in_tv()
 		self.parent.rebuild()
 
 	def on_go_up_clicked(self, wdg):
@@ -71,10 +71,10 @@ class ControllersViewRow(Gtk.ActionBar):
 		if self.index < self.trk.nctrl - 1:
 			self.parent.trkview.controller_editors[self.index], self.parent.trkview.controller_editors[self.index - 1] = \
 				self.parent.trkview.controller_editors[self.index - 1], self.parent.trkview.controller_editors[self.index]
-			
+
 			self.trk.ctrl.swap(self.index, self.index + 1)
 			self.reassign_in_tv()
-			
+
 		self.parent.rebuild()
 
 	def on_num_changed(self, adj):

@@ -15,6 +15,7 @@ rm -rf vht/*.pyc
 rm -rf dist
 rm -rf vht.egg-info
 rm -f libvht/libvht_wrap.c
+rm vht.prof vht.calltree
 
 cd libvht
 ./beautify.sh

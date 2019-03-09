@@ -379,7 +379,7 @@ class ControllerEditor():
 			return
 
 		ctrl = self.trk.get_ctrl_rec(self.ctrlnum, r)
-		yp = yh / len(ctrl)
+		yp = yh / self.trk.ctrlpr
 		y0 = r * yh
 
 		# doodles
@@ -430,7 +430,7 @@ class ControllerEditor():
 			cr.fill()
 
 		ctrl = self.trk.get_ctrl_env(self.ctrlnum, r)
-		yp = yh / len(ctrl)
+		yp = yh / self.trk.ctrlpr
 		y0 = r * yh
 
 		cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), .4)
@@ -723,10 +723,10 @@ class ControllerEditor():
 					self.edit = self.trk.nrows - 1
 
 			if event.keyval == 65363:						# right
-				return shift
+				return False
 
 			if event.keyval == 65361:						# left
-				return shift
+				return False
 
 			if event.keyval == 65360:						# home
 				self.edit = 0

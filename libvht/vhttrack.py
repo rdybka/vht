@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 from libvht.vhtcolumn import VHTColumn
 from libvht.vhtctrllist import VHTCtrlList
+from libvht.vhtquicklist import VHTQuickList
 
 class VHTTrack(Iterable):
 	def __init__(self, vht, trk, index):
@@ -127,11 +128,7 @@ class VHTTrack(Iterable):
 		ret_arr = self._vht_handle.int_array(lpr)
 		self._vht_handle.track_get_ctrl(self._trk_handle, ret_arr, lpr, c, r)
 
-		ret_lst = []
-		for i in range(lpr):
-			ret_lst.append(ret_arr[i])
-
-		return ret_lst
+		return VHTQuickList(ret_arr, lpr)
 
 	# gets all controls for given row (recorded/rendered part/doodles)
 	def get_ctrl_rec(self, c, r):
@@ -139,11 +136,7 @@ class VHTTrack(Iterable):
 		ret_arr = self._vht_handle.int_array(lpr)
 		self._vht_handle.track_get_ctrl_rec(self._trk_handle, ret_arr, lpr, c, r)
 
-		ret_lst = []
-		for i in range(lpr):
-			ret_lst.append(ret_arr[i])
-
-		return ret_lst
+		return VHTQuickList(ret_arr, lpr)
 
 	# gets all controls for given row (env part)
 	def get_ctrl_env(self, c, r):
@@ -151,11 +144,7 @@ class VHTTrack(Iterable):
 		ret_arr = self._vht_handle.int_array(lpr)
 		self._vht_handle.track_get_ctrl_env(self._trk_handle, ret_arr, lpr, c, r)
 
-		ret_lst = []
-		for i in range(lpr):
-			ret_lst.append(ret_arr[i])
-
-		return ret_lst
+		return VHTQuickList(ret_arr, lpr)
 
 	# gets last sent controller value
 	def get_lctrlval(self, c):
