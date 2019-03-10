@@ -40,9 +40,14 @@ class MainWin(Gtk.ApplicationWindow):
 		label = Gtk.Label("BPM:")
 		self.hb.pack_start(label)
 
-		self.adj = Gtk.Adjustment(120.0, mod.min_bpm, mod.max_bpm, 1.0, 10.0)
+		self.adj = Gtk.Adjustment(120.0, mod.min_bpm, mod.max_bpm, 1, 10.0, 1.0)
 		self.bpmbutton = Gtk.SpinButton()
 		self.bpmbutton.set_adjustment(self.adj)
+		self.bpmbutton.set_digits(2)
+		#self.bpmbutton.set_snap_to_ticks(True)
+		self.bpmbutton.set_numeric(True)
+		self.bpmbutton.set_increments(1, 10)
+
 		self.hb.pack_start(self.bpmbutton)
 		self.adj.set_value(mod.bpm)
 		self.adj.connect("value-changed", self.on_bpm_changed)
@@ -93,7 +98,7 @@ class MainWin(Gtk.ApplicationWindow):
 		mod.play = False
 
 	def on_bpm_changed(self, adj):
-		mod.bpm = int(adj.get_value())
+		mod.bpm = adj.get_value()
 
 	def load(self, filename):
 		self._sequence_view.load(filename)

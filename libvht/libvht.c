@@ -15,7 +15,7 @@ void stop() {
 	jack_stop();
 }
 
-int module_get_bpm() {
+float module_get_bpm() {
 	return module.bpm;
 }
 
@@ -23,7 +23,7 @@ int get_jack_max_ports() {
 	return JACK_CLIENT_MAX_PORTS;
 }
 
-void module_set_bpm(int bpm) {
+void module_set_bpm(float bpm) {
 	module.bpm = bpm;
 }
 

@@ -47,8 +47,8 @@ extern int module_is_recording(void);
 
 extern void module_reset(void);
 
-extern int module_get_bpm(void);
-extern void module_set_bpm(int);
+extern float module_get_bpm(void);
+extern void module_set_bpm(float);
 
 extern int module_get_nports(void);
 

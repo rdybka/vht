@@ -48,6 +48,8 @@ class Configuration():
 		self.select_button = 1
 		self.delete_button = 3
 
+		self.new_tracks_left = True
+
 		self.key = {
 			# sequenceview		shift, ctrl, alt
 			"quit": cfgkey("q", False, True, False),

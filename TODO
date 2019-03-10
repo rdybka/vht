@@ -1,4 +1,13 @@
-- newly added tracks on left
+* make bpm a float
+- popup delay before closing
+- popup delay before opening
+* newly added tracks on left (as option)
+* staying in edit mode after deleting track
+* indicate recording in statusbar
+* entering velocityeditor from note-offs
+* right click
+	* stop recording
+	* reset velocity to set vel
 * controllers
 	* refactor pitchwheeleditor into controllereditor
 	* cursor movement
@@ -6,28 +15,19 @@
 	* gui in track props
 	* envelopes
 		* snapping
-- trackview redraw(controller) situation
-- right click
-	- stop recording
-	* reset velocity to set vel
-- indicate recording in statusbar
-- track names
-- entering velocityeditor from note-offs
-- make bpm a float!!!!!!!!!!!!!
-- clone - ctrl-n
-- gui magic
+* extended view
+	* show/hide timeshift
+	* disable notes hiding when controllers off
+* auto-scroll
+	* fix with visible controllers
+* track names
+* gui magic
 	* rotation
+- clone - ctrl-n
 ? get rid of overshoot thingys?
 - move menu in fullscreen
 - disable menu when no jack
-- deleting track mutes it
-? metronome
-- extended view
-	* show/hide timeshift
-	- disable notes hiding when controllers off
-- auto-scroll
-	- fix with visible controllers
-	- inhibit while moving notes
+* deleting track mutes it
 - triggers
 - timeline
 - configuration
@@ -36,5 +36,3 @@
 ? save notification
 - split filename in title
 - magic transposing
-* popup delay before closing
-- popup delay before opening

@@ -160,7 +160,7 @@ void module_mute() {
 
 void module_free() {
 	// fresh start?
-	if (module.bpm == 0) {
+	if (module.bpm == -1) {
 		return;
 	}
 
@@ -170,7 +170,7 @@ void module_free() {
 
 		free(module.seq);
 		module.seq = NULL;
-		module.bpm = 0;
+		module.bpm = -1;
 	}
 }
 

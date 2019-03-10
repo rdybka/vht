@@ -5,6 +5,7 @@ import cairo
 
 from vht import *
 from vht.trackview import TrackView
+from vht.pulsar import Pulsar
 
 class StatusBar(Gtk.DrawingArea):
 	def __init__(self):
@@ -37,6 +38,8 @@ class StatusBar(Gtk.DrawingArea):
 		self.tt_rect = Gdk.Rectangle()
 		self.tt_txt = None
 
+		self.pulse = Pulsar(4)
+
 	def redraw(self):
 		cr = self._context
 		w = self.get_allocated_width()
@@ -46,10 +49,16 @@ class StatusBar(Gtk.DrawingArea):
 
 		self.set_size_request(1, height * 1.5 * cfg.seq_spacing)
 
+		bar_col = cfg.colour
+		intensity = 1.0
+		if mod.record:
+			bar_col = cfg.record_colour
+			intensity = self.pulse.intensity(mod[mod.curr_seq].pos)
+
 		gradient = cairo.LinearGradient(0, 0, 0, h)
-		gradient.add_color_stop_rgb(0, *(col * cfg.intensity_background for col in cfg.colour))
-		gradient.add_color_stop_rgb(.3, *(col *  cfg.intensity_txt for col in cfg.colour))
-		gradient.add_color_stop_rgb(.7, *(col *  cfg.intensity_txt for col in cfg.colour))
+		gradient.add_color_stop_rgb(0, *(col * cfg.intensity_background * intensity for col in bar_col))
+		gradient.add_color_stop_rgb(.3, *(col *  cfg.intensity_txt * intensity for col in bar_col))
+		gradient.add_color_stop_rgb(.7, *(col *  cfg.intensity_txt * intensity for col in bar_col))
 
 		gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_background for col in cfg.colour))
 
@@ -79,7 +88,13 @@ class StatusBar(Gtk.DrawingArea):
 		txt = "%02d:%02d:%02d:%03d" % (cs, t, c, r)
 		h = ((height * 1.5 * cfg.seq_spacing) / 2.0) + (height / 2.0)
 
-		cr.set_source_rgb(*(col * 0 for col in cfg.colour))
+		intensity = 1.0 - intensity
+
+		if mod.record:
+			cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
+		else:
+			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
+
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(self.pos[-1], h)
 		cr.show_text(txt)
@@ -89,7 +104,7 @@ class StatusBar(Gtk.DrawingArea):
 		if self.active_field == 1:
 			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 		else:
-			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
+			cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
 		txt = " oct:%d" % cfg.octave
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
@@ -101,7 +116,7 @@ class StatusBar(Gtk.DrawingArea):
 		if self.active_field == 2:
 			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 		else:
-			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
+			cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
 		txt = " vel:%d" % cfg.velocity
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
@@ -113,7 +128,7 @@ class StatusBar(Gtk.DrawingArea):
 		if self.active_field == 3:
 			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 		else:
-			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
+			cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
 		txt = " skp:%d" % cfg.skip
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
@@ -125,7 +140,7 @@ class StatusBar(Gtk.DrawingArea):
 		if self.active_field == 4:
 			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 		else:
-			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
+			cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
 		txt = " hig:%d" % cfg.highlight
 
@@ -141,7 +156,7 @@ class StatusBar(Gtk.DrawingArea):
 		if self.active_field == 5:
 			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 		else:
-			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
+			cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
 		txt = " bpm:%d" % mod.bpm
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
@@ -153,7 +168,7 @@ class StatusBar(Gtk.DrawingArea):
 		if self.active_field == 6:
 			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 		else:
-			cr.set_source_rgb(*(col * 0 for col in cfg.colour))
+			cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
 		txt = " prt:%d" % cfg.default_midi_out_port
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
@@ -162,11 +177,17 @@ class StatusBar(Gtk.DrawingArea):
 		xx += dx
 		self.pos.append(xx)
 
-		cr.set_source_rgb(*(col * 0 for col in cfg.colour))
+		if mod.record:
+			cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
+		else:
+			cr.set_source_rgb(*(col * intensity for col in cfg.colour))
+
 		txt = "%02d:%03d.%03d ***" % (cs, int(mod[cs].pos), (mod[cs].pos - int(mod[cs].pos)) * 1000)
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(w - dx, h)
 		cr.show_text(txt)
+
+		cr.set_source_rgb(*(col * 0 for col in cfg.colour))
 
 		cr.move_to(0, 0)
 		cr.line_to(w, 0)

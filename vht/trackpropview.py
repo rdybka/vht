@@ -323,7 +323,7 @@ class TrackPropView(Gtk.DrawingArea):
 		if self.trk.name:
 			pref = ""
 			if not self.trkview.show_notes:
-				pref = "%02d:%02d " % (self.trk.port, self.trk.channel)
+				pref = "p%02d c%02d " % (self.trk.port, self.trk.channel)
 
 			cr.show_text("%s%s" % (pref, self.trk.name))
 		else:
@@ -335,7 +335,7 @@ class TrackPropView(Gtk.DrawingArea):
 
 		if self.trk.name and self.trkview.show_notes:
 			cr.move_to(0, self.txt_height * yadj* cfg.seq_spacing)
-			cr.show_text("%02d:%02d" % (self.trk.port, self.trk.channel))
+			cr.show_text("p%02d c%02d" % (self.trk.port, self.trk.channel))
 
 		if self.trkview.show_pitchwheel and self.trkview.pitchwheel_editor:
 			cr.move_to(self.trkview.pitchwheel_editor.x_from, self.txt_height * yadj * cfg.seq_spacing)

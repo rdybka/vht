@@ -122,14 +122,11 @@ class TrackView(Gtk.DrawingArea):
 
 		self.show_notes = True
 		self.show_timeshift = False
-		self.show_pitchwheel = True
-		self.show_controllers = True
+		self.show_pitchwheel = False
+		self.show_controllers = False
 
 		if trk:
 			self.undo_buff = TrackUndoBuffer(trk)
-			self.trk.ctrl.add(23)
-			self.trk.ctrl.add(69)
-			self.trk.ctrl.add(123)
 
 		self._surface = None
 		self._context = None
@@ -964,7 +961,9 @@ class TrackView(Gtk.DrawingArea):
 			if self.trk[col][row].type == 0:
 				trk = mod.active_track
 				if trk:
+					mod.record = 0
 					self.leave_all()
+					self.parent.redraw_track(mod.active_track.trk)
 
 				self.parent.change_active_track(self)
 				return True
@@ -1065,7 +1064,7 @@ class TrackView(Gtk.DrawingArea):
 				enter_edit = False
 				self.drag = False
 
-				if fldwidth < offs < fldwidth * 2:
+				if fldwidth < offs < fldwidth * 2 and self.trk[col][row].type == 1:
 					self.velocity_editor = VelocityEditor(self, col, row, event)
 
 				if self.show_timeshift:

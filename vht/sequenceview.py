@@ -368,19 +368,18 @@ class SequenceView(Gtk.Box):
 				self.seq[t].trigger()
 				self.prop_view.redraw()
 
-		"""
 		# do we enter editing mode?
-		if not mod.active_track:
-			vals = [65364, 65362, 65363, 65361, 65366, 65365, 65360, 65367]
+		if mod.active_track:
+			if not mod.active_track.edit:
+				vals = [65364, 65362, 65363, 65361, 65366, 65365, 65360, 65367]
 
-			for v in vals:
-				if event.keyval == v:
-					mod.active_track = self.get_tracks()[0]
-					if not mod.active_track.select_start:
-						mod.active_track.edit = 0, 0
-						mod.active_track.redraw(0)
-						return True
-		"""
+				for v in vals:
+					if event.keyval == v:
+						if not mod.active_track.select_start:
+							mod.active_track.edit = 0, 0
+							mod.active_track.redraw(0)
+							return True
+
 		if mod.active_track:
 			return mod.active_track.on_key_press(widget, event)
 
@@ -439,7 +438,9 @@ class SequenceView(Gtk.Box):
 
 		if trk:
 			self.prop_view.add_track(trk, t)
-			#self.change_active_track(t)
+
+			if cfg.new_tracks_left:
+				self.prop_view.move_first(trk)
 
 		t.show()
 
@@ -460,7 +461,7 @@ class SequenceView(Gtk.Box):
 		self.prop_view.redraw()
 
 	def del_track(self, trk):
-		restore_track_index = None
+		restore_track_index = -1
 		restore_edit = None
 		if mod.active_track:
 			restore_track_index = mod.active_track.trk.index
@@ -484,11 +485,12 @@ class SequenceView(Gtk.Box):
 			for i, wdg in enumerate(self.get_tracks()):
 				wdg.trk.index = i
 
-		if restore_track_index:
+		if restore_track_index > -1:
 			restore_track_index = min(restore_track_index, len(self.seq) - 1)
-			mod.active_track = self.get_tracks()[restore_track_index]
-			if restore_edit:
-				mod.active_track.edit = min(restore_edit[0], len(mod.active_track.trk) - 1), min(restore_edit[1], mod.active_track.trk.nrows - 1)
+			if restore_track_index > -1:
+				mod.active_track = self.get_tracks()[restore_track_index]
+				if restore_edit:
+					mod.active_track.edit = min(restore_edit[0], len(mod.active_track.trk) - 1), min(restore_edit[1], mod.active_track.trk.nrows - 1)
 
 		self.recalculate_row_spacing()
 
