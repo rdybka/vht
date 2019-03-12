@@ -1361,7 +1361,7 @@ class ControllerEditor():
 		dpr = self.trk.ctrlpr 	# doodles per row
 		while p <= e:
 			for r in d:
-				if p <= e:
+				if p < e:
 					if doodles:
 						for i, val in enumerate(r):
 							self.trk.set_ctrl(self.ctrlnum, (dpr * p) + i, val)

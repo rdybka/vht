@@ -111,6 +111,17 @@ class VHTModule(Iterable):
 	def curr_seq(self):
 		return libcvht.module_get_curr_seq()
 
+	@property
+	def rpb(self):
+		return libcvht.module_get_rpb()
+		
+	@rpb.setter
+	def rpb(self, value):
+		if value:
+			libcvht.module_set_rpb(value)
+		else:
+			libcvht.module_set_rpb(4)
+
 	@record.setter
 	def record(self, value):
 		if value:

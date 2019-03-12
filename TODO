@@ -1,7 +1,9 @@
+- resync
 * make bpm a float
 - popup delay before closing
 - popup delay before opening
 * newly added tracks on left (as option)
+	- while recording
 * staying in edit mode after deleting track
 * indicate recording in statusbar
 * entering velocityeditor from note-offs

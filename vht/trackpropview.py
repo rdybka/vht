@@ -323,11 +323,11 @@ class TrackPropView(Gtk.DrawingArea):
 		if self.trk.name:
 			pref = ""
 			if not self.trkview.show_notes:
-				pref = "p%02d c%02d " % (self.trk.port, self.trk.channel)
+				pref = "p%02dc%02d " % (self.trk.port, self.trk.channel)
 
 			cr.show_text("%s%s" % (pref, self.trk.name))
 		else:
-			cr.show_text("p%02d c%02d" % (self.trk.port, self.trk.channel))
+			cr.show_text("p%02dc%02d" % (self.trk.port, self.trk.channel))
 
 		self._context.set_font_size(cfg.seq_font_size * .6)
 		cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
@@ -335,7 +335,7 @@ class TrackPropView(Gtk.DrawingArea):
 
 		if self.trk.name and self.trkview.show_notes:
 			cr.move_to(0, self.txt_height * yadj* cfg.seq_spacing)
-			cr.show_text("p%02d c%02d" % (self.trk.port, self.trk.channel))
+			cr.show_text("p%02dc%02d" % (self.trk.port, self.trk.channel))
 
 		if self.trkview.show_pitchwheel and self.trkview.pitchwheel_editor:
 			cr.move_to(self.trkview.pitchwheel_editor.x_from, self.txt_height * yadj * cfg.seq_spacing)

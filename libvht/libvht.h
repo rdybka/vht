@@ -59,6 +59,8 @@ extern void module_del_sequence(int s);
 extern void module_swap_sequence(int s1, int s2);
 extern int module_get_curr_seq(void);
 extern void module_dump_notes(int);
+extern int module_get_rpb(void);
+extern void module_set_rpb(int rpb);
 
 extern void queue_midi_note_on(sequence *seq, int port, int chn, int note, int velocity);
 extern void queue_midi_note_off(sequence *seq, int port, int chn, int note);

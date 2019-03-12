@@ -20,6 +20,7 @@ gi.require_version('Gtk', '3.0')
 import cairo
 
 from vht import cfg, mod
+from vht.pulsar import Pulsar
 from libvht.vhtsequence import VHTSequence
 
 class TrackviewPointer():
@@ -34,6 +35,8 @@ class TrackviewPointer():
 		self.height = cfg.seq_font_size
 
 		self.lpos = None
+		
+		self.pulse = Pulsar(mod.rpb)
 
 		self.stopped = False
 		self.gradient = None
@@ -79,6 +82,7 @@ class TrackviewPointer():
 			cl = cfg.colour
 			if mod.record == 2:
 				cl = cfg.record_colour
+				i = self.pulse.intensity(mod[mod.curr_seq].pos)
 
 			gradient = cairo.LinearGradient(x, y, x, y + self.height)
 			gradient.add_color_stop_rgba(0.0, *(col * i for col in cl), 0)
@@ -141,6 +145,7 @@ class TrackviewPointer():
 				if mod.active_track:
 					if mod.active_track.trk.index == self.trk.index and mod.record == 1:
 						cl = cfg.record_colour
+						i = self.pulse.intensity(pos)
 
 				gradient = cairo.LinearGradient(x, y, x, y + self.height)
 				gradient.add_color_stop_rgba(0.0, *(col * i for col in cl), 0)

@@ -49,6 +49,16 @@ int module_is_recording() {
 	return module.recording;
 }
 
+int module_get_rpb() {
+	return module.rpb;
+}
+
+void module_set_rpb(int v) {
+	module_excl_in();
+	module.rpb = v;
+	module_excl_out();
+}
+
 void module_reset() {
 	module.seq[0]->pos = 0;
 	module.zero_time = 0;

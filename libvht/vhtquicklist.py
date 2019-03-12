@@ -1,10 +1,10 @@
 from collections.abc import Iterable
 
-# a wrapper for the c int_array
+# a quick and dirty wrapper for the c int_array
 class VHTQuickList(Iterable):
 	def __init__(self, i, l):
 		self._i = i
-		self._l = l;
+		self._l = l
 		super()
 
 	def __len__(self):
@@ -13,6 +13,16 @@ class VHTQuickList(Iterable):
 	def __iter__(self):
 		for itm in range(self._l):
 			yield int(self._i[itm])
+	
+	def __eq__(self, other):
+		if isinstance(other, VHTQuickList):
+			for f in range(self._l):
+				if self._i[f] != other._i[f]:
+					return False
+		else:
+			return NotImplemented
+		
+		return True
 
 	def __getitem__(self, itm):
 		if itm >= self._l:

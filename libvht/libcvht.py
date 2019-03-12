@@ -219,6 +219,14 @@ def module_dump_notes(arg1):
     return _libcvht.module_dump_notes(arg1)
 module_dump_notes = _libcvht.module_dump_notes
 
+def module_get_rpb():
+    return _libcvht.module_get_rpb()
+module_get_rpb = _libcvht.module_get_rpb
+
+def module_set_rpb(rpb):
+    return _libcvht.module_set_rpb(rpb)
+module_set_rpb = _libcvht.module_set_rpb
+
 def queue_midi_note_on(seq, port, chn, note, velocity):
     return _libcvht.queue_midi_note_on(seq, port, chn, note, velocity)
 queue_midi_note_on = _libcvht.queue_midi_note_on

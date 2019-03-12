@@ -38,7 +38,7 @@ class StatusBar(Gtk.DrawingArea):
 		self.tt_rect = Gdk.Rectangle()
 		self.tt_txt = None
 
-		self.pulse = Pulsar(4)
+		self.pulse = Pulsar(mod.rpb)
 
 	def redraw(self):
 		cr = self._context
@@ -60,7 +60,7 @@ class StatusBar(Gtk.DrawingArea):
 		gradient.add_color_stop_rgb(.3, *(col *  cfg.intensity_txt * intensity for col in bar_col))
 		gradient.add_color_stop_rgb(.7, *(col *  cfg.intensity_txt * intensity for col in bar_col))
 
-		gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_background for col in cfg.colour))
+		gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_background for col in bar_col))
 
 		cr.set_source(gradient)
 

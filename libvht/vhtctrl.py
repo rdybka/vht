@@ -29,10 +29,10 @@ class VHTCtrl(Iterable):
 
 	def __getitem__(self, itm):
 		if itm >= self.__len__():
-			raise IndexError()
+			raise IndexError(itm)
 
 		if itm < 0:
-			raise IndexError()
+			raise IndexError(itm)
 
 		return VHTCtrlRow(self._vht_handle, self._vht_handle.track_get_ctrlrow_ptr(self._trk_handle, self._ctrl, itm))
 
