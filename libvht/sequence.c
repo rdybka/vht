@@ -46,6 +46,11 @@ void sequence_add_track(sequence *seq, track *trk) {
 	module_excl_out();
 	return;
 }
+track *sequence_clone_track(sequence *seq, track *trk) {
+	track *ntrk = track_clone(trk);
+	sequence_add_track(seq, ntrk);
+	return ntrk;
+}
 
 void sequence_free(sequence *seq) {
 	for (int t = 0; t < seq->ntrk; t++) {

@@ -84,6 +84,7 @@ extern int sequence_get_length(sequence *seq);
 extern void sequence_set_length(sequence *seq, int length);
 extern track *sequence_get_trk(sequence *seq, int n);
 extern void sequence_add_track(sequence *seq, track *trk);
+extern track *sequence_clone_track(sequence *seq, track *trk);
 extern void sequence_del_track(sequence *seq, int t);
 extern void sequence_swap_track(sequence *seq, int t1, int t2);
 extern double sequence_get_pos(sequence *seq);

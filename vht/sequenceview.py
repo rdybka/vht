@@ -246,6 +246,11 @@ class SequenceView(Gtk.Box):
 			self._side_prop.add_track()
 			return True
 
+		if cfg.key["track_clone"].matches(event):
+			if mod.active_track:
+				self._side_prop.clone_track(mod.active_track)
+			return True
+
 		if cfg.key["track_del"].matches(event):
 			if mod.active_track:
 				self.del_track(mod.active_track.trk)
@@ -443,6 +448,7 @@ class SequenceView(Gtk.Box):
 				self.prop_view.move_first(trk)
 
 		t.show()
+		return t
 
 	def expand_track(self, trk):
 		trk.add_column()

@@ -1,3 +1,4 @@
+* clone - ctrl-n
 * newly added tracks on left (as option)
 	* not while recording
 * resync
@@ -25,7 +26,6 @@
 * track names
 * gui magic
 	* rotation
-- clone - ctrl-n
 ? get rid of overshoot thingys?
 - move menu in fullscreen
 - disable menu when no jack

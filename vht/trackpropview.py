@@ -7,6 +7,7 @@ from vht import *
 from vht.trackpropviewpopover import TrackPropViewPopover
 from vht.sequencepropviewpopover import SequencePropViewPopover
 from vht.trackview import TrackView
+from copy import deepcopy
 
 class TrackPropView(Gtk.DrawingArea):
 	def __init__(self, trk = None, trkview = None, seq = None, seqview = None, propview = None):
@@ -86,6 +87,31 @@ class TrackPropView(Gtk.DrawingArea):
 
 		trk = self.seq.add_track(port, channel)
 		self.seqview.add_track(trk)
+
+	def clone_track(self, trk):
+		ntrk = self.seq.clone_track(trk.trk)
+		t = self.seqview.add_track(ntrk)
+		t.show_controllers = trk.show_controllers
+		t.show_pitchwheel = trk.show_pitchwheel
+		t.show_notes = trk.show_notes
+		t.show_timeshift = trk.show_timeshift
+
+		t.undo_buff._states = deepcopy(trk.undo_buff._states)
+		t.undo_buff._state = deepcopy(trk.undo_buff._state)
+
+		t.pitchwheel_editor.undo_buff._states = deepcopy(trk.pitchwheel_editor.undo_buff._states)
+		t.pitchwheel_editor.undo_buff._state = deepcopy(trk.pitchwheel_editor.undo_buff._state)
+		for st in range(len(t.pitchwheel_editor.undo_buff._states) - 1):
+			t.pitchwheel_editor.undo_buff._dstates.append({})
+
+		for i, c in enumerate(t.controller_editors):
+			c.undo_buff._states = deepcopy(trk.controller_editors[i].undo_buff._states)
+			c.undo_buff._state = deepcopy(trk.controller_editors[i].undo_buff._state)
+
+			for st in range(len(c.undo_buff._states) - 1):
+				c.undo_buff._dstates.append({})
+
+		t.redraw_full()
 
 	def del_track(self):
 		self.seqview.del_track(self.trk)

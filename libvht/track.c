@@ -291,10 +291,37 @@ void track_clear_crows(track *trk, int c) {
 	pthread_mutex_unlock(&trk->exclctrl);
 }
 
-// do we reaaaaaly need it?
 track *track_clone(track *src) {
 	track *dst = track_new(src->port, src->channel, src->nrows, src->nsrows);
-	// todo: copy cols and shit or scrap
+
+	for (int c = 0; c < src->ncols; c++) {
+		if (c > 0)
+			track_add_col(dst);
+
+		for (int r = 0; r < src->nrows; r++) {
+			row *s = &src->rows[c][r];
+			row_set(&dst->rows[c][r], s->type, s->note, s->velocity, s->delay);
+		}
+	}
+
+	for (int c = 0; c < src->nctrl; c++) {
+		if (c > 0)
+			track_add_ctrl(dst, src->ctrlnum[c]);
+
+		for (int r = 0; r < src->nrows; r++) {
+			ctrlrow *s = &src->crows[c][r];
+			ctrlrow_set(&dst->crows[c][r], s->velocity, s->linked, s->smooth, s->anchor);
+
+			for (int rr = 0; rr < src->ctrlpr; rr++) {
+				dst->ctrl[c][(r * src->ctrlpr) + rr] = src->ctrl[c][(r * src->ctrlpr) + rr]	;
+			}
+		}
+
+		track_ctrl_refresh_envelope(dst, c);
+
+		// don't forget about the triggers one day!!!!
+	}
+
 	return dst;
 }
 

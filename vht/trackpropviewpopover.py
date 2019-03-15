@@ -89,7 +89,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.grid.attach(self.extend_grid,4,0,5,6)
 
 			grid = Gtk.Grid()
-			grid.set_column_homogeneous(True)
+			grid.set_column_homogeneous(False)
 			grid.set_row_homogeneous(True)
 			grid.set_column_spacing(2)
 			grid.set_row_spacing(2)
@@ -114,11 +114,14 @@ class TrackPropViewPopover(Gtk.Popover):
 			grid.attach(self.show_pitchwheel_button, 3, 0, 1, 1)
 			grid.attach(self.show_controllers_button, 4, 0, 1, 1)
 
-			self.loop_button = Gtk.CheckButton("loop")
-			grid.attach(self.loop_button, 4, 3, 1, 1)
+			#self.loop_button = Gtk.CheckButton("loop")
+			#grid.attach(self.loop_button, 4, 4, 1, 1)
+			grid.attach(Gtk.Label(""), 0, 2, 1, 1)
 
 			self.clone_button = Gtk.Button("clone")
-			grid.attach(self.clone_button, 4, 2, 1, 1)
+			self.clone_button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_clone"]))
+			self.clone_button.connect("clicked", self.on_clone_button_clicked)
+			grid.attach(self.clone_button, 4, 3, 1, 1)
 
 			self.name_entry = Gtk.Entry()
 			self.name_entry.connect("changed", self.on_name_changed)
@@ -333,6 +336,9 @@ class TrackPropViewPopover(Gtk.Popover):
 	def on_expand_button_clicked(self, switch):
 		self.parent.seqview.expand_track(self.trk)
 
+	def on_clone_button_clicked(self, wdg):
+		self.parent.clone_track(self.trkview)
+
 	def on_port_changed(self, adj):
 		self.trk.port = int(adj.get_value())
 		self.parent.redraw()
@@ -387,4 +393,5 @@ class TrackPropViewPopover(Gtk.Popover):
 
 	def on_move_last_button_clicked(self, switch):
 		self.parent.move_last()
+
 

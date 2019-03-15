@@ -34,6 +34,16 @@ class VHTSequence(Iterable):
 		self._vht_handle.sequence_add_track(self._seq_handle, trk)
 		return self[self.__len__() - 1]
 
+	def clone_track(self, trk):
+		ntrk = self._vht_handle.sequence_clone_track(self._seq_handle, trk._trk_handle)
+		itm = None
+		self._vht_handle.track_set_playing(ntrk, 0)
+		for t, tt in enumerate (self):
+			if tt._trk_handle == ntrk:
+				itm = t
+
+		return VHTTrack(self._vht_handle, ntrk, itm) if itm else None
+
 	def swap_track(self, t1, t2):
 		self._vht_handle.sequence_swap_track(self._seq_handle, t1, t2)
 

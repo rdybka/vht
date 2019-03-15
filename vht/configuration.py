@@ -87,6 +87,7 @@ class Configuration():
 			"track_move_last": cfgkey("End", False, True, False),
 			"track_move_first": cfgkey("Home", False, True, False),
 			"track_clear": cfgkey("d", True, False, False),
+			"track_clone": cfgkey("n", False, True, False),
 			"select_all": cfgkey("a", False, True, False),
 			"copy": cfgkey("c", False, True, False),
 			"cut": cfgkey("x", False, True, False),

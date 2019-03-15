@@ -291,6 +291,10 @@ def sequence_add_track(seq, trk):
     return _libcvht.sequence_add_track(seq, trk)
 sequence_add_track = _libcvht.sequence_add_track
 
+def sequence_clone_track(seq, trk):
+    return _libcvht.sequence_clone_track(seq, trk)
+sequence_clone_track = _libcvht.sequence_clone_track
+
 def sequence_del_track(seq, t):
     return _libcvht.sequence_del_track(seq, t)
 sequence_del_track = _libcvht.sequence_del_track
