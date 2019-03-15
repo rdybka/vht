@@ -439,7 +439,7 @@ class SequenceView(Gtk.Box):
 		if trk:
 			self.prop_view.add_track(trk, t)
 
-			if cfg.new_tracks_left:
+			if cfg.new_tracks_left and mod.record != 2:
 				self.prop_view.move_first(trk)
 
 		t.show()

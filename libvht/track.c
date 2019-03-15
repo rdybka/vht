@@ -48,7 +48,7 @@ track *track_new(int port, int channel, int len, int songlen) {
 	trk->playing = 0;
 	trk->port = port;
 	trk->cur_rec_update = 0;
-
+	trk->resync = 1;
 	pthread_mutex_init(&trk->excl, NULL);
 	pthread_mutex_init(&trk->exclrec, NULL);
 	pthread_mutex_init(&trk->exclctrl, NULL);
@@ -748,6 +748,7 @@ void track_resize(track *trk, int size) {
 	// no need to realloc?
 	if (trk->arows >= size) {
 		trk->nrows = size;
+		trk->resync = 1;
 		module_excl_out();
 		return;
 	}

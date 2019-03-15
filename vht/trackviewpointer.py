@@ -35,7 +35,7 @@ class TrackviewPointer():
 		self.height = cfg.seq_font_size
 
 		self.lpos = None
-		
+
 		self.pulse = Pulsar(mod.rpb)
 
 		self.stopped = False

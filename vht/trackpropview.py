@@ -327,7 +327,7 @@ class TrackPropView(Gtk.DrawingArea):
 
 			cr.show_text("%s%s" % (pref, self.trk.name))
 		else:
-			cr.show_text("p%02dc%02d" % (self.trk.port, self.trk.channel))
+			cr.show_text("p%02d c%02d" % (self.trk.port, self.trk.channel))
 
 		self._context.set_font_size(cfg.seq_font_size * .6)
 		cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))

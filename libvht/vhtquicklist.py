@@ -13,7 +13,7 @@ class VHTQuickList(Iterable):
 	def __iter__(self):
 		for itm in range(self._l):
 			yield int(self._i[itm])
-	
+
 	def __eq__(self, other):
 		if isinstance(other, VHTQuickList):
 			for f in range(self._l):
@@ -21,7 +21,7 @@ class VHTQuickList(Iterable):
 					return False
 		else:
 			return NotImplemented
-		
+
 		return True
 
 	def __getitem__(self, itm):

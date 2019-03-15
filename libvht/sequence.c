@@ -61,14 +61,26 @@ void sequence_free(sequence *seq) {
 void sequence_advance(sequence *seq, double period) {
 	seq->last_period = period;
 	for (int t = 0; t < seq->ntrk; t++) {
+		int adv_track = 1;
 		//if (seq->trk[t]->playing) {
-		track_advance(seq->trk[t], period);
+		if (seq->trk[t]->resync) {
+			seq->trk[t]->pos = seq->pos;
 
-		// if track past end, stop playing
-		if (seq->trk[t]->pos > seq->trk[t]->nrows)
-			if (!seq->trk[t]->loop)
-				seq->trk[t]->playing = 0;
-		//}
+			if (seq->trk[t]->pos > seq->trk[t]->nrows) {
+				adv_track = 0;
+			} else {
+				seq->trk[t]->resync = 0;
+			}
+		}
+
+		if (adv_track) {
+			track_advance(seq->trk[t], period);
+
+			// if track past end, stop playing
+			if (seq->trk[t]->pos > seq->trk[t]->nrows)
+				if (!seq->trk[t]->loop)
+					seq->trk[t]->playing = 0;
+		}
 	}
 
 	// will we reach the end of sequence?

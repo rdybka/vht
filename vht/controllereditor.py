@@ -115,7 +115,7 @@ class ControllerEditor():
 			recr_cr = True
 
 		if self.env_cr:
-			if self.env_cr.get_target().get_width() != self.x_to - self.x_from:
+			if self.env_cr.get_target().get_width() != self.tv._back_surface.get_width():
 				recr_cr = True
 			if self.env_cr.get_target().get_height() != self.tv._back_surface.get_height():
 				recr_cr = True

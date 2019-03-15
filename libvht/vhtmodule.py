@@ -114,7 +114,7 @@ class VHTModule(Iterable):
 	@property
 	def rpb(self):
 		return libcvht.module_get_rpb()
-		
+
 	@rpb.setter
 	def rpb(self, value):
 		if value:

@@ -67,6 +67,8 @@ typedef struct track_t {
 	int trigger_note;
 	int loop;
 
+	int resync;
+
 	struct rec_update_t updates[EVT_BUFFER_LENGTH];
 	int cur_rec_update;
 
