@@ -102,7 +102,7 @@ class TimeshiftEditor():
 
 		new_hover_row = min(int(event.y / self.tv.txt_height), self.tv.trk.nrows - 1)
 
-		if self.tv.trk[self.col][self.row].type != 1:
+		if not 0 < self.tv.trk[self.col][self.row].type < 3:
 			return False
 
 		y1 = new_hover_row * self.tv.txt_height

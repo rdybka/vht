@@ -79,7 +79,6 @@ int y2bz(envelope *env, float y) {
 	return (int)y * env->res + (int)((y - floorf(y)) * env->res);
 }
 
-// z pozdrowieniami dla Konrada Wicyńskiego
 void envelope_draw_cluster(envelope *env, int nf, int nl) {
 	float lx = 0;					// past
 	float ly = 0;
@@ -134,7 +133,7 @@ void envelope_draw_cluster(envelope *env, int nf, int nl) {
 			xx+=dx / env->res;
 		}
 
-		// bezierish part
+		// bezierish part - hold on tight
 		if (z + lz > 1) {
 			z = 1 - lz;
 		}

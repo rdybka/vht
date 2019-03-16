@@ -21,8 +21,7 @@ from gi.repository import Gdk, Gtk
 import cairo
 
 #  --- not in production
-import inspect
-import time
+#import inspect
 
 from vht import mod, cfg
 from vht.trackviewpointer import TrackviewPointer
@@ -975,7 +974,7 @@ class TrackView(Gtk.DrawingArea):
 			fldwidth =  self.txt_width / flds
 
 			if fldwidth  < offs < fldwidth * 2:	# reset velocity
-				if self.trk[col][row].type == 1:
+				if 0 < self.trk[col][row].type < 3:
 					self.velocity_editor = VelocityEditor(self, col, row, event)
 					self.velocity_editor.clearing = True
 					self.trk[col][row].velocity = cfg.velocity
@@ -988,7 +987,7 @@ class TrackView(Gtk.DrawingArea):
 
 			if self.show_timeshift:
 				if fldwidth * 2 < offs < fldwidth * 3:	# reset timeshift
-					if self.trk[col][row].type == 1:
+					if 0 < self.trk[col][row].type < 3:
 						self.timeshift_editor = TimeshiftEditor(self, col, row, event)
 						self.timeshift_editor.clearing = True
 						self.trk[col][row].delay = 0

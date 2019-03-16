@@ -320,6 +320,16 @@ class SequenceView(Gtk.Box):
 			mod.mainwin.adj.set_value(mod.bpm)
 			return True
 
+		if cfg.key["bpm_frac_up"].matches(event):
+			mod.bpm = mod.bpm + .01
+			mod.mainwin.adj.set_value(mod.bpm)
+			return True
+
+		if cfg.key["bpm_frac_down"].matches(event):
+			mod.bpm = mod.bpm - .01
+			mod.mainwin.adj.set_value(mod.bpm)
+			return True
+
 		if cfg.key["bpm_10_up"].matches(event):
 			mod.bpm = mod.bpm + 10
 			mod.mainwin.adj.set_value(mod.bpm)

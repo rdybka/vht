@@ -172,7 +172,7 @@ class VHTModule(Iterable):
 
 	@property
 	def max_bpm(self):
-		return 1000
+		return 1023
 
 	# those two work non-realtime,
 	# actual recording happens in c

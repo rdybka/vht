@@ -1,10 +1,10 @@
+- fix popups
+- triggers
 * clone - ctrl-n
 * newly added tracks on left (as option)
 	* not while recording
 * resync
-- fix keyboard and all for float bpm
-- popup delay before closing
-- popup delay before opening
+* fix keyboard for float bpm
 * make bpm a float
 * staying in edit mode after deleting track
 * indicate recording in statusbar
@@ -27,11 +27,9 @@
 * track names
 * gui magic
 	* rotation
-? get rid of overshoot thingys?
 - move menu in fullscreen
 - disable menu when no jack
 * deleting track mutes it
-- triggers
 - timeline
 - configuration
 - about
