@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from copy import deepcopy
+from libvht.vhtquicklist import VHTQuickList
+
 class ControllerUndoBuffer():
 	def __init__(self, trk, ctrlnum):
 		self._trk = trk
@@ -74,6 +77,27 @@ class ControllerUndoBuffer():
 			self._dstate[k] = dstate[k]
 			if dstate[k] == 0:
 				del self._dstate[k]
+
+	def clone(self, dest):
+		dest._states = deepcopy(self._states)
+		dest._state = deepcopy(self._state)
+		dest._dstate = {}
+		for key, val in self._dstate.items():
+			if isinstance(val, VHTQuickList):
+				dest._dstate[key] = val.as_list()
+			elif isinstance(val, list):
+				dest._dstate[key] = deepcopy(val)
+
+		dest._dstates = []
+		for s in self._dstates:
+			state = {}
+			for key, val in s.items():
+				if isinstance(val, VHTQuickList):
+					state[key] = val.as_list()
+				elif isinstance(val, list):
+					state[key] = deepcopy(val)
+
+			dest._dstates.append(state)
 
 	def restore(self):
 		if len(self._states) > 1:

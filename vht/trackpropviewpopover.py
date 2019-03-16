@@ -89,7 +89,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.grid.attach(self.extend_grid,4,0,5,6)
 
 			grid = Gtk.Grid()
-			grid.set_column_homogeneous(False)
+			grid.set_column_homogeneous(True)
 			grid.set_row_homogeneous(True)
 			grid.set_column_spacing(2)
 			grid.set_row_spacing(2)

@@ -2,6 +2,7 @@
 * newly added tracks on left (as option)
 	* not while recording
 * resync
+- fix keyboard and all for float bpm
 - popup delay before closing
 - popup delay before opening
 * make bpm a float

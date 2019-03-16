@@ -168,7 +168,7 @@ class VHTModule(Iterable):
 
 	@property
 	def min_bpm(self):
-		return 1
+		return .23
 
 	@property
 	def max_bpm(self):

@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from copy import deepcopy
+
 class TrackUndoBuffer():
 	def __init__(self, trk):
 		self._trk = trk
@@ -46,6 +48,10 @@ class TrackUndoBuffer():
 			self._state[k] = state[k]
 			if state[k] == 0:
 				del self._state[k]
+
+	def clone(self, dest):
+		dest._states = deepcopy(self._states)
+		dest._state = deepcopy(self._state)
 
 	def restore(self):
 		if len(self._states) == 1:

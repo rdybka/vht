@@ -158,7 +158,7 @@ class StatusBar(Gtk.DrawingArea):
 		else:
 			cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
-		txt = " bpm:%d" % mod.bpm
+		txt = " bpm:%6.2f" % mod.bpm
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(self.pos[-1], h)
 		cr.show_text(txt)

@@ -19,6 +19,10 @@ class VHTQuickList(Iterable):
 			for f in range(self._l):
 				if self._i[f] != other._i[f]:
 					return False
+		elif isinstance(other, list):
+			for f in range(self._l):
+				if self._i[f] != other[f]:
+					return False
 		else:
 			return NotImplemented
 
@@ -32,3 +36,11 @@ class VHTQuickList(Iterable):
 			raise IndexError(itm, "don't be so negative")
 
 		return int(self._i[itm])
+
+	# this is expensive
+	def as_list(self):
+		ret = []
+		for i in range(self._l):
+			ret.append(int(self._i[i]))
+
+		return ret
