@@ -7,7 +7,7 @@ asynchronous rendering.
 
 ## installation on Fedora
 ```
-[sudo] dnf install jack-audio-connection-kit-devel python3-devel swig git rpm-devel
+[sudo] dnf install jack-audio-connection-kit-devel python3-devel rpm-devel
 git clone https://github.com/rdybka/vht
 cd vht
 ./setup.py install --user
