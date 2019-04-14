@@ -1,6 +1,6 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gdk, Gtk, Gio, Vte
+from gi.repository import Gdk, Gtk, Gio, Vte, Pango
 import cairo
 import threading
 import sys
@@ -45,7 +45,6 @@ class Console(Vte.Terminal):
 		self.history = []
 		self.browsing = False
 		self.hist_ptr = 0
-		self.fs = 50
 
 		self.set_color_background(Gdk.RGBA(*(col * cfg.intensity_background for col in cfg.console_colour), 1))
 		self.set_color_foreground(Gdk.RGBA(*(col * cfg.intensity_txt for col in cfg.console_colour), 1))
@@ -53,6 +52,9 @@ class Console(Vte.Terminal):
 		self.set_rewrap_on_resize(True)
 
 		self.set_font_scale(cfg.console_scale)
+		
+		self.set_font(Pango.FontDescription.from_string(cfg.console_font))
+		self.fs = int(cfg.console_scale * 50)
 		self.set_input_enabled(True)
 		mod.termfile = HackerIO(self)
 
@@ -67,14 +69,14 @@ class Console(Vte.Terminal):
 
 	def on_scroll(self, widget, event):
 		if event.state & Gdk.ModifierType.CONTROL_MASK: # we're zooming!
-			scale = 1
+			
 			if event.delta_y < 0:
-				self.fs += 1
+				self.fs += 2
 				self.fs = min(100, self.fs)
 
 			if event.delta_y > 0:
-				self.fs -= 1
-				self.fs = max(1, self.fs)
+				self.fs -= 2
+				self.fs = max(15, self.fs)
 
 			scale = (self.fs / 50.0)
 			cfg.console_scale = scale

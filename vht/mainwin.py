@@ -15,7 +15,7 @@ class MainWin(Gtk.ApplicationWindow):
 		self.app = app
 		mod.mainwin = self
 		self.timeline_visible = False
-
+		self.console_visible = False
 		self.last_filename = None
 
 		# here we GUI
@@ -67,20 +67,24 @@ class MainWin(Gtk.ApplicationWindow):
 		self.hb.pack_end(self.time_display)
 
 		self.vbox = Gtk.Box()
-		self.hbox = Gtk.Paned();
+		self.hbox = Gtk.Paned()
+		self.seqbox = Gtk.Paned()
+		self.seqbox.set_orientation(Gtk.Orientation.VERTICAL)
 
 		self._sequence_view = SequenceView(mod[0])
 		self.hbox.set_orientation(Gtk.Orientation.HORIZONTAL)
-		self.hbox.pack1(self._sequence_view, True, True)
+
+		self.seqbox.pack1(self._sequence_view, True, True)
+		
+		self.hbox.pack1(self.seqbox, True, True)
+		self.console = Console()
 
 		self.timeline_box = Gtk.Paned()
 		self.timeline_box.set_orientation(Gtk.Orientation.VERTICAL)
 		self.timeline = Gtk.Label("Timeline")
-		self.console = Console()
 
 		self.timeline_box.pack1(self.timeline, True, True)
-		self.timeline_box.pack2(self.console, True, True)
-
+		
 		self.vbox.pack_start(self.hbox, True, True, 0)
 		self._status_bar = StatusBar()
 		self.vbox.pack_end(self._status_bar, False, True, 0)
@@ -132,10 +136,30 @@ class MainWin(Gtk.ApplicationWindow):
 
 		if 1 == len(self.hbox.get_children()):
 			self.hbox.pack2(self.timeline_box, False, True)
-			self.hbox.set_wide_handle(True)
 			self.hbox.set_position(self.get_window().get_width() * cfg.timeline_position)
+		
+		self.hbox.set_wide_handle(True)
 		self.timeline_visible = True
-		self.show_all()
+		self.timeline_box.show_all()
+
+	def hide_console(self):
+		if not self.console_visible:
+			return
+		
+		self.console.hide()
+		self.console_visible = False
+
+	def show_console(self):
+		if self.console_visible:
+			return
+			
+		if 1 == len(self.seqbox.get_children()):
+			self.seqbox.pack2(self.console, True, True)
+			self.seqbox.set_position(self.get_window().get_height() * cfg.console_position)
+		
+		self.console_visible = True
+		self.seqbox.set_wide_handle(True)
+		self.seqbox.show_all()
 
 	def on_key_press(self, wdg, event):
 		if cfg.key["toggle_timeline"].matches(event):
@@ -146,6 +170,13 @@ class MainWin(Gtk.ApplicationWindow):
 				self.show_timeline()
 			return True
 
+		if cfg.key["toggle_console"].matches(event):
+			if self.console_visible:
+				self.hide_console()
+				self.seqbox.set_wide_handle(False)
+			else:
+				self.show_console()
+				
 		return False
 
 	def load(self, filename):

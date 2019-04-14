@@ -7,8 +7,10 @@ class Configuration():
 		self._highlight = 4
 		self.on_highlight = []  # add callbacks here
 
-		#self.seq_font = "Ubuntu Mono"
-		self.seq_font = "Monospace"
+		self.seq_font = "Ubuntu Mono"
+		self.console_font = "Ubuntu Mono Light"
+		
+		#self.seq_font = "Monospace"
 		self.gui_font_size = 16
 		self.seq_font_size = 16
 		self.seq_line_width = 1.0
@@ -18,6 +20,7 @@ class Configuration():
 		self.console_colour = (.9, .8, .4)
 		self.console_scale = .7
 		self.timeline_position = .66
+		self.console_position = .6
 		self.colour = (0, .7, .7)
 		self.star_colour = (1, 1, 0)
 		self.record_colour = (1.0, 0, 0)
@@ -57,6 +60,8 @@ class Configuration():
 			# sequenceview		shift, ctrl, alt
 			"quit": cfgkey("q", False, True, False),
 			"toggle_timeline" : cfgkey("Tab", False, True, False),
+			"toggle_console" : cfgkey("grave", False, False, False),
+			
 			"play": cfgkey("Return", False, False, False),
 			"reset": cfgkey("Escape", False, False, False),
 			"multi_record": cfgkey("space", False, True, False),
