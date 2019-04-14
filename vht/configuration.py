@@ -7,8 +7,8 @@ class Configuration():
 		self._highlight = 4
 		self.on_highlight = []  # add callbacks here
 
-		self.seq_font = "Ubuntu Mono"
-		self.console_font = "Ubuntu Mono Light"
+		self.seq_font = "Monospace"
+		self.console_font = "Monospace"
 		
 		#self.seq_font = "Monospace"
 		self.gui_font_size = 16
@@ -17,12 +17,14 @@ class Configuration():
 		self.seq_spacing = 1.05
 		self.status_bar_font_size = 32
 		#self.console_colour = (.5, .5, 1)
-		self.console_colour = (.9, .8, .4)
-		self.console_scale = .7
+		#self.console_colour = (.9, .8, .4)
+		
+		self.console_scale = 1
 		self.timeline_position = .66
 		self.console_position = .6
 		self.colour = (0, .7, .7)
 		self.star_colour = (1, 1, 0)
+		self.console_colour = self.star_colour
 		self.record_colour = (1.0, 0, 0)
 
 		self.intensity_background = .2

@@ -50,7 +50,9 @@ class Console(Vte.Terminal):
 		self.set_color_foreground(Gdk.RGBA(*(col * cfg.intensity_txt for col in cfg.console_colour), 1))
 		
 		self.set_rewrap_on_resize(True)
-
+		self.set_scroll_on_output(True)
+		self.set_scroll_on_keystroke(True)
+		
 		self.set_font_scale(cfg.console_scale)
 		
 		self.set_font(Pango.FontDescription.from_string(cfg.console_font))
@@ -112,6 +114,7 @@ class Console(Vte.Terminal):
 
 		if self.buff:
 			if key == 13 or key_name == "KP_Enter":
+				self.browsing = False
 				self.history.append(self.buff)
 				self.buff += "\r\n"
 				self.cons.q.put(self.buff)
