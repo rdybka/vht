@@ -3,7 +3,7 @@
 from setuptools import setup, Extension
 
 setup(name = "vht",
-	version = "0.1.7",
+	version = "0.1.8",
 	description = "Valhalla MIDI Tracker",
 	author = "Remigiusz Dybka",
 	author_email = "remigiusz.dybka@gmail.com",
@@ -21,7 +21,7 @@ setup(name = "vht",
 			"libvht/track.c",
 			"libvht/envelope.c",], 
 			libraries = ["jack"])],
-	
+
 	packages = ["vht", "libvht"],
 	entry_points={
         'console_scripts': [
@@ -29,10 +29,9 @@ setup(name = "vht",
         ]},
 	
 	data_files = [
-		('share/applications', ['data/com.github.rdybka.vht.desktop']),
+		('share/vht', ['data/vht.svg', 'data/menu.ui']),
 		('share/icons', ['data/vht.svg']),
-		('share/vht', ['COPYING.txt', 'README.md']),
-		('data', ['data/vht.svg', 'data/menu.ui'])
+		('share/applications', ['data/com.github.rdybka.vht.desktop'])
 	],
 	
 	classifiers=[

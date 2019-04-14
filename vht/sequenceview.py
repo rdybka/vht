@@ -7,7 +7,6 @@ from vht import *
 from vht.trackview import TrackView
 from vht.propview import PropView
 from vht.trackpropview import TrackPropView
-from vht.statusbar import StatusBar
 
 class SequenceView(Gtk.Box):
 	def __init__(self, seq):
@@ -32,7 +31,6 @@ class SequenceView(Gtk.Box):
 		self._sv.connect("enter-notify-event", self.on_enter)
 
 		self._sv.set_can_focus(True)
-		self._sv.set_overlay_scrolling(True)
 
 		mod.gui_midi_capture = False
 		self.add_tick_callback(self.tick)
@@ -79,14 +77,11 @@ class SequenceView(Gtk.Box):
 		vbox = Gtk.Box()
 		vbox.set_orientation(Gtk.Orientation.VERTICAL)
 
-		self._status_bar = StatusBar()
-
 		hbox = Gtk.Box()
 		hbox.pack_start(self._side, False, True, 0)
 		hbox.pack_end(self._sv, True, True, 0)
 
 		vbox.pack_start(hbox, True, True, 0)
-		vbox.pack_end(self._status_bar, False, True, 0)
 
 		self.pack_end(vbox, True, True, 0)
 
@@ -422,7 +417,7 @@ class SequenceView(Gtk.Box):
 		self.redraw_track(None)
 		self._side_prop.redraw()
 		self.prop_view.redraw()
-		self._status_bar.queue_resize()
+		#self._status_bar.queue_resize()
 
 	def on_scroll(self, widget, event):
 		if event.state & Gdk.ModifierType.CONTROL_MASK: # we're zooming!

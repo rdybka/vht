@@ -131,6 +131,7 @@ class VHTApp(Gtk.Application):
 def run():
 	pkg = pkg_resources.require("vht")[0]
 	print("Valhalla Tracker %s" % (pkg.version))
+	
 	mod.start_error = None
 	if mod.jack_start() != 0:
 		mod.start_error = "you will need JACK for this"
@@ -142,7 +143,24 @@ def run():
 
 	mod.set_midi_record_ignore(midig)
 	randomcomposer.muzakize()
-	mod.data_path = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), "..", "data"))
+
+	paths2try = []
+	
+	paths2try.append(os.path.normpath(os.path.join(pkg.module_path, "data")))
+	paths2try.append(os.path.normpath(os.path.join(pkg.module_path, "share/vht")))
+	
+	p = pkg.module_path
+	pf = p.find('/lib')
+	if pf:
+		p = p[:pf]
+	
+		paths2try.append(os.path.normpath(os.path.join(p, "share/vht")))
+
+	mod.data_path = "."
+	
+	for p in paths2try:
+		if os.path.exists(p):
+			mod.data_path = p
 
 	#print(mod.to_xml())
 	try:

@@ -5,21 +5,22 @@ JACK/Yoshimi/Hydrogen/Calf setup. It relies 100% on JACK for timing
 which allows sample-exact synchronisation and in future, 
 asynchronous rendering.
 
-## installation on Fedora
+## installation (tested on Fedora 29 and Ubuntu 18.10)
 ```
-[sudo] dnf install jack-audio-connection-kit-devel python3-devel rpm-devel
-git clone https://github.com/rdybka/vht
-cd vht
-./setup.py install --user
+[fedora] dnf install python3-devel jack-audio-connection-kit-devel
+[ubuntu] 
+
+pip3 install vht --user
 ```
 
 ## roadmap before a file release
 - [x] record/edit notes
-- [ ] record/edit controllers
-- [ ] triggers
+- [x] record/edit controllers
+- [x] console
 - [ ] timeline
 - [ ] loops
-- [ ] export to wav
+- [ ] triggers
+- [ ] export midi/wav
 - [ ] configuration window
 
 deadline: soon enough

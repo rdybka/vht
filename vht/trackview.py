@@ -636,7 +636,7 @@ class TrackView(Gtk.DrawingArea):
 						draw_text = True
 						cr.set_source_rgb(*(col * cfg.intensity_select for col in cfg.colour))
 						if c == len(self.trk) - 1:
-							cr.rectangle(c * self.txt_width, r * self.txt_height, (self.txt_width / 8.0) * 7.2, self.txt_height)
+							cr.rectangle(c * self.txt_width, r * self.txt_height, (self.txt_width / 8.0) * 7.4, self.txt_height)
 						else:
 							cr.rectangle(c * self.txt_width, r * self.txt_height, self.txt_width, self.txt_height)
 						cr.fill()

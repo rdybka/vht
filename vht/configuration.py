@@ -14,7 +14,10 @@ class Configuration():
 		self.seq_line_width = 1.0
 		self.seq_spacing = 1.05
 		self.status_bar_font_size = 32
-		#self.colour = (.5, .5, 1)
+		#self.console_colour = (.5, .5, 1)
+		self.console_colour = (.9, .8, .4)
+		self.console_scale = .7
+		self.timeline_position = .66
 		self.colour = (0, .7, .7)
 		self.star_colour = (1, 1, 0)
 		self.record_colour = (1.0, 0, 0)
@@ -53,6 +56,7 @@ class Configuration():
 		self.key = {
 			# sequenceview		shift, ctrl, alt
 			"quit": cfgkey("q", False, True, False),
+			"toggle_timeline" : cfgkey("Tab", False, True, False),
 			"play": cfgkey("Return", False, False, False),
 			"reset": cfgkey("Escape", False, False, False),
 			"multi_record": cfgkey("space", False, True, False),

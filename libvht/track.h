@@ -1,6 +1,6 @@
 /* track.h
  *
- * Copyright (C) 2017 Remigiusz Dybka
+ * Copyright (C) 2019 Remigiusz Dybka
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@
 #define TRIGGER_NONE 	0
 #define TRIGGER_NORMAL 	1
 #define TRIGGER_HOLD	2
-
 
 #define TRACK_CONTROLS_PER_ROW	16
 

@@ -1,9 +1,12 @@
 import gi, os
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio
+gi.require_version('Vte', '2.91')
+from gi.repository import Gtk, Gdk, Gio
 
 from vht import *
 from vht.sequenceview import SequenceView
+from vht.statusbar import StatusBar
+from vht.console import Console
 
 class MainWin(Gtk.ApplicationWindow):
 	def __init__(self, app):
@@ -11,10 +14,17 @@ class MainWin(Gtk.ApplicationWindow):
 		self.fs = False
 		self.app = app
 		mod.mainwin = self
+		self.timeline_visible = False
 
 		self.last_filename = None
 
-		# here we go, the worst thing is gui
+		# here we GUI
+		st = self.get_settings()
+		st.set_property("gtk-application-prefer-dark-theme", True)
+
+		self.set_events(Gdk.EventMask.KEY_PRESS_MASK)
+		self.connect("key-press-event", self.on_key_press)
+
 		self.hb = Gtk.HeaderBar()
 		self.hb.set_show_close_button(True)
 		self.set_titlebar(self.hb)
@@ -57,19 +67,27 @@ class MainWin(Gtk.ApplicationWindow):
 		self.hb.pack_end(self.time_display)
 
 		self.vbox = Gtk.Box()
-		self.hbox = Gtk.Box();
-
-		self.seqlab = Gtk.Label()
-		self.seqlab.props.hexpand = False
-
-		self.hbox.pack_start(self.seqlab, False, True, 0)
+		self.hbox = Gtk.Paned();
 
 		self._sequence_view = SequenceView(mod[0])
-		self.vbox.pack_start(self._sequence_view, True, True, 0)
+		self.hbox.set_orientation(Gtk.Orientation.HORIZONTAL)
+		self.hbox.pack1(self._sequence_view, True, True)
 
+		self.timeline_box = Gtk.Paned()
+		self.timeline_box.set_orientation(Gtk.Orientation.VERTICAL)
+		self.timeline = Gtk.Label("Timeline")
+		self.console = Console()
+
+		self.timeline_box.pack1(self.timeline, True, True)
+		self.timeline_box.pack2(self.console, True, True)
+
+		self.vbox.pack_start(self.hbox, True, True, 0)
+		self._status_bar = StatusBar()
+		self.vbox.pack_end(self._status_bar, False, True, 0)
 		self.vbox.set_orientation(Gtk.Orientation.VERTICAL)
 
 		self.add(self.vbox)
+
 		self.set_default_size(800, 600)
 		self.show_all()
 
@@ -99,6 +117,36 @@ class MainWin(Gtk.ApplicationWindow):
 
 	def on_bpm_changed(self, adj):
 		mod.bpm = adj.get_value()
+
+	def hide_timeline(self):
+		if not self.timeline_visible:
+			return
+
+		self.timeline_box.hide()
+
+		self.timeline_visible = False
+
+	def show_timeline(self):
+		if self.timeline_visible:
+			return
+
+		if 1 == len(self.hbox.get_children()):
+			self.hbox.pack2(self.timeline_box, False, True)
+			self.hbox.set_wide_handle(True)
+			self.hbox.set_position(self.get_window().get_width() * cfg.timeline_position)
+		self.timeline_visible = True
+		self.show_all()
+
+	def on_key_press(self, wdg, event):
+		if cfg.key["toggle_timeline"].matches(event):
+			if self.timeline_visible:
+				self.hide_timeline()
+				self.hbox.set_wide_handle(False)
+			else:
+				self.show_timeline()
+			return True
+
+		return False
 
 	def load(self, filename):
 		self._sequence_view.load(filename)
