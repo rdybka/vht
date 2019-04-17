@@ -9,16 +9,16 @@ class Configuration():
 
 		self.seq_font = "Monospace"
 		self.console_font = "Monospace"
-		
+
 		#self.seq_font = "Monospace"
 		self.gui_font_size = 16
 		self.seq_font_size = 16
 		self.seq_line_width = 1.0
 		self.seq_spacing = 1.05
 		self.status_bar_font_size = 32
-		#self.console_colour = (.5, .5, 1)
-		#self.console_colour = (.9, .8, .4)
-		
+		#self.colour = (.5, .5, 1)
+		#self.colour = (.9, .8, .4)
+
 		self.console_scale = 1
 		self.timeline_position = .66
 		self.console_position = .6
@@ -63,7 +63,7 @@ class Configuration():
 			"quit": cfgkey("q", False, True, False),
 			"toggle_timeline" : cfgkey("Tab", False, True, False),
 			"toggle_console" : cfgkey("grave", False, False, False),
-			
+
 			"play": cfgkey("Return", False, False, False),
 			"reset": cfgkey("Escape", False, False, False),
 			"multi_record": cfgkey("space", False, True, False),

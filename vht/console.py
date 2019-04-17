@@ -48,13 +48,13 @@ class Console(Vte.Terminal):
 
 		self.set_color_background(Gdk.RGBA(*(col * cfg.intensity_background for col in cfg.console_colour), 1))
 		self.set_color_foreground(Gdk.RGBA(*(col * cfg.intensity_txt for col in cfg.console_colour), 1))
-		
+
 		self.set_rewrap_on_resize(True)
 		self.set_scroll_on_output(True)
 		self.set_scroll_on_keystroke(True)
-		
+
 		self.set_font_scale(cfg.console_scale)
-		
+
 		self.set_font(Pango.FontDescription.from_string(cfg.console_font))
 		self.fs = int(cfg.console_scale * 50)
 		self.set_input_enabled(True)
@@ -71,7 +71,7 @@ class Console(Vte.Terminal):
 
 	def on_scroll(self, widget, event):
 		if event.state & Gdk.ModifierType.CONTROL_MASK: # we're zooming!
-			
+
 			if event.delta_y < 0:
 				self.fs += 2
 				self.fs = min(100, self.fs)
@@ -86,7 +86,7 @@ class Console(Vte.Terminal):
 			return True
 
 		return False
-		
+
 	def on_key_press(self, widget, event):
 		shift = False
 		ctrl = False
@@ -131,16 +131,16 @@ class Console(Vte.Terminal):
 				self.browsing = True
 				if self.history:
 					self.hist_ptr = len(self.history)
-			
+
 			if self.history:
 				for c in self.buff:
 					self.feed("\x1B[1D \x1B[1D".encode())
-				
+
 				self.hist_ptr = max(self.hist_ptr - 1, 0)
-			
-				self.buff = self.history[self.hist_ptr]			
+
+				self.buff = self.history[self.hist_ptr]
 				self.feed(self.buff.encode())
-				
+
 		if key_name == "Down":
 			if not self.browsing:
 				return False
@@ -152,10 +152,10 @@ class Console(Vte.Terminal):
 				self.hist_ptr += 1
 				if self.hist_ptr >= len(self.history):
 					self.browsing = False
-					
+
 					self.buff = ""
 				else:
-					self.buff = self.history[self.hist_ptr]			
+					self.buff = self.history[self.hist_ptr]
 					self.feed(self.buff.encode())
-					
+
 		return True

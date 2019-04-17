@@ -110,7 +110,8 @@ class TimeshiftEditor():
 
 		vel = 0
 
-		if event.y > y1 and event.y < y2:
+		if (event.y > y1 and event.y < y2) or (event.y > y1 and new_hover_row >= self.tv.trk.nrows - 1)\
+				or (new_hover_row == 0):
 			vel = min(max(((event.x - self.x_from) / self.x_to) * 98.0, 0), 98)
 			vel = vel - 49
 

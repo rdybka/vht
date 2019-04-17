@@ -33,5 +33,4 @@ typedef struct stip_t {
 
 strip *strip_new(int pos, int len);
 
-
 #endif //__STRIP_H__

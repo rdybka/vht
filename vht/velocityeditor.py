@@ -115,7 +115,8 @@ class VelocityEditor():
 
 		vel = cfg.default_velocity
 
-		if event.y > y1 and event.y < y2:
+		if (event.y > y1 and event.y < y2) or (event.y > y1 and new_hover_row >= self.tv.trk.nrows - 1)\
+				or new_hover_row == 0:
 			vel = min(max(((event.x - self.x_from) / self.x_to) * 127.0, 0), 127)
 
 		if self.lock:
