@@ -35,14 +35,14 @@ class SequencePropViewPopover(Gtk.Popover):
 		button = Gtk.Button("*2")
 		button.connect("clicked", self.on_double_clicked)
 		button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["sequence_double"]))
-		self.grid.attach(button, 0, 2, 1, 1)
+		self.grid.attach(button, 1, 2, 1, 1)
 
 		button = Gtk.Button("/2")
 		button.connect("clicked", self.on_halve_clicked)
 		button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["sequence_halve"]))
-		self.grid.attach(button, 1, 2, 1, 1)
-
-		self.length_adj = Gtk.Adjustment(0, 0, seq.max_length, 1.0, 1.0)
+		self.grid.attach(button, 0, 2, 1, 1)
+		
+		self.length_adj = Gtk.Adjustment(0, 1, seq.max_length, 1.0, 1.0)
 		self.length_button = Gtk.SpinButton()
 		self.length_button.set_adjustment(self.length_adj)
 		self.length_adj.set_value(seq.length)
@@ -55,8 +55,11 @@ class SequencePropViewPopover(Gtk.Popover):
 		self.set_modal(False)
 
 	def on_length_changed(self, adj):
-		print("length changed")
-		self.seq.length = int(adj.get_value())
+		val = int(adj.get_value())
+		if self.seq.length == val:
+			return
+			
+		self.seq.length = val
 		for trk in self.seq:
 			if trk.nsrows > self.seq.length:
 				trk.nsrows = self.seq.length
@@ -96,20 +99,14 @@ class SequencePropViewPopover(Gtk.Popover):
 	
 	def on_double_clicked(self, switch):	
 		self.parent.seqview.double()
-		self.length_adj.disconnect(self.length_conn_id)
 		self.length_adj.set_value(self.seq.length)
-		self.length_conn_id = self.length_adj.connect("value-changed", self.on_length_changed)
 
 	def on_halve_clicked(self, switch):
 		self.parent.seqview.halve()
-		self.length_adj.disconnect(self.length_conn_id)
 		self.length_adj.set_value(self.seq.length)
-		self.length_conn_id = self.length_adj.connect("value-changed", self.on_length_changed)
 
 	def pop(self):
 		mod.clear_popups(self)
-		self.length_adj.disconnect(self.length_conn_id)
 		self.length_adj.set_value(self.seq.length)
-		self.length_conn_id = self.length_adj.connect("value-changed", self.on_length_changed)
 		self.popup()
 		self.entered = False

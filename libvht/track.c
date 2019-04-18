@@ -770,13 +770,13 @@ void track_swap_ctrl(track *trk, int c, int c2) {
 }
 
 void track_resize(track *trk, int size) {
-	module_excl_in();
+	pthread_mutex_lock(&trk->excl);
 
 	// no need to realloc?
 	if (trk->arows >= size) {
 		trk->nrows = size;
 		trk->resync = 1;
-		module_excl_out();
+		pthread_mutex_unlock(&trk->excl);
 		return;
 	}
 
@@ -817,7 +817,7 @@ void track_resize(track *trk, int size) {
 
 	trk->nrows = size;
 
-	module_excl_out();
+	pthread_mutex_unlock(&trk->excl);
 	track_clear_updates(trk);
 }
 

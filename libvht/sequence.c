@@ -64,7 +64,7 @@ void sequence_double(sequence *seq) {
 }
 
 void sequence_halve(sequence *seq) {
-	if (seq->length < 8)
+	if (seq->length < 2)
 		return;
 
 	for (int t = 0; t < seq->ntrk; t++)
@@ -190,8 +190,6 @@ void sequence_set_length(sequence *seq, int length) {
 	seq->length = length;
 	module_excl_out();
 }
-
-
 
 void sequence_handle_record(sequence *seq, midi_event evt) {
 	if (module.recording == 1)
