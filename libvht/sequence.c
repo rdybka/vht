@@ -46,10 +46,31 @@ void sequence_add_track(sequence *seq, track *trk) {
 	module_excl_out();
 	return;
 }
+
 track *sequence_clone_track(sequence *seq, track *trk) {
 	track *ntrk = track_clone(trk);
 	sequence_add_track(seq, ntrk);
 	return ntrk;
+}
+
+void sequence_double(sequence *seq) {
+	if (seq->length > SEQUENCE_MAX_LENGTH / 2)
+		return;
+
+	for (int t = 0; t < seq->ntrk; t++)
+		track_double(seq->trk[t]);
+
+	seq->length *= 2;
+}
+
+void sequence_halve(sequence *seq) {
+	if (seq->length < 8)
+		return;
+
+	for (int t = 0; t < seq->ntrk; t++)
+		track_halve(seq->trk[t]);
+
+	seq->length /= 2;
 }
 
 void sequence_free(sequence *seq) {
@@ -107,7 +128,6 @@ void sequence_advance(sequence *seq, double period) {
 		seq->pos -= seq->length;
 }
 
-
 void sequence_del_track(sequence *seq, int t) {
 	if (t == -1)
 		t = seq->ntrk - 1;
@@ -157,6 +177,21 @@ void sequence_swap_track(sequence *seq, int t1, int t2) {
 void sequence_set_midi_focus(sequence *seq, int foc) {
 	seq->midi_focus = foc;
 }
+
+void sequence_set_length(sequence *seq, int length) {
+	module_excl_in();
+	for (int t = 0; t < seq->ntrk; t++) {
+		if((seq->trk[t]->nrows == seq->trk[t]->nsrows) && (seq->trk[t]->nrows == seq->length)) {
+			track_resize(seq->trk[t], length);
+			seq->trk[t]->nsrows = length;
+		}
+	}
+
+	seq->length = length;
+	module_excl_out();
+}
+
+
 
 void sequence_handle_record(sequence *seq, midi_event evt) {
 	if (module.recording == 1)

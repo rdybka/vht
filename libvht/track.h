@@ -89,6 +89,9 @@ void track_add_col(track *trk);
 void track_del_col(track *trk, int c);
 void track_swap_col(track *trk, int c, int c2);
 void track_resize(track *trk, int size);
+void track_double(track *trk);
+void track_halve(track *trk);
+
 void track_trigger(track *trk);
 
 void track_add_ctrl(track *trk, int ctl);

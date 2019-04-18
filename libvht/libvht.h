@@ -81,6 +81,7 @@ extern void set_default_midi_port(int port);
 extern sequence *sequence_new(int length);
 extern int sequence_get_ntrk(sequence *seq);
 extern int sequence_get_length(sequence *seq);
+extern int sequence_get_max_length(void);
 extern void sequence_set_length(sequence *seq, int length);
 extern track *sequence_get_trk(sequence *seq, int n);
 extern void sequence_add_track(sequence *seq, track *trk);
@@ -89,6 +90,8 @@ extern void sequence_del_track(sequence *seq, int t);
 extern void sequence_swap_track(sequence *seq, int t1, int t2);
 extern double sequence_get_pos(sequence *seq);
 extern void sequence_set_midi_focus(sequence *seq, int foc);
+extern void sequence_double(sequence *seq);
+extern void sequence_halve(sequence *seq);
 
 // track
 extern row *track_get_row_ptr(track *, int c, int r);
@@ -131,6 +134,8 @@ extern void track_add_col(track *trk);
 extern void track_del_col(track *trk, int c);
 extern void track_swap_col(track *trk, int c, int c2);
 extern void track_resize(track *trk, int size);
+extern void track_double(track *trk);
+extern void track_halve(track *trk);
 extern void track_trigger(track *trk);
 extern void track_kill_notes(track *trk);
 

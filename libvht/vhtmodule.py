@@ -56,6 +56,7 @@ class VHTModule(Iterable):
 		return libcvht.module_get_nseq()
 
 	def __iter__(self):
+		print("iter")
 		for itm in range(self.__len__()):
 			yield VHTSequence(libcvht, libcvht.module_get_seq(itm))
 

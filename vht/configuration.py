@@ -101,6 +101,8 @@ class Configuration():
 			"track_move_first": cfgkey("Home", False, True, False),
 			"track_clear": cfgkey("d", True, False, False),
 			"track_clone": cfgkey("n", False, True, False),
+			"sequence_double" : cfgkey("y", False, True, False),
+			"sequence_halve" : cfgkey("u", False, True, False),
 			"select_all": cfgkey("a", False, True, False),
 			"copy": cfgkey("c", False, True, False),
 			"cut": cfgkey("x", False, True, False),

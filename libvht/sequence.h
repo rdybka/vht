@@ -21,6 +21,8 @@
 #include "midi_event.h"
 #include "track.h"
 
+#define SEQUENCE_MAX_LENGTH	256
+
 typedef struct sequence_t {
 	track **trk;
 	int ntrk;
@@ -33,9 +35,11 @@ typedef struct sequence_t {
 sequence *sequence_new(int length);
 void sequence_add_track(sequence *seq, track *trk);
 track *sequence_clone_track(sequence *seq, track *trk);
+void sequence_set_length(sequence *seq, int length);
 void sequence_del_track(sequence *seq, int t);
 void sequence_swap_track(sequence *seq, int t1, int t2);
-
+void sequence_double(sequence *seq);
+void sequence_halve(sequence *seq);
 void sequence_free(sequence *);
 void sequence_advance(sequence *seq, double period);
 

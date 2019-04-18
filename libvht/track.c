@@ -821,6 +821,55 @@ void track_resize(track *trk, int size) {
 	track_clear_updates(trk);
 }
 
+void track_double(track *trk) {
+	int offs = trk->nrows;
+	track_resize(trk, trk->nrows * 2);
+	trk->nsrows *= 2;
+
+	module_excl_in();
+
+	for (int c = 0; c < trk->ncols; c++) {
+		for (int r = 0; r < offs; r++) {
+			row *s = &trk->rows[c][r];
+			row_set(&trk->rows[c][r + offs], s->type, s->note, s->velocity, s->delay);
+		}
+	}
+
+	for (int c = 0; c < trk->nctrl; c++) {
+		for (int r = 0; r < offs; r++) {
+			ctrlrow *s = &trk->crows[c][r];
+			ctrlrow_set(&trk->crows[c][r + offs], s->velocity, s->linked, s->smooth, s->anchor);
+
+			for (int rr = 0; rr < trk->ctrlpr; rr++) {
+				trk->ctrl[c][((r + offs) * trk->ctrlpr) + rr] = trk->ctrl[c][(r * trk->ctrlpr) + rr];
+			}
+		}
+
+		track_ctrl_refresh_envelope(trk, c);
+	}
+
+	module_excl_out();
+}
+
+void track_halve(track *trk) {
+	int offs = trk->nrows / 2;
+	for (int c = 0; c < trk->nctrl; c++) {
+		for (int r = offs; r < trk->nrows; r++) {
+			ctrlrow_set(&trk->crows[c][r], -1, 0, 0, 0);
+
+			for (int rr = 0; rr < trk->ctrlpr; rr++) {
+				trk->ctrl[c][(r * trk->ctrlpr) + rr] = -1;
+			}
+		}
+
+		track_ctrl_refresh_envelope(trk, c);
+	}
+
+	track_resize(trk, trk->nrows / 2);
+	trk->nsrows /= 2;
+}
+
+
 void track_trigger(track *trk) {
 	if (trk->playing) {
 		trk->playing = 0;

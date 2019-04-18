@@ -279,6 +279,10 @@ def sequence_get_length(seq):
     return _libcvht.sequence_get_length(seq)
 sequence_get_length = _libcvht.sequence_get_length
 
+def sequence_get_max_length():
+    return _libcvht.sequence_get_max_length()
+sequence_get_max_length = _libcvht.sequence_get_max_length
+
 def sequence_set_length(seq, length):
     return _libcvht.sequence_set_length(seq, length)
 sequence_set_length = _libcvht.sequence_set_length
@@ -310,6 +314,14 @@ sequence_get_pos = _libcvht.sequence_get_pos
 def sequence_set_midi_focus(seq, foc):
     return _libcvht.sequence_set_midi_focus(seq, foc)
 sequence_set_midi_focus = _libcvht.sequence_set_midi_focus
+
+def sequence_double(seq):
+    return _libcvht.sequence_double(seq)
+sequence_double = _libcvht.sequence_double
+
+def sequence_halve(seq):
+    return _libcvht.sequence_halve(seq)
+sequence_halve = _libcvht.sequence_halve
 
 def track_get_row_ptr(arg1, c, r):
     return _libcvht.track_get_row_ptr(arg1, c, r)
@@ -442,6 +454,14 @@ track_swap_col = _libcvht.track_swap_col
 def track_resize(trk, size):
     return _libcvht.track_resize(trk, size)
 track_resize = _libcvht.track_resize
+
+def track_double(trk):
+    return _libcvht.track_double(trk)
+track_double = _libcvht.track_double
+
+def track_halve(trk):
+    return _libcvht.track_halve(trk)
+track_halve = _libcvht.track_halve
 
 def track_trigger(trk):
     return _libcvht.track_trigger(trk)

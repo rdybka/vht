@@ -1,5 +1,6 @@
 - fix popups
 - triggers
+	-let ring
 - timeline
 * clone - ctrl-n
 * newly added tracks on left (as option)

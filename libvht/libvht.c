@@ -90,6 +90,9 @@ int sequence_get_length(sequence *seq) {
 	return seq->length;
 }
 
+int sequence_get_max_length(void) {
+	return SEQUENCE_MAX_LENGTH;
+}
 
 track *sequence_get_trk(sequence *seq, int n) {
 	return seq->trk[n];
@@ -161,17 +164,6 @@ void track_set_nsrows(track *trk, int n) {
 
 int module_get_nports() {
 	return JACK_CLIENT_MAX_PORTS;
-}
-
-void sequence_set_length(sequence *seq, int length) {
-	for (int t = 0; t < seq->ntrk; t++) {
-		if((seq->trk[t]->nrows == seq->trk[t]->nsrows) && (seq->trk[t]->nrows == seq->length)) {
-			track_resize(seq->trk[t], length);
-			seq->trk[t]->nsrows = length;
-		}
-	}
-
-	seq->length = length;
 }
 
 char *get_jack_error() {

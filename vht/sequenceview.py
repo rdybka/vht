@@ -188,8 +188,16 @@ class SequenceView(Gtk.Box):
 		if cfg.key["reset"].matches(event):
 			if not mod.play:
 				mod.reset()
-
 			return True
+
+		if cfg.key["sequence_double"].matches(event):
+			self.double()
+			return True
+
+		if cfg.key["sequence_halve"].matches(event):
+			self.halve()
+			return True
+
 
 		if cfg.key["undo"].matches(event):
 			if mod.active_track:
@@ -459,6 +467,17 @@ class SequenceView(Gtk.Box):
 		trk.add_column()
 		self.redraw_track(trk)
 		self.prop_view.redraw()
+
+	def double(self):
+		self.seq.double()
+		self.recalculate_row_spacing()
+		self.redraw_track()
+	
+	def halve(self):
+		TrackView.leave_all()
+		self.seq.halve()
+		self.recalculate_row_spacing()
+		self.redraw_track()
 
 	def shrink_track(self, trk):
 		trk.del_column()

@@ -44,6 +44,12 @@ class VHTSequence(Iterable):
 
 		return VHTTrack(self._vht_handle, ntrk, itm) if itm else None
 
+	def double(self):
+		self._vht_handle.sequence_double(self._seq_handle)
+		
+	def halve(self):
+		self._vht_handle.sequence_halve(self._seq_handle)
+
 	def swap_track(self, t1, t2):
 		self._vht_handle.sequence_swap_track(self._seq_handle, t1, t2)
 
@@ -68,6 +74,10 @@ class VHTSequence(Iterable):
 	@length.setter
 	def length(self, value):
 		self._vht_handle.sequence_set_length(self._seq_handle, value)
+
+	@property
+	def max_length(self):
+		return self._vht_handle.sequence_get_max_length()
 
 	def __str__(self):
 		ret = ""
