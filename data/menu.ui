@@ -14,26 +14,36 @@
         <attribute name="action">app.save_as</attribute>
         <attribute name="label">Save as</attribute>
       </item>
+      <submenu>
+        <attribute name="label">Export</attribute>
+			<item>
+			<attribute name="action">app.exp_midi</attribute>
+			<attribute name="label">Midi</attribute>
+			</item>
+			<item>
+			<attribute name="action">app.exp_audio</attribute>
+			<attribute name="label">Audio</attribute>
+			</item>
+      </submenu>
       
     </section>
     <section>
       <item>
         <attribute name="action">app.prefs</attribute>
-        <attribute name="label">_Preferences</attribute>
+        <attribute name="label">Preferences</attribute>
       </item>
-    
-    </section>
-    <section>
-      
+      <item>
+        <attribute name="action">app.keyb</attribute>
+        <attribute name="label">Keyboard Shortcuts</attribute>
+      </item>
+      <item>
+        <attribute name="action">app.help</attribute>
+        <attribute name="label">Help</attribute>
+      </item>
       <item>
         <attribute name="action">app.about</attribute>
-        <attribute name="label">_About</attribute>
+        <attribute name="label">About Valhalla Tracker</attribute>
       </item>
-      <item>
-        <attribute name="action">app.quit</attribute>
-        <attribute name="label">_Quit</attribute>
-        <attribute name="accel">&lt;Primary&gt;q</attribute>
-    </item>
     </section>
   </menu>
 </interface>

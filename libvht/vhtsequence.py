@@ -46,7 +46,7 @@ class VHTSequence(Iterable):
 
 	def double(self):
 		self._vht_handle.sequence_double(self._seq_handle)
-		
+
 	def halve(self):
 		self._vht_handle.sequence_halve(self._seq_handle)
 

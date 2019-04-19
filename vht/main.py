@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 #
-# Valhalla Tracker - prolly my magnum opus
-# Copyright (C) 2017 Remigiusz Dybka
+# Valhalla Tracker - a live MIDI sequencer for JACK
+# Copyright (C) 2019 Remigiusz Dybka
+# @schtixfnord
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,18 +28,15 @@ from vht import randomcomposer
 from vht.mainwin import MainWin
 
 class VHTApp(Gtk.Application):
-	def __init__(self):
-		Gtk.Application.__init__(self, application_id = "com.github.rdybka.vht",
-			flags = Gio.ApplicationFlags.NON_UNIQUE)
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, application_id = "com.github.rdybka.vht",
+			flags = Gio.ApplicationFlags.HANDLES_COMMAND_LINE |\
+			Gio.ApplicationFlags.NON_UNIQUE, **kwargs)
 
 		self.main_win = None
 
 	def do_startup(self):
 		Gtk.Application.do_startup(self)
-
-		action = Gio.SimpleAction.new("quit", None)
-		action.connect("activate", self.on_quit)
-		self.add_action(action)
 
 		action = Gio.SimpleAction.new("load", None)
 		action.connect("activate", self.on_load)
@@ -52,9 +50,9 @@ class VHTApp(Gtk.Application):
 		action.connect("activate", self.on_save_as)
 		self.add_action(action)
 
-		with open(os.path.join(mod.data_path, "menu.ui"), 'r') as f:
-			builder = Gtk.Builder.new_from_string(f.read(), -1)
-			self.set_app_menu(builder.get_object("app-menu"))
+	def do_command_line(self, command_line):
+		self.activate()
+		return 0
 
 	def do_activate(self):
 		self.main_win = MainWin(self)
@@ -82,7 +80,6 @@ class VHTApp(Gtk.Application):
 		dialog.close()
 		if response == Gtk.ResponseType.OK:
 			self.main_win.load(dialog.get_filename())
-
 
 		dialog.destroy()
 

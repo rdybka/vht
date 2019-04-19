@@ -473,7 +473,7 @@ class SequenceView(Gtk.Box):
 		self._side_prop.popover.length_adj.set_value(self.seq.length)
 		self.recalculate_row_spacing()
 		self.redraw_track()
-	
+
 	def halve(self):
 		TrackView.leave_all()
 		self.seq.halve()

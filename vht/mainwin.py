@@ -10,12 +10,13 @@ from vht.console import Console
 
 class MainWin(Gtk.ApplicationWindow):
 	def __init__(self, app):
-		Gtk.ApplicationWindow.__init__(self, application = app)
+		super().__init__(application = app)
+		#Gtk.ApplicationWindow.__init__(self, application = app)
 		self.fs = False
 		self.app = app
 		mod.mainwin = self
 		self.timeline_visible = False
-		self.console_visible = False
+		mod.console_visible = False
 		self.last_filename = None
 
 		# here we GUI
@@ -27,6 +28,7 @@ class MainWin(Gtk.ApplicationWindow):
 
 		self.hb = Gtk.HeaderBar()
 		self.hb.set_show_close_button(True)
+		
 		self.set_titlebar(self.hb)
 		self.set_default_icon_name("vht")
 		self.set_icon_name("vht")
@@ -64,8 +66,22 @@ class MainWin(Gtk.ApplicationWindow):
 
 		self.time_display = Gtk.Label()
 		self.time_display.use_markup = True
-		self.hb.pack_end(self.time_display)
+		
+		self.hb.pack_end(Gtk.Separator())		
+		self.menubutt = Gtk.MenuButton()
+		icon = Gio.ThemedIcon(name="open-menu-symbolic")
+		image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+		self.menubutt.add(image)
+		self.menubutt.set_use_popover(True)
 
+		with open(os.path.join(mod.data_path, "menu.ui"), 'r') as f:
+			builder = Gtk.Builder.new_from_string(f.read(), -1)
+			menu = builder.get_object("app-menu")
+			self.menubutt.set_menu_model(menu)
+				
+		self.hb.pack_end(self.menubutt)
+		self.hb.pack_end(self.time_display)
+		
 		self.vbox = Gtk.Box()
 		self.hbox = Gtk.Paned()
 		self.seqbox = Gtk.Paned()
@@ -94,6 +110,7 @@ class MainWin(Gtk.ApplicationWindow):
 
 		self.set_default_size(800, 600)
 		self.show_all()
+		self.show_console()
 
 		if mod.start_error:
 			dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
@@ -143,21 +160,21 @@ class MainWin(Gtk.ApplicationWindow):
 		self.timeline_box.show_all()
 
 	def hide_console(self):
-		if not self.console_visible:
+		if not mod.console_visible:
 			return
 
 		self.console.hide()
-		self.console_visible = False
+		mod.console_visible = False
 
 	def show_console(self):
-		if self.console_visible:
+		if mod.console_visible:
 			return
 
 		if 1 == len(self.seqbox.get_children()):
 			self.seqbox.pack2(self.console, True, True)
 			self.seqbox.set_position(self.get_window().get_height() * cfg.console_position)
 
-		self.console_visible = True
+		mod.console_visible = True
 		self.seqbox.set_wide_handle(True)
 		self.seqbox.show_all()
 
@@ -171,7 +188,7 @@ class MainWin(Gtk.ApplicationWindow):
 			return True
 
 		if cfg.key["toggle_console"].matches(event):
-			if self.console_visible:
+			if mod.console_visible:
 				self.hide_console()
 				self.seqbox.set_wide_handle(False)
 			else:

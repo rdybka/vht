@@ -216,7 +216,6 @@ class StatusBar(Gtk.DrawingArea):
 
 		self._context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
 
-
 		fs = cfg.status_bar_font_size
 		fits = False
 		while not fits:
@@ -378,7 +377,6 @@ class StatusBar(Gtk.DrawingArea):
 			if down:
 				cfg.default_midi_out_port = min(max(cfg.default_midi_out_port - 1, 0), mod.max_ports - 1)
 				mod.set_default_midi_port(cfg.default_midi_out_port)
-
 
 	def on_tooltip(self, wdg, x, y, kbd, tt):
 		if not self.active_field:

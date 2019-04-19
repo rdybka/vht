@@ -1,11 +1,15 @@
+[...and done]
+! resync
 - fix popups
 - triggers
 	-let ring
 - timeline
+* doubling/halving
+- console
+	- click in statusbar
 * clone - ctrl-n
 * newly added tracks on left (as option)
 	* not while recording
-* resync
 * fix keyboard for float bpm
 * make bpm a float
 * staying in edit mode after deleting track
@@ -29,6 +33,7 @@
 * track names
 * gui magic
 	* rotation
+- on a sober day, go through threading - it's out of control
 - move menu in fullscreen
 - disable menu when no jack
 * deleting track mutes it
