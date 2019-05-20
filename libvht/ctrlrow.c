@@ -17,6 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ctrlrow.h"
+
 int ctrlrow_get_velocity(ctrlrow *crw) {
 	return crw->velocity;
 }
