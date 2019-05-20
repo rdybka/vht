@@ -1,6 +1,7 @@
-/* ctrlrow.c - Valhalla Tracker
+/* ctrlrow.c - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2018 Remigiusz Dybka
+ * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * @schtixfnord
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#include "ctrlrow.h"
 
 int ctrlrow_get_velocity(ctrlrow *crw) {
 	return crw->velocity;

@@ -1,9 +1,11 @@
-[...and done]
 ! resync
 - fix popups
 - triggers
 	-let ring
 - timeline
+- whole track selection
+	- moving
+	- cloning
 * doubling/halving
 - console
 	- click in statusbar

@@ -1,6 +1,7 @@
-/* track.c
+/* track.c - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2017 Remigiusz Dybka
+ * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * @schtixfnord
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,6 +50,9 @@ track *track_new(int port, int channel, int len, int songlen) {
 	trk->port = port;
 	trk->cur_rec_update = 0;
 	trk->resync = 1;
+	trk->name = malloc(1);
+	trk->name[0] = 0;
+
 	pthread_mutex_init(&trk->excl, NULL);
 	pthread_mutex_init(&trk->exclrec, NULL);
 	pthread_mutex_init(&trk->exclctrl, NULL);
@@ -262,6 +266,7 @@ void track_free(track *trk) {
 	free(trk->ctrlnum);
 	free(trk->lctrlval);
 	free(trk->env);
+	free(trk->name);
 
 	free(trk);
 }
@@ -320,6 +325,12 @@ track *track_clone(track *src) {
 		track_ctrl_refresh_envelope(dst, c);
 
 		// don't forget about the triggers one day!!!!
+	}
+
+	if (src->name) {
+		free(dst->name);
+		dst->name = malloc(strlen(src->name) + 1);
+		strcpy(dst->name, src->name);
 	}
 
 	return dst;

@@ -1,6 +1,7 @@
-/* module.h
+/* module.h - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2017 Remigiusz Dybka
+ * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * @schtixfnord
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,8 +51,7 @@ void module_advance(jack_nframes_t curr_frames) {
 	if (module.nseq == 0)
 		return;
 
-//	module_excl_in();
-//	module_excl_out();
+	module_excl_in();
 
 	midi_buffer_clear();
 
@@ -131,6 +131,7 @@ void module_advance(jack_nframes_t curr_frames) {
 	midi_buffer_flush();
 	//printf("time: %02d:%02d:%03d %3.5f %d\n", module.min, module.sec, module.ms, period, module.bpm);
 	module.song_pos += period;
+	module_excl_out();
 }
 
 void module_new() {

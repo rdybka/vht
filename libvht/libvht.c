@@ -1,4 +1,24 @@
+/* libvht.c - Valhalla Tracker (libvht)
+ *
+ * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * @schtixfnord
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <stdio.h>
+#include <string.h>
 #include "jack_client.h"
 #include "jack_process.h"
 
@@ -160,6 +180,16 @@ void track_set_nrows(track *trk, int n) {
 
 void track_set_nsrows(track *trk, int n) {
 	trk->nsrows = n;
+}
+
+char *track_get_name(track *trk) {
+	return(trk->name);
+}
+
+void track_set_name(track *trk, char *name) {
+	free(trk->name);
+	trk->name = malloc(strlen(name) + 1);
+	strcpy(trk->name, name);
 }
 
 int module_get_nports() {

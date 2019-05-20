@@ -1,6 +1,7 @@
-/* pms.h
+/* libvht.h - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2017 Remigiusz Dybka
+ * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * @schtixfnord
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -129,6 +130,9 @@ extern int track_get_nctrl(track *trk);
 extern int track_get_ctrlpr(track *trk);
 
 extern char *track_get_envelope(track *trk, int c);
+
+extern char *track_get_name(track *trk);
+extern void track_set_name(track *trk, char *name);
 
 extern void track_add_col(track *trk);
 extern void track_del_col(track *trk, int c);

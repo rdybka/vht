@@ -1,3 +1,21 @@
+# trackpropview.py - Valhalla Tracker
+#
+# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# @schtixfnord
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, Gio
@@ -217,7 +235,7 @@ class TrackPropView(Gtk.DrawingArea):
 
 		(x, y, width, height, dx, dy) = cr.text_extents("000 00_|")
 		if self.trkview.show_timeshift:
-			(x, y, width, height, dx, dy) = cr.text_extents("000 000 00_./set|")
+			(x, y, width, height, dx, dy) = cr.text_extents("000 000 00_|")
 
 		self.txt_height = height
 		self.txt_width = int(dx)
@@ -327,6 +345,8 @@ class TrackPropView(Gtk.DrawingArea):
 		cr.stroke()
 
 		# display labels
+		cr.rectangle(0, 0, self.width - width, h)
+		cr.clip()
 		cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
 
 		cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
@@ -337,9 +357,10 @@ class TrackPropView(Gtk.DrawingArea):
 					cr.set_source_rgb(*(cfg.record_colour))
 
 		cr.move_to(x, self.txt_height * .95 *  cfg.seq_spacing)
+
 		if self.trk.name:
 			pref = ""
-			if not self.trkview.show_notes:
+			if not self.trkview.show_notes and self.trk.nctrl > 2:
 				pref = "p%02dc%02d " % (self.trk.port, self.trk.channel)
 
 			cr.show_text("%s%s" % (pref, self.trk.name))

@@ -1,3 +1,21 @@
+# mainwin.py - Valhalla Tracker
+#
+# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# @schtixfnord
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import gi, os
 gi.require_version('Gtk', '3.0')
 gi.require_version('Vte', '2.91')
@@ -28,7 +46,7 @@ class MainWin(Gtk.ApplicationWindow):
 
 		self.hb = Gtk.HeaderBar()
 		self.hb.set_show_close_button(True)
-		
+
 		self.set_titlebar(self.hb)
 		self.set_default_icon_name("vht")
 		self.set_icon_name("vht")
@@ -66,8 +84,8 @@ class MainWin(Gtk.ApplicationWindow):
 
 		self.time_display = Gtk.Label()
 		self.time_display.use_markup = True
-		
-		self.hb.pack_end(Gtk.Separator())		
+
+		self.hb.pack_end(Gtk.Separator())
 		self.menubutt = Gtk.MenuButton()
 		icon = Gio.ThemedIcon(name="open-menu-symbolic")
 		image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
@@ -78,10 +96,10 @@ class MainWin(Gtk.ApplicationWindow):
 			builder = Gtk.Builder.new_from_string(f.read(), -1)
 			menu = builder.get_object("app-menu")
 			self.menubutt.set_menu_model(menu)
-				
+
 		self.hb.pack_end(self.menubutt)
 		self.hb.pack_end(self.time_display)
-		
+
 		self.vbox = Gtk.Box()
 		self.hbox = Gtk.Paned()
 		self.seqbox = Gtk.Paned()
@@ -110,7 +128,7 @@ class MainWin(Gtk.ApplicationWindow):
 
 		self.set_default_size(800, 600)
 		self.show_all()
-		self.show_console()
+		#self.show_console()
 
 		if mod.start_error:
 			dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,
@@ -165,6 +183,7 @@ class MainWin(Gtk.ApplicationWindow):
 
 		self.console.hide()
 		mod.console_visible = False
+		self._sequence_view.auto_scroll_req = True
 
 	def show_console(self):
 		if mod.console_visible:
@@ -176,6 +195,7 @@ class MainWin(Gtk.ApplicationWindow):
 
 		mod.console_visible = True
 		self.seqbox.set_wide_handle(True)
+		self._sequence_view.auto_scroll_req = True
 		self.seqbox.show_all()
 
 	def on_key_press(self, wdg, event):

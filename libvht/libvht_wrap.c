@@ -5709,6 +5709,61 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_track_get_name(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  char *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:track_get_name",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_get_name" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  result = (char *)track_get_name(arg1);
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_track_set_name(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:track_set_name",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_set_name" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "track_set_name" "', argument " "2"" of type '" "char *""'");
+  }
+  arg2 = (char *)(buf2);
+  track_set_name(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_track_add_col(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   track *arg1 = (track *) 0 ;
@@ -6603,6 +6658,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "track_get_nctrl", _wrap_track_get_nctrl, METH_VARARGS, NULL},
 	 { "track_get_ctrlpr", _wrap_track_get_ctrlpr, METH_VARARGS, NULL},
 	 { "track_get_envelope", _wrap_track_get_envelope, METH_VARARGS, NULL},
+	 { "track_get_name", _wrap_track_get_name, METH_VARARGS, NULL},
+	 { "track_set_name", _wrap_track_set_name, METH_VARARGS, NULL},
 	 { "track_add_col", _wrap_track_add_col, METH_VARARGS, NULL},
 	 { "track_del_col", _wrap_track_del_col, METH_VARARGS, NULL},
 	 { "track_swap_col", _wrap_track_swap_col, METH_VARARGS, NULL},

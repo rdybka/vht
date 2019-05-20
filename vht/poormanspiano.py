@@ -1,4 +1,5 @@
-# Valhalla Tracker
+# poormanspiano.py - Valhalla Tracker
+#
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
 # @schtixfnord
 #

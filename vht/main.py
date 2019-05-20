@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #
 # Valhalla Tracker - a live MIDI sequencer for JACK
-# Copyright (C) 2019 Remigiusz Dybka
+# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
 # @schtixfnord
 #
 # This program is free software: you can redistribute it and/or modify

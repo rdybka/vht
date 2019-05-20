@@ -1,3 +1,21 @@
+# sequenceview.py - Valhalla Tracker
+#
+# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# @schtixfnord
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, Gio, GObject
@@ -622,11 +640,6 @@ class SequenceView(Gtk.Box):
 		hadj = self._sv.get_hadjustment()
 		vadj = self._sv.get_vadjustment()
 
-		if self.last_autoscroll_r == -1 and not self.autoscroll_req:
-			return
-
-		r = self.last_autoscroll_r
-
 		if not self.autoscroll_req:
 			return
 
@@ -649,7 +662,7 @@ class SequenceView(Gtk.Box):
 
 		vadj.set_value(vtarget)
 
-		hextra = 0#trk.width / 2
+		hextra = 0 #trk.width / 2
 		htarget = (trk.edit[0] * trk.txt_width) + hextra
 		if trk.keyboard_focus:
 			htarget = trk.keyboard_focus.x_from + hextra
@@ -684,6 +697,7 @@ class SequenceView(Gtk.Box):
 			if wdg.edit and wdg.trk:
 				self.auto_scroll(wdg)
 
+		# this is for things like start/stop/record/rewind/clear track
 		if not mod.gui_midi_capture:
 			midin = mod.get_midi_in_event()
 			while(midin):

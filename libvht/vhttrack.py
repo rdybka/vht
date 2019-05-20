@@ -1,3 +1,21 @@
+# vhttrack.py - Valhalla Tracker (libvht)
+#
+# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# @schtixfnord
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from collections.abc import Iterable
 from libvht.vhtcolumn import VHTColumn
 from libvht.vhtctrllist import VHTCtrlList
@@ -8,7 +26,6 @@ class VHTTrack(Iterable):
 		self._vht_handle = vht
 		self._trk_handle = trk;
 		self.index = index
-		self.name = ""
 		super()
 
 	def __len__(self):
@@ -70,6 +87,14 @@ class VHTTrack(Iterable):
 	def channel(self, value):
 		self.kill_notes()
 		self._vht_handle.track_set_channel(self._trk_handle, value)
+
+	@property
+	def name(self):
+		return self._vht_handle.track_get_name(self._trk_handle)
+
+	@name.setter
+	def name(self, n):
+		self._vht_handle.track_set_name(self._trk_handle, n)
 
 	@property
 	def nrows(self):

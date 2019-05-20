@@ -439,6 +439,14 @@ def track_get_envelope(trk, c):
     return _libcvht.track_get_envelope(trk, c)
 track_get_envelope = _libcvht.track_get_envelope
 
+def track_get_name(trk):
+    return _libcvht.track_get_name(trk)
+track_get_name = _libcvht.track_get_name
+
+def track_set_name(trk, name):
+    return _libcvht.track_set_name(trk, name)
+track_set_name = _libcvht.track_set_name
+
 def track_add_col(trk):
     return _libcvht.track_add_col(trk)
 track_add_col = _libcvht.track_add_col
