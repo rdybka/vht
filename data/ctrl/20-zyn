@@ -1,0 +1,13 @@
+#vht ctrl definition file
+1:modulation
+7:volume
+10:pan
+11:expression
+64:sustain
+65:portamento
+71:flt Q
+74:flt cutoff
+75:bandwidth
+76:mod amp
+77:res freq
+78:res width

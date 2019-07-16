@@ -1,7 +1,6 @@
 # sequenceview.py - Valhalla Tracker
 #
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
-# @schtixfnord
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -478,6 +477,7 @@ class SequenceView(Gtk.Box):
 			if cfg.new_tracks_left and mod.record != 2:
 				self.prop_view.move_first(trk)
 
+		self.recalculate_row_spacing()
 		t.show()
 		return t
 
@@ -517,6 +517,12 @@ class SequenceView(Gtk.Box):
 			restore_track_index = mod.active_track.trk.index
 			if mod.active_track.edit:
 				restore_edit = mod.active_track.edit
+
+		del(mod.extras[self.seq.index][trk.index])
+		for i in sorted(mod.extras[self.seq.index]):
+			if i > trk.index:
+				mod.extras[self.seq.index][i - 1] = mod.extras[self.seq.index][i]
+				del(mod.extras[self.seq.index][i])
 
 		TrackView.leave_all()
 		mod.active_track = None
@@ -614,6 +620,9 @@ class SequenceView(Gtk.Box):
 		self.build()
 
 	def recalculate_row_spacing(self):
+		if not self.get_realized():
+			return
+
 		minspc = 1.0
 
 		for wdg in self.get_tracks(True):

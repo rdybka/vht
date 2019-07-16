@@ -1,0 +1,285 @@
+#general midi 2
+121:*:*
+[Piano]
+0:1:Acoustic Grand Piano
+1:1:Wide Acoustic Grand
+2:1:Dark Acoustic Grand
+0:2:Bright Acoustic Piano
+1:2:Wide Bright Acoustic
+0:3:Electric Grand Piano
+1:3:Wide Electric Grand
+0:4:Honky-tonk Piano
+1:4:Wide Honky-tonk
+0:5:Rhodes Piano
+1:5:Detuned Electric Piano 1
+2:5:Electric Piano 1 Variation
+3:5:60's Electric Piano
+0:6:Chorused Electric Piano
+1:6:Detuned Electric Piano 2
+2:6:Electric Piano 2 Variation
+3:6:Electric Piano Legend
+4:6:Electric Piano Phase
+0:7:Harpsichord
+1:7:Coupled Harpsichord
+2:7:Wide Harpsichord
+3:7:Open Harpsichord
+0:8:Clavinet
+1:8:Pulse Clavinet
+[Chromatic Percussion]
+0:9:Celesta
+0:10:Glockenspiel
+0:11:Music Box
+0:12:Vibraphone
+1:12:Wet Vibraphone
+0:13:Marimba
+1:13:Wide Marimba
+0:14:Xylophone
+0:15:Tubular Bell
+1:15:Church Bell
+2:15:Carillon
+0:16:Dulcimer/Santur
+[Organ]
+0:17:Hammond Organ
+1:17:Detuned Organ 1
+2:17:60's Organ 1
+3:17:Organ 4
+0:18:Percussive Organ
+1:18:Detuned Organ 2
+2:18:Organ 5
+0:19:Rock Organ
+0:20:Church Organ 1
+1:20:Church Organ 2
+2:20:Church Organ 3
+0:21:Reed Organ
+1:21:Puff Organ
+0:22:French Accordion
+1:22:Italian Accordion
+0:23:Harmonica
+0:24:Bandoneon
+[Guitar]
+0:25:Nylon-String Guitar
+1:25:Ukulele
+2:25:Open Nylon Guitar
+3:25:Nylon Guitar 2
+0:26:Steel-String Guitar
+1:26:12-String Guitar
+2:26:Mandolin
+3:26:Steel + Body
+0:27:Jazz Guitar
+1:27:Hawaiian Guitar
+0:28:Clean Electric Guitar
+1:28:Chorus Guitar
+2:28:Mid Tone Guitar
+0:29:Muted Electric Guitar
+1:29:Funk Guitar
+2:29:Funk Guitar 2
+3:29:Jazz Man
+0:30:Overdriven Guitar
+1:30:Guitar Pinch
+0:31:Distortion Guitar
+1:31:Feedback Guitar
+2:31:Distortion Rtm Guitar
+0:32:Guitar Harmonics
+1:32:Guitar Feedback
+[Bass]
+0:33:Acoustic Bass
+0:34:Fingered Bass
+1:34:Finger Slap
+0:35:Picked Bass
+0:36:Fretless Bass
+0:37:Slap Bass 1
+0:38:Slap Bass 2
+0:39:Synth Bass 1
+1:39:Synth Bass 101
+2:39:Synth Bass 3
+3:39:Clavi Bass
+4:39:Hammer
+0:40:Synth Bass 2
+1:40:Synth Bass 4
+2:40:Rubber Bass
+3:40:Attack Pulse
+[Orchestra Solo]
+0:41:Violin
+1:41:Slow Violin
+0:42:Viola
+0:43:Cello
+0:44:Contrabass
+0:45:Tremolo Strings
+0:46:Pizzicato Strings
+0:47:Harp
+1:47:Yang Qin
+0:48:Timpani
+[Orchestra Ensemble]
+0:49:String Ensemble
+1:49:Orchestra Strings
+2:49:60's Strings
+0:50:Slow String Ensemble
+0:51:Synth Strings 1
+1:51:Synth Strings 3
+0:52:Synth Strings 2
+0:53:Choir Aahs
+1:53:Choir Aahs 2
+0:54:Voice Oohs
+1:54:Humming
+0:55:Synth Voice
+1:55:Analog Voice
+0:56:Orchestra Hit
+1:56:Bass Hit
+2:56:6th Hit
+3:56:Euro Hit
+[Brass]
+0:57:Trumpet
+1:57:Dark Trumpet
+0:58:Trombone
+1:58:Trombone 2
+2:58:Bright Trombone
+0:59:Tuba
+0:60:Muted Trumpet
+1:60:Muted Trumpet 2
+0:61:French Horns
+1:61:French Horn 2
+0:62:Brass Section 1
+1:62:Brass Section 2
+0:63:Synth Brass 1
+1:63:Synth Brass 3
+2:63:Analog Brass 1
+3:63:Jump Brass
+0:64:Synth Brass 2
+1:64:Synth Brass 4
+2:64:Analog Brass 2
+[Reed]
+0:65:Soprano Sax
+0:66:Alto Sax
+0:67:Tenor Sax
+0:68:Baritone Sax
+0:69:Oboe
+0:70:English Horn
+0:71:Bassoon
+0:72:Clarinet
+[Wind]
+0:73:Piccolo
+0:74:Flute
+0:75:Recorder
+0:76:Pan Flute
+0:77:Bottle Blow
+0:78:Shakuhachi
+0:79:Whistle
+0:80:Ocarina
+[Synth Lead]
+0:81:Square Lead
+1:81:Square Wave
+2:81:Sine Wave
+0:82:Saw Lead
+1:82:Saw Wave
+2:82:Doctor Solo
+3:82:Natural Lead
+4:82:Sequenced Saw
+0:83:Synth Calliope
+0:84:Chiffer Lead
+0:85:Charang
+1:85:Wire Lead
+0:86:Solo Synth Vox
+0:87:5th Saw Wave
+0:88:Bass & Lead
+1:88:Delayed Lead
+[Synth Pad]
+0:89:Fantasia Pad
+0:90:Warm Pad
+1:90:Sine Pad
+0:91:Polysynth Pad
+0:92:Space Voice Pad
+1:92:Itopia
+0:93:Bowed Glass Pad
+0:94:Metal Pad
+0:95:Halo Pad
+0:96:Sweep Pad
+[Synth Sound FX]
+0:97:Ice Rain
+0:98:Soundtrack
+0:99:Crystal
+1:99:Synth Mallet
+0:100:Atmosphere
+0:101:Brightness
+0:102:Goblin
+0:103:Echo Drops
+1:103:Echo Bell
+2:103:Echo Pan
+0:104:Star Theme
+[Ethnic]
+0:105:Sitar
+1:105:Sitar 2
+0:106:Banjo
+0:107:Shamisen
+0:108:Koto
+1:108:Taisho Koto
+0:109:Kalimba
+0:110:Bagpipe
+0:111:Fiddle
+0:112:Shanai
+[Percussive]
+0:113:Tinkle Bell
+0:114:Agogo
+0:115:Steel Drums
+0:116:Woodblock
+1:116:Castanets
+0:117:Taiko
+1:117:Concert Bass Drum
+0:118:Melodic Tom 1
+1:118:Melodic Tom 2
+0:119:Synth Drum
+1:119:808 Tom
+2:119:Electric Percussion
+0:120:Reverse Cymbal
+[Sound Effect]
+0:121:Guitar Fret Noise
+1:121:Guitar Cut Noise
+2:121:String Slap
+0:122:Breath Noise
+1:122:Flute Key Click
+0:123:Seashore
+1:123:Rain
+2:123:Thunder
+3:123:Wind
+4:123:Stream
+5:123:Bubble
+0:124:Bird
+1:124:Dog
+2:124:Horse-Gallop
+3:124:Bird 2
+0:125:Telephone 1
+1:125:Telephone 2
+2:125:Door Creaking
+3:125:Door Closing
+4:125:Scratch
+5:125:Wind Chimes
+0:126:Helicopter
+1:126:Car-Engine
+2:126:Car-Stop
+3:126:Car-Pass
+4:126:Car-Crash
+5:126:Siren
+6:126:Train
+7:126:Jetplane
+8:126:Starship
+9:126:Burst Noise
+0:127:Applause
+1:127:Laughing
+2:127:Screaming
+3:127:Punch
+4:127:Heart Beat
+5:127:Footsteps
+0:128:Gun Shot
+1:128:Machine Gun
+2:128:Lasergun
+3:128:Explosion
+120:0:*
+[Drum Kit]
+1:Standard Kit
+9:Room Kit
+17:Power Kit
+25:Electronic Kit
+26:TR-808 Kit
+33:Jazz Kit
+41:Brush Kit
+49:Orchestra Kit
+57:Sound FX Kit

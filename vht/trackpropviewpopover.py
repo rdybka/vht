@@ -1,7 +1,6 @@
 # trackpropviewpopover.py - Valhalla Tracker
 #
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
-# @schtixfnord
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,19 +15,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, Gio
 
 from vht import cfg, mod
 from vht.controllersview import ControllersView
+from vht.triggersview import TriggersView
+from vht.notebooklabel import NotebookLabel
 
 class TrackPropViewPopover(Gtk.Popover):
 	def __init__(self, parent, trk):
 		super(TrackPropViewPopover, self).__init__()
 		self.set_relative_to(parent)
 
-		self.set_events(Gdk.EventMask.LEAVE_NOTIFY_MASK
+		self.add_events(Gdk.EventMask.LEAVE_NOTIFY_MASK
 			| Gdk.EventMask.ENTER_NOTIFY_MASK)
 
 		self.connect("leave-notify-event", self.on_leave)
@@ -41,7 +43,7 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.grid.set_column_spacing(3)
 		self.grid.set_row_spacing(3)
 
-		self.entered = False
+		self.time_want_to_leave = 0
 
 		if trk:
 			button = Gtk.Button()
@@ -144,15 +146,87 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.name_entry = Gtk.Entry()
 			self.name_entry.connect("changed", self.on_name_changed)
 
-			self.name_entry.set_text(self.trk.name)
 			self.name_entry.set_activates_default(False)
 
 			grid.attach(self.name_entry, 1, 4, 4, 1)
 			grid.attach(Gtk.Label("name:"), 0, 4, 1, 1)
 
+			if not parent.seq.index in mod.extras:
+				mod.extras[parent.seq.index] = {}
+
+			if not self.trk.index in mod.extras[parent.seq.index]:
+				mod.extras[parent.seq.index][self.trk.index] = {}
+
+			if not "track_name" in mod.extras[parent.seq.index][self.trk.index]:
+				mod.extras[parent.seq.index][self.trk.index]["track_name"] = ""
+
+			self.name_entry.set_text(mod.extras[parent.seq.index][self.trk.index]["track_name"])
+
+			grid.attach(Gtk.Label("patch:"), 0, 3, 1, 1)
+
+			box = Gtk.Box()
+
+			self.patch_adj = Gtk.Adjustment(1, -1, 127, 1.0, 1.0)
+			self.patch_button = Gtk.SpinButton()
+			self.patch_button.set_adjustment(self.patch_adj)
+			self.patch_adj.set_value(-1)
+
+			self.patch_adj.connect("value-changed", self.on_patch_value_changed)
+
+			self.patch_menu = Gtk.Menu()
+
+			i = 0
+			for n, c in mod.bank.items():
+				m = Gtk.MenuItem(n)
+				sub = Gtk.Menu()
+				subs = {}
+				for p in c:
+					if p[1] not in subs:
+						subs[p[1]] = []
+
+					subs[p[1]].append((p[0], p[2]))
+
+				for s in subs:
+					sname = s
+					if s:
+						mitm = Gtk.MenuItem(s)
+						mitmm = Gtk.Menu()
+						for p in subs[s]:
+							itm = Gtk.MenuItem(p[1])
+							itm.patch = p
+							itm.connect("activate", self.on_patch_menu_item_activate)
+							itm.show()
+							mitmm.append(itm)
+						mitm.set_submenu(mitmm)
+						mitm.show()
+						sub.append(mitm)
+					else:
+						for p in subs[s]:
+							mitm = Gtk.MenuItem(p[1])
+							mitm.patch = p
+							mitm.connect("activate", self.on_patch_menu_item_activate)
+							mitm.show()
+							sub.append(mitm)
+
+				sub.show()
+				m.set_submenu(sub)
+				m.show()
+
+				self.patch_menu.append(m)
+				i += 1
+
+			self.patch_menu_button = Gtk.MenuButton()
+			self.patch_menu_button.set_popup(self.patch_menu)
+
+			box.add(self.patch_button)
+			box.add(self.patch_menu_button)
+
+			grid.attach(box, 1, 3, 2, 1)
+
 			self.extend_track_grid = grid
 
 			self.extend_controllers_grid = Gtk.Grid()
+
 			grid = self.extend_controllers_grid
 
 			grid.set_column_homogeneous(True)
@@ -161,16 +235,15 @@ class TrackPropViewPopover(Gtk.Popover):
 			grid.set_row_spacing(2)
 
 			self.ctrlsview = ControllersView(self.trk, self.trkview, self)
-
-			self.extend_triggers_grid = Gtk.Grid()
+			self.trgview = TriggersView(self.trk, self.trkview, self)
 
 			self.extend_notebook = Gtk.Notebook()
 			self.extend_notebook.set_hexpand(True)
 			self.extend_notebook.set_vexpand(True)
 
-			self.extend_notebook.append_page(self.extend_track_grid, Gtk.Label("track"))
-			self.extend_notebook.append_page(self.ctrlsview, Gtk.Label("controllers"))
-			self.extend_notebook.append_page(self.extend_triggers_grid, Gtk.Label("triggers"))
+			self.extend_notebook.append_page(self.extend_track_grid, NotebookLabel("track", self.extend_notebook, 0))
+			self.extend_notebook.append_page(self.ctrlsview, NotebookLabel("controllers", self.extend_notebook, 1))
+			self.extend_notebook.append_page(self.trgview, NotebookLabel("triggers", self.extend_notebook, 2))
 
 			self.extend_grid.attach(self.extend_notebook, 0, 0, 5, 5)
 			self.extend_grid.show()
@@ -241,6 +314,12 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.extend_notebook.set_current_page(0)
 			self.set_modal(False)
 
+	def on_patch_menu_item_activate(self, itm):
+		self.name_entry.set_text(itm.patch[1])
+		self.trk.set_bank(*itm.patch[0][:2])
+		self.patch_adj.set_value(itm.patch[0][2])
+
+
 	def refresh(self):
 		if self.trkview.trk.nctrl == 1:
 			self.show_controllers_button.set_sensitive(False)
@@ -274,29 +353,63 @@ class TrackPropViewPopover(Gtk.Popover):
 		#self.show_notes_button.set_sensitive(False)
 		self.refresh()
 		self.ctrlsview.rebuild()
-		self.popup()
-		self.entered = False
+		self.time_want_to_leave = 0
+		self.add_tick_callback(self.tick)
+		self.set_opacity(1)
+		self.show()
+		#self.popup()
 
-	def on_leave(self, wdg, prm):
-		if not self.entered:
+	def tick(self, wdg, param):
+		if self.time_want_to_leave == 0: # normal
+			op = self.get_opacity()
+			if op < 1.0:
+				self.set_opacity(op * 1.2)
+
 			return True
 
+		if self.time_want_to_leave == -1: # closed - stop callback
+			return False
+
+		if self.ctrlsview.new_ctrl_menu.is_visible():
+			self.time_want_to_leave = 0
+			return True
+
+		if self.patch_menu.is_visible():
+			self.time_want_to_leave = 0
+			return True
+
+		t = datetime.now() - self.time_want_to_leave
+		t = float(t.seconds) + t.microseconds / 1000000
+		if t > cfg.popup_timeout / 2.0:
+			t = 1 - (t - cfg.popup_timeout / 2.0) / (cfg.popup_timeout / 2.0)
+			if t > 0:
+				self.set_opacity(t)
+			if t < 0:
+				self.hide()
+				self.unpop()
+
+		return True
+
+	def on_patch_value_changed(self, adj):
+		c = int(adj.get_value())
+		if c == -1:
+			self.trk.set_bank(0, 0)
+		self.trk.send_program_change(c)
+
+	def on_leave(self, wdg, prm):
 		if prm.window == self.get_window():
 			if prm.detail != Gdk.NotifyType.INFERIOR:
-				self.unpop()
-				return True
-
+				self.time_want_to_leave = datetime.now()
 		return True
 
 	def on_enter(self, wdg, prm):
 		if prm.window == self.get_window():
-			if prm.detail == Gdk.NotifyType.INFERIOR:
-				self.entered = True
-
+			self.time_want_to_leave = 0
 		return True
 
 	def unpop(self):
 		self.popdown()
+		self.time_want_to_leave = -1
 		self.parent.button_highlight = False
 		self.ctrlsview.capturing = False
 		self.parent.popped = False
@@ -313,8 +426,9 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.show_controllers_button.set_sensitive(False)
 
 	def on_name_changed(self, wdg):
-		self.trk.name = wdg.get_text()
-		self.parent.redraw()
+		mod.extras[self.parent.seq.index][self.trk.index]["track_name"] = wdg.get_text()
+		if self.parent.get_realized():
+			self.parent.redraw()
 
 	def on_show_timeshift_toggled(self, wdg):
 		self.trkview.show_timeshift = wdg.get_active()
@@ -341,9 +455,9 @@ class TrackPropViewPopover(Gtk.Popover):
 		if self.trkview.show_controllers != wdg.get_active():
 			self.trkview.toggle_controls()
 
-		if self.entered:
-			self.trkview.redraw_full()
-			self.parent.redraw()
+		#if self.entered:
+		self.trkview.redraw_full()
+		self.parent.redraw()
 
 	def on_remove_button_clicked(self, switch):
 		self.parent.del_track()

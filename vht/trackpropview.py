@@ -1,7 +1,6 @@
 # trackpropview.py - Valhalla Tracker
 #
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
-# @schtixfnord
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -107,6 +106,9 @@ class TrackPropView(Gtk.DrawingArea):
 
 	def clone_track(self, trk):
 		ntrk = self.seq.clone_track(trk.trk)
+
+		mod.extras[self.seq.index][ntrk.index] = mod.extras[self.seq.index][trk.trk.index].copy()
+
 		t = self.seqview.add_track(ntrk)
 		t.show_controllers = trk.show_controllers
 		t.show_pitchwheel = trk.show_pitchwheel
@@ -332,7 +334,9 @@ class TrackPropView(Gtk.DrawingArea):
 
 		(x, y, width, height, dx, dy) = cr.text_extents("*** ")
 
-		cr.move_to(self.trkview.width - (dx + x), self.txt_height * 2 * cfg.seq_spacing)
+		stars_x = self.trkview.width - (dx + x)
+		cr.move_to(stars_x, self.txt_height * 2 * cfg.seq_spacing)
+
 		cr.show_text("***")
 
 		cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
@@ -347,6 +351,7 @@ class TrackPropView(Gtk.DrawingArea):
 		# display labels
 		cr.rectangle(0, 0, self.width - width, h)
 		cr.clip()
+
 		cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
 
 		cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
@@ -358,20 +363,25 @@ class TrackPropView(Gtk.DrawingArea):
 
 		cr.move_to(x, self.txt_height * .95 *  cfg.seq_spacing)
 
-		if self.trk.name:
+		trkname = mod.extras[self.seq.index][self.trk.index]["track_name"]
+
+		if trkname:
+			cr.move_to(x, self.txt_height * .8 *  cfg.seq_spacing)
+			self._context.set_font_size(cfg.seq_font_size * .6)
 			pref = ""
 			if not self.trkview.show_notes and self.trk.nctrl > 2:
 				pref = "p%02dc%02d " % (self.trk.port, self.trk.channel)
 
-			cr.show_text("%s%s" % (pref, self.trk.name))
+			cr.show_text("%s%s" % (pref, trkname))
 		else:
 			cr.show_text("p%02d c%02d" % (self.trk.port, self.trk.channel))
 
 		self._context.set_font_size(cfg.seq_font_size * .6)
+
 		cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 		yadj = 1.7
 
-		if self.trk.name and self.trkview.show_notes:
+		if trkname and self.trkview.show_notes:
 			cr.move_to(0, self.txt_height * yadj* cfg.seq_spacing)
 			cr.show_text("p%02dc%02d" % (self.trk.port, self.trk.channel))
 
@@ -379,10 +389,18 @@ class TrackPropView(Gtk.DrawingArea):
 			cr.move_to(self.trkview.pitchwheel_editor.x_from, self.txt_height * yadj * cfg.seq_spacing)
 			cr.show_text(" pitch")
 
+		cr.rectangle(0, 0, stars_x, h)
+		cr.clip()
+
 		if self.trkview.show_controllers:
-			for c in self.trkview.controller_editors:
+			for i, c in enumerate(self.trkview.controller_editors):
 				cr.move_to(c.x_from, self.txt_height * yadj * cfg.seq_spacing)
-				cr.show_text(" ctrl %d" % self.trkview.trk.ctrls[c.ctrlnum])
+
+				ctrllabel = " ctrl %d" % self.trkview.trk.ctrls[c.ctrlnum]
+				if i + 1 in mod.extras[self.seq.index][self.trk.index]["ctrl_names"]:
+					ctrllabel = "%s" % mod.extras[self.seq.index][self.trk.index]["ctrl_names"][i + 1][1][:12]
+
+				cr.show_text(ctrllabel)
 
 		self.queue_draw()
 

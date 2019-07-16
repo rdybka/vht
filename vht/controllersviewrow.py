@@ -1,7 +1,6 @@
 # controllersviewrow.py - Valhalla Tracker
 #
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
-# @schtixfnord
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,13 +22,14 @@ from gi.repository import Gtk, Gio
 from vht import *
 
 class ControllersViewRow(Gtk.ActionBar):
-	def __init__(self, parent, trk, ctrlnum, index):
+	def __init__(self, parent, trk, ctrlnum, index, parn, name):
 		super(ControllersViewRow, self).__init__()
 
 		self.parent = parent
 		self.trk = trk
 		self.ctrlnum = ctrlnum
 		self.index = index
+		self.parn = parn
 
 		button = Gtk.Button()
 		icon = Gio.ThemedIcon(name="go-up")
@@ -47,7 +47,7 @@ class ControllersViewRow(Gtk.ActionBar):
 		self.pack_start(button)
 		self.down_button = button
 
-		self.ctrl_adj = Gtk.Adjustment(1, 1, 127, 1.0, 10.0)
+		self.ctrl_adj = Gtk.Adjustment(1, 0, 127, 1.0, 1.0)
 		self.ctrl_button = Gtk.SpinButton()
 		self.ctrl_button.set_adjustment(self.ctrl_adj)
 		self.ctrl_adj.set_value(self.ctrlnum)
@@ -61,17 +61,35 @@ class ControllersViewRow(Gtk.ActionBar):
 		button.add(image)
 		button.connect("clicked", self.on_del_clicked)
 		self.pack_start(button)
+
+		self.entry = Gtk.Entry()
+		self.entry.set_text(name)
+		self.entry.connect("changed", self.on_name_changed)
+		self.pack_end(self.entry)
+
 		self.show_all()
 
 	def reassign_in_tv(self):
 		for c, cc in enumerate(self.parent.trkview.controller_editors):
 			cc.ctrlnum = c + 1
 			cc.ctrlrows = self.trk.ctrl[c + 1]
+
 			cc.undo_buff._ctrlnum = c + 1
+
+	def on_name_changed(self, wdg):
+		self.parent.ctrl_names[self.index] = self.parn, self.entry.get_text()
+		self.parent.parent.parent.redraw()
 
 	def on_del_clicked(self, wdg):
 		del self.parent.trkview.controller_editors[self.index - 1]
+		del self.parent.ctrl_names[self.index]
 		self.trk.ctrl.delete(self.index)
+
+		for i in sorted(self.parent.ctrl_names):
+			if i > self.index:
+				self.parent.ctrl_names[i - 1] = self.parent.ctrl_names[i]
+				del(self.parent.ctrl_names[i])
+
 		self.reassign_in_tv()
 		self.parent.rebuild()
 
@@ -79,6 +97,9 @@ class ControllersViewRow(Gtk.ActionBar):
 		if self.index > 1:
 			self.parent.trkview.controller_editors[self.index - 2], self.parent.trkview.controller_editors[self.index - 1] = \
 				self.parent.trkview.controller_editors[self.index - 1], self.parent.trkview.controller_editors[self.index - 2]
+
+			self.parent.ctrl_names[self.index], self.parent.ctrl_names[self.index - 1]\
+				= self.parent.ctrl_names[self.index - 1], self.parent.ctrl_names[self.index]
 
 			self.trk.ctrl.swap(self.index, self.index - 1)
 			self.reassign_in_tv()
@@ -90,6 +111,9 @@ class ControllersViewRow(Gtk.ActionBar):
 			self.parent.trkview.controller_editors[self.index], self.parent.trkview.controller_editors[self.index - 1] = \
 				self.parent.trkview.controller_editors[self.index - 1], self.parent.trkview.controller_editors[self.index]
 
+			self.parent.ctrl_names[self.index], self.parent.ctrl_names[self.index + 1]\
+				= self.parent.ctrl_names[self.index + 1], self.parent.ctrl_names[self.index]
+
 			self.trk.ctrl.swap(self.index, self.index + 1)
 			self.reassign_in_tv()
 
@@ -97,7 +121,15 @@ class ControllersViewRow(Gtk.ActionBar):
 
 	def on_num_changed(self, adj):
 		self.ctrlnum = int(adj.get_value())
+
+		c = int(adj.get_value())
+		n = mod.ctrls[self.parn]
+		if c in n:
+			self.entry.set_text(n[c])
+		else:
+			self.entry.set_text("")
+
+		self.parent.ctrl_names[self.index] = (self.parn, self.entry.get_text())
 		self.trk.ctrl[self.index].ctrlnum = self.ctrlnum
 		self.parent.trkview.controller_editors[self.index - 1].midi_ctrlnum = self.ctrlnum
 		self.parent.rebuild()
-

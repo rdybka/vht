@@ -1,7 +1,6 @@
 # console.py - Valhalla Tracker
 #
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
-# @schtixfnord
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -48,6 +47,8 @@ class HackerIO(object):
 
 	def write(self, data):
 		self._trm.feed(data.replace("\n", "\r\n").encode())
+		if mod.mainwin.get_realized():
+			mod.mainwin.show_console()
 		#self.stdout.write(data)
 
 	def readline(self):
@@ -89,7 +90,6 @@ class Console(Vte.Terminal):
 
 	def on_scroll(self, widget, event):
 		if event.state & Gdk.ModifierType.CONTROL_MASK: # we're zooming!
-
 			if event.delta_y < 0:
 				self.fs += 2
 				self.fs = min(100, self.fs)

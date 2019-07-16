@@ -1,7 +1,6 @@
 # controllersview.py - Valhalla Tracker
 #
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
-# @schtixfnord
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -62,15 +61,75 @@ class ControllersView(Gtk.Box):
 		self.capture_button.connect("toggled", self.on_capture_toggled)
 		self.new_ctrl.pack_start(self.capture_button)
 
-		self.new_ctrl_adj = Gtk.Adjustment(1, 1, 127, 1.0, 1.0)
+		self.new_ctrl_adj = Gtk.Adjustment(1, 0, 127, 1.0, 1.0)
 		self.new_ctrl_button = Gtk.SpinButton()
 		self.new_ctrl_button.set_adjustment(self.new_ctrl_adj)
 		self.new_ctrl_adj.set_value(1)
+
+		self.new_ctrl_adj.connect("value-changed", self.on_new_ctrl_changed)
+
 		self.new_ctrl.pack_start(self.new_ctrl_button)
+
+		self.new_ctrl_entry = Gtk.Entry()
+		self.new_ctrl_entry.set_text(mod.ctrls[cfg.default_ctrl_name][1])
+
+		self.new_ctrl.pack_end(self.new_ctrl_entry)
+
+		self.last_ctrl = cfg.default_ctrl_name
+
+		if not parent.parent.seq.index in mod.extras:
+			mod.extras[parent.parent.seq.index] = {}
+
+		if not self.trk.index in mod.extras[parent.parent.seq.index]:
+			mod.extras[parent.parent.seq.index][self.trk.index] = {}
+
+		if not "ctrl_names" in mod.extras[parent.parent.seq.index][self.trk.index]:
+			mod.extras[parent.parent.seq.index][self.trk.index]["ctrl_names"] = {}
+
+		self.ctrl_names = mod.extras[parent.parent.seq.index][self.trk.index]["ctrl_names"]
+
+		self.new_ctrl_menu = Gtk.Menu()
+		i = 0
+		for n, c in mod.ctrls.items():
+			m = Gtk.MenuItem(n)
+			sub = Gtk.Menu()
+			parn = n # parent's name
+			for c, n in c.items():
+				mitm = Gtk.MenuItem("%3d %s" % (c, n))
+				mitm.connect("activate", self.on_menuitem_activate)
+				mitm.parn = parn
+				mitm.show()
+				sub.append(mitm)
+
+			sub.show()
+			m.set_submenu(sub)
+			m.show()
+
+			self.new_ctrl_menu.append(m)
+			i += 1
+
+		self.new_ctrl_menu.show()
+		self.new_ctrl_menu_button = Gtk.MenuButton()
+		#self.new_ctrl_menu_button.connect("clicked", self.on_menu_popped)
+		self.new_ctrl_menu_button.set_popup(self.new_ctrl_menu)
+		self.new_ctrl.pack_end(self.new_ctrl_menu_button)
 
 		self.pack_end(self.new_ctrl, False, False, 0)
 		self.rebuild()
 		self.show_all()
+
+	def on_new_ctrl_changed(self, adj):
+		c = int(adj.get_value())
+		n = mod.ctrls[self.last_ctrl]
+		if c in n:
+			self.new_ctrl_entry.set_text(n[c].strip())
+		else:
+			self.new_ctrl_entry.set_text("")
+
+	def on_menuitem_activate(self, itm):
+		self.new_ctrl_adj.set_value(int(itm.get_label().split()[0]))
+		self.new_ctrl_entry.set_text(itm.get_label()[3:].strip())
+		self.last_ctrl = itm.parn
 
 	def on_capture_toggled(self, wdg):
 		if wdg.get_active():
@@ -98,6 +157,9 @@ class ControllersView(Gtk.Box):
 	def rebuild(self, just_gui = False):
 		reuse = False
 
+		if self.ctrl_names == None:
+			self.ctrl_names = {}
+
 		if len(self.box.get_children()) == self.trk.nctrl - 1:
 			reuse = True
 
@@ -107,13 +169,22 @@ class ControllersView(Gtk.Box):
 
 		for i, c in enumerate(self.trk.ctrls):
 			if c != -1:
+				parn = (self.last_ctrl, self.new_ctrl_entry.get_text())
+				if i in self.ctrl_names:
+					parn = self.ctrl_names[i]
+				else:
+					self.ctrl_names[i] = parn
+
 				if not reuse:
-					rw = ControllersViewRow(self, self.trk, c, i)
+					rw = ControllersViewRow(self, self.trk, c, i, parn[0], parn[1])
 					self.box.pack_start(rw, False, False, 0)
 				else:
 					rw = self.box.get_children()[i - 1]
 					rw.ctrlnum = c
-					rw.ctrl_adj.set_value(c)
+					rw.parn = self.ctrl_names[i][0]
+					name = self.ctrl_names[i][1]
+					rw.ctrl_adj.set_value(self.trk.ctrl[i].ctrlnum)
+					rw.entry.set_text(name)
 
 		for i, w in enumerate(self.box.get_children()):
 			w.up_button.set_sensitive(True)

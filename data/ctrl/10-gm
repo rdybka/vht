@@ -1,0 +1,25 @@
+#vht ctrl definition file
+1:modulation
+2:breath
+4:foot
+5:port
+7:volume
+11:pan
+64:sust on/off
+65:port on/off
+66:sost on/off
+67:soft on/off 
+70:variation
+71:flt res
+72:release
+73:attack
+74:flt cutoff
+75:decay
+76:vib rate
+77:vib depth
+78:vib delay
+91:fx1
+92:fx2
+93:fx3
+94:fx4
+95:fx5

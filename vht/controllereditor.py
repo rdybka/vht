@@ -1,7 +1,6 @@
 # controllereditor.py - Valhalla Tracker
 #
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
-# @schtixfnord
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -540,6 +539,21 @@ class ControllerEditor():
 				self.edit = self.edit + cfg.skip
 				if self.edit >= self.trk.nrows:
 					self.edit = 0
+				handled = True
+
+			if cfg.key["push"].matches(event):
+				for r in range(self.trk.nrows - 1, self.edit, -1):
+					self.trk.ctrl[self.ctrlnum][r].copy(self.trk.ctrl[self.ctrlnum][r - 1])
+
+				self.trk.ctrl[self.ctrlnum][self.edit].clear()
+				handled = True
+
+			if cfg.key["pull"].matches(event):
+				for r in range(self.edit, self.trk.nrows - 1):
+					self.trk.ctrl[self.ctrlnum][r].copy(self.trk.ctrl[self.ctrlnum][r + 1])
+
+				self.trk.ctrl[self.ctrlnum][self.trk.nrows - 1].clear()
+
 				handled = True
 
 			if not shift and not ctrl and not alt:

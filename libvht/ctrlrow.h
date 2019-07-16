@@ -1,7 +1,6 @@
 /* ctrlrow.h - Valhalla Tracker (libvht)
  *
  * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
- * @schtixfnord
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

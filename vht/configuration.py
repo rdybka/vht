@@ -1,7 +1,6 @@
 # configuration.py - Valhalla Tracker
 #
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
-# @schtixfnord
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,7 +27,6 @@ class Configuration():
 		self.seq_font = "Monospace"
 		self.console_font = "Monospace"
 
-		#self.seq_font = "Monospace"
 		self.gui_font_size = 16
 		self.seq_font_size = 16
 		self.seq_line_width = 1.0
@@ -44,6 +42,8 @@ class Configuration():
 		self.star_colour = (1, 1, 0)
 		self.console_colour = self.star_colour
 		self.record_colour = (1.0, 0, 0)
+
+		self.popup_timeout = 1
 
 		self.intensity_background = .2
 		self.intensity_txt = 1
@@ -74,7 +74,11 @@ class Configuration():
 		self.select_button = 1
 		self.delete_button = 3
 
+		self.default_ctrl_name = "zyn"
+		self.dark_theme = False
+
 		self.new_tracks_left = False
+		self.notebook_mouseover = False
 
 		self.key = {
 			# sequenceview		shift, ctrl, alt

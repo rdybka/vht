@@ -1,14 +1,21 @@
-! resync
-- fix popups
+* resync
 - triggers
 	-let ring
 - timeline
 - whole track selection
 	- moving
 	- cloning
-* doubling/halving
 - console
 	- click in statusbar
+- autoscroll and console open/close (magic row 27)
+- go through threading
+- move menu in fullscreen
+- configuration
+? save notification
+- split filename in title
+- magic transposing
+* fix popups
+* doubling/halving
 * clone - ctrl-n
 * newly added tracks on left (as option)
 	* not while recording
@@ -35,13 +42,7 @@
 * track names
 * gui magic
 	* rotation
-- on a sober day, go through threading - it's out of control
-- move menu in fullscreen
-- disable menu when no jack
+* disable menu when no jack
 * deleting track mutes it
-- configuration
-- about
+* about
 	* version from setup.py
-? save notification
-- split filename in title
-- magic transposing

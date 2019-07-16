@@ -1,7 +1,6 @@
 # trackview.py - Valhalla Tracker
 #
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
-# @schtixfnord
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -144,6 +143,9 @@ class TrackView(Gtk.DrawingArea):
 		self.edit = None
 
 		self.set_can_focus(True)
+
+		#if trk:
+		#	self.show_controllers = True
 
 		TrackView.track_views.append(self)
 

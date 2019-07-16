@@ -1,4 +1,4 @@
-# pulsar.py - Valhalla Tracker
+# notebooklabel.py - Valhalla Tracker
 #
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
@@ -15,19 +15,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-class Pulsar():
-	def __init__(self, freq):
-		self._freq = freq
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, Gdk
 
-	@property
-	def freq(self):
-		return self._freq
+from vht import cfg, mod
 
-	@freq.setter
-	def freq(self, f):
-		self._freq = f
+class NotebookLabel(Gtk.EventBox):
+	def __init__(self, name, nb, pos):
+		super(NotebookLabel, self).__init__()
 
-	def intensity(self, pos):
-		r = .8 - ((pos % self._freq) / self._freq)
-		return max(r, 0.0)
+		self.pos = pos
+		self.nb = nb
+
+		self.add_events(Gdk.EventMask.POINTER_MOTION_MASK)
+
+		self.add(Gtk.Label(name))
+		if cfg.notebook_mouseover:
+			self.connect("motion-notify-event", self.motion)
+		self.show_all()
+
+	def motion(self, wdg, evt):
+		self.nb.set_current_page(self.pos)
 

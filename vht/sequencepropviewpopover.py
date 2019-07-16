@@ -1,7 +1,6 @@
 # sequencepropviewpopover.py - Valhalla Tracker
 #
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
-# @schtixfnord
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GObject, Gdk, Gtk, Gio
@@ -40,7 +40,7 @@ class SequencePropViewPopover(Gtk.Popover):
 		self.grid.set_column_spacing(3)
 		self.grid.set_row_spacing(3)
 
-		self.entered = False
+		self.time_want_to_leave = 0
 
 		button = Gtk.Button()
 		icon = Gio.ThemedIcon(name="list-add")
@@ -72,6 +72,29 @@ class SequencePropViewPopover(Gtk.Popover):
 		self.add(self.grid)
 		self.set_modal(False)
 
+	def tick(self, wdg, param):
+		if self.time_want_to_leave == 0: # normal
+			op = self.get_opacity()
+			if op < 1.0:
+				self.set_opacity(op * 1.2)
+
+			return True
+
+		if self.time_want_to_leave == -1: # closed - stop callback
+			return False
+
+		t = datetime.now() - self.time_want_to_leave
+		t = float(t.seconds) + t.microseconds / 1000000
+		if t > cfg.popup_timeout / 2.0:
+			t = 1 - (t - cfg.popup_timeout / 2.0) / (cfg.popup_timeout / 2.0)
+			if t > 0:
+				self.set_opacity(t)
+			if t < 0:
+				self.hide()
+				self.unpop()
+
+		return True
+
 	def on_length_changed(self, adj):
 		val = int(adj.get_value())
 		if self.seq.length == val:
@@ -87,26 +110,19 @@ class SequencePropViewPopover(Gtk.Popover):
 		self.parent.seqview.queue_draw()
 
 	def on_leave(self, wdg, prm):
-		if not self.entered:
-			return True
-
 		if prm.window == self.get_window():
 			if prm.detail != Gdk.NotifyType.INFERIOR:
-				self.unpop()
-				return True
-
+				self.time_want_to_leave = datetime.now()
 		return True
 
 	def on_enter(self, wdg, prm):
 		if prm.window == self.get_window():
-			if prm.detail == Gdk.NotifyType.INFERIOR:
-				self.entered = True
-
+			self.time_want_to_leave = 0
 		return True
 
 	def unpop(self):
 		self.popdown()
-		self.entered = False
+		self.time_want_to_leave = -1
 		self.parent.popped = False
 		self.parent.button_highlight = False
 		self.parent.redraw()
@@ -126,5 +142,7 @@ class SequencePropViewPopover(Gtk.Popover):
 	def pop(self):
 		mod.clear_popups(self)
 		self.length_adj.set_value(self.seq.length)
+		self.time_want_to_leave = 0
+		self.add_tick_callback(self.tick)
+
 		self.popup()
-		self.entered = False

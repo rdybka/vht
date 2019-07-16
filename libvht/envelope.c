@@ -1,7 +1,6 @@
 /* envelope.c - Valhalla Tracker (libvht)
  *
  * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
- * @schtixfnord
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -135,7 +134,7 @@ void envelope_draw_cluster(envelope *env, int nf, int nl) {
 			xx+=dx / env->res;
 		}
 
-		// bezierish part - hold on tight
+		// bezier'ish part - hold on tight
 		if (z + lz > 1) {
 			z = 1 - lz;
 		}

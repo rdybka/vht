@@ -1,7 +1,6 @@
 # vhtmodule.py - Valhalla Tracker (libvht)
 #
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
-# @schtixfnord
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,6 +25,7 @@ class VHTModule(Iterable):
 	def __init__(self):
 		self.active_track = None
 		libcvht.module_new();
+		self.extras = {} # will be saved - for stuff like names of tracks
 		super()
 
 	def __del__(self):
@@ -201,6 +201,7 @@ class VHTModule(Iterable):
 	def save(self, filename):
 		jm = {}
 		jm["bpm"] = self.bpm
+		jm["extras"] = self.extras
 		jm["seq"] = []
 		for seq in self:
 			s = {}
@@ -263,5 +264,6 @@ class VHTModule(Iterable):
 							rr.delay = row["delay"]
 
 			self.play = p
+			self.extras = jm["extras"]
 			print("loaded %s\n" % (filename))
 

@@ -1,7 +1,6 @@
 /* sequence.c - Valhalla Tracker (libvht)
  *
  * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
- * @schtixfnord
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -88,38 +87,21 @@ void sequence_free(sequence *seq) {
 void sequence_advance(sequence *seq, double period) {
 	seq->last_period = period;
 	for (int t = 0; t < seq->ntrk; t++) {
-		int adv_track = 1;
-		//if (seq->trk[t]->playing) {
-		if (seq->trk[t]->resync) {
-			seq->trk[t]->pos = seq->pos;
+		track_advance(seq->trk[t], period);
 
-			if (seq->trk[t]->pos > seq->trk[t]->nrows) {
-				adv_track = 0;
-			} else {
-				seq->trk[t]->resync = 0;
-			}
-		}
-
-		if (adv_track) {
-			track_advance(seq->trk[t], period);
-
-			// if track past end, stop playing
-			if (seq->trk[t]->pos > seq->trk[t]->nrows)
-				if (!seq->trk[t]->loop)
-					seq->trk[t]->playing = 0;
-		}
+		// if track past end, stop playing
+		if (seq->trk[t]->pos > seq->trk[t]->nrows)
+			if (!seq->trk[t]->loop)
+				seq->trk[t]->playing = 0;
 	}
 
-	// will we reach the end of sequence?
-	// if so, reset non-looping tracks
-	if (seq->pos + period > seq->length) {
-		// reset track positions
-		for (int t = 0; t < seq->ntrk; t++) {
-			if (!seq->trk[t]->loop) {
-				seq->trk[t]->pos = 0;
-				track_wind(seq->trk[t], (double)seq->length - (seq->pos + period));
-				track_advance(seq->trk[t], period);
-			}
+	// resync tracks
+	for (int t = 0; t < seq->ntrk; t++) {
+		if (seq->trk[t]->resync) {
+			seq->trk[t]->resync = 0;
+			seq->trk[t]->pos = 0;
+			track_wind(seq->trk[t], seq->pos);
+			track_advance(seq->trk[t], period);
 		}
 	}
 

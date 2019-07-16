@@ -1,7 +1,6 @@
 # propview.py - Valhalla Tracker
 #
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
-# @schtixfnord
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -68,6 +67,8 @@ class PropView(Gtk.ScrolledWindow):
 		wdg = self.seqview._track_box.get_children()[trk.index]
 		self.seqview._track_box.reorder_child(wdg, (trk.index) + offs)
 		self.seq.swap_track(trk.index, trk.index + offs)
+		mod.extras[self.seq.index][trk.index], mod.extras[self.seq.index][trk.index + offs] =\
+			mod.extras[self.seq.index][trk.index + offs], mod.extras[self.seq.index][trk.index]
 		self.reindex_tracks()
 
 	def move_left(self, trk):
@@ -77,7 +78,7 @@ class PropView(Gtk.ScrolledWindow):
 		self.move_track(trk, -1)
 
 	def move_right(self, trk):
-		if trk.index is len(self.seq):
+		if trk.index is len(self.seq) - 1:
 			return
 
 		self.move_track(trk, 1)
@@ -94,7 +95,9 @@ class PropView(Gtk.ScrolledWindow):
 		for wdg in self._track_box.get_children() + [self.seqview._side_prop]:
 			if wdg.get_realized():
 				if ignore != wdg.popover:
-					wdg.popover.unpop()
+					#wdg.popover.unpop()
+					wdg.popover.hide()
+
 					wdg.popped = False
 					wdg.redraw()
 

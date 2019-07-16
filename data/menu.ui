@@ -30,19 +30,19 @@
     <section>
       <item>
         <attribute name="action">app.prefs</attribute>
-        <attribute name="label">Preferences</attribute>
+        <attribute name="label">_Preferences</attribute>
       </item>
       <item>
         <attribute name="action">app.keyb</attribute>
-        <attribute name="label">Keyboard Shortcuts</attribute>
+        <attribute name="label">_Keyboard Shortcuts</attribute>
       </item>
       <item>
         <attribute name="action">app.help</attribute>
-        <attribute name="label">Help</attribute>
+        <attribute name="label">_Help</attribute>
       </item>
       <item>
         <attribute name="action">app.about</attribute>
-        <attribute name="label">About Valhalla Tracker</attribute>
+        <attribute name="label">_About Valhalla Tracker</attribute>
       </item>
     </section>
   </menu>

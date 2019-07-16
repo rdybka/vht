@@ -439,14 +439,6 @@ def track_get_envelope(trk, c):
     return _libcvht.track_get_envelope(trk, c)
 track_get_envelope = _libcvht.track_get_envelope
 
-def track_get_name(trk):
-    return _libcvht.track_get_name(trk)
-track_get_name = _libcvht.track_get_name
-
-def track_set_name(trk, name):
-    return _libcvht.track_set_name(trk, name)
-track_set_name = _libcvht.track_set_name
-
 def track_add_col(trk):
     return _libcvht.track_add_col(trk)
 track_add_col = _libcvht.track_add_col
@@ -478,6 +470,18 @@ track_trigger = _libcvht.track_trigger
 def track_kill_notes(trk):
     return _libcvht.track_kill_notes(trk)
 track_kill_notes = _libcvht.track_kill_notes
+
+def track_set_program(trk, p):
+    return _libcvht.track_set_program(trk, p)
+track_set_program = _libcvht.track_set_program
+
+def track_set_bank(trk, msb, lsb):
+    return _libcvht.track_set_bank(trk, msb, lsb)
+track_set_bank = _libcvht.track_set_bank
+
+def track_get_program(trk):
+    return _libcvht.track_get_program(trk)
+track_get_program = _libcvht.track_get_program
 
 def track_new(port, channel, len, songlen):
     return _libcvht.track_new(port, channel, len, songlen)

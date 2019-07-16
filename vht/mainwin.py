@@ -1,7 +1,6 @@
 # mainwin.py - Valhalla Tracker
 #
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
-# @schtixfnord
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -39,7 +38,7 @@ class MainWin(Gtk.ApplicationWindow):
 
 		# here we GUI
 		st = self.get_settings()
-		st.set_property("gtk-application-prefer-dark-theme", True)
+		st.set_property("gtk-application-prefer-dark-theme", cfg.dark_theme)
 
 		self.set_events(Gdk.EventMask.KEY_PRESS_MASK)
 		self.connect("key-press-event", self.on_key_press)

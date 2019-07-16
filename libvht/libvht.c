@@ -1,7 +1,6 @@
 /* libvht.c - Valhalla Tracker (libvht)
  *
  * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
- * @schtixfnord
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -180,16 +179,7 @@ void track_set_nrows(track *trk, int n) {
 
 void track_set_nsrows(track *trk, int n) {
 	trk->nsrows = n;
-}
-
-char *track_get_name(track *trk) {
-	return(trk->name);
-}
-
-void track_set_name(track *trk, char *name) {
-	free(trk->name);
-	trk->name = malloc(strlen(name) + 1);
-	strcpy(trk->name, name);
+	trk->resync = 1;
 }
 
 int module_get_nports() {

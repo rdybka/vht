@@ -5709,61 +5709,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_track_get_name(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  track *arg1 = (track *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  char *result = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:track_get_name",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_get_name" "', argument " "1"" of type '" "track *""'"); 
-  }
-  arg1 = (track *)(argp1);
-  result = (char *)track_get_name(arg1);
-  resultobj = SWIG_FromCharPtr((const char *)result);
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_track_set_name(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  track *arg1 = (track *) 0 ;
-  char *arg2 = (char *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int res2 ;
-  char *buf2 = 0 ;
-  int alloc2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:track_set_name",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_set_name" "', argument " "1"" of type '" "track *""'"); 
-  }
-  arg1 = (track *)(argp1);
-  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "track_set_name" "', argument " "2"" of type '" "char *""'");
-  }
-  arg2 = (char *)(buf2);
-  track_set_name(arg1,arg2);
-  resultobj = SWIG_Py_Void();
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return resultobj;
-fail:
-  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_track_add_col(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   track *arg1 = (track *) 0 ;
@@ -5962,6 +5907,97 @@ SWIGINTERN PyObject *_wrap_track_kill_notes(PyObject *SWIGUNUSEDPARM(self), PyOb
   arg1 = (track *)(argp1);
   track_kill_notes(arg1);
   resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_track_set_program(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:track_set_program",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_set_program" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "track_set_program" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  track_set_program(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_track_set_bank(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOO:track_set_bank",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_set_bank" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "track_set_bank" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "track_set_bank" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  track_set_bank(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_track_get_program(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  char *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:track_get_program",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_get_program" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  result = (char *)track_get_program(arg1);
+  resultobj = SWIG_FromCharPtr((const char *)result);
   return resultobj;
 fail:
   return NULL;
@@ -6658,8 +6694,6 @@ static PyMethodDef SwigMethods[] = {
 	 { "track_get_nctrl", _wrap_track_get_nctrl, METH_VARARGS, NULL},
 	 { "track_get_ctrlpr", _wrap_track_get_ctrlpr, METH_VARARGS, NULL},
 	 { "track_get_envelope", _wrap_track_get_envelope, METH_VARARGS, NULL},
-	 { "track_get_name", _wrap_track_get_name, METH_VARARGS, NULL},
-	 { "track_set_name", _wrap_track_set_name, METH_VARARGS, NULL},
 	 { "track_add_col", _wrap_track_add_col, METH_VARARGS, NULL},
 	 { "track_del_col", _wrap_track_del_col, METH_VARARGS, NULL},
 	 { "track_swap_col", _wrap_track_swap_col, METH_VARARGS, NULL},
@@ -6668,6 +6702,9 @@ static PyMethodDef SwigMethods[] = {
 	 { "track_halve", _wrap_track_halve, METH_VARARGS, NULL},
 	 { "track_trigger", _wrap_track_trigger, METH_VARARGS, NULL},
 	 { "track_kill_notes", _wrap_track_kill_notes, METH_VARARGS, NULL},
+	 { "track_set_program", _wrap_track_set_program, METH_VARARGS, NULL},
+	 { "track_set_bank", _wrap_track_set_bank, METH_VARARGS, NULL},
+	 { "track_get_program", _wrap_track_get_program, METH_VARARGS, NULL},
 	 { "track_new", _wrap_track_new, METH_VARARGS, NULL},
 	 { "row_get_type", _wrap_row_get_type, METH_VARARGS, NULL},
 	 { "row_get_note", _wrap_row_get_note, METH_VARARGS, NULL},

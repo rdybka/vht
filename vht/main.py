@@ -2,7 +2,6 @@
 #
 # Valhalla Tracker - a live MIDI sequencer for JACK
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
-# @schtixfnord
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,11 +19,11 @@
 import sys, os
 import gi
 import pkg_resources
-gi.require_version('Gtk', '3.0')
-from gi.repository import GLib, Gtk, Gio
 
-from vht import *
-from vht import randomcomposer
+gi.require_version('Gtk', '3.0')
+from gi.repository import GLib, Gtk, Gio, GdkPixbuf
+
+from vht import mod, cfg, ctrlcfg, bankcfg, randomcomposer
 from vht.mainwin import MainWin
 
 class VHTApp(Gtk.Application):
@@ -48,6 +47,10 @@ class VHTApp(Gtk.Application):
 
 		action = Gio.SimpleAction.new("save_as", None)
 		action.connect("activate", self.on_save_as)
+		self.add_action(action)
+
+		action = Gio.SimpleAction.new("about", None)
+		action.connect("activate", self.on_about_dialog)
 		self.add_action(action)
 
 	def do_command_line(self, command_line):
@@ -82,6 +85,18 @@ class VHTApp(Gtk.Application):
 			self.main_win.load(dialog.get_filename())
 
 		dialog.destroy()
+
+	def on_about_dialog(self, action, param):
+		ab = Gtk.AboutDialog(self.main_win)
+		ab.set_license_type(Gtk.License.GPL_3_0)
+		ab.set_copyright("Copyright (C) 2019 Remigiusz Dybka\nremigiusz.dybka@gmail.com\n@schtixfnord")
+		pkg = pkg_resources.require("vht")[0]
+		ab.set_version(pkg.version)
+		ab.set_program_name("Valhalla Tracker")
+		ab.set_comments("a live MIDI sequencer for JACK")
+		ab.set_logo(GdkPixbuf.Pixbuf.new_from_file_at_size(mod.data_path + os.sep + "vht.svg", 160, 160))
+		ab.run()
+		ab.close()
 
 	def save_with_dialog(self):
 		if not self.main_win.last_filename:
@@ -141,6 +156,7 @@ def run():
 	mod.set_midi_record_ignore(midig)
 	randomcomposer.muzakize()
 
+	# fix data path
 	paths2try = []
 
 	paths2try.append(os.path.normpath(os.path.join(pkg.module_path, "data")))
@@ -159,18 +175,31 @@ def run():
 		if os.path.exists(p):
 			mod.data_path = p
 
+	# fix local config path
+	mod.cfg_path = os.path.expanduser("~/.config/vht")
+	if not os.path.exists(mod.cfg_path):
+		print("creating", mod.cfg_path)
+		os.mkdir(mod.cfg_path)
+
+	#print("data:", mod.data_path)
+	#print("cfg:", mod.cfg_path)
+
+	# fix controller configs
+	mod.ctrls = ctrlcfg.load()
+	# fix patches
+	mod.bank = bankcfg.load()
+
 	#print(mod.to_xml())
 	try:
 		app = VHTApp()
-
 		app.run(sys.argv)
 	except:
 		mod.jack_stop()
 		sys.exit()
 
-	# is this reliable? should we wait for module.mute == 0?
 	mod.play = False
 	mod.jack_stop()
+
 
 if __name__ == "__main__":
 	run()

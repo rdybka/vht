@@ -1,16 +1,13 @@
 ![vht header](/data/vht_header.png)
 ## about
 Valhalla Tracker aims to be a MIDI sequencing companion for your
-JACK/Yoshimi/Hydrogen/Calf setup. It relies 100% on JACK for timing
-which allows sample-exact synchronisation and in future, 
-asynchronous rendering.
+GNU/Linux audio setup. It's timing and input/output relies 100% on JACK,
+which allows "sample-exact" synchronisation and asynchronous rendering.
 
-## installation
+## deps
 ```
-[fedora sudo] dnf install python3-devel jack-audio-connection-kit-devel
-[ubuntu sudo] apt install python3-dev python3-pip libjack-jackd2-dev
-
-pip3 install vht --user
+fedora - python3-devel jack-audio-connection-kit-devel
+ubuntu - python3-dev libjack-jackd2-dev
 ```
 
 ## roadmap before a file release

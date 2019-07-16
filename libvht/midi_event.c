@@ -1,7 +1,6 @@
 /* midi_event.c - Valhalla Tracker (libvht)
  *
  * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
- * @schtixfnord
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,6 +79,9 @@ int midi_encode_event(midi_event evt, unsigned char *buff) {
 	case pitch_wheel:
 		buff[0] = 0xE0;
 		break;
+	case program_change:
+		buff[0] = 0xC0;
+		break;
 	}
 
 	buff[0]+= evt.channel - 1;
@@ -146,6 +148,9 @@ char *midi_describe_event(midi_event evt, char *buff, int len) {
 	case pitch_wheel:
 		b = "pitch_wheel";
 		break;
+	case program_change:
+		b = "program_change";
+		break;
 	}
 
 	if (evt.type == note_on || evt.type == note_off) {
@@ -204,8 +209,15 @@ void midi_buffer_flush_port(int port) {
 
 	for (int i = 0; i < curr_midi_event[port]; i++) {
 		unsigned char buff[3];
-		if (midi_encode_event(midi_buffer[port][i], buff))
-			jack_midi_event_write(outp, midi_buffer[port][i].time, buff, 3);
+		if (midi_encode_event(midi_buffer[port][i], buff)) {
+			int l = 3;
+
+			if (midi_buffer[port][i].type == program_change) {
+				l = 2;
+			}
+
+			jack_midi_event_write(outp, midi_buffer[port][i].time, buff, l);
+		}
 
 		if (module.dump_notes) {
 			char desc[256];

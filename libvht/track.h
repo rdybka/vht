@@ -1,7 +1,6 @@
 /* track.h - Valhalla Tracker (libvht)
  *
  * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
- * @schtixfnord
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,8 +47,6 @@ typedef struct track_t {
 	double last_pos;
 	double last_period;
 
-	char *name;
-
 	int ncols;
 	row **rows;
 	envelope **env;
@@ -59,6 +56,11 @@ typedef struct track_t {
 	int *ctrlnum;
 	int *lctrlval;
 	int **ctrl;
+
+	int prog;
+	int prog_sent;
+	int bank_msb;
+	int bank_lsb;
 
 	ctrlrow **crows;
 
@@ -117,5 +119,9 @@ void track_reset(track *trk);
 void track_advance(track *trk, double speriod);
 void track_wind(track *trk, double speriod);
 void track_kill_notes(track *trk);
+
+void track_set_program(track *trk, int p);
+void track_set_bank(track *trk, int msb, int lsb);
+char *track_get_program(track *trk);
 
 #endif //__TRACK_H__

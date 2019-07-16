@@ -1,7 +1,6 @@
 /* track.c - Valhalla Tracker (libvht)
  *
  * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
- * @schtixfnord
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,9 +48,11 @@ track *track_new(int port, int channel, int len, int songlen) {
 	trk->playing = 0;
 	trk->port = port;
 	trk->cur_rec_update = 0;
-	trk->resync = 1;
-	trk->name = malloc(1);
-	trk->name[0] = 0;
+	trk->resync = 0;
+	trk->prog = -1;
+	trk->prog_sent = 0;
+	trk->bank_msb = -1;
+	trk->bank_lsb = -1;
 
 	pthread_mutex_init(&trk->excl, NULL);
 	pthread_mutex_init(&trk->exclrec, NULL);
@@ -83,6 +84,7 @@ track *track_new(int port, int channel, int len, int songlen) {
 
 void track_reset(track *trk) {
 	trk->pos = trk->last_pos = trk->last_period = 0.0;
+	trk->prog_sent = 0;
 	track_kill_notes(trk);
 }
 
@@ -266,7 +268,6 @@ void track_free(track *trk) {
 	free(trk->ctrlnum);
 	free(trk->lctrlval);
 	free(trk->env);
-	free(trk->name);
 
 	free(trk);
 }
@@ -324,13 +325,9 @@ track *track_clone(track *src) {
 
 		track_ctrl_refresh_envelope(dst, c);
 
+		dst->prog = src->prog;
+		dst->prog_sent = src->prog_sent;
 		// don't forget about the triggers one day!!!!
-	}
-
-	if (src->name) {
-		free(dst->name);
-		dst->name = malloc(strlen(src->name) + 1);
-		strcpy(dst->name, src->name);
 	}
 
 	return dst;
@@ -521,6 +518,10 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 }
 
 void track_advance(track *trk, double speriod) {
+	if (trk->resync) {
+		return;
+	}
+
 	// length of period in track time
 	double tperiod = ((double)trk->nrows / (double)trk->nsrows) * speriod;
 	double tmul = (double) jack_buffer_size / tperiod;
@@ -530,6 +531,41 @@ void track_advance(track *trk, double speriod) {
 
 	if (row_end > trk->nrows)
 		row_end = trk->nrows;
+
+	// send program change?
+	if (trk->prog > -1) {
+		if ((trk->prog_sent == 0) && (trk->playing))  {
+			trk->prog_sent = 1;
+			midi_event evt;
+
+			evt.time = 0;
+			evt.channel = trk->channel;
+			evt.type = control_change;
+			evt.control = 0;
+			evt.data = trk->bank_msb;
+
+			if (trk->bank_msb > -1)
+				midi_buffer_add(trk->port, evt);
+
+			evt.time = 0;
+			evt.channel = trk->channel;
+			evt.type = control_change;
+			evt.control = 32;
+			evt.data = trk->bank_lsb;
+
+			if (trk->bank_lsb > -1)
+				midi_buffer_add(trk->port, evt);
+
+			evt.time = 0;
+			evt.channel = trk->channel;
+			evt.type = program_change;
+			evt.control = trk->prog;
+			evt.data = 0;
+
+			midi_buffer_add(trk->port, evt);
+
+		}
+	}
 
 	// play notes
 	for (int c = 0; c < trk->ncols; c++)
@@ -625,6 +661,8 @@ void track_advance(track *trk, double speriod) {
 void track_wind(track *trk, double period) {
 	double tperiod = ((double)trk->nrows / (double)trk->nsrows) * period;
 	trk->pos += tperiod;
+	while (trk->pos > trk->nsrows)
+		trk->pos -= trk->nsrows;
 }
 
 void track_kill_notes(track *trk) {
@@ -761,6 +799,10 @@ void track_swap_ctrl(track *trk, int c, int c2) {
 
 	pthread_mutex_lock(&trk->exclctrl);
 
+	int lc = trk->lctrlval[c];
+	trk->lctrlval[c] = trk->lctrlval[c2];
+	trk->lctrlval[c2] = lc;
+
 	int *cc3 = trk->ctrl[c];
 	trk->ctrl[c] = trk->ctrl[c2];
 	trk->ctrl[c2] = cc3;
@@ -776,6 +818,7 @@ void track_swap_ctrl(track *trk, int c, int c2) {
 	envelope *env3 = trk->env[c];
 	trk->env[c] = trk->env[c2];
 	trk->env[c2] = env3;
+
 
 	pthread_mutex_unlock(&trk->exclctrl);
 }
@@ -1094,4 +1137,20 @@ int track_get_lctrlval(track *trk, int c) {
 	ret = trk->lctrlval[c];
 	pthread_mutex_unlock(&trk->exclctrl);
 	return ret;
+}
+
+void track_set_program(track *trk, int p) {
+	trk->prog = p;
+	trk->prog_sent = 0;
+}
+
+void track_set_bank(track *trk, int msb, int lsb) {
+	trk->bank_msb = msb;
+	trk->bank_lsb = lsb;
+}
+
+char *track_get_program(track *trk) {
+	static char rc[256];
+	sprintf(rc, "[%3d, %3d, %3d]", trk->bank_msb, trk->bank_lsb, trk->prog);
+	return rc;
 }
