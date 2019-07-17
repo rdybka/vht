@@ -483,6 +483,18 @@ def track_get_program(trk):
     return _libcvht.track_get_program(trk)
 track_get_program = _libcvht.track_get_program
 
+def track_set_qc1(trk, ctrl, val):
+    return _libcvht.track_set_qc1(trk, ctrl, val)
+track_set_qc1 = _libcvht.track_set_qc1
+
+def track_set_qc2(trk, ctrl, val):
+    return _libcvht.track_set_qc2(trk, ctrl, val)
+track_set_qc2 = _libcvht.track_set_qc2
+
+def track_get_qc(trk):
+    return _libcvht.track_get_qc(trk)
+track_get_qc = _libcvht.track_get_qc
+
 def track_new(port, channel, len, songlen):
     return _libcvht.track_new(port, channel, len, songlen)
 track_new = _libcvht.track_new

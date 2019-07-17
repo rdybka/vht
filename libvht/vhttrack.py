@@ -137,11 +137,21 @@ class VHTTrack(Iterable):
 	def send_program_change(self, prog):
 		self._vht_handle.track_set_program(self._trk_handle, prog)
 
+	def set_qc1(self, ctrl, val):
+		self._vht_handle.track_set_qc1(self._trk_handle, ctrl, val)
+
+	def set_qc2(self, ctrl, val):
+		self._vht_handle.track_set_qc2(self._trk_handle, ctrl, val)
+
 	def set_bank(self, msb, lsb):
 		self._vht_handle.track_set_bank(self._trk_handle, msb, lsb)
 
 	def get_program(self):
 		return eval(self._vht_handle.track_get_program(self._trk_handle))
+		
+	def get_qc(self):
+		return eval(self._vht_handle.track_get_qc(self._trk_handle))
+		
 
 	# sets control, r = row * ctrlpr + offset
 	def set_ctrl(self, c, r, val):

@@ -62,6 +62,14 @@ typedef struct track_t {
 	int bank_msb;
 	int bank_lsb;
 
+	int qc1_ctrl;
+	int qc1_val;
+	int qc1_last;
+
+	int qc2_ctrl;
+	int qc2_val;
+	int qc2_last;
+
 	ctrlrow **crows;
 
 	int arows; // allocated rows
@@ -124,4 +132,6 @@ void track_set_program(track *trk, int p);
 void track_set_bank(track *trk, int msb, int lsb);
 char *track_get_program(track *trk);
 
+void track_set_qc1(track *trk, int ctrl, int val);
+void track_set_qc2(track *trk, int ctrl, int val);
 #endif //__TRACK_H__

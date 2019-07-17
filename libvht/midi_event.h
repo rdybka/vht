@@ -70,5 +70,4 @@ extern midi_event midi_ignore_buffer[EVT_BUFFER_LENGTH];
 void midi_ignore_buff_excl_in(void);
 void midi_ignore_buff_excl_out(void);
 
-
 #endif //__MIDI_EVENT_H__ 

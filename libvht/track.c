@@ -53,6 +53,12 @@ track *track_new(int port, int channel, int len, int songlen) {
 	trk->prog_sent = 0;
 	trk->bank_msb = -1;
 	trk->bank_lsb = -1;
+	trk->qc1_ctrl = -1;
+	trk->qc1_val = -1;
+	trk->qc1_last = -1;
+	trk->qc2_ctrl = -1;
+	trk->qc2_val = -1;
+	trk->qc2_last = -1;
 
 	pthread_mutex_init(&trk->excl, NULL);
 	pthread_mutex_init(&trk->exclrec, NULL);
@@ -85,6 +91,9 @@ track *track_new(int port, int channel, int len, int songlen) {
 void track_reset(track *trk) {
 	trk->pos = trk->last_pos = trk->last_period = 0.0;
 	trk->prog_sent = 0;
+	trk->qc1_last = -1;
+	trk->qc2_last = -1;
+
 	track_kill_notes(trk);
 }
 
@@ -245,7 +254,6 @@ void track_get_ctrl_env(track *trk, int *ret, int l, int c, int n) {
 	pthread_mutex_unlock(&trk->exclctrl);
 }
 
-
 void track_free(track *trk) {
 	pthread_mutex_destroy(&trk->excl);
 	pthread_mutex_destroy(&trk->exclrec);
@@ -327,6 +335,15 @@ track *track_clone(track *src) {
 
 		dst->prog = src->prog;
 		dst->prog_sent = src->prog_sent;
+
+		dst->bank_msb = src->bank_msb;
+		dst->bank_lsb = src->bank_lsb;
+		dst->qc1_ctrl = src->qc1_ctrl;
+		dst->qc1_last = src->qc1_last;
+		dst->qc1_val = src->qc1_val;
+		dst->qc2_ctrl = src->qc2_ctrl;
+		dst->qc2_last = src->qc2_last;
+		dst->qc2_val = src->qc2_val;
 		// don't forget about the triggers one day!!!!
 	}
 
@@ -564,6 +581,36 @@ void track_advance(track *trk, double speriod) {
 
 			midi_buffer_add(trk->port, evt);
 
+		}
+	}
+
+	// quick controls
+	if (trk->pos < trk->last_pos || trk->last_pos == 0.0 ||\
+	        trk->qc1_last != trk->qc1_val || trk->qc2_last != trk->qc2_val) {
+		midi_event evt;
+
+		evt.time = 0;
+		evt.channel = trk->channel;
+		evt.type = control_change;
+
+		if (trk->qc1_ctrl > 0) {
+			if (trk->qc1_val != trk->qc1_last) {
+				evt.control = trk->qc1_ctrl;
+				evt.data = trk->qc1_val;
+				midi_buffer_add(trk->port, evt);
+
+				trk->qc1_last = trk->qc1_val;
+			}
+		}
+
+		if (trk->qc2_ctrl > 0 || trk->last_pos == 0.0) {
+			if (trk->qc2_val != trk->qc2_last) {
+				evt.control = trk->qc2_ctrl;
+				evt.data = trk->qc2_val;
+				midi_buffer_add(trk->port, evt);
+
+				trk->qc2_last = trk->qc2_val;
+			}
 		}
 	}
 
@@ -923,7 +970,6 @@ void track_halve(track *trk) {
 	trk->nsrows /= 2;
 }
 
-
 void track_trigger(track *trk) {
 	if (trk->playing) {
 		trk->playing = 0;
@@ -1153,4 +1199,20 @@ char *track_get_program(track *trk) {
 	static char rc[256];
 	sprintf(rc, "[%3d, %3d, %3d]", trk->bank_msb, trk->bank_lsb, trk->prog);
 	return rc;
+}
+
+char *track_get_qc(track *trk) {
+	static char rc[256];
+	sprintf(rc, "[%3d, %3d, %3d, %3d]", trk->qc1_ctrl, trk->qc1_val, trk->qc2_ctrl, trk->qc2_val);
+	return rc;
+}
+
+void track_set_qc1(track *trk, int ctrl, int val) {
+	trk->qc1_ctrl = ctrl;
+	trk->qc1_val = val;
+}
+
+void track_set_qc2(track *trk, int ctrl, int val) {
+	trk->qc2_ctrl = ctrl;
+	trk->qc2_val = val;
 }

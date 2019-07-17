@@ -75,10 +75,17 @@ class Configuration():
 		self.delete_button = 3
 
 		self.default_ctrl_name = "zyn"
-		self.dark_theme = False
+		self.dark_theme = True
+		self.notebook_mouseover = True
+		
+		self.quick_controls_desc = "vol/pan:"
+		self.quick_control_1_ctrl = 7
+		self.quick_control_1_def = 100
+		self.quick_control_2_ctrl = 10
+		self.quick_control_2_def = 64
 
 		self.new_tracks_left = False
-		self.notebook_mouseover = False
+		
 
 		self.key = {
 			# sequenceview		shift, ctrl, alt

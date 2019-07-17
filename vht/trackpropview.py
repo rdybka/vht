@@ -140,16 +140,17 @@ class TrackPropView(Gtk.DrawingArea):
 		self.propview.move_last(self.trk)
 
 	def on_mouse_move(self, widget, data):
-		if data.x >= self.button_rect.x:
-			if data.x <= self.button_rect.x + self.button_rect.width:
-				if data.y >= self.button_rect.y:
-					if data.y <= self.button_rect.y + self.button_rect.height:
-						if not self.popped:
-							self.popover.pop()
-							self.popped = True
-							self.button_highlight = True
-							self.redraw()
-						return
+		if mod.mainwin.is_active():	
+			if data.x >= self.button_rect.x:
+				if data.x <= self.button_rect.x + self.button_rect.width:
+					if data.y >= self.button_rect.y:
+						if data.y <= self.button_rect.y + self.button_rect.height:
+							if not self.popped:
+								self.popover.pop()
+								self.popped = True
+								self.button_highlight = True
+								self.redraw()
+							return
 
 		self.button_highlight = False
 		self.redraw()

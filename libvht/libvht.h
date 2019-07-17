@@ -141,7 +141,9 @@ extern void track_kill_notes(track *trk);
 extern void track_set_program(track *trk, int p);
 extern void track_set_bank(track *trk, int msb, int lsb);
 extern char *track_get_program(track *trk);
-
+extern void track_set_qc1(track *trk, int ctrl, int val);
+extern void track_set_qc2(track *trk, int ctrl, int val);
+extern char *track_get_qc(track *trk);
 
 extern track *track_new(int port, int channel, int len, int songlen);
 

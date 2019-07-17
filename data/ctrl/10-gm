@@ -4,7 +4,8 @@
 4:foot
 5:port
 7:volume
-11:pan
+10:pan
+11:expression
 64:sust on/off
 65:port on/off
 66:sost on/off

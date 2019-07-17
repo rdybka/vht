@@ -110,7 +110,7 @@ class TrackPropViewPopover(Gtk.Popover):
 
 			grid = Gtk.Grid()
 			grid.set_column_homogeneous(True)
-			grid.set_row_homogeneous(True)
+			grid.set_row_homogeneous(False)
 			grid.set_column_spacing(2)
 			grid.set_row_spacing(2)
 
@@ -136,20 +136,36 @@ class TrackPropViewPopover(Gtk.Popover):
 
 			#self.loop_button = Gtk.CheckButton("loop")
 			#grid.attach(self.loop_button, 4, 4, 1, 1)
-			grid.attach(Gtk.Label(""), 0, 2, 1, 1)
+			grid.attach(Gtk.Label(cfg.quick_controls_desc), 0, 2, 1, 1)
+
+			self.quick_control_scale_1 = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 0, 127, 1)
+			self.quick_control_scale_2 = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 0, 127, 1)
+
+			qc = trk.get_qc()
+			v1 = qc[1] if qc[1] > -1 else cfg.quick_control_1_def
+			v2 = qc[3] if qc[3] > -1 else cfg.quick_control_2_def
+
+			self.quick_control_scale_1.set_value(v1)
+			self.quick_control_scale_2.set_value(v2)
+			
+			grid.attach(self.quick_control_scale_1, 1, 2, 2, 1)
+			grid.attach(self.quick_control_scale_2, 3, 2, 2, 1)
+			
+			self.quick_control_scale_1.connect("value-changed", self.on_qc1_changed)
+			self.quick_control_scale_2.connect("value-changed", self.on_qc2_changed)
 
 			self.clone_button = Gtk.Button("clone")
 			self.clone_button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_clone"]))
 			self.clone_button.connect("clicked", self.on_clone_button_clicked)
-			grid.attach(self.clone_button, 4, 3, 1, 1)
+			grid.attach(self.clone_button, 4, 4, 1, 1)
 
 			self.name_entry = Gtk.Entry()
 			self.name_entry.connect("changed", self.on_name_changed)
 
 			self.name_entry.set_activates_default(False)
 
-			grid.attach(self.name_entry, 1, 4, 4, 1)
-			grid.attach(Gtk.Label("name:"), 0, 4, 1, 1)
+			grid.attach(Gtk.Label("name:"), 0, 5, 1, 1)
+			grid.attach(self.name_entry, 1, 5, 4, 1)
 
 			if not parent.seq.index in mod.extras:
 				mod.extras[parent.seq.index] = {}
@@ -526,4 +542,8 @@ class TrackPropViewPopover(Gtk.Popover):
 	def on_move_last_button_clicked(self, switch):
 		self.parent.move_last()
 
+	def on_qc1_changed(self, adj):
+		self.trk.set_qc1(cfg.quick_control_1_ctrl, int(adj.get_value()))
 
+	def on_qc2_changed(self, adj):
+		self.trk.set_qc2(cfg.quick_control_2_ctrl, int(adj.get_value()))
