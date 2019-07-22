@@ -442,7 +442,7 @@ class TrackView(Gtk.DrawingArea):
 			fnum = oldw.midi_ctrlnum
 
 			for w in self.controller_editors + [self.pitchwheel_editor]:
-				if w.midi_ctrlnum == fnum:
+				if w == oldw:
 					self.keyboard_focus = w
 					self.keyboard_focus.edit = oldr
 
@@ -772,7 +772,7 @@ class TrackView(Gtk.DrawingArea):
 	def on_motion(self, widget, event):
 		if not self.trk:
 			return False
-
+			
 		new_hover_row = min(int(event.y / self.txt_height), self.trk.nrows - 1)
 		new_hover_column = min(int(event.x / self.txt_width), len(self.trk) -1)
 
@@ -801,7 +801,7 @@ class TrackView(Gtk.DrawingArea):
 
 		if self.show_controllers:
 			for ctrl in self.controller_editors:
-				ctrl.on_motion(widget, event)
+				ctrl.on_motion(ctrl, event)
 
 		if oldf != self.keyboard_focus:
 			if oldf:
