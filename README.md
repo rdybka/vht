@@ -2,7 +2,7 @@
 ## about
 Valhalla Tracker aims to be a MIDI sequencing companion for your
 GNU/Linux audio setup. It's timing and input/output relies 100% on JACK,
-which allows sample-exact synchronisation and asynchronous rendering.
+which allows sample-exact timing and asynchronous rendering.
 
 ## deps
 ```
@@ -14,9 +14,9 @@ ubuntu - python3-dev libjack-jackd2-dev
 - [x] record/edit notes
 - [x] record/edit controllers
 - [x] console
+- [ ] triggers
 - [ ] timeline
 - [ ] loops
-- [ ] triggers
 - [ ] export midi/wav
 - [ ] configuration window
 
