@@ -543,7 +543,9 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.parent.move_last()
 
 	def on_qc1_changed(self, adj):
-		self.trk.set_qc1(cfg.quick_control_1_ctrl, int(adj.get_value()))
+		qc = self.trk.get_qc()
+		self.trk.set_qc1(qc[0] if qc[0] > -1 else cfg.quick_control_1_ctrl, int(adj.get_value()))
 
 	def on_qc2_changed(self, adj):
-		self.trk.set_qc2(cfg.quick_control_2_ctrl, int(adj.get_value()))
+		qc = self.trk.get_qc()
+		self.trk.set_qc2(qc[2] if qc[2] > -1 else cfg.quick_control_2_ctrl, int(adj.get_value()))

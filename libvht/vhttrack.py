@@ -151,7 +151,6 @@ class VHTTrack(Iterable):
 		
 	def get_qc(self):
 		return eval(self._vht_handle.track_get_qc(self._trk_handle))
-		
 
 	# sets control, r = row * ctrlpr + offset
 	def set_ctrl(self, c, r, val):
