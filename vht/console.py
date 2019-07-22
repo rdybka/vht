@@ -130,14 +130,15 @@ class Console(Vte.Terminal):
 			self.buff += t
 			self.feed(t.encode())
 
-		if self.buff:
-			if key == 13 or key_name == "KP_Enter":
-				self.browsing = False
-				self.history.append(self.buff)
-				self.buff += "\r\n"
-				self.cons.q.put(self.buff)
-				self.buff = ""
-				print() # :)
+		if key == 13 or key_name == "KP_Enter":
+			if not self.buff:
+				self.buff = " "
+			self.browsing = False
+			self.history.append(self.buff)
+			self.buff += "\r\n"
+			self.cons.q.put(self.buff)
+			self.buff = ""
+			print() # :)
 
 		if (key == 8): # backspace
 			if self.buff:
