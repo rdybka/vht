@@ -992,7 +992,7 @@ class ControllerEditor():
 		if ctrl:
 			xw = self.x_to - (self.x_from + self.txt_width)
 			v = max(min(((event.x - (self.x_from + self.txt_width)) / xw) * 127, 127), 0)
-			r = event.y / self.tv.txt_height
+			r = min(event.y / self.tv.txt_height, self.trk.nrows - .01)
 
 			if self.doodle_hint_row == int(r):
 				v = self.doodle_hint
