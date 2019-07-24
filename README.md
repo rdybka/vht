@@ -1,7 +1,7 @@
 ![vht header](/data/vht_header.png)
 ## about
 Valhalla Tracker is a MIDI sequencing companion for
-your GNU/Linux audio setup.
+your GNU/Linux audio setup
 
 - by itself produces no sound and will not run on Windows
 - timing/input/output relies 100% on JACK
@@ -11,7 +11,7 @@ your GNU/Linux audio setup.
 - that's the only way it's been tested
 - minimalistic by design
 - minimalistic by necessity
-- open-sourced in case someone finds it useful
+- open-sourced in case someone else finds it useful
 - tries not to interfere with the creative process but to inspire experimentation
 - for the same reason, sparsely documented
 
