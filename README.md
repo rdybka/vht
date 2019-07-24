@@ -1,8 +1,23 @@
 ![vht header](/data/vht_header.png)
 ## about
-Valhalla Tracker aims to be a MIDI sequencing companion for your
-GNU/Linux audio setup. It's timing and input/output relies 100% on JACK,
-which allows sample-exact timing and asynchronous rendering.
+Valhalla Tracker is a MIDI sequencing companion for
+your GNU/Linux audio setup.
+
+- by itself produces no sound and will not run on Windows
+- timing/input/output relies 100% on JACK
+- motivated by ability to mess with time
+- tracker based, so probably most suitable for loop based music
+- seems to work fine with ZynAddSubFX and a MIDI keyboard
+- that's the only way it's been tested
+- minimalistic by design
+- minimalistic by necessity
+- open-sourced in case someone finds it useful
+- tries not to interfere with the creative process but rather inspire experimentation
+- for the same reason - sparsely documented
+
+in zip:
+	vhtlib - C library which talks to JACK and runs gameloop
+	vht	   - GTK interface written in Python
 
 ## deps
 ```
@@ -16,7 +31,6 @@ ubuntu - python3-dev libjack-jackd2-dev
 - [x] console
 - [ ] triggers
 - [ ] timeline
-- [ ] loops
 - [ ] export midi/wav
 - [ ] configuration window
 

@@ -43,7 +43,7 @@ class Configuration():
 		self.console_colour = self.star_colour
 		self.record_colour = (1.0, 0, 0)
 
-		self.popup_timeout = 1
+		self.popup_timeout = .5
 
 		self.intensity_background = .2
 		self.intensity_txt = 1
@@ -86,7 +86,6 @@ class Configuration():
 
 		self.new_tracks_left = False
 		
-
 		self.key = {
 			# sequenceview		shift, ctrl, alt
 			"quit": cfgkey("q", False, True, False),
