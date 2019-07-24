@@ -16,8 +16,8 @@ your GNU/Linux audio setup.
 - for the same reason - sparsely documented
 
 in zip:
-	vhtlib - C library which talks to JACK and runs gameloop
-	vht	   - GTK interface written in Python
+- vhtlib - C library which talks to JACK and runs gameloop
+- GTK interface written in Python
 
 ## deps
 ```
