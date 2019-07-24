@@ -12,7 +12,7 @@ your GNU/Linux audio setup.
 - minimalistic by design
 - minimalistic by necessity
 - open-sourced in case someone finds it useful
-- tries not to interfere with the creative process but rather inspire experimentation
+- tries not to interfere with the creative process but to inspire experimentation
 - for the same reason, sparsely documented
 
 ## in zip
