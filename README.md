@@ -13,9 +13,10 @@ your GNU/Linux audio setup.
 - minimalistic by necessity
 - open-sourced in case someone finds it useful
 - tries not to interfere with the creative process but rather inspire experimentation
-- for the same reason - sparsely documented
+- for the same reason:
+- sparsely documented
 
-in zip:
+## in zip
 - C library which talks to JACK and runs gameloop
 - GTK interface written in Python
 
