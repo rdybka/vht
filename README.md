@@ -11,7 +11,7 @@ your GNU/Linux audio setup
 - that's the only way it's been tested
 - minimalistic by design
 - minimalistic by necessity
-- open-sourced in case someone else finds it useful
+- open-sourced in case someone finds it useful
 - tries not to interfere with the creative process but to inspire experimentation
 - for the same reason, sparsely documented
 
