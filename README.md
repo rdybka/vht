@@ -12,6 +12,7 @@ your GNU/Linux audio setup
 - minimalistic by design
 - minimalistic by necessity
 - open-sourced in case someone finds it useful
+- has ability to save and load files
 - tries not to interfere but inspire
 - for the same reason, sparsely documented
 
