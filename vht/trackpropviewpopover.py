@@ -147,10 +147,10 @@ class TrackPropViewPopover(Gtk.Popover):
 
 			self.quick_control_scale_1.set_value(v1)
 			self.quick_control_scale_2.set_value(v2)
-			
+
 			grid.attach(self.quick_control_scale_1, 1, 2, 2, 1)
 			grid.attach(self.quick_control_scale_2, 3, 2, 2, 1)
-			
+
 			self.quick_control_scale_1.connect("value-changed", self.on_qc1_changed)
 			self.quick_control_scale_2.connect("value-changed", self.on_qc2_changed)
 

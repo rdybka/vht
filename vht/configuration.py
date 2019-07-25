@@ -77,7 +77,7 @@ class Configuration():
 		self.default_ctrl_name = "zyn"
 		self.dark_theme = True
 		self.notebook_mouseover = True
-		
+
 		self.quick_controls_desc = "vol/pan:"
 		self.quick_control_1_ctrl = 7
 		self.quick_control_1_def = 100
@@ -85,7 +85,7 @@ class Configuration():
 		self.quick_control_2_def = 64
 
 		self.new_tracks_left = False
-		
+
 		self.key = {
 			# sequenceview		shift, ctrl, alt
 			"quit": cfgkey("q", False, True, False),

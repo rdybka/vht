@@ -772,7 +772,7 @@ class TrackView(Gtk.DrawingArea):
 	def on_motion(self, widget, event):
 		if not self.trk:
 			return False
-			
+
 		new_hover_row = min(int(event.y / self.txt_height), self.trk.nrows - 1)
 		new_hover_column = min(int(event.x / self.txt_width), len(self.trk) -1)
 
