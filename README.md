@@ -5,14 +5,14 @@ your GNU/Linux audio setup
 
 - by itself produces no sound and will not run on Windows
 - timing/input/output relies 100% on JACK
-- motivated by ability to mess with time
+- driven by desire to mess with time
 - probably most suitable for loop based music
 - seems to work fine with ZynAddSubFX and a MIDI keyboard
 - that's the only way it's been tested
 - minimalistic by design
 - minimalistic by necessity
 - open-sourced in case someone finds it useful
-- has ability to save and load files
+- can save and load files
 - tries not to interfere but inspire
 - for the same reason, sparsely documented
 
