@@ -71,11 +71,15 @@ class TrackPropView(Gtk.DrawingArea):
 
 
 	def configure(self):
+		win = self.get_window()
+		if not win:
+			return
+		
 		if self._surface:
 			self._surface.finish()
 
 		if self.trkview:
-			self._surface = self.get_window().create_similar_surface(cairo.CONTENT_COLOR,
+			self._surface = win.create_similar_surface(cairo.CONTENT_COLOR,
 				self.trkview.width,
 				self.get_allocated_height())
 

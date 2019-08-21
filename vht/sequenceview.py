@@ -490,6 +490,10 @@ class SequenceView(Gtk.Box):
 		self.seq.double()
 		self._side_prop.popover.length_adj.set_value(self.seq.length)
 		self.recalculate_row_spacing()
+		
+		for trk in self.get_tracks():
+			trk.resetundo()
+		
 		self.redraw_track()
 
 	def halve(self):
@@ -497,6 +501,10 @@ class SequenceView(Gtk.Box):
 		self.seq.halve()
 		self._side_prop.popover.length_adj.set_value(self.seq.length)
 		self.recalculate_row_spacing()
+
+		for trk in self.get_tracks():
+			trk.resetundo()
+		
 		self.redraw_track()
 
 	def shrink_track(self, trk):

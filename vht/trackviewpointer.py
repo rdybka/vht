@@ -71,6 +71,7 @@ class TrackviewPointer():
 
 		r = int(self.trk.pos)
 
+		# sideview
 		if isinstance(self.trk, VHTSequence):
 			i = .5
 			if cfg.highlight > 1 and (r) % cfg.highlight == 0:

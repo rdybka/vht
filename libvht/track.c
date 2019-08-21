@@ -866,7 +866,6 @@ void track_swap_ctrl(track *trk, int c, int c2) {
 	trk->env[c] = trk->env[c2];
 	trk->env[c2] = env3;
 
-
 	pthread_mutex_unlock(&trk->exclctrl);
 }
 

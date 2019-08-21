@@ -30,6 +30,7 @@ from vht.poormanspiano import PoorMansPiano
 from vht.velocityeditor import VelocityEditor
 from vht.timeshifteditor import TimeshiftEditor
 from vht.controllereditor import ControllerEditor
+from vht.controllerundobuffer import ControllerUndoBuffer
 
 class TrackView(Gtk.DrawingArea):
 	track_views = []
@@ -143,10 +144,7 @@ class TrackView(Gtk.DrawingArea):
 		self.edit = None
 
 		self.set_can_focus(True)
-
-		#if trk:
-		#	self.show_controllers = True
-
+		
 		TrackView.track_views.append(self)
 
 	def __del__(self):
@@ -1705,7 +1703,7 @@ class TrackView(Gtk.DrawingArea):
 
 		note = self.pmp.key2note(Gdk.keyval_to_lower(event.keyval))
 
-		if self.edit and note and mod.record == 0:
+		if self.edit and self.edit[0] < len(self.trk) and note and mod.record == 0:
 			self.undo_buff.add_state()
 			old = self.edit[1]
 			self.trk[self.edit[0]][self.edit[1]] = note
@@ -2260,3 +2258,10 @@ class TrackView(Gtk.DrawingArea):
 
 		if redr:
 			self.redraw()
+			
+	def resetundo(self):
+		self.unfo_buff = TrackUndoBuffer(self.trk)
+		
+		for ctr in self.controller_editors:
+			ctr.undo_buff = ControllerUndoBuffer(self.trk, ctr.ctrlnum)
+		

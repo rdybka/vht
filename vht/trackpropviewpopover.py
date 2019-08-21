@@ -471,9 +471,9 @@ class TrackPropViewPopover(Gtk.Popover):
 		if self.trkview.show_controllers != wdg.get_active():
 			self.trkview.toggle_controls()
 
-		#if self.entered:
-		self.trkview.redraw_full()
-		self.parent.redraw()
+		if self.parent.popped:
+			self.trkview.redraw_full()
+			self.parent.redraw()
 
 	def on_remove_button_clicked(self, switch):
 		self.parent.del_track()

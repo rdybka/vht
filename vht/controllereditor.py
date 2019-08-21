@@ -615,9 +615,10 @@ class ControllerEditor():
 				self.tv.redraw()
 				return True
 
-			self.tv.leave_all()
 			self.selection = (0, self.trk.nrows -1)
 			self.edit = self.selection[1]
+			self.tv.recalc_edit(self.tv)
+			
 			handled = True
 
 		if cfg.key["doodle_cut"].matches(event):
