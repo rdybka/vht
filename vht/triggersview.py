@@ -54,7 +54,7 @@ class TriggersView(Gtk.Grid):
 		self.attach(self.mute_capture_button, 1, 0, 1, 1)
 
 		self.mute_entry = Gtk.Entry()
-		self.mute_entry.props.editable = False
+		self.mute_entry.props.sensitive = False
 
 		self.mute_entry.set_width_chars(entry_wc)
 
@@ -78,7 +78,8 @@ class TriggersView(Gtk.Grid):
 		self.attach(self.cue_capture_button, 1, 1, 1, 1)
 
 		self.cue_entry = Gtk.Entry()
-		self.cue_entry.props.editable = False
+		self.cue_entry.props.sensitive = False
+
 		self.cue_entry.set_width_chars(entry_wc)
 		self.attach(self.cue_entry, 3, 1, 1, 1)
 
@@ -100,13 +101,13 @@ class TriggersView(Gtk.Grid):
 		self.attach(self.play_capture_button, 1, 2, 1, 1)
 
 		self.play_midi_entry = Gtk.Entry()
-		self.play_midi_entry.props.editable = False
+		self.play_midi_entry.props.sensitive = False
 		self.play_midi_entry.set_width_chars(entry_wc)
 		self.attach(self.play_midi_entry, 3, 2, 1, 1)
 
 		self.play_kp_entry = Gtk.Entry()
 		self.play_kp_entry.set_tooltip_markup(cfg.tooltip_markup % ("keypad"))
-		self.play_kp_entry.props.editable = False
+		self.play_kp_entry.props.sensitive = False
 		self.play_kp_entry.set_width_chars(1)
 		self.attach(self.play_kp_entry, 4, 2, 1, 1)
 
