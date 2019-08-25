@@ -431,6 +431,8 @@ class TrackPropViewPopover(Gtk.Popover):
 		self.time_want_to_leave = -1
 		self.parent.button_highlight = False
 		self.ctrlsview.capturing = False
+		self.trgview.capture = -1
+		mod.gui_midi_capture = False
 		self.parent.popped = False
 		self.parent.redraw()
 
