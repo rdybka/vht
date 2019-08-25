@@ -618,7 +618,7 @@ class ControllerEditor():
 			self.selection = (0, self.trk.nrows -1)
 			self.edit = self.selection[1]
 			self.tv.recalc_edit(self.tv)
-			
+
 			handled = True
 
 		if cfg.key["doodle_cut"].matches(event):
@@ -819,6 +819,20 @@ class ControllerEditor():
 				return True
 
 		return False
+
+	def destroy(self):
+		if self.env_sf:
+			self.env_sf.finish()
+
+		if self.ctrl_sf:
+			self.ctrl_sf.finish()
+
+		if self.zero_pattern_surface:
+			self.zero_pattern_surface.finish()
+
+		if self.empty_pattern_surface:
+			self.empty_pattern_surface.finish()
+
 
 	def on_key_release(self, widget, event):
 		handled = False

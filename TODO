@@ -14,6 +14,7 @@
 ? save notification
 - split filename in title
 - magic transposing
+- nudge timeshift
 * fix popups
 * doubling/halving
 * clone - ctrl-n

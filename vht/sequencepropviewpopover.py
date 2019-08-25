@@ -112,7 +112,8 @@ class SequencePropViewPopover(Gtk.Popover):
 	def on_leave(self, wdg, prm):
 		if prm.window == self.get_window():
 			if prm.detail != Gdk.NotifyType.INFERIOR:
-				self.time_want_to_leave = datetime.now()
+				if self.time_want_to_leave == 0:
+					self.time_want_to_leave = datetime.now()
 		return True
 
 	def on_enter(self, wdg, prm):
@@ -144,5 +145,4 @@ class SequencePropViewPopover(Gtk.Popover):
 		self.length_adj.set_value(self.seq.length)
 		self.time_want_to_leave = 0
 		self.add_tick_callback(self.tick)
-
-		self.popup()
+		self.show()

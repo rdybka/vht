@@ -46,6 +46,7 @@ class PropView(Gtk.ScrolledWindow):
 	def del_track(self, trk):
 		track_pv = self._track_box.get_children()[trk.index]
 		track_pv.popover.popdown()
+		track_pv.popover.destroy()
 		track_pv.destroy()
 
 	def on_leave(self, wdg, prm):

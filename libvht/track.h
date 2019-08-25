@@ -24,16 +24,22 @@
 #include "ctrlrow.h"
 #include "envelope.h"
 
-#define TRIGGER_NONE 	0
-#define TRIGGER_NORMAL 	1
+#define TRIGGER_ONOFF 	0
+#define TRIGGER_SINGLE 	1
 #define TRIGGER_HOLD	2
 
 #define TRACK_CONTROLS_PER_ROW	16
 
-struct rec_update_t {
+typedef struct rec_update_t {
 	int col;
 	int row;
 } rec_upd;
+
+typedef struct trigger_t {
+	int channel;
+	int type;
+	int note;
+} trigger;
 
 typedef struct track_t {
 	int port;
@@ -75,14 +81,20 @@ typedef struct track_t {
 	int arows; // allocated rows
 	int *ring;
 
-	int trigger_channel;
-	int trigger_note;
-	int loop;
-
 	int resync;
 
-	struct rec_update_t updates[EVT_BUFFER_LENGTH];
+	rec_upd updates[EVT_BUFFER_LENGTH];
 	int cur_rec_update;
+
+	// triggers
+	trigger triggers[3];
+
+	int trg_timeline;
+	int trg_letring;
+	int trg_playmode;
+	int trg_quantise;
+
+	int loop;
 
 	unsigned char trigger_type;
 	pthread_mutex_t excl; // for atomic row access
@@ -131,6 +143,20 @@ void track_kill_notes(track *trk);
 void track_set_program(track *trk, int p);
 void track_set_bank(track *trk, int msb, int lsb);
 char *track_get_program(track *trk);
+
+void track_set_loop(track *trk, int v);
+void track_set_trg_timeline(track *trk, int v);
+void track_set_trg_letring(track *trk, int v);
+void track_set_trg_quantise(track *trk, int v);
+void track_set_trg_playmode(track *trk, int v);
+int track_get_loop(track *trk);
+int track_get_trg_timeline(track *trk);
+int track_get_trg_letring(track *trk);
+int track_get_trg_quantise(track *trk);
+int track_get_trg_playmode(track *trk);
+
+void track_set_trig(track *trk, int t, int tp, int ch, int nt);
+char *track_get_trig(track *trk, int t);
 
 void track_set_qc1(track *trk, int ctrl, int val);
 void track_set_qc2(track *trk, int ctrl, int val);

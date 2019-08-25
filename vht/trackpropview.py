@@ -74,7 +74,7 @@ class TrackPropView(Gtk.DrawingArea):
 		win = self.get_window()
 		if not win:
 			return
-		
+
 		if self._surface:
 			self._surface.finish()
 

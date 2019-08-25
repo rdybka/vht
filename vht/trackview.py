@@ -92,6 +92,7 @@ class TrackView(Gtk.DrawingArea):
 		self.connect("key-press-event", self.on_key_press)
 		self.connect("key-release-event", self.on_key_release)
 		self.connect("leave-notify-event", self.on_leave)
+		self.connect("destroy", self.on_destroy)
 
 		self.seq = seq
 		self.trk = trk
@@ -144,7 +145,7 @@ class TrackView(Gtk.DrawingArea):
 		self.edit = None
 
 		self.set_can_focus(True)
-		
+
 		TrackView.track_views.append(self)
 
 	def __del__(self):
@@ -323,6 +324,22 @@ class TrackView(Gtk.DrawingArea):
 			# because rowheight is float
 			matrix.scale(1.0, round(self.txt_height * self.zero_pattern_highlight) / (self.txt_height * self.zero_pattern_highlight))
 			self.empty_pattern.set_matrix(matrix)
+
+	def on_destroy(self, wdg):
+		if self._surface:
+			self._surface.finish()
+
+		if self._back_surface:
+			self._back_surface.finish()
+
+		if self.zero_pattern_surface:
+			self.zero_pattern_surface.finish()
+
+		if self.empty_pattern_surface:
+			self.empty_pattern_surface.finish()
+
+		for ctrl in self.controller_editors:
+			ctrl.destroy()
 
 	def on_configure(self, wdg, event):
 		if self._surface:
@@ -2258,10 +2275,10 @@ class TrackView(Gtk.DrawingArea):
 
 		if redr:
 			self.redraw()
-			
+
 	def resetundo(self):
 		self.unfo_buff = TrackUndoBuffer(self.trk)
-		
+
 		for ctr in self.controller_editors:
 			ctr.undo_buff = ControllerUndoBuffer(self.trk, ctr.ctrlnum)
-		
+

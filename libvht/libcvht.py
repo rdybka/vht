@@ -495,6 +495,54 @@ def track_get_qc(trk):
     return _libcvht.track_get_qc(trk)
 track_get_qc = _libcvht.track_get_qc
 
+def track_set_loop(trk, v):
+    return _libcvht.track_set_loop(trk, v)
+track_set_loop = _libcvht.track_set_loop
+
+def track_set_trg_timeline(trk, v):
+    return _libcvht.track_set_trg_timeline(trk, v)
+track_set_trg_timeline = _libcvht.track_set_trg_timeline
+
+def track_set_trg_letring(trk, v):
+    return _libcvht.track_set_trg_letring(trk, v)
+track_set_trg_letring = _libcvht.track_set_trg_letring
+
+def track_set_trg_playmode(trk, v):
+    return _libcvht.track_set_trg_playmode(trk, v)
+track_set_trg_playmode = _libcvht.track_set_trg_playmode
+
+def track_set_trg_quantise(trk, v):
+    return _libcvht.track_set_trg_quantise(trk, v)
+track_set_trg_quantise = _libcvht.track_set_trg_quantise
+
+def track_get_loop(trk):
+    return _libcvht.track_get_loop(trk)
+track_get_loop = _libcvht.track_get_loop
+
+def track_get_trg_timeline(trk):
+    return _libcvht.track_get_trg_timeline(trk)
+track_get_trg_timeline = _libcvht.track_get_trg_timeline
+
+def track_get_trg_letring(trk):
+    return _libcvht.track_get_trg_letring(trk)
+track_get_trg_letring = _libcvht.track_get_trg_letring
+
+def track_get_trg_playmode(trk):
+    return _libcvht.track_get_trg_playmode(trk)
+track_get_trg_playmode = _libcvht.track_get_trg_playmode
+
+def track_get_trg_quantise(trk):
+    return _libcvht.track_get_trg_quantise(trk)
+track_get_trg_quantise = _libcvht.track_get_trg_quantise
+
+def track_set_trig(trk, t, tp, ch, nt):
+    return _libcvht.track_set_trig(trk, t, tp, ch, nt)
+track_set_trig = _libcvht.track_set_trig
+
+def track_get_trig(trk, t):
+    return _libcvht.track_get_trig(trk, t)
+track_get_trig = _libcvht.track_get_trig
+
 def track_new(port, channel, len, songlen):
     return _libcvht.track_new(port, channel, len, songlen)
 track_new = _libcvht.track_new

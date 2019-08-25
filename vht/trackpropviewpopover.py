@@ -134,8 +134,6 @@ class TrackPropViewPopover(Gtk.Popover):
 			grid.attach(self.show_pitchwheel_button, 3, 0, 1, 1)
 			grid.attach(self.show_controllers_button, 4, 0, 1, 1)
 
-			#self.loop_button = Gtk.CheckButton("loop")
-			#grid.attach(self.loop_button, 4, 4, 1, 1)
 			grid.attach(Gtk.Label(cfg.quick_controls_desc), 0, 2, 1, 1)
 
 			self.quick_control_scale_1 = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 0, 127, 1)
@@ -393,6 +391,11 @@ class TrackPropViewPopover(Gtk.Popover):
 		if self.patch_menu.is_visible():
 			self.time_want_to_leave = 0
 			return True
+
+		if self.trgview.play_mode_cb.props.popup_shown:
+			self.time_want_to_leave = 0
+			return True
+
 
 		t = datetime.now() - self.time_want_to_leave
 		t = float(t.seconds) + t.microseconds / 1000000

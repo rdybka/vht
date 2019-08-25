@@ -40,10 +40,7 @@ track *track_new(int port, int channel, int len, int songlen) {
 	trk->nrows = len;
 	trk->arows = len;
 	trk->nsrows = songlen;
-	trk->trigger_channel = 0;
-	trk->trigger_note = 0;
 	trk->loop = 1;
-	trk->trigger_type = TRIGGER_NORMAL;
 	trk->ncols = 1;
 	trk->playing = 0;
 	trk->port = port;
@@ -85,6 +82,16 @@ track *track_new(int port, int channel, int len, int songlen) {
 	track_add_ctrl(trk, -1);
 	track_reset(trk);
 	trk->playing = 1;
+
+	for (int t = 0; t < 3; t ++) {
+		trk->triggers[t].type = trk->triggers[t].channel = trk->triggers[t].note = 0;
+	}
+
+	trk->trg_timeline = 1;
+	trk->trg_letring = 0;
+	trk->trg_playmode = 0;
+	trk->trg_quantise = 0;
+
 	return trk;
 };
 
@@ -344,7 +351,14 @@ track *track_clone(track *src) {
 		dst->qc2_ctrl = src->qc2_ctrl;
 		dst->qc2_last = src->qc2_last;
 		dst->qc2_val = src->qc2_val;
-		// don't forget about the triggers one day!!!!
+		dst->loop = src->loop;
+		dst->trg_timeline = src->trg_timeline;
+		dst->trg_letring = src->trg_letring;
+		dst->trg_playmode = src->trg_playmode;
+		dst->trg_quantise = src->trg_quantise;
+		for (int t = 0; t < 3; t++) {
+			dst->triggers[t] = src->triggers[t];
+		}
 	}
 
 	return dst;
@@ -1184,34 +1198,3 @@ int track_get_lctrlval(track *trk, int c) {
 	return ret;
 }
 
-void track_set_program(track *trk, int p) {
-	trk->prog = p;
-	trk->prog_sent = 0;
-}
-
-void track_set_bank(track *trk, int msb, int lsb) {
-	trk->bank_msb = msb;
-	trk->bank_lsb = lsb;
-}
-
-char *track_get_program(track *trk) {
-	static char rc[256];
-	sprintf(rc, "[%3d, %3d, %3d]", trk->bank_msb, trk->bank_lsb, trk->prog);
-	return rc;
-}
-
-char *track_get_qc(track *trk) {
-	static char rc[256];
-	sprintf(rc, "[%3d, %3d, %3d, %3d]", trk->qc1_ctrl, trk->qc1_val, trk->qc2_ctrl, trk->qc2_val);
-	return rc;
-}
-
-void track_set_qc1(track *trk, int ctrl, int val) {
-	trk->qc1_ctrl = ctrl;
-	trk->qc1_val = val;
-}
-
-void track_set_qc2(track *trk, int ctrl, int val) {
-	trk->qc2_ctrl = ctrl;
-	trk->qc2_val = val;
-}

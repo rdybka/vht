@@ -24,7 +24,7 @@
 #include "libvht.h"
 #include "module.h"
 
-// all wrappers and getters/setters go here, what a mess!
+// getters/setters and global stuff
 
 int start(char *name) {
 	return jack_start(name);
@@ -180,6 +180,96 @@ void track_set_nrows(track *trk, int n) {
 void track_set_nsrows(track *trk, int n) {
 	trk->nsrows = n;
 	trk->resync = 1;
+}
+
+void track_set_program(track *trk, int p) {
+	trk->prog = p;
+	trk->prog_sent = 0;
+}
+
+void track_set_bank(track *trk, int msb, int lsb) {
+	trk->bank_msb = msb;
+	trk->bank_lsb = lsb;
+}
+
+char *track_get_program(track *trk) {
+	static char rc[256];
+	sprintf(rc, "[%3d, %3d, %3d]", trk->bank_msb, trk->bank_lsb, trk->prog);
+	return rc;
+}
+
+char *track_get_qc(track *trk) {
+	static char rc[256];
+	sprintf(rc, "[%3d, %3d, %3d, %3d]", trk->qc1_ctrl, trk->qc1_val, trk->qc2_ctrl, trk->qc2_val);
+	return rc;
+}
+
+void track_set_qc1(track *trk, int ctrl, int val) {
+	trk->qc1_ctrl = ctrl;
+	trk->qc1_val = val;
+}
+
+void track_set_qc2(track *trk, int ctrl, int val) {
+	trk->qc2_ctrl = ctrl;
+	trk->qc2_val = val;
+}
+
+void track_set_loop(track *trk, int v) {
+	trk->loop = v;
+}
+
+int track_get_loop(track *trk) {
+	return trk->loop;
+}
+
+void track_set_trg_timeline(track *trk, int v) {
+	trk->trg_timeline = v;
+}
+
+int track_get_trg_timeline(track *trk) {
+	return trk->trg_timeline;
+}
+
+void track_set_trg_letring(track *trk, int v) {
+	trk->trg_letring = v;
+}
+
+int track_get_trg_letring(track *trk) {
+	return trk->trg_letring;
+}
+
+void track_set_trg_quantise(track *trk, int v) {
+	trk->trg_quantise = v;
+}
+
+int track_get_trg_quantise(track *trk) {
+	return trk->trg_quantise;
+}
+
+void track_set_trg_playmode(track *trk, int v) {
+	trk->trg_playmode = v;
+}
+
+int track_get_trg_playmode(track *trk) {
+	return trk->trg_playmode;
+}
+
+void track_set_trig(track *trk, int t, int tp, int ch, int nt) {
+	if ((t > 2) || (t < 0))
+		return;
+	trk->triggers[t].type = tp;
+	trk->triggers[t].channel = ch;
+	trk->triggers[t].note = nt;
+}
+
+char *track_get_trig(track *trk, int t) {
+	static char rc[256];
+
+	if ((t > 2) || (t < 0))
+		return "[0,0,0]";
+
+	sprintf(rc, "[%3d, %3d, %3d]", trk->triggers[t].type, trk->triggers[t].channel, trk->triggers[t].note);
+	return rc;
 }
 
 int module_get_nports() {
