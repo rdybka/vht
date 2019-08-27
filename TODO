@@ -15,6 +15,10 @@
 - split filename in title
 - magic transposing
 - nudge timeshift
+- export:
+	- midi
+	- audio
+		- freewheeling
 * fix popups
 * doubling/halving
 * clone - ctrl-n
