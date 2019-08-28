@@ -28,7 +28,7 @@
 #include "row.h"
 #include "libvht.h"
 
-track *track_new(int port, int channel, int len, int songlen) {
+track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	track *trk = malloc(sizeof(track));
 	if (len == -1)
 		len = module.def_nrows;
@@ -70,7 +70,7 @@ track *track_new(int port, int channel, int len, int songlen) {
 		trk->ring[c] = -1;
 	}
 
-	trk->ctrlpr = TRACK_CONTROLS_PER_ROW;
+	trk->ctrlpr = ctrlpr;
 	trk->nctrl = 0;
 	trk->ctrl = 0;
 	trk->ctrlnum = 0;
@@ -313,7 +313,7 @@ void track_clear_crows(track *trk, int c) {
 }
 
 track *track_clone(track *src) {
-	track *dst = track_new(src->port, src->channel, src->nrows, src->nsrows);
+	track *dst = track_new(src->port, src->channel, src->nrows, src->nsrows, src->ctrlpr);
 
 	for (int c = 0; c < src->ncols; c++) {
 		if (c > 0)

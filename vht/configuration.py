@@ -86,6 +86,8 @@ class Configuration():
 
 		self.new_tracks_left = False
 
+		self.controller_resolution = 8
+
 		self.key = {
 			# sequenceview		shift, ctrl, alt
 			"quit": cfgkey("q", False, True, False),

@@ -148,7 +148,7 @@ void module_new() {
 	module.song_pos = 0.0;
 	module.mute = 0;
 	module.dump_notes = 0;
-
+	module.ctrlpr = DEFAULT_CTRLPR;
 	cur_rec_update = 0;
 
 	module_excl_out();

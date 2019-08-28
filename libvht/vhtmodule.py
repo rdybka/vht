@@ -57,7 +57,6 @@ class VHTModule(Iterable):
 		return libcvht.module_get_nseq()
 
 	def __iter__(self):
-		print("iter")
 		for itm in range(self.__len__()):
 			yield VHTSequence(libcvht, libcvht.module_get_seq(itm))
 
@@ -123,6 +122,14 @@ class VHTModule(Iterable):
 			libcvht.module_set_rpb(value)
 		else:
 			libcvht.module_set_rpb(4)
+
+	@property
+	def ctrlpr(self):
+		return libcvht.module_get_ctrlpr()
+		
+	@ctrlpr.setter
+	def ctrlpr(self, value):
+		libcvht.module_set_ctrlpr(value)
 
 	@record.setter
 	def record(self, value):
@@ -201,6 +208,7 @@ class VHTModule(Iterable):
 	def save(self, filename):
 		jm = {}
 		jm["bpm"] = self.bpm
+		jm["ctrlpr"] = self.ctrlpr
 		jm["extras"] = self.extras
 		jm["seq"] = []
 		for seq in self:
@@ -215,7 +223,6 @@ class VHTModule(Iterable):
 				t["nrows"] = trk.nrows
 				t["nsrows"] = trk.nsrows
 				t["playing"] = trk.playing
-				t["name"] = trk.name
 				t["col"] = []
 
 				for col in trk:
@@ -234,7 +241,6 @@ class VHTModule(Iterable):
 
 		with open(filename, 'w') as f:
 			json.dump(jm, f, indent = 4)
-			print("saved %s\n" % (filename))
 
 	def load(self, filename):
 		with open(filename, 'r') as f:
@@ -243,13 +249,13 @@ class VHTModule(Iterable):
 			self.reset()
 			libcvht.module_new();
 			self.bpm = jm["bpm"]
+			self.ctrlpr = jm["ctrlpr"]
 			for seq in jm["seq"]:
 				s = self.add_sequence()
 				s.length = seq["length"]
 				for trk in seq["trk"]:
-					t = s.add_track(trk["port"], trk["channel"], trk["nrows"], trk["nsrows"])
+					t = s.add_track(trk["port"], trk["channel"], trk["nrows"], trk["nsrows"], self.ctrlpr)
 					t.playing = trk["playing"]
-					t.name = trk["name"]
 					for cc, col in enumerate(trk["col"]):
 						if cc == 0:
 							c = t[0]
@@ -265,5 +271,4 @@ class VHTModule(Iterable):
 
 			self.play = p
 			self.extras = jm["extras"]
-			print("loaded %s\n" % (filename))
 

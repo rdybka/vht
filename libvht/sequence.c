@@ -194,7 +194,7 @@ void sequence_handle_record(sequence *seq, midi_event evt) {
 
 		if (!found) {
 			track *trk;
-			trk = track_new(default_midi_port, evt.channel, seq->length, seq->length);
+			trk = track_new(default_midi_port, evt.channel, seq->length, seq->length, module.ctrlpr);
 			sequence_add_track(seq, trk);
 
 			trk->last_pos = seq->pos - seq->last_period;

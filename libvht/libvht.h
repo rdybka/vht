@@ -61,6 +61,8 @@ extern int module_get_curr_seq(void);
 extern void module_dump_notes(int);
 extern int module_get_rpb(void);
 extern void module_set_rpb(int rpb);
+extern int module_get_ctrlpr(void);
+extern void module_set_ctrlpr(int);
 
 extern void queue_midi_note_on(sequence *seq, int port, int chn, int note, int velocity);
 extern void queue_midi_note_off(sequence *seq, int port, int chn, int note);
@@ -158,7 +160,7 @@ extern int track_get_trg_quantise(track *trk);
 extern void track_set_trig(track *trk, int t, int tp, int ch, int nt);
 extern char *track_get_trig(track *trk, int t);
 
-extern track *track_new(int port, int channel, int len, int songlen);
+extern track *track_new(int port, int channel, int len, int songlen, int ctrlpr);
 
 // row
 extern int row_get_type(row *rw);

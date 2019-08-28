@@ -121,7 +121,7 @@ class TriggersView(Gtk.Grid):
 		self.attach(button, 2, 2, 1, 1)
 
 		self.play_mode_cb = Gtk.ComboBoxText()
-		for m in ["on/off", "single", "hold"]:
+		for m in ["on/off", "hold"]:
 			self.play_mode_cb.append_text(m)
 
 		self.play_mode_cb.set_active(trk.trg_playmode)

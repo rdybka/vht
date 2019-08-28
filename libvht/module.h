@@ -26,6 +26,8 @@
 #include "midi_event.h"
 #include "sequence.h"
 
+#define DEFAULT_CTRLPR 16
+
 struct module_t {
 	int playing;
 
@@ -38,6 +40,7 @@ struct module_t {
 	float bpm;
 	int rpb; // rows per beat
 
+	int ctrlpr;
 	int def_nrows;
 	sequence **seq;
 	int nseq;

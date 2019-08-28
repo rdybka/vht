@@ -101,6 +101,14 @@ int module_get_curr_seq() {
 	return module.curr_seq;
 }
 
+int module_get_ctrlpr() {
+	return module.ctrlpr;
+}
+
+void module_set_ctrlpr(int ctrlpr) {
+	module.ctrlpr = ctrlpr;
+}
+
 int sequence_get_ntrk(sequence *seq) {
 	return seq->ntrk;
 }

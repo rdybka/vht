@@ -227,6 +227,14 @@ def module_set_rpb(rpb):
     return _libcvht.module_set_rpb(rpb)
 module_set_rpb = _libcvht.module_set_rpb
 
+def module_get_ctrlpr():
+    return _libcvht.module_get_ctrlpr()
+module_get_ctrlpr = _libcvht.module_get_ctrlpr
+
+def module_set_ctrlpr(arg1):
+    return _libcvht.module_set_ctrlpr(arg1)
+module_set_ctrlpr = _libcvht.module_set_ctrlpr
+
 def queue_midi_note_on(seq, port, chn, note, velocity):
     return _libcvht.queue_midi_note_on(seq, port, chn, note, velocity)
 queue_midi_note_on = _libcvht.queue_midi_note_on
@@ -543,8 +551,8 @@ def track_get_trig(trk, t):
     return _libcvht.track_get_trig(trk, t)
 track_get_trig = _libcvht.track_get_trig
 
-def track_new(port, channel, len, songlen):
-    return _libcvht.track_new(port, channel, len, songlen)
+def track_new(port, channel, len, songlen, ctrlpr):
+    return _libcvht.track_new(port, channel, len, songlen, ctrlpr)
 track_new = _libcvht.track_new
 
 def row_get_type(rw):

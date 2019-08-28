@@ -44,11 +44,14 @@ class VHTSequence(Iterable):
 
 		return VHTTrack(self._vht_handle, self._vht_handle.sequence_get_trk(self._seq_handle, itm), itm)
 
-	def add_track(self, port = 0, channel = 1, length = -1, songlength = -1):
+	def add_track(self, port = 0, channel = 1, length = -1, songlength = -1, ctrlpr = -1):
 		if length == -1:
 			length = self.length
 
-		trk = self._vht_handle.track_new(port, channel, length, songlength)
+		if ctrlpr == -1:
+			ctrlpr = self._vht_handle.module_get_ctrlpr()
+
+		trk = self._vht_handle.track_new(port, channel, length, songlength, ctrlpr)
 		self._vht_handle.sequence_add_track(self._seq_handle, trk)
 		return self[self.__len__() - 1]
 

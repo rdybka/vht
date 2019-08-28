@@ -25,10 +25,7 @@
 #include "envelope.h"
 
 #define TRIGGER_ONOFF 	0
-#define TRIGGER_SINGLE 	1
-#define TRIGGER_HOLD	2
-
-#define TRACK_CONTROLS_PER_ROW	16
+#define TRIGGER_HOLD	1
 
 typedef struct rec_update_t {
 	int col;
@@ -102,7 +99,7 @@ typedef struct track_t {
 	pthread_mutex_t exclctrl; // for ctrls
 } track;
 
-track *track_new(int port, int channel, int len, int songlen);
+track *track_new(int port, int channel, int len, int songlen, int ctrlpr);
 track *track_clone(track *t);
 
 void track_set_row(track *trk, int c, int n, int type, int note, int velocity, int delay);

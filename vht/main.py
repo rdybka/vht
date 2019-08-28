@@ -84,7 +84,7 @@ class VHTApp(Gtk.Application):
 		if response == Gtk.ResponseType.OK:
 			self.main_win.load(dialog.get_filename())
 
-		dialog.destroy()
+		#dialog.destroy()
 
 	def on_about_dialog(self, action, param):
 		ab = Gtk.AboutDialog(self.main_win)
@@ -147,6 +147,8 @@ def run():
 	mod.start_error = None
 	if mod.jack_start() != 0:
 		mod.start_error = "you will need JACK for this"
+
+	mod.ctrlpr = cfg.controller_resolution
 
 	#mod.dump_notes = True
 	midig = []
