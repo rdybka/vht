@@ -17,7 +17,7 @@
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio
+from gi.repository import Gtk, Gio, Gdk
 
 from vht import cfg, mod
 
@@ -31,6 +31,7 @@ class TriggersView(Gtk.Grid):
 		self.trk = trk
 		self.trkview = trkview
 		self.capture = -1
+		self.butt_handler = None
 
 		self.set_column_spacing(3)
 		self.set_row_spacing(3)
@@ -180,10 +181,16 @@ class TriggersView(Gtk.Grid):
 		self.mute_entry.props.text = TriggersView.desc_trigger(self.trk.get_trig(0))
 		self.cue_entry.props.text = TriggersView.desc_trigger(self.trk.get_trig(1))
 		self.play_midi_entry.props.text = TriggersView.desc_trigger(self.trk.get_trig(2))
+		if "kp" in mod.extras[self.parent.parent.seq.index][self.trk.index]:
+			if mod.extras[self.parent.parent.seq.index][self.trk.index]["kp"] > -1:
+				self.play_kp_entry.props.text = str(mod.extras[self.parent.parent.seq.index][self.trk.index]["kp"])
 
 	def on_clear_clicked(self, wdg, c):
 		self.trk.set_trig(c, 0, 0, 0)
 		self.refresh_desc()
+		if c is 2:
+			self.play_kp_entry.props.text = ""
+			mod.extras[self.parent.parent.seq.index][self.trk.index]["kp"] = -1
 
 	def on_bool_toggled(self, wdg, t):
 		if t == 0:
@@ -217,10 +224,23 @@ class TriggersView(Gtk.Grid):
 			if capt == 2:
 				self.cue_capture_button.set_active(False)
 				self.mute_capture_button.set_active(False)
+				self.connect("key-press-event", self.on_key_press)
 		else:
 			if capt == self.capture:
 				self.capture = -1
 				mod.gui_midi_capture = False
+
+	def on_key_press(self, wdg, evt):
+		if self.capture == 2:
+			# let's hardcode some shit
+			k = evt.keyval
+			if 65456 <= k <= 65465:
+				kp = k - 65456
+				self.play_kp_entry.props.text = str(kp)
+				mod.extras[self.parent.parent.seq.index][self.trk.index]["kp"] = kp
+				return True
+
+		return False
 
 	def tick(self, wdg, param):
 		if self.capture == -1:
