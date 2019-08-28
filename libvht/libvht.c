@@ -173,15 +173,6 @@ void track_set_channel(track *trk, int n) {
 	trk->channel = n;
 }
 
-void track_set_nrows(track *trk, int n) {
-	track_resize(trk, n);
-}
-
-void track_set_nsrows(track *trk, int n) {
-	trk->nsrows = n;
-	trk->resync = 1;
-}
-
 void track_set_program(track *trk, int p) {
 	trk->prog = p;
 	trk->prog_sent = 0;

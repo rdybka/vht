@@ -935,6 +935,21 @@ void track_resize(track *trk, int size) {
 	track_clear_updates(trk);
 }
 
+void track_set_nrows(track *trk, int n) {
+	track_resize(trk, n);
+}
+
+void track_set_nsrows(track *trk, int n) {
+	trk->nsrows = n;
+	if (n > trk->nrows) {
+		int nrows = trk->nrows;
+		track_resize(trk, n);
+		trk->nrows = nrows;
+	}
+
+	trk->resync = 1;
+}
+
 void track_double(track *trk) {
 	int offs = trk->nrows;
 	track_resize(trk, trk->nrows * 2);
