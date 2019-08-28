@@ -1700,7 +1700,7 @@ class TrackView(Gtk.DrawingArea):
 
 			return True
 
-		if self.edit and cfg.key["note_off"].matches(event):				#  note_off
+		if self.edit and  cfg.key["note_off"].matches(event) and self.keyboard_focus is None:
 			self.trk[self.edit[0]][self.edit[1]].clear()
 			self.trk[self.edit[0]][self.edit[1]].type = 2
 
