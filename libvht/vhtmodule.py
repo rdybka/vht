@@ -126,7 +126,7 @@ class VHTModule(Iterable):
 	@property
 	def ctrlpr(self):
 		return libcvht.module_get_ctrlpr()
-		
+
 	@ctrlpr.setter
 	def ctrlpr(self, value):
 		libcvht.module_set_ctrlpr(value)

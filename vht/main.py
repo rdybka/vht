@@ -84,8 +84,6 @@ class VHTApp(Gtk.Application):
 		if response == Gtk.ResponseType.OK:
 			self.main_win.load(dialog.get_filename())
 
-		#dialog.destroy()
-
 	def on_about_dialog(self, action, param):
 		ab = Gtk.AboutDialog(self.main_win)
 		ab.set_license_type(Gtk.License.GPL_3_0)
@@ -113,7 +111,7 @@ class VHTApp(Gtk.Application):
 				self.main_win.last_filename = dialog.get_filename()
 				mod.save(self.main_win.last_filename)
 				self.main_win.hb.set_title(self.main_win.last_filename)
-			dialog.destroy()
+
 			return
 
 		if self.main_win.last_filename:
