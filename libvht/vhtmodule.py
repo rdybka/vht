@@ -18,7 +18,7 @@
 from collections.abc import Iterable
 from libvht import libcvht
 from libvht.vhtsequence import VHTSequence
-import json
+import pickle
 
 class VHTModule(Iterable):
 	# a somewhat pythonic interface to the vht magic
@@ -223,47 +223,131 @@ class VHTModule(Iterable):
 				t["nrows"] = trk.nrows
 				t["nsrows"] = trk.nsrows
 				t["playing"] = trk.playing
-				t["col"] = []
+				t["ctrlpr"] = trk.ctrlpr
+				t["program"] = trk.get_program()
+				t["qc"] = trk.get_qc()
+				t["loop"] = trk.loop
+				t["trg_timeline"] = trk.trg_timeline
+				t["trg_letring"] = trk.trg_letring
+				t["trg_playmode"] = trk.trg_playmode
+				t["trg_quantise"] = trk.trg_quantise
+				t["trig"] = [trk.get_trig(0), trk.get_trig(1), trk.get_trig(2)]
+				
+				t["ctrl"] = []
+				for cn, ctrl in enumerate(trk.ctrl):
+					c = {}
+					c["ctrlnum"] = ctrl.ctrlnum
+					c["rows"] = []
+					c["doodles"] = []
+					rn = 0
+					for r in ctrl:
+						if r.velocity > -1:
+							rw = {}
+							rw["n"] = rn
+							rw["velocity"] = r.velocity
+							rw["linked"] = r.linked
+							rw["smooth"] = r.smooth
+							rw["anchor"] = r.anchor
+							c["rows"].append(rw) 
+				
+						rn += 1	
 
+					for r in range(trk.nrows):
+						dood = trk.get_ctrl_rec(cn, r).as_list()
+						empty = True
+						for d in dood:
+							if d > -1:
+								empty = False
+								
+						if not empty:
+							c["doodles"].append([r, dood])
+					
+					t["ctrl"].append(c)
+					
+				t["col"] = []
 				for col in trk:
 					c = []
+					rn = 0
 					for row in col:
-						r = {}
-						r["type"] = row.type
-						r["note"] = row.note
-						r["velocity"] = row.velocity
-						r["delay"] = row.delay
-						c.append(r)
+						if row.type > 0:
+							r = {}
+							r["n"] = rn
+							r["type"] = row.type
+							r["note"] = row.note
+							r["velocity"] = row.velocity
+							r["delay"] = row.delay
+							c.append(r)
+						
+						rn += 1
 					t["col"].append(c)
+	
 				s["trk"].append(t)
 			jm["seq"].append(s)
 
 
-		with open(filename, 'w') as f:
-			json.dump(jm, f, indent = 4)
+		with open(filename, 'wb') as f:
+			pickle.dump(jm, f)
 
 	def load(self, filename):
-		with open(filename, 'r') as f:
-			jm = json.load(f)
+		with open(filename, 'rb') as f:
+			jm = pickle.load(f)
 			p = self.play
 			self.reset()
 			libcvht.module_new();
 			self.bpm = jm["bpm"]
 			self.ctrlpr = jm["ctrlpr"]
+			
 			for seq in jm["seq"]:
 				s = self.add_sequence()
 				s.length = seq["length"]
 				for trk in seq["trk"]:
-					t = s.add_track(trk["port"], trk["channel"], trk["nrows"], trk["nsrows"], self.ctrlpr)
+					t = s.add_track(trk["port"], trk["channel"], trk["nrows"], trk["nsrows"], trk["ctrlpr"])
 					t.playing = trk["playing"]
+					t.set_bank(trk["program"][0], trk["program"][1])
+					t.send_program_change(trk["program"][2])
+					t.set_qc1(trk["qc"][0], trk["qc"][1])
+					t.set_qc2(trk["qc"][2], trk["qc"][3])
+					
+					t.loop = trk["loop"]
+					t.trg_timeline = trk["trg_timeline"]
+					t.trg_letring = trk["trg_letring"]
+					t.trg_playmode = trk["trg_playmode"]
+					t.trg_quantise = trk["trg_quantise"]
+					
+					t.set_trig(0, trk["trig"][0][0], trk["trig"][0][1], trk["trig"][0][2])
+					t.set_trig(1, trk["trig"][1][0], trk["trig"][1][1], trk["trig"][1][2])
+					t.set_trig(2, trk["trig"][2][0], trk["trig"][2][1], trk["trig"][2][2])
+					
+					nctrl = 0
+					for ctrl in trk["ctrl"]:
+						if ctrl["ctrlnum"] > -1:
+							t.ctrl.add(ctrl["ctrlnum"])
+							
+						for rw in ctrl["rows"]:
+							r = t.ctrl[nctrl][rw["n"]]
+							r.velocity = rw["velocity"]
+							r.linked = rw["linked"]
+							r.smooth = rw["smooth"]
+							r.anchor = rw["anchor"]	
+							
+							t.ctrl[nctrl].refresh()
+
+						for dood in ctrl["doodles"]:
+							rn = dood[0] * t.ctrlpr
+							for d in dood[1]:
+								t.set_ctrl(nctrl, rn, d)
+								rn += 1
+							
+						nctrl += 1
+
 					for cc, col in enumerate(trk["col"]):
 						if cc == 0:
 							c = t[0]
 						else:
 							c = t.add_column()
 
-						for r, row in enumerate(col):
-							rr = c[r]
+						for row in col:
+							rr = c[row["n"]]
 							rr.type = row["type"]
 							rr.note = row["note"]
 							rr.velocity = row["velocity"]

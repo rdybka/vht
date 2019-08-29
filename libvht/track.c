@@ -307,6 +307,8 @@ void track_clear_crows(track *trk, int c) {
 	for (int t = 0; t < trk->nrows; t++) {
 		trk->crows[c][t].velocity = -1;
 		trk->crows[c][t].linked = 0;
+		trk->crows[c][t].smooth = 0;
+		trk->crows[c][t].anchor = 0;
 	}
 
 	pthread_mutex_unlock(&trk->exclctrl);

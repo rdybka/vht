@@ -1183,6 +1183,7 @@ class ControllerEditor():
 				self.trk.ctrl[self.ctrlnum][self.active_row].linked = 0
 				self.active_row = r
 				self.edit = r
+				self.tv.recalc_edit(self.tv)
 				lrow = self.trk.ctrl[self.ctrlnum][self.active_row]
 
 			if r == self.active_row:
@@ -1351,7 +1352,7 @@ class ControllerEditor():
 		return True
 
 	def to_clipboard(self, doodles = False):
-		if not self.selection and not self.edit != -1:
+		if not self.selection and self.edit == -1:
 			return
 
 		if not self.selection:
@@ -1378,6 +1379,7 @@ class ControllerEditor():
 
 		s = max(-1, self.edit)
 		e = s + len(d) - 1
+
 		if self.selection:
 			s = self.selection[0]
 			e = self.selection[1]
@@ -1389,9 +1391,10 @@ class ControllerEditor():
 
 		p = s
 		dpr = self.trk.ctrlpr 	# doodles per row
+
 		while p <= e:
 			for r in d:
-				if p < e:
+				if p <= e:
 					if doodles:
 						for i, val in enumerate(r):
 							self.trk.set_ctrl(self.ctrlnum, (dpr * p) + i, val)

@@ -64,9 +64,9 @@ class VHTCtrlRow():
 
 	def clear(self):
 		self._velocity = -1
-		self.linked = 0
-		self.smooth = 0
-		self.anchor = 0
+		self._linked = 0
+		self._smooth = 0
+		self._anchor = 0
 		if not self._dummy:
 			self._vht_handle.ctrlrow_set(self._crowptr, -1, 0, 0, 0)
 		self.update_strrep()

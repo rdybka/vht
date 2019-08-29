@@ -31,6 +31,7 @@ class SequenceView(Gtk.Box):
 
 		self._sv = Gtk.ScrolledWindow()
 		self._sv.set_events(Gdk.EventMask.POINTER_MOTION_MASK |
+			Gdk.EventMask.BUTTON_PRESS_MASK |
 			Gdk.EventMask.SCROLL_MASK |
 			Gdk.EventMask.ENTER_NOTIFY_MASK |
 			Gdk.EventMask.KEY_PRESS_MASK |
@@ -46,6 +47,7 @@ class SequenceView(Gtk.Box):
 		self._sv.connect("key-press-event", self.on_key_press)
 		self._sv.connect("key-release-event", self.on_key_release)
 		self._sv.connect("enter-notify-event", self.on_enter)
+		self._sv.connect("button-press-event", self.on_button_press)
 
 		self._sv.set_can_focus(True)
 
@@ -120,6 +122,11 @@ class SequenceView(Gtk.Box):
 		self.build()
 
 		self.show_all()
+
+	def on_button_press(self, widget, event):
+		if event.button == cfg.delete_button:
+			TrackView.leave_all()
+			mod.record = 0
 
 	def on_sv_vadj_changed(self, adj):
 		dest_adj = None
