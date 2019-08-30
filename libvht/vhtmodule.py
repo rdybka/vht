@@ -232,7 +232,7 @@ class VHTModule(Iterable):
 				t["trg_playmode"] = trk.trg_playmode
 				t["trg_quantise"] = trk.trg_quantise
 				t["trig"] = [trk.get_trig(0), trk.get_trig(1), trk.get_trig(2)]
-				
+
 				t["ctrl"] = []
 				for cn, ctrl in enumerate(trk.ctrl):
 					c = {}
@@ -248,9 +248,9 @@ class VHTModule(Iterable):
 							rw["linked"] = r.linked
 							rw["smooth"] = r.smooth
 							rw["anchor"] = r.anchor
-							c["rows"].append(rw) 
-				
-						rn += 1	
+							c["rows"].append(rw)
+
+						rn += 1
 
 					for r in range(trk.nrows):
 						dood = trk.get_ctrl_rec(cn, r).as_list()
@@ -258,12 +258,12 @@ class VHTModule(Iterable):
 						for d in dood:
 							if d > -1:
 								empty = False
-								
+
 						if not empty:
 							c["doodles"].append([r, dood])
-					
+
 					t["ctrl"].append(c)
-					
+
 				t["col"] = []
 				for col in trk:
 					c = []
@@ -277,10 +277,10 @@ class VHTModule(Iterable):
 							r["velocity"] = row.velocity
 							r["delay"] = row.delay
 							c.append(r)
-						
+
 						rn += 1
 					t["col"].append(c)
-	
+
 				s["trk"].append(t)
 			jm["seq"].append(s)
 
@@ -296,7 +296,7 @@ class VHTModule(Iterable):
 			libcvht.module_new();
 			self.bpm = jm["bpm"]
 			self.ctrlpr = jm["ctrlpr"]
-			
+
 			for seq in jm["seq"]:
 				s = self.add_sequence()
 				s.length = seq["length"]
@@ -307,29 +307,29 @@ class VHTModule(Iterable):
 					t.send_program_change(trk["program"][2])
 					t.set_qc1(trk["qc"][0], trk["qc"][1])
 					t.set_qc2(trk["qc"][2], trk["qc"][3])
-					
+
 					t.loop = trk["loop"]
 					t.trg_timeline = trk["trg_timeline"]
 					t.trg_letring = trk["trg_letring"]
 					t.trg_playmode = trk["trg_playmode"]
 					t.trg_quantise = trk["trg_quantise"]
-					
+
 					t.set_trig(0, trk["trig"][0][0], trk["trig"][0][1], trk["trig"][0][2])
 					t.set_trig(1, trk["trig"][1][0], trk["trig"][1][1], trk["trig"][1][2])
 					t.set_trig(2, trk["trig"][2][0], trk["trig"][2][1], trk["trig"][2][2])
-					
+
 					nctrl = 0
 					for ctrl in trk["ctrl"]:
 						if ctrl["ctrlnum"] > -1:
 							t.ctrl.add(ctrl["ctrlnum"])
-							
+
 						for rw in ctrl["rows"]:
 							r = t.ctrl[nctrl][rw["n"]]
 							r.velocity = rw["velocity"]
 							r.linked = rw["linked"]
 							r.smooth = rw["smooth"]
-							r.anchor = rw["anchor"]	
-							
+							r.anchor = rw["anchor"]
+
 							t.ctrl[nctrl].refresh()
 
 						for dood in ctrl["doodles"]:
@@ -337,7 +337,7 @@ class VHTModule(Iterable):
 							for d in dood[1]:
 								t.set_ctrl(nctrl, rn, d)
 								rn += 1
-							
+
 						nctrl += 1
 
 					for cc, col in enumerate(trk["col"]):
