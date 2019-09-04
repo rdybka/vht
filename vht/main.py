@@ -79,10 +79,16 @@ class VHTApp(Gtk.Application):
 
 		self.add_file_filters(dialog)
 
+		if cfg.last_load_path:
+			dialog.set_current_folder_uri(cfg.last_load_path)
+		elif cfg.last_load_path:
+			dialog.set_current_folder_uri(cfg.last_save_path)
+
 		response = dialog.run()
 		dialog.close()
 		if response == Gtk.ResponseType.OK:
 			self.main_win.load(dialog.get_filename())
+			cfg.last_load_path = dialog.get_current_folder_uri()
 
 	def on_about_dialog(self, action, param):
 		ab = Gtk.AboutDialog(self.main_win)
@@ -101,21 +107,30 @@ class VHTApp(Gtk.Application):
 			dialog = Gtk.FileChooserDialog("Please choose a file", self.get_active_window(),
 				Gtk.FileChooserAction.SAVE,
 				(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-				Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+				Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
 
 			self.add_file_filters(dialog)
+			
+			if cfg.last_save_path:
+				dialog.set_current_folder_uri(cfg.last_save_path)
+			elif cfg.last_load_path:
+				dialog.set_current_folder_uri(cfg.last_load_path)
 
 			response = dialog.run()
+			
 			dialog.close()
 			if response == Gtk.ResponseType.OK:
+				cfg.last_save_path = dialog.get_current_folder_uri()
 				self.main_win.last_filename = dialog.get_filename()
 				mod.save(self.main_win.last_filename)
+				mod.saving = True
 				self.main_win.hb.set_title(self.main_win.last_filename)
-
 			return
 
 		if self.main_win.last_filename:
 			mod.save(self.main_win.last_filename)
+			mod.saving = True
+			cfg.last_save_path = cfg.last_load_path
 
 	def on_save(self, action, param):
 		self.save_with_dialog()
@@ -124,6 +139,7 @@ class VHTApp(Gtk.Application):
 		fn = self.main_win.last_filename
 		self.main_win.last_filename = None
 		self.save_with_dialog()
+		# if cancelled
 		if not self.main_win.last_filename:
 			self.main_win.last_filename = fn
 
@@ -147,7 +163,7 @@ def run():
 		mod.start_error = "you will need JACK for this"
 
 	mod.ctrlpr = cfg.controller_resolution
-
+	mod.saving = False
 	#mod.dump_notes = True
 	midig = []
 	for val in cfg.midi_in.values():

@@ -19,7 +19,8 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, Gio
 import cairo
-
+import random
+from datetime import datetime
 from vht import *
 from vht.trackpropviewpopover import TrackPropViewPopover
 from vht.sequencepropviewpopover import SequencePropViewPopover
@@ -60,6 +61,8 @@ class TrackPropView(Gtk.DrawingArea):
 		self._context = None
 
 		self.popped = False
+
+		self.time_to_wiggle = None
 
 		if trk:
 			self.popover = TrackPropViewPopover(self, trk)
@@ -210,6 +213,22 @@ class TrackPropView(Gtk.DrawingArea):
 			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 			cr.rectangle(0, 0, w, h)
 			cr.fill()
+
+			if self.time_to_wiggle:
+				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.record_colour))
+				for f in range(random.randint(1, 10)):
+					y = random.randint(0, h)							
+					cr.move_to(0, y)
+					cr.line_to(w, y) 
+					cr.stroke()
+
+				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
+				for f in range(random.randint(1, 3)):
+					y = random.randint(0, h)							
+					cr.move_to(0, y)
+					cr.line_to(w, y) 
+					cr.stroke()
+
 
 			if self.popped or self.button_highlight:
 				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
@@ -424,6 +443,18 @@ class TrackPropView(Gtk.DrawingArea):
 		cr.paint()
 		return False
 
+	def check_saving(self):
+		if mod.saving:
+			mod.saving = False
+			self.time_to_wiggle = datetime.now()
+		
+		if self.time_to_wiggle:
+			t = datetime.now() - self.time_to_wiggle
+			t = float(t.seconds) + t.microseconds / 1000000
+			if t > cfg.save_indication_time:
+				self.time_to_wiggle = None
+
 	def tick(self, wdg, param):
 		self.redraw()
-		return False
+		self.check_saving()
+		return True

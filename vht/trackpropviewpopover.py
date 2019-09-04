@@ -407,7 +407,6 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.time_want_to_leave = 0
 			return True
 
-
 		t = datetime.now() - self.time_want_to_leave
 		t = float(t.seconds) + t.microseconds / 1000000
 		if t > cfg.popup_timeout / 2.0:

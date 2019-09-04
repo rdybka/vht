@@ -25,7 +25,8 @@
 #include "envelope.h"
 
 #define TRIGGER_ONOFF 	0
-#define TRIGGER_HOLD	1
+#define TRIGGER_ONOFF	1
+#define TRIGGER_HOLD	2
 
 typedef struct rec_update_t {
 	int col;

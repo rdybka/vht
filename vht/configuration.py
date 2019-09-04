@@ -77,6 +77,7 @@ class Configuration():
 		self.default_ctrl_name = "zyn"
 		self.dark_theme = True
 		self.notebook_mouseover = True
+		self.save_indication_time = .25
 
 		self.quick_controls_desc = "vol/pan:"
 		self.quick_control_1_ctrl = 7
@@ -85,8 +86,12 @@ class Configuration():
 		self.quick_control_2_def = 64
 
 		self.new_tracks_left = False
+		self.default_seq_length = 16
 
 		self.controller_resolution = 8
+		
+		self.last_load_path = None
+		self.last_save_path = None
 
 		self.key = {
 			# sequenceview		shift, ctrl, alt
@@ -101,6 +106,8 @@ class Configuration():
 			"fullscreen": cfgkey("Return", False, False, True),
 			"exit_edit": cfgkey("Escape", False, False, False),
 			"undo": cfgkey("z", False, True, False),
+			"save": cfgkey("s", False, True, False),
+			"load": cfgkey("o", False, True, False),
 			"zoom_in": cfgkey("KP_Add", False, True, False),
 			"zoom_out": cfgkey("KP_Subtract", False, True, False),
 			"skip_up": cfgkey("KP_Add", False, False, False),

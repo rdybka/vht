@@ -195,6 +195,12 @@ class SequenceView(Gtk.Box):
 			if mod.active_track:
 				self.redraw_track(mod.active_track.trk)
 
+		if cfg.key["save"].matches(event):
+			mod.mainwin.app.on_save(None, None)
+
+		if cfg.key["load"].matches(event):
+			mod.mainwin.app.on_load(None, None)
+
 		if cfg.key["fullscreen"].matches(event):
 			if mod.mainwin.fs:
 				mod.mainwin.unfullscreen()
@@ -221,7 +227,6 @@ class SequenceView(Gtk.Box):
 		if cfg.key["sequence_halve"].matches(event):
 			self.halve()
 			return True
-
 
 		if cfg.key["undo"].matches(event):
 			if mod.active_track:

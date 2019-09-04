@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from vht import mod
+from vht import mod, cfg
 
 def track_fill(trk, note = "c3", skip = 2, velocity = 100):
 	for r in range(len(trk[0])):
@@ -26,6 +26,6 @@ def track_fill(trk, note = "c3", skip = 2, velocity = 100):
 def muzakize():
 	mod.bpm = 123
 
-	seq = mod.add_sequence(32)
+	seq = mod.add_sequence(cfg.default_seq_length)
 	trk = seq.add_track()
 	#trk.ctrl.add(1)

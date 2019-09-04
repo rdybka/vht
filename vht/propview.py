@@ -96,7 +96,6 @@ class PropView(Gtk.ScrolledWindow):
 		for wdg in self._track_box.get_children() + [self.seqview._side_prop]:
 			if wdg.get_realized():
 				if ignore != wdg.popover:
-					#wdg.popover.unpop()
 					wdg.popover.hide()
 
 					wdg.popped = False
