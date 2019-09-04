@@ -289,6 +289,9 @@ class VHTModule(Iterable):
 			pickle.dump(jm, f)
 
 	def load(self, filename):
+		if not isinstance(filename, str):
+			filename = filename.get_path()
+		
 		with open(filename, 'rb') as f:
 			jm = pickle.load(f)
 			p = self.play

@@ -91,7 +91,7 @@ class Configuration():
 
 		self.last_load_path = None
 		self.last_save_path = None
-		self.save_indication_time = .5
+		self.save_indication_time = .23
 
 		self.key = {
 			# sequenceview		shift, ctrl, alt

@@ -45,7 +45,7 @@ class MainWin(Gtk.ApplicationWindow):
 
 		self.hb = Gtk.HeaderBar()
 		self.hb.set_show_close_button(True)
-
+		#self.hb.set_has_subtitle(False)
 		self.set_titlebar(self.hb)
 		self.set_default_icon_name("vht")
 		self.set_icon_name("vht")
@@ -215,8 +215,12 @@ class MainWin(Gtk.ApplicationWindow):
 
 		return False
 
+	def set_header_from_filename(self, filename):
+		self.hb.set_title(os.path.split(filename)[1])
+		self.hb.set_subtitle(os.path.split(os.path.normpath(filename))[0].replace("//", "/"))
+
 	def load(self, filename):
 		self._sequence_view.load(filename)
 		self.last_filename = filename
-		self.hb.set_title(filename)
+		self.set_header_from_filename(filename)
 		self.adj.set_value(mod.bpm)

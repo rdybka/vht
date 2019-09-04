@@ -29,10 +29,11 @@ from vht.mainwin import MainWin
 class VHTApp(Gtk.Application):
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, application_id = "com.github.rdybka.vht",
-			flags = Gio.ApplicationFlags.HANDLES_COMMAND_LINE |\
+			flags = Gio.ApplicationFlags.HANDLES_OPEN | \
 			Gio.ApplicationFlags.NON_UNIQUE, **kwargs)
 
 		self.main_win = None
+		self.start_load_file = None
 
 	def do_startup(self):
 		Gtk.Application.do_startup(self)
@@ -57,11 +58,24 @@ class VHTApp(Gtk.Application):
 		self.activate()
 		return 0
 
+	def do_open(self, files, hint, n):
+		self.start_load_file = files[0]
+		self.activate()
+
 	def do_activate(self):
+		if self.start_load_file:
+			mod.load(self.start_load_file)
+		
 		self.main_win = MainWin(self)
 
 		if mod.start_error:
 			self.quit()
+
+		if self.start_load_file:
+			self.main_win.last_filename = self.start_load_file.get_path()
+			cfg.last_load_path = "file:///" + os.path.split(self.main_win.last_filename)[0]
+			self.main_win.set_header_from_filename(self.main_win.last_filename)
+			self.main_win.adj.set_value(mod.bpm)
 
 		self.add_window(self.main_win)
 		self.main_win.show_all()
@@ -81,7 +95,7 @@ class VHTApp(Gtk.Application):
 
 		if cfg.last_load_path:
 			dialog.set_current_folder_uri(cfg.last_load_path)
-		elif cfg.last_load_path:
+		elif cfg.last_save_path:
 			dialog.set_current_folder_uri(cfg.last_save_path)
 
 		response = dialog.run()
@@ -124,7 +138,8 @@ class VHTApp(Gtk.Application):
 				self.main_win.last_filename = dialog.get_filename()
 				mod.save(self.main_win.last_filename)
 				mod.saving = True
-				self.main_win.hb.set_title(self.main_win.last_filename)
+				self.main_win.set_header_from_filename(self.main_win.last_filename)
+				
 			return
 
 		if self.main_win.last_filename:

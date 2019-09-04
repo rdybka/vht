@@ -197,9 +197,11 @@ class SequenceView(Gtk.Box):
 
 		if cfg.key["save"].matches(event):
 			mod.mainwin.app.on_save(None, None)
+			return True
 
 		if cfg.key["load"].matches(event):
 			mod.mainwin.app.on_load(None, None)
+			return True
 
 		if cfg.key["fullscreen"].matches(event):
 			if mod.mainwin.fs:
