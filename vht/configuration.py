@@ -77,7 +77,6 @@ class Configuration():
 		self.default_ctrl_name = "zyn"
 		self.dark_theme = True
 		self.notebook_mouseover = True
-		self.save_indication_time = .25
 
 		self.quick_controls_desc = "vol/pan:"
 		self.quick_control_1_ctrl = 7
@@ -89,9 +88,10 @@ class Configuration():
 		self.default_seq_length = 16
 
 		self.controller_resolution = 8
-		
+
 		self.last_load_path = None
 		self.last_save_path = None
+		self.save_indication_time = .5
 
 		self.key = {
 			# sequenceview		shift, ctrl, alt

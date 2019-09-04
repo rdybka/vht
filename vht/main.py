@@ -110,14 +110,14 @@ class VHTApp(Gtk.Application):
 				Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
 
 			self.add_file_filters(dialog)
-			
+
 			if cfg.last_save_path:
 				dialog.set_current_folder_uri(cfg.last_save_path)
 			elif cfg.last_load_path:
 				dialog.set_current_folder_uri(cfg.last_load_path)
 
 			response = dialog.run()
-			
+
 			dialog.close()
 			if response == Gtk.ResponseType.OK:
 				cfg.last_save_path = dialog.get_current_folder_uri()

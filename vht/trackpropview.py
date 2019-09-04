@@ -217,16 +217,16 @@ class TrackPropView(Gtk.DrawingArea):
 			if self.time_to_wiggle:
 				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.record_colour))
 				for f in range(random.randint(1, 10)):
-					y = random.randint(0, h)							
+					y = random.randint(0, h)
 					cr.move_to(0, y)
-					cr.line_to(w, y) 
+					cr.line_to(w, y)
 					cr.stroke()
 
 				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
 				for f in range(random.randint(1, 3)):
-					y = random.randint(0, h)							
+					y = random.randint(0, h)
 					cr.move_to(0, y)
-					cr.line_to(w, y) 
+					cr.line_to(w, y)
 					cr.stroke()
 
 
@@ -447,7 +447,7 @@ class TrackPropView(Gtk.DrawingArea):
 		if mod.saving:
 			mod.saving = False
 			self.time_to_wiggle = datetime.now()
-		
+
 		if self.time_to_wiggle:
 			t = datetime.now() - self.time_to_wiggle
 			t = float(t.seconds) + t.microseconds / 1000000

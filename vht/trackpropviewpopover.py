@@ -186,7 +186,7 @@ class TrackPropViewPopover(Gtk.Popover):
 				mod.extras[self.parent.seq.index][self.trk.index]["track_show_timeshift"] = False
 				mod.extras[self.parent.seq.index][self.trk.index]["track_show_pitchwheel"] = False
 				mod.extras[self.parent.seq.index][self.trk.index]["track_show_controllers"] = False
-			
+
 			grid.attach(Gtk.Label("patch:"), 0, 3, 1, 1)
 
 			box = Gtk.Box()
