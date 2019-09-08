@@ -65,7 +65,7 @@ class VHTApp(Gtk.Application):
 	def do_activate(self):
 		if self.start_load_file:
 			mod.load(self.start_load_file)
-		
+
 		self.main_win = MainWin(self)
 
 		if mod.start_error:
@@ -139,7 +139,7 @@ class VHTApp(Gtk.Application):
 				mod.save(self.main_win.last_filename)
 				mod.saving = True
 				self.main_win.set_header_from_filename(self.main_win.last_filename)
-				
+
 			return
 
 		if self.main_win.last_filename:

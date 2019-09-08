@@ -21,8 +21,7 @@ from gi.repository import Gdk
 
 class Configuration():
 	def __init__(self):
-		self._highlight = 4
-		self.on_highlight = []  # add callbacks here
+		self.highlight = 4	# just a default - seq's will have their own (saved in mod.extras)
 
 		self.seq_font = "Monospace"
 		self.console_font = "Monospace"
@@ -32,13 +31,15 @@ class Configuration():
 		self.seq_line_width = 1.0
 		self.seq_spacing = 1.05
 		self.status_bar_font_size = 32
-		#self.colour = (.5, .5, 1)
-		#self.colour = (.9, .8, .4)
 
 		self.console_scale = 1
 		self.timeline_position = .66
 		self.console_position = .6
+
+		#self.colour = (.5, .5, 1)
+		#self.colour = (.9, .8, .4)
 		self.colour = (0, .7, .7)
+		
 		self.star_colour = (1, 1, 0)
 		self.console_colour = self.star_colour
 		self.record_colour = (1.0, 0, 0)
@@ -89,8 +90,8 @@ class Configuration():
 
 		self.controller_resolution = 8
 
-		self.last_load_path = None
-		self.last_save_path = None
+		self.last_load_path = ""
+		self.last_save_path = ""
 		self.save_indication_time = .23
 
 		self.key = {
@@ -185,17 +186,6 @@ class Configuration():
 		self.velocity_keys = "zxcvbnm"
 		self.piano_white_keys = "zxcvbnmqwertyu"
 		self.piano_black_keys = "sdghj23567"
-
-	@property
-	def highlight(self):
-		return self._highlight
-
-	@highlight.setter
-	def highlight(self, value):
-		self._highlight = value
-		if len(self.on_highlight):
-			for cb in self.on_highlight:
-				cb()
 
 key_aliases = {"KP_Add": "keypad +",
 				"KP_Subtract": "keypad -",

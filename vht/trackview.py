@@ -244,8 +244,8 @@ class TrackView(Gtk.DrawingArea):
 			if self.zero_pattern_surface.get_height() != round(self.txt_height * 2):
 				recr_cr = True
 
-		if self.zero_pattern_highlight != cfg.highlight:
-			self.zero_pattern_highlight = cfg.highlight
+		if self.zero_pattern_highlight != self.parent.highlight:
+			self.zero_pattern_highlight = self.parent.highlight
 			recr_cr = True
 
 		if recr_cr:
@@ -296,7 +296,7 @@ class TrackView(Gtk.DrawingArea):
 				cr.rectangle(0, r * self.txt_height, self.width, self.txt_height)
 				cr.fill()
 
-				if self.zero_pattern_highlight > 1 and (r) % cfg.highlight == 0:
+				if self.zero_pattern_highlight > 1 and (r) % self.parent.highlight == 0:
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
 				else:
 					cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
@@ -528,7 +528,7 @@ class TrackView(Gtk.DrawingArea):
 				if self.hover and r == self.hover[1]:
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight * 1.2 for col in cfg.colour))
 				else:
-					if cfg.highlight > 1 and (r) % cfg.highlight == 0:
+					if cfg.highlight > 1 and (r) % self.parent.highlight == 0:
 						cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
 					else:
 						cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
@@ -1219,7 +1219,7 @@ class TrackView(Gtk.DrawingArea):
 
 	@staticmethod
 	def recalc_edit(trk):
-		if trk.show_pitchwheel:
+		if trk.show_pitchwheel and trk.pitchwheel_editor:
 			if trk.pitchwheel_editor.edit > -1:
 				trk.edit = len(trk.trk) if trk.show_notes else 0, trk.pitchwheel_editor.edit
 

@@ -37,8 +37,6 @@ class SequenceView(Gtk.Box):
 			Gdk.EventMask.KEY_PRESS_MASK |
 			Gdk.EventMask.KEY_RELEASE_MASK)
 
-		cfg.on_highlight.append(self.redraw_track)
-
 		self._sv.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 
 		self._sv.connect("draw", self.on_draw)
@@ -59,6 +57,15 @@ class SequenceView(Gtk.Box):
 		self.last_count = len(seq)
 
 		self.def_new_track_width = 0
+		
+		self.highlight = cfg.highlight
+		if self.seq.index in mod.extras:
+			if "highlight" in mod.extras[self.seq.index][-1]:
+				self.highlight = mod.extras[self.seq.index][-1]["highlight"]
+		else:
+			mod.extras[self.seq.index] = {}
+			mod.extras[self.seq.index][-1] = {}
+			mod.extras[self.seq.index][-1]["highlight"] = self.highlight
 
 		self._track_box = Gtk.Box()
 		self._track_box.set_spacing(0)
@@ -375,11 +382,15 @@ class SequenceView(Gtk.Box):
 			return True
 
 		if cfg.key["highlight_up"].matches(event):
-			cfg.highlight = min(cfg.highlight + 1, 32)
+			self.highlight = min(self.highlight + 1, 32)
+			mod.extras[self.seq.index][-1]["highlight"] = self.highlight
+			self.redraw_track()
 			return True
 
 		if cfg.key["highlight_down"].matches(event):
-			cfg.highlight = max(cfg.highlight - 1, 1)
+			self.highlight = max(self.highlight - 1, 1)
+			mod.extras[self.seq.index][-1]["highlight"] = self.highlight
+			self.redraw_track()
 			return True
 
 		# velocities fall through if not in edit mode
@@ -610,10 +621,6 @@ class SequenceView(Gtk.Box):
 				wdg.redraw_full()
 				if trk:
 					self.prop_view.redraw(trk.index)
-				#w = wdg.width
-
-				#if trk and w != wdg.width:
-				#	self.prop_view.redraw(trk.index)
 
 		if not trk:
 			self.prop_view.redraw()
@@ -621,6 +628,7 @@ class SequenceView(Gtk.Box):
 		self.queue_draw()
 
 	def build(self):
+		self.highlight = mod.extras[self.seq.index][-1]["highlight"]
 		self.prop_view.seq = self.seq
 		self._side_prop.seq = self.seq
 		self._side_prop.popover.seq = self.seq

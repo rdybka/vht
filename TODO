@@ -1,4 +1,3 @@
-* resync
 - triggers
 	-let ring
 - timeline
@@ -16,6 +15,7 @@
 	- midi
 	- audio
 		- freewheeling
+* resync
 * split filename in title
 * save notification
 * fix popups

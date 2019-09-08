@@ -194,7 +194,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.patch_adj = Gtk.Adjustment(1, -1, 127, 1.0, 1.0)
 			self.patch_button = Gtk.SpinButton()
 			self.patch_button.set_adjustment(self.patch_adj)
-			self.patch_adj.set_value(-1)
+			self.patch_adj.set_value(self.trk.get_program()[2])
 
 			self.patch_adj.connect("value-changed", self.on_patch_value_changed)
 

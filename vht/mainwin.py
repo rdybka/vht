@@ -216,7 +216,12 @@ class MainWin(Gtk.ApplicationWindow):
 		return False
 
 	def set_header_from_filename(self, filename):
-		self.hb.set_title(os.path.split(filename)[1])
+		title = os.path.split(filename)[1]
+		if title.endswith(".vht"):
+			title = title[:-4]
+
+		self.hb.set_title(title)
+		
 		self.hb.set_subtitle(os.path.split(os.path.normpath(filename))[0].replace("//", "/"))
 
 	def load(self, filename):

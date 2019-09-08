@@ -159,9 +159,9 @@ class StatusBar(Gtk.DrawingArea):
 		else:
 			cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
-		txt = " hig:%d" % cfg.highlight
+		txt = " hig:%d" % mod.mainwin._sequence_view.highlight
 
-		if cfg.highlight == 1:
+		if mod.mainwin._sequence_view.highlight == 1:
 			txt = " hig:0"
 
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
@@ -316,10 +316,14 @@ class StatusBar(Gtk.DrawingArea):
 				cfg.skip = max(cfg.skip - 1, -16)
 
 		if self.active_field == 4:
+			aseq = mod.mainwin._sequence_view
 			if up:
-				cfg.highlight = min(cfg.highlight + 1, 32)
+				aseq.highlight = min(aseq.highlight + 1, 32)
 			if down:
-				cfg.highlight = max(cfg.highlight - 1, 1)
+				aseq.highlight = max(aseq.highlight - 1, 1)
+				
+			mod.mainwin._sequence_view.redraw_track()
+			mod.extras[aseq.seq.index][-1]["highlight"] = aseq.highlight
 
 		if self.active_field == 5:
 			if up:
@@ -336,7 +340,6 @@ class StatusBar(Gtk.DrawingArea):
 			if down:
 				cfg.default_midi_out_port = min(max(cfg.default_midi_out_port - 1, 0), mod.max_ports - 1)
 				mod.set_default_midi_port(cfg.default_midi_out_port)
-
 
 		return True
 
