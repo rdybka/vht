@@ -64,7 +64,8 @@ class VHTApp(Gtk.Application):
 
 	def do_activate(self):
 		if self.start_load_file:
-			mod.load(self.start_load_file)
+			if not mod.load(self.start_load_file):
+				self.quit()
 
 		self.main_win = MainWin(self)
 
@@ -101,8 +102,8 @@ class VHTApp(Gtk.Application):
 		response = dialog.run()
 		dialog.close()
 		if response == Gtk.ResponseType.OK:
-			self.main_win.load(dialog.get_filename())
-			cfg.last_load_path = dialog.get_current_folder_uri()
+			if self.main_win.load(dialog.get_filename()):
+				cfg.last_load_path = dialog.get_current_folder_uri()
 
 	def on_about_dialog(self, action, param):
 		ab = Gtk.AboutDialog(self.main_win)

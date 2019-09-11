@@ -39,7 +39,7 @@ class Configuration():
 		#self.colour = (.5, .5, 1)
 		#self.colour = (.9, .8, .4)
 		self.colour = (0, .7, .7)
-		
+
 		self.star_colour = (1, 1, 0)
 		self.console_colour = self.star_colour
 		self.record_colour = (1.0, 0, 0)

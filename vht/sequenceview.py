@@ -57,7 +57,7 @@ class SequenceView(Gtk.Box):
 		self.last_count = len(seq)
 
 		self.def_new_track_width = 0
-		
+
 		self.highlight = cfg.highlight
 		if self.seq.index in mod.extras:
 			if "highlight" in mod.extras[self.seq.index][-1]:
@@ -645,10 +645,20 @@ class SequenceView(Gtk.Box):
 
 	def load(self, filename):
 		self.clear()
-		mod.load(filename)
-		self.seq = mod[0]
-		self.build()
+		
+		if mod.load(filename):
+			self.seq = mod[0]
+			self.build()
+			return True
+		else:
+			print("...")
+			mod.new()	
+			randomcomposer.muzakize()
+			self.seq = mod[0]
+			self.build()			
 
+			return False
+			
 	def recalculate_row_spacing(self):
 		if not self.get_realized():
 			return

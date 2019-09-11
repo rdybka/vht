@@ -216,16 +216,25 @@ class MainWin(Gtk.ApplicationWindow):
 		return False
 
 	def set_header_from_filename(self, filename):
+		if not filename:
+			self.hb.set_title(None)
+			self.hb.set_subtitle(None)
+			return
+			
 		title = os.path.split(filename)[1]
 		if title.endswith(".vht"):
 			title = title[:-4]
 
 		self.hb.set_title(title)
-		
 		self.hb.set_subtitle(os.path.split(os.path.normpath(filename))[0].replace("//", "/"))
 
 	def load(self, filename):
-		self._sequence_view.load(filename)
+		self.set_header_from_filename(None)
+		
+		if not self._sequence_view.load(filename):
+			return False
+			
 		self.last_filename = filename
 		self.set_header_from_filename(filename)
 		self.adj.set_value(mod.bpm)
+		return True

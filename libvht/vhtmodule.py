@@ -293,10 +293,16 @@ class VHTModule(Iterable):
 			filename = filename.get_path()
 
 		with open(filename, 'rb') as f:
-			jm = pickle.load(f)
+			try:
+				jm = pickle.load(f)
+			except:
+				print("Couln't load", filename)
+				return False
+
 			p = self.play
+			
 			self.reset()
-			libcvht.module_new();
+			self.new()
 			self.bpm = jm["bpm"]
 			self.ctrlpr = jm["ctrlpr"]
 
@@ -358,4 +364,6 @@ class VHTModule(Iterable):
 
 			self.play = p
 			self.extras = jm["extras"]
+		
+		return True
 

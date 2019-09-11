@@ -321,7 +321,7 @@ class StatusBar(Gtk.DrawingArea):
 				aseq.highlight = min(aseq.highlight + 1, 32)
 			if down:
 				aseq.highlight = max(aseq.highlight - 1, 1)
-				
+
 			mod.mainwin._sequence_view.redraw_track()
 			mod.extras[aseq.seq.index][-1]["highlight"] = aseq.highlight
 
