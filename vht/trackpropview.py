@@ -427,6 +427,7 @@ class TrackPropView(Gtk.DrawingArea):
 
 				cr.show_text(ctrllabel)
 
+		self.popover.refresh()
 		self.queue_draw()
 
 	def on_enter(self, wdg, prm):
