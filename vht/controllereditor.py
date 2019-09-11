@@ -123,8 +123,8 @@ class ControllerEditor():
 		if not self.zero_pattern_surface:
 			recr_cr = True
 
-		if self.zero_pattern_highlight != cfg.highlight:
-			 self.zero_pattern_highlight = cfg.highlight
+		if self.zero_pattern_highlight != self.tv.parent.highlight:
+			 self.zero_pattern_highlight = self.tv.parent.highlight
 			 recr_cr = True
 
 		if recr_cr:
@@ -191,7 +191,7 @@ class ControllerEditor():
 				cr.rectangle(0, r * self.tv.txt_height, self.width, self.tv.txt_height)
 				cr.fill()
 
-				if self.zero_pattern_highlight > 1 and (r) % cfg.highlight == 0:
+				if self.zero_pattern_highlight > 1 and (r) % self.tv.parent.highlight == 0:
 					cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.colour))
 				else:
 					cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
@@ -752,14 +752,14 @@ class ControllerEditor():
 
 			if event.keyval == 65365:						# page-up
 				self.edit = self.edit - 1
-				while self.edit % cfg.highlight != 0:
+				while self.edit % self.tv.parent.highlight != 0:
 					self.edit = self.edit - 1
 				if self.edit < 0:
 					self.edit = 0
 
 			if event.keyval == 65366:						# page-down
 				self.edit = self.edit + 1
-				while self.edit % cfg.highlight != 0:
+				while self.edit % self.tv.parent.highlight != 0:
 					self.edit = self.edit + 1
 				if self.edit >= self.trk.nrows:
 					self.edit = self.trk.nrows -1
