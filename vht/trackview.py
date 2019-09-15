@@ -19,6 +19,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk
 import cairo
+import math
 
 #  --- not in production
 #import inspect
@@ -113,6 +114,10 @@ class TrackView(Gtk.DrawingArea):
 		self.select = False
 		self.select_start = None
 		self.select_end = None
+
+		self.nudge_last_y = -1
+		self.nudge_hide_timeshift = False
+		self.nudge_buff = None
 
 		self.keyboard_focus = None
 
@@ -797,8 +802,9 @@ class TrackView(Gtk.DrawingArea):
 		if self.velocity_editor:
 			return self.velocity_editor.on_motion(widget, event)
 
-		if self.timeshift_editor:
-			return self.timeshift_editor.on_motion(widget, event)
+		if self.timeshift_editor and not ((event.state & Gdk.ModifierType.CONTROL_MASK) and\
+			(event.state & Gdk.ModifierType.BUTTON1_MASK)):
+				return self.timeshift_editor.on_motion(widget, event)
 
 		oldf = self.keyboard_focus
 
@@ -834,6 +840,52 @@ class TrackView(Gtk.DrawingArea):
 			if self.select_end[1] != new_hover_row or self.select_end[0] != new_hover_column:
 				self.select_end = new_hover_column, new_hover_row
 				self.redraw()
+
+		if self.select_start and self.select_end and\
+			(event.state & Gdk.ModifierType.CONTROL_MASK) and\
+			(event.state & Gdk.ModifierType.BUTTON1_MASK): # nudge
+				if self.nudge_last_y == -1:
+					self.nudge_last_y = event.y
+					if not self.show_timeshift:
+						self.nudge_hide_timeshift = True
+						self.show_timeshift = True
+
+					self.timeshift_editor = TimeshiftEditor(self, new_hover_column, new_hover_row, event)
+					self.timeshift_editor.confirmed = True
+					self.configure()
+					self.parent.redraw_track(self.trk)
+					self.nudge_buff = {}
+					self.sel_dragged = True
+					return True
+
+				n = math.floor(event.y - self.nudge_last_y) / 4
+				if n != 0:
+					maxn = -50
+					minn = 50
+
+					for c in range(self.select_start[0], self.select_end[0] + 1):
+						for r in range(self.select_start[1], self.select_end[1] + 1):
+							if not (c, r) in self.nudge_buff:
+								self.nudge_buff[(c, r)] = self.trk[c][r].delay
+
+							if self.trk[c][r].type > 0:
+								maxn = max(maxn, self.nudge_buff[(c, r)])
+								minn = min(minn, self.nudge_buff[(c, r)])
+
+					maxn = 49 - maxn
+					minn = -49 - minn
+
+					if n > 0:
+						n = min(n, maxn)
+					else:
+						n = max(n, minn)
+
+					for c in range(self.select_start[0], self.select_end[0] + 1):
+						for r in range(self.select_start[1], self.select_end[1] + 1):
+							self.trk[c][r].delay = self.nudge_buff[(c, r)] + n
+							self.redraw(r)
+
+				return True
 
 		if self.drag:
 			if self.trk[new_hover_column][new_hover_row].type == 0:		# dragging single cell
@@ -1186,9 +1238,10 @@ class TrackView(Gtk.DrawingArea):
 				self.select_start = ssx, ssy
 				self.select_end = sex, sey
 
-			if self.drag:
-				self.drag = False
-				self.undo_buff.add_state()
+			if not event.state & Gdk.ModifierType.CONTROL_MASK:
+				if self.drag:
+					self.drag = False
+					self.undo_buff.add_state()
 
 		if self.velocity_editor:
 			self.velocity_editor = None
@@ -2244,7 +2297,17 @@ class TrackView(Gtk.DrawingArea):
 		if cfg.key["toggle_controls"].matches(event):
 			return True
 
-		if shift or ctrl or alt:
+		if ctrl:
+			self.nudge_last_y = -1
+
+			if self.nudge_hide_timeshift:
+				self.show_timeshift = False
+				self.parent.redraw_track(self.trk)
+				self.nudge_hide_timeshift = False
+
+			return True
+
+		if shift or alt:
 			return True
 
 		if self.keyboard_focus is None:

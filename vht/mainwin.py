@@ -220,7 +220,7 @@ class MainWin(Gtk.ApplicationWindow):
 			self.hb.set_title(None)
 			self.hb.set_subtitle(None)
 			return
-			
+
 		title = os.path.split(filename)[1]
 		if title.endswith(".vht"):
 			title = title[:-4]
@@ -230,10 +230,10 @@ class MainWin(Gtk.ApplicationWindow):
 
 	def load(self, filename):
 		self.set_header_from_filename(None)
-		
+
 		if not self._sequence_view.load(filename):
 			return False
-			
+
 		self.last_filename = filename
 		self.set_header_from_filename(filename)
 		self.adj.set_value(mod.bpm)

@@ -645,20 +645,20 @@ class SequenceView(Gtk.Box):
 
 	def load(self, filename):
 		self.clear()
-		
+
 		if mod.load(filename):
 			self.seq = mod[0]
 			self.build()
 			return True
 		else:
 			print("...")
-			mod.new()	
+			mod.new()
 			randomcomposer.muzakize()
 			self.seq = mod[0]
-			self.build()			
+			self.build()
 
 			return False
-			
+
 	def recalculate_row_spacing(self):
 		if not self.get_realized():
 			return

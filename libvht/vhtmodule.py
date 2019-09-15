@@ -300,7 +300,7 @@ class VHTModule(Iterable):
 				return False
 
 			p = self.play
-			
+
 			self.reset()
 			self.new()
 			self.bpm = jm["bpm"]
@@ -364,6 +364,6 @@ class VHTModule(Iterable):
 
 			self.play = p
 			self.extras = jm["extras"]
-		
+
 		return True
 
