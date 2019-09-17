@@ -250,7 +250,7 @@ class StatusBar(Gtk.DrawingArea):
 		while not fits:
 			self._context.set_font_size(fs)
 			(x, y, width, height, dx, dy) = self._context.text_extents("X" * self.min_char_width)
-			if w > width:
+			if w > dx:
 				fits = True
 			else:
 				fs -= 1
@@ -397,12 +397,17 @@ class StatusBar(Gtk.DrawingArea):
 			if down:
 				cfg.skip = max(cfg.skip - 1, -16)
 
-		if self.active_field == 4:
-			if up:
-				cfg.highlight = min(cfg.highlight + 1, 32)
-			if down:
-				cfg.highlight = max(cfg.highlight - 1, 1)
 
+		if self.active_field == 4:
+			aseq = mod.mainwin._sequence_view
+			if up:
+				aseq.highlight = min(aseq.highlight + 1, 32)
+			if down:
+				aseq.highlight = max(aseq.highlight - 1, 1)
+
+			mod.mainwin._sequence_view.redraw_track()
+			mod.extras[aseq.seq.index][-1]["highlight"] = aseq.highlight
+		
 		if self.active_field == 5:
 			if up:
 				mod.bpm = mod.bpm + 1

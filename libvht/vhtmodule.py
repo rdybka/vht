@@ -119,7 +119,7 @@ class VHTModule(Iterable):
 	@rpb.setter
 	def rpb(self, value):
 		if value:
-			libcvht.module_set_rpb(min(max(1, value), 23))
+			libcvht.module_set_rpb(min(max(1, value), 32))
 
 	@property
 	def ctrlpr(self):
