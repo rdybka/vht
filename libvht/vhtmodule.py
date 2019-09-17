@@ -119,9 +119,7 @@ class VHTModule(Iterable):
 	@rpb.setter
 	def rpb(self, value):
 		if value:
-			libcvht.module_set_rpb(value)
-		else:
-			libcvht.module_set_rpb(4)
+			libcvht.module_set_rpb(min(max(1, value), 23))
 
 	@property
 	def ctrlpr(self):
@@ -208,6 +206,7 @@ class VHTModule(Iterable):
 	def save(self, filename):
 		jm = {}
 		jm["bpm"] = self.bpm
+		jm["rpb"] = self.rpb
 		jm["ctrlpr"] = self.ctrlpr
 		jm["extras"] = self.extras
 		jm["seq"] = []
@@ -304,6 +303,7 @@ class VHTModule(Iterable):
 			self.reset()
 			self.new()
 			self.bpm = jm["bpm"]
+			self.rpb = jm["rpb"]
 			self.ctrlpr = jm["ctrlpr"]
 
 			for seq in jm["seq"]:

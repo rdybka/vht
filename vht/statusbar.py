@@ -45,7 +45,7 @@ class StatusBar(Gtk.DrawingArea):
 
 		self._surface = None
 		self._context = None
-		self.min_char_width = 70
+		self.min_char_width = 75
 
 		self.pos = []
 		self.active_field = None
@@ -187,6 +187,18 @@ class StatusBar(Gtk.DrawingArea):
 		else:
 			cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
+		txt = " rpb:%d" % mod.rpb
+		(x, y, width, height, dx, dy) = cr.text_extents(txt)
+		cr.move_to(self.pos[-1], h)
+		cr.show_text(txt)
+		xx += dx
+		self.pos.append(xx)
+
+		if self.active_field == 7:
+			cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.star_colour))
+		else:
+			cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
+
 		txt = " prt:%d" % cfg.default_midi_out_port
 		(x, y, width, height, dx, dy) = cr.text_extents(txt)
 		cr.move_to(self.pos[-1], h)
@@ -285,7 +297,10 @@ class StatusBar(Gtk.DrawingArea):
 			if self.active_field == 5:	# bpm
 				self.tt_txt = "<big> ⇑</big> %s\n<big> ↑</big> %s\n<big>.↑</big> %s\n<big>.↓</big> %s\n<big> ↓</big> %s\n<big> ⇓</big> %s" % (cfg.key["bpm_10_up"], cfg.key["bpm_up"], cfg.key["bpm_frac_up"], cfg.key["bpm_frac_down"], cfg.key["bpm_down"], cfg.key["bpm_10_down"])
 
-			if self.active_field == 6:	# prt
+			if self.active_field == 6:	# rpb
+				self.tt_txt = "<big>↑</big> %s\n<big>↓</big> %s" % (cfg.key["rpb_up"], cfg.key["rpb_down"])
+
+			if self.active_field == 7:	# prt
 				self.tt_txt = "<big>↑</big> %s\n<big>↓</big> %s" % (cfg.key["def_port_up"], cfg.key["def_port_down"])
 
 			self.last_active_field = self.active_field
@@ -334,6 +349,12 @@ class StatusBar(Gtk.DrawingArea):
 				mod.mainwin.adj.set_value(mod.bpm)
 
 		if self.active_field == 6:
+			if up:
+				mod.rpb += 1
+			if down:
+				mod.rpb -= 1
+
+		if self.active_field == 7:
 			if up:
 				cfg.default_midi_out_port = min(max(cfg.default_midi_out_port + 1, 0), mod.max_ports - 1)
 				mod.set_default_midi_port(cfg.default_midi_out_port)
@@ -391,6 +412,12 @@ class StatusBar(Gtk.DrawingArea):
 				mod.mainwin.adj.set_value(mod.bpm)
 
 		if self.active_field == 6:
+			if up:
+				mod.rpb += 1
+			if down:
+				mod.rpb -= 1
+
+		if self.active_field == 7:
 			if up:
 				cfg.default_midi_out_port = min(max(cfg.default_midi_out_port + 1, 0), mod.max_ports - 1)
 				mod.set_default_midi_port(cfg.default_midi_out_port)

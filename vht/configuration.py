@@ -119,6 +119,8 @@ class Configuration():
 			"bpm_10_down": cfgkey("Page_Down", True, True, False),
 			"bpm_frac_up": cfgkey("Right", True, True, False),
 			"bpm_frac_down": cfgkey("Left", True, True, False),
+			"rpb_up": cfgkey("Up", True, True, False),
+			"rpb_down": cfgkey("Down", True, True, False),
 			"octave_up": cfgkey("KP_Multiply", False, False, False),
 			"octave_down": cfgkey("KP_Divide", False, False, False),
 			"highlight_up": cfgkey("KP_Multiply", True, False, False),
