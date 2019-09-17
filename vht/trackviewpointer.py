@@ -42,6 +42,7 @@ class TrackviewPointer():
 		self.gradient = None
 
 	def draw(self, pos):
+		self.pulse.freq = mod.rpb
 		if not mod.play and pos == 0:
 			if self.stopped:
 				return

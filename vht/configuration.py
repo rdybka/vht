@@ -30,7 +30,7 @@ class Configuration():
 		self.seq_font_size = 16
 		self.seq_line_width = 1.0
 		self.seq_spacing = 1.05
-		self.status_bar_font_size = 32
+		self.status_bar_font_size = 64
 
 		self.console_scale = 1
 		self.timeline_position = .66
@@ -113,14 +113,14 @@ class Configuration():
 			"zoom_out": cfgkey("KP_Subtract", False, True, False),
 			"skip_up": cfgkey("KP_Add", False, False, False),
 			"skip_down": cfgkey("KP_Subtract", False, False, False),
-			"bpm_up": cfgkey("KP_Add", True, True, False),
-			"bpm_down": cfgkey("KP_Subtract", True, True, False),
+			"bpm_up": cfgkey("Up", True, True, False),
+			"bpm_down": cfgkey("Down", True, True, False),
 			"bpm_10_up": cfgkey("Page_Up", True, True, False),
 			"bpm_10_down": cfgkey("Page_Down", True, True, False),
 			"bpm_frac_up": cfgkey("Right", True, True, False),
 			"bpm_frac_down": cfgkey("Left", True, True, False),
-			"rpb_up": cfgkey("Up", True, True, False),
-			"rpb_down": cfgkey("Down", True, True, False),
+			"rpb_up": cfgkey("KP_Add", True, True, False),
+			"rpb_down": cfgkey("KP_Subtract", True, True, False),
 			"octave_up": cfgkey("KP_Multiply", False, False, False),
 			"octave_down": cfgkey("KP_Divide", False, False, False),
 			"highlight_up": cfgkey("KP_Multiply", True, False, False),

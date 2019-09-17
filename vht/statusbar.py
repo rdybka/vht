@@ -45,7 +45,7 @@ class StatusBar(Gtk.DrawingArea):
 
 		self._surface = None
 		self._context = None
-		self.min_char_width = 75
+		self.min_char_width = 80
 
 		self.pos = []
 		self.active_field = None
@@ -225,6 +225,7 @@ class StatusBar(Gtk.DrawingArea):
 		self.queue_draw()
 
 	def tick(self, wdg, param):
+		self.pulse.freq = mod.rpb
 		self.redraw()
 		return 1
 
@@ -250,7 +251,7 @@ class StatusBar(Gtk.DrawingArea):
 		while not fits:
 			self._context.set_font_size(fs)
 			(x, y, width, height, dx, dy) = self._context.text_extents("X" * self.min_char_width)
-			if w > dx:
+			if w > width:
 				fits = True
 			else:
 				fs -= 1
