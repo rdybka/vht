@@ -1033,7 +1033,7 @@ class TrackView(Gtk.DrawingArea):
 					mod.record = 0
 					self.leave_all()
 					self.parent.redraw_track(mod.active_track.trk)
-
+					self.select = None
 				self.parent.change_active_track(self)
 				return True
 
@@ -1076,6 +1076,9 @@ class TrackView(Gtk.DrawingArea):
 		enter_edit = False
 
 		if event.button != cfg.select_button:
+			return False
+
+		if event.state & Gdk.ModifierType.CONTROL_MASK:
 			return False
 
 		self.sel_drag = False
@@ -2305,6 +2308,7 @@ class TrackView(Gtk.DrawingArea):
 				self.parent.redraw_track(self.trk)
 				self.nudge_hide_timeshift = False
 
+			self.undo_buff.add_state()
 			return True
 
 		if shift or alt:
