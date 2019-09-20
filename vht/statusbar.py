@@ -408,7 +408,7 @@ class StatusBar(Gtk.DrawingArea):
 
 			mod.mainwin._sequence_view.redraw_track()
 			mod.extras[aseq.seq.index][-1]["highlight"] = aseq.highlight
-		
+
 		if self.active_field == 5:
 			if up:
 				mod.bpm = mod.bpm + 1

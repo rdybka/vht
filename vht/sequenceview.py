@@ -387,7 +387,7 @@ class SequenceView(Gtk.Box):
 
 		if cfg.key["rpb_down"].matches(event):
 			mod.rpb -= 1
-			return True		
+			return True
 
 		if cfg.key["highlight_up"].matches(event):
 			self.highlight = min(self.highlight + 1, 32)
