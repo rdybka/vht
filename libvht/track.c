@@ -757,6 +757,7 @@ void track_add_col(track *trk) {
 	trk->rows = realloc(trk->rows, sizeof(row*) * trk->ncols);
 	trk->rows[trk->ncols -1] = malloc(sizeof(row) * trk->arows);
 	trk->ring = realloc(trk->ring, sizeof(int) * trk->ncols);
+	trk->ring[trk->ncols - 1] = -1;
 	pthread_mutex_unlock(&trk->excl);
 
 	track_clear_rows(trk, trk->ncols - 1);

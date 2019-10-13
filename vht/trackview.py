@@ -793,6 +793,9 @@ class TrackView(Gtk.DrawingArea):
 		if not self.trk:
 			return False
 
+		if not event.window.get_toplevel().get_state() & Gdk.WindowState.FOCUSED:
+			return False
+
 		new_hover_row = min(int(event.y / self.txt_height), self.trk.nrows - 1)
 		new_hover_column = min(int(event.x / self.txt_width), len(self.trk) -1)
 
@@ -1119,34 +1122,34 @@ class TrackView(Gtk.DrawingArea):
 			enter_edit = True
 			self.drag = True
 
-		if self.trk[col][row].type == 2:# note_off
-			enter_edit = True
-			self.drag = True
-
 		flds = 2
 		if self.show_timeshift:
 			flds = 3
 
 		fldwidth =  self.txt_width / flds
 
-		if offs < fldwidth:	# edit note
+		if self.trk[col][row].type == 2:# note_off
 			enter_edit = True
-		else: 							# edit velocity or timeshift
-			if not shift and 0 < self.trk[col][row].type < 3:
-				enter_edit = False
-				self.drag = False
-
-				if fldwidth < offs < fldwidth * 2 and self.trk[col][row].type == 1:
-					self.velocity_editor = VelocityEditor(self, col, row, event)
-
-				if self.show_timeshift:
-					if fldwidth * 2 < offs < fldwidth * 3:
-						self.timeshift_editor = TimeshiftEditor(self, col, row, event)
-
-				self.configure()
-				self.redraw()
-				self.parent.prop_view.redraw()
-				self.undo_buff.add_state()
+			self.drag = True
+		else:
+			if offs < fldwidth:	# edit note
+				enter_edit = True
+			else: 							# edit velocity or timeshift
+				if not shift and 0 < self.trk[col][row].type < 3:
+					enter_edit = False
+					self.drag = False
+	
+					if fldwidth < offs < fldwidth * 2 and self.trk[col][row].type == 1:
+						self.velocity_editor = VelocityEditor(self, col, row, event)
+	
+					if self.show_timeshift:
+						if fldwidth * 2 < offs < fldwidth * 3:
+							self.timeshift_editor = TimeshiftEditor(self, col, row, event)
+	
+					self.configure()
+					self.redraw()
+					self.parent.prop_view.redraw()
+					self.undo_buff.add_state()
 
 		if enter_edit:
 			if shift:

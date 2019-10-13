@@ -23,7 +23,7 @@ import pkg_resources
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib, Gtk, Gio, GdkPixbuf
 
-from vht import mod, cfg, ctrlcfg, bankcfg, randomcomposer
+from vht import mod, cfg, ctrlcfg, autoexec, bankcfg, randomcomposer
 from vht.mainwin import MainWin
 
 class VHTApp(Gtk.Application):
@@ -108,7 +108,7 @@ class VHTApp(Gtk.Application):
 	def on_about_dialog(self, action, param):
 		ab = Gtk.AboutDialog(self.main_win)
 		ab.set_license_type(Gtk.License.GPL_3_0)
-		ab.set_copyright("Copyright (C) 2019 Remigiusz Dybka\nremigiusz.dybka@gmail.com\n@schtixfnord")
+		ab.set_copyright("Copyright (C) 2019 Remigiusz Dybka\nremigiusz.dybka@gmail.com\n🐦@schtixfnord")
 		pkg = pkg_resources.require("vht")[0]
 		ab.set_version(pkg.version)
 		ab.set_program_name("Valhalla Tracker")
@@ -213,6 +213,8 @@ def run():
 		print("creating", mod.cfg_path)
 		os.mkdir(mod.cfg_path)
 
+	autoexec.run()
+
 	#print("data:", mod.data_path)
 	#print("cfg:", mod.cfg_path)
 
@@ -231,7 +233,7 @@ def run():
 
 	mod.play = False
 	mod.jack_stop()
-
+	mod.free()
 
 if __name__ == "__main__":
 	run()

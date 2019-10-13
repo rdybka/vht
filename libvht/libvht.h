@@ -78,6 +78,7 @@ extern void midi_ignore_buffer_clear(void);
 extern void midi_ignore_buffer_add(int channel, int type, int note);
 
 extern void set_default_midi_port(int port);
+extern timeline *module_get_timeline(void);
 
 // sequence
 extern sequence *sequence_new(int length);
@@ -187,6 +188,14 @@ extern void ctrlrow_set_smooth(ctrlrow *crw, int s);
 extern void ctrlrow_set_anchor(ctrlrow *crw, int a);
 
 extern void ctrlrow_set(ctrlrow *crw, int v, int l, int s, int a);
+
+// timeline
+extern int timeline_change_set(timeline *tl, long row, float bpm, int rpb, int linked);
+extern void timeline_change_del(timeline *tl, int id);
+extern char *timeline_get_change(timeline *tl, int id);
+extern int timeline_get_nchanges(timeline *tl);
+extern int timeline_get_nticks(timeline *tl);
+extern double timeline_get_tick(timeline *tl, int n);
 
 extern int parse_note(char *);
 #endif //__LIBVHT_H__

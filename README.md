@@ -9,7 +9,6 @@ your GNU/Linux audio setup
 - seems to work fine with ZynAddSubFX and a MIDI keyboard
 - minimalistic by design
 - minimalistic by necessity
-- driven by desire to mess with time
 - can load and save files
 - tries not to interfere but inspire
 - for the same reason, sparsely documented

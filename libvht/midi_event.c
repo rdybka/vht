@@ -183,7 +183,6 @@ void midi_buffer_add(int port, midi_event evt) {
 		return;
 
 	midi_buffer[port][curr_midi_event[port]++] = evt;
-
 }
 
 int midi_buffer_compare(const void *a, const void *b) {

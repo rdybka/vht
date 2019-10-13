@@ -275,6 +275,10 @@ def set_default_midi_port(port):
     return _libcvht.set_default_midi_port(port)
 set_default_midi_port = _libcvht.set_default_midi_port
 
+def module_get_timeline():
+    return _libcvht.module_get_timeline()
+module_get_timeline = _libcvht.module_get_timeline
+
 def sequence_new(length):
     return _libcvht.sequence_new(length)
 sequence_new = _libcvht.sequence_new
@@ -626,6 +630,30 @@ ctrlrow_set_anchor = _libcvht.ctrlrow_set_anchor
 def ctrlrow_set(crw, v, l, s, a):
     return _libcvht.ctrlrow_set(crw, v, l, s, a)
 ctrlrow_set = _libcvht.ctrlrow_set
+
+def timeline_change_set(tl, row, bpm, rpb, linked):
+    return _libcvht.timeline_change_set(tl, row, bpm, rpb, linked)
+timeline_change_set = _libcvht.timeline_change_set
+
+def timeline_change_del(tl, id):
+    return _libcvht.timeline_change_del(tl, id)
+timeline_change_del = _libcvht.timeline_change_del
+
+def timeline_get_change(tl, id):
+    return _libcvht.timeline_get_change(tl, id)
+timeline_get_change = _libcvht.timeline_get_change
+
+def timeline_get_nchanges(tl):
+    return _libcvht.timeline_get_nchanges(tl)
+timeline_get_nchanges = _libcvht.timeline_get_nchanges
+
+def timeline_get_nticks(tl):
+    return _libcvht.timeline_get_nticks(tl)
+timeline_get_nticks = _libcvht.timeline_get_nticks
+
+def timeline_get_tick(tl, n):
+    return _libcvht.timeline_get_tick(tl, n)
+timeline_get_tick = _libcvht.timeline_get_tick
 
 def parse_note(arg1):
     return _libcvht.parse_note(arg1)

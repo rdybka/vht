@@ -127,7 +127,12 @@ class MainWin(Gtk.ApplicationWindow):
 
 		self.set_default_size(800, 600)
 		self.show_all()
-		#self.show_console()
+
+		if cfg.console_show:
+			self.show_console()
+
+		if cfg.timeline_show:
+			self.show_timeline()
 
 		if mod.start_error:
 			dialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR,

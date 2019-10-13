@@ -33,11 +33,23 @@ class VHTCons(InteractiveConsole):
 		self.d = True
 
 		self.q = Queue()
-		self.runsource("import sys")
-		self.runsource("from vht import mod, cfg")
+
+		self.autoexec =	\
+"""
+import sys
+from vht import mod, cfg
+seq = mod[0]
+trk = seq[0]
+tl = mod.timeline
+"""
+
+		for line in self.autoexec.split("\n"):
+			self.runsource(line)
+
 		self.runsource("sys.stdout = mod.termfile")
-		self.runsource("sys.stderr = mod.termfile")
 		self.runsource("sys.stdin = mod.termfile")
+		if cfg.console_steal_stderr:
+			self.runsource("sys.stderr = mod.termfile")
 
 class HackerIO(object):
 	def __init__(self, trm):
@@ -86,6 +98,7 @@ class Console(Vte.Terminal):
 		mod.termfile.q = self.cons.q
 		t = threading.Thread(target = self.cons.interact)
 		t.daemon = True
+
 		t.start()
 
 	def on_scroll(self, widget, event):

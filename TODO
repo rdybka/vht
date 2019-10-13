@@ -1,52 +1,24 @@
-- triggers
-	-let ring
+-------------------------------------------------------------
 - timeline
-- whole track selection
-	- moving
-	- cloning
+- seqlist
+	- clone
+	- split
+	- merge
+	- strip
+	- name
+	- triggers
+		- don't record
+		- mute
+- tracks:
+	- let ring?
+	- triggers?
 - console
 	- click in statusbar
 - autoscroll and console open/close (magic row 27)
-- go through threading
 - configuration
 - magic transposing
-- nudge timeshift
 - export:
 	- midi
 	- audio
 		- freewheeling
-* resync
-* split filename in title
-* save notification
-* fix popups
-* doubling/halving
-* clone - ctrl-n
-* newly added tracks on left (as option)
-	* not while recording
-* fix keyboard for float bpm
-* make bpm a float
-* staying in edit mode after deleting track
-* indicate recording in statusbar
-* entering velocityeditor from note-offs
-* right click
-	* stop recording
-	* reset velocity to set vel
-* controllers
-	* refactor pitchwheeleditor into controllereditor
-	* cursor movement
-	* ctrl+x,c,v,b - cut, copy, paste, render doodles
-	* gui in track props
-	* envelopes
-		* snapping
-* extended view
-	* show/hide timeshift
-	* disable notes hiding when controllers off
-* auto-scroll
-	* fix with visible controllers
-* track names
-* gui magic
-	* rotation
-* disable menu when no jack
-* deleting track mutes it
-* about
-	* version from setup.py
+- new

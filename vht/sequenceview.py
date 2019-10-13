@@ -501,6 +501,8 @@ class SequenceView(Gtk.Box):
 
 		if trk:
 			self._track_box.pack_start(t, False, True, 0)
+			t.undo_buff.reset()
+			t.undo_buff.add_state(True)
 		else:
 			self._side_box.pack_start(t, False, True, 0)
 
@@ -511,6 +513,7 @@ class SequenceView(Gtk.Box):
 				self.prop_view.move_first(trk)
 
 		self.recalculate_row_spacing()
+
 		t.show()
 		return t
 

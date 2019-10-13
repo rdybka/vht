@@ -25,6 +25,7 @@
 #include <pthread.h>
 #include "midi_event.h"
 #include "sequence.h"
+#include "timeline.h"
 
 #define DEFAULT_CTRLPR 16
 
@@ -43,6 +44,7 @@ struct module_t {
 	int ctrlpr;
 	int def_nrows;
 	sequence **seq;
+	timeline *tline;
 	int nseq;
 	int curr_seq;
 	int mute;

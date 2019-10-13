@@ -47,7 +47,7 @@ class ControllersView(Gtk.Box):
 		self.new_ctrl = Gtk.ActionBar()
 
 		button = Gtk.Button()
-		icon = Gio.ThemedIcon(name="edit-add")
+		icon = Gio.ThemedIcon(name="list-add")
 		image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
 		button.add(image)
 		button.connect("clicked", self.on_add_clicked)

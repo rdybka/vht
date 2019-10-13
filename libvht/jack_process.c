@@ -33,6 +33,7 @@ int jack_process(jack_nframes_t nframes, void *arg) {
 	jack_last_frame = jack_last_frame_time(jack_client);
 	jack_synch_output_ports();
 	module_advance(curr_frames);
+	midi_buffer_flush();
 	return 0;
 }
 

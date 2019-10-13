@@ -18,6 +18,7 @@
 from collections.abc import Iterable
 from libvht import libcvht
 from libvht.vhtsequence import VHTSequence
+from libvht.vhttimeline import VHTTimeline
 import pickle
 
 class VHTModule(Iterable):
@@ -26,6 +27,7 @@ class VHTModule(Iterable):
 		self.active_track = None
 		libcvht.module_new();
 		self.extras = {} # will be saved - for stuff like names of tracks
+		self.timeline = VHTTimeline(libcvht)
 		super()
 
 	def __del__(self):
@@ -52,6 +54,7 @@ class VHTModule(Iterable):
 
 	def new(self):
 		libcvht.module_new();
+		self.timeline = VHTTimeline(libcvht)
 
 	def __len__(self):
 		return libcvht.module_get_nseq()
@@ -96,6 +99,9 @@ class VHTModule(Iterable):
 	def sneakily_queue_midi_ctrl(self, seq, trk, value, ctrl):
 		libcvht.queue_midi_ctrl(seq, trk, value, ctrl)
 
+	def free(self):
+		libcvht.module_free();
+
 	@property
 	def jack_error(self):
 		return libcvht.get_jack_error()
@@ -120,6 +126,7 @@ class VHTModule(Iterable):
 	def rpb(self, value):
 		if value:
 			libcvht.module_set_rpb(min(max(1, value), 32))
+			self.timeline.changes[0] = [0, self.bpm, self.rpb, 0]
 
 	@property
 	def ctrlpr(self):
@@ -160,6 +167,7 @@ class VHTModule(Iterable):
 	def bpm(self, value):
 		value = min(max(value, self.min_bpm), self.max_bpm)
 		libcvht.module_set_bpm(value)
+		self.timeline.changes[0] = [0, self.bpm, self.rpb, 0]
 
 	@property
 	def nports(self):

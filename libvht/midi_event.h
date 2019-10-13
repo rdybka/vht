@@ -23,7 +23,7 @@
 #include <pthread.h>
 #include "jack_client.h"
 
-#define EVT_BUFFER_LENGTH 1024
+#define EVT_BUFFER_LENGTH 1023
 
 enum MIDI_EVENT_TYPE {none, note_on, note_off, pitch_wheel, control_change, program_change};
 extern pthread_mutex_t midi_buff_exl; // initialised from jack_start()

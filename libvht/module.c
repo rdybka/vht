@@ -81,10 +81,8 @@ void module_advance(jack_nframes_t curr_frames) {
 
 	module.ms = (time - floorf(time)) * 1000;
 
-	sequence *seq = module.seq[0];
-
 	if (module.playing)
-		sequence_advance(seq, period);
+		timeline_advance(module.tline, period);
 
 // handle input from MIDI
 	void *inp = jack_port_get_buffer(jack_input_port, jack_buffer_size);
@@ -127,7 +125,6 @@ void module_advance(jack_nframes_t curr_frames) {
 		}
 	}
 
-	midi_buffer_flush();
 	//printf("time: %02d:%02d:%03d %3.5f %d\n", module.min, module.sec, module.ms, period, module.bpm);
 	module.song_pos += period;
 	module_excl_out();
@@ -150,6 +147,7 @@ void module_new() {
 	module.dump_notes = 0;
 	module.ctrlpr = DEFAULT_CTRLPR;
 	cur_rec_update = 0;
+	module.tline = timeline_new();
 
 	module_excl_out();
 }
@@ -171,6 +169,11 @@ void module_free() {
 		free(module.seq);
 		module.seq = NULL;
 		module.bpm = -1;
+	}
+
+	if (module.tline != NULL) {
+		timeline_free(module.tline);
+		module.tline = NULL;
 	}
 }
 
@@ -240,6 +243,10 @@ void module_swap_sequence(int s1, int s2) {
 	module.seq[s2] = s3;
 
 	module_excl_out();
+}
+
+timeline *module_get_timeline(void) {
+	return module.tline;
 }
 
 char *module_get_time(void) {

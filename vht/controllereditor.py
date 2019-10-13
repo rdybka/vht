@@ -390,6 +390,8 @@ class ControllerEditor():
 				xx = (v / 127) - 64
 			else:
 				xx = v - 64
+				if v == 0:
+					xx = -66
 
 			xx = xx * ((xw / 2) / 64)
 
@@ -414,6 +416,9 @@ class ControllerEditor():
 		if r == self.doodle_hint_row:
 			cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.star_colour), .7)
 			xx = self.doodle_hint - 64
+			if self.ctrlnum > 0:
+				if xx == -64:
+					xx = -66
 
 			xx = xx * ((xw / 2) / 64)
 
@@ -439,6 +444,8 @@ class ControllerEditor():
 				xx = (v / 127) - 64
 			else:
 				xx = v - 64
+				if v == 0:
+					xx = -66
 
 			xx = xx * ((xw / 2) / 64)
 
@@ -890,7 +897,6 @@ class ControllerEditor():
 						self.drag_static = []
 						self.drag_selection_offset = r - self.selection[0]
 						self.drag_start = self.selection[0]
-
 						for rr, row in enumerate(self.trk.ctrl[self.ctrlnum]):
 							rd = row.dummy()
 
@@ -908,6 +914,7 @@ class ControllerEditor():
 					self.edit = r
 					self.selection = None
 					self.last_keyboard_edit = -1
+					self.last_selected = r
 					self.tv.recalc_edit(self.tv)
 
 				self.active_row = r
@@ -1068,6 +1075,8 @@ class ControllerEditor():
 			self.drag = False
 			if not self.dragged:
 				self.selection = None
+				if (self.edit):
+					self.last_selected = self.edit
 
 			self.redraw_env()
 			self.tv.redraw()

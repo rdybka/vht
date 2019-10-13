@@ -30,11 +30,14 @@ class Configuration():
 		self.seq_font_size = 16
 		self.seq_line_width = 1.0
 		self.seq_spacing = 1.05
-		self.status_bar_font_size = 64
+		self.status_bar_font_size = 24
 
 		self.console_scale = 1
 		self.timeline_position = .66
 		self.console_position = .6
+		self.console_show = False
+		self.timeline_show = False
+		self.console_steal_stderr = True
 
 		#self.colour = (.5, .5, 1)
 		#self.colour = (.9, .8, .4)

@@ -147,6 +147,9 @@ class TrackPropView(Gtk.DrawingArea):
 		self.propview.move_last(self.trk)
 
 	def on_mouse_move(self, widget, data):
+		if not data.window.get_toplevel().get_state() & Gdk.WindowState.FOCUSED:
+			return False
+		
 		if mod.mainwin.is_active():
 			if data.x >= self.button_rect.x:
 				if data.x <= self.button_rect.x + self.button_rect.width:
@@ -202,6 +205,9 @@ class TrackPropView(Gtk.DrawingArea):
 		active = False
 		if mod.active_track == self.trkview:
 			active = True
+
+		if not self.get_window().get_toplevel().get_state() & Gdk.WindowState.FOCUSED:
+			active = False
 
 		if self.trk == None:
 			(x, y, width, height, dx, dy) = cr.text_extents("00_|")
@@ -431,6 +437,9 @@ class TrackPropView(Gtk.DrawingArea):
 		self.queue_draw()
 
 	def on_enter(self, wdg, prm):
+		if not prm.window.get_toplevel().get_state() & Gdk.WindowState.FOCUSED:
+			return False
+		
 		if self.trk:
 			if mod.active_track:
 				if not mod.active_track.edit:
