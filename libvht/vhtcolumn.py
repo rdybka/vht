@@ -21,7 +21,7 @@ from libvht.vhtrow import VHTRow
 class VHTColumn(Iterable):
 	def __init__(self, vht, trk, col):
 		self._vht_handle = vht
-		self._trk_handle = trk;
+		self._trk_handle = trk
 		self._col = col
 		super()
 
@@ -55,4 +55,3 @@ class VHTColumn(Iterable):
 			ret = ret + "\n"
 
 		return ret
-

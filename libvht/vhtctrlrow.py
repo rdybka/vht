@@ -29,7 +29,7 @@ class VHTCtrlRow():
 		self.update_strrep()
 
 	def __eq__(self, other):
-		if other == None:
+		if other is None:
 			return False
 
 		if self._velocity != other._velocity:
@@ -117,4 +117,3 @@ class VHTCtrlRow():
 
 	def __str__(self):
 		return self._strrep
-

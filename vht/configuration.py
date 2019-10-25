@@ -25,23 +25,25 @@ class Configuration():
 
 		self.seq_font = "Monospace"
 		self.console_font = "Monospace"
+		self.mixer_font = "Monospace"
 
-		self.gui_font_size = 16
 		self.seq_font_size = 16
+		self.mixer_font_size = 16
+		self.mixer_padding = 1.5
 		self.seq_line_width = 1.0
 		self.seq_spacing = 1.05
 		self.status_bar_font_size = 24
 
 		self.console_scale = 1
-		self.timeline_position = .66
-		self.console_position = .6
+		self.timeline_position = .75
+		self.console_position = .7
 		self.console_show = False
-		self.timeline_show = False
-		self.console_steal_stderr = True
+		self.timeline_show = True
+		self.console_steal_stderr = False
 
-		#self.colour = (.5, .5, 1)
-		#self.colour = (.9, .8, .4)
+		self.mixer_colour = (0, .7, .7)
 		self.colour = (0, .7, .7)
+		#self.mixer_colour = (.9, .8, .4)
 
 		self.star_colour = (1, 1, 0)
 		self.console_colour = self.star_colour
@@ -131,6 +133,9 @@ class Configuration():
 			"def_port_up": cfgkey("KP_Multiply", True, True, False),
 			"def_port_down": cfgkey("KP_Divide", True, True, False),
 			"follow": cfgkey("f", False, False, False),
+			"seq_add" : cfgkey("n", False, True, False),
+			"seq_play_mode" : cfgkey("", False, False, False),
+			"panic" : cfgkey("p", False, True, True),
 
 			# trackview
 			"note_off": cfgkey("backslash", False, False, False),
@@ -143,7 +148,7 @@ class Configuration():
 			"track_move_last": cfgkey("End", False, True, False),
 			"track_move_first": cfgkey("Home", False, True, False),
 			"track_clear": cfgkey("d", True, False, False),
-			"track_clone": cfgkey("n", False, True, False),
+			"track_clone": cfgkey("n", True, True, False),
 			"sequence_double" : cfgkey("y", False, True, False),
 			"sequence_halve" : cfgkey("u", False, True, False),
 			"select_all": cfgkey("a", False, True, False),

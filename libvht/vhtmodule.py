@@ -187,7 +187,7 @@ class VHTModule(Iterable):
 
 	@property
 	def max_bpm(self):
-		return 1023
+		return 1023	# don't crash the synth
 
 	# those two work non-realtime,
 	# actual recording happens in c
@@ -210,6 +210,9 @@ class VHTModule(Iterable):
 
 	def set_default_midi_port(self, port):
 		libcvht.set_default_midi_port(port)
+
+	def panic(self):
+		print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFUUUUUUUUUUUUUUUUUUUUUUUU!!!!!!!")
 
 	def save(self, filename):
 		jm = {}

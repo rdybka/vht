@@ -229,6 +229,10 @@ class SequenceView(Gtk.Box):
 				mod.reset()
 			return True
 
+		if cfg.key["seq_add"].matches(event):
+			self.seq_add()
+			return True
+
 		if cfg.key["sequence_double"].matches(event):
 			self.double()
 			return True
@@ -496,6 +500,11 @@ class SequenceView(Gtk.Box):
 		#mod.clear_popups()
 		self._sv.grab_focus()
 
+	def seq_add(self):
+		mod.add_sequence()
+		mod.seqlist.configure()
+		mod.seqlist.redraw()
+	
 	def add_track(self, trk):
 		t = TrackView(self.seq, trk, self)
 
@@ -752,6 +761,7 @@ class SequenceView(Gtk.Box):
 		self._sv.set_vadjustment(vadj)
 
 	def tick(self, wdg, param):
+		mod.seqlist.tick()
 		for wdg in self.get_tracks(True):
 			wdg.tick()
 			if wdg.edit and wdg.trk:

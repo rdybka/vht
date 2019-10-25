@@ -15,17 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import math
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gdk, Gtk, Gio
+from gi.repository import Gdk, Gtk
 import cairo
-import random
-from datetime import datetime
-from vht import *
+from vht import cfg, mod
 
 class SequenceListView(Gtk.DrawingArea):
 	def __init__(self):
-		super(TrackPropView, self).__init__()
+		super(SequenceListView, self).__init__()
 
 		self.set_events(Gdk.EventMask.POINTER_MOTION_MASK |
 			Gdk.EventMask.SCROLL_MASK |
@@ -38,9 +37,8 @@ class SequenceListView(Gtk.DrawingArea):
 		self.connect("motion-notify-event", self.on_mouse_move)
 		self.connect("draw", self.on_draw)
 		self.connect("configure-event", self.on_configure)
-
-		self.add_tick_callback(self.tick)
-
+		self.connect("scroll-event", self.on_scroll)
+		
 		self._surface = None
 		self._context = None
 
@@ -57,11 +55,19 @@ class SequenceListView(Gtk.DrawingArea):
 			self.get_allocated_height())
 
 		self._context = cairo.Context(self._surface)
-		self._context.set_antialias(cairo.ANTIALIAS_NONE)
-		self._context.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
-		self._context.select_font_face(cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+		self._context.set_antialias(cairo.ANTIALIAS_DEFAULT)
+		self._context.set_line_width((cfg.mixer_font_size / 6.0) * cfg.seq_line_width)
+		self._context.select_font_face(cfg.mixer_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+		self._context.set_font_size(cfg.mixer_font_size)
+		
+		(q,w,e,self._txt_height,r,t) = self._context.text_extents("|")
+		(y,u,i,o,self._txt_width,p) = self._context.text_extents("0")
+		self._shining_stars = [False] * len(mod)
+		self._twinkling_lines = [(0,1)] * len(mod)
+		self._highlight = None
 
 	def on_configure(self, wdg, event):
+		self.configure()
 		self.redraw()
 		return True
 
@@ -71,19 +77,70 @@ class SequenceListView(Gtk.DrawingArea):
 	def on_click(self, widget, data):
 		pass
 
-	def redraw(self, col):
+	def zoom(self, i):
+		cfg.mixer_font_size += i	
+		cfg.mixer_font_size = min(max(1, cfg.mixer_font_size), 230)		
+		self.configure()
+		self.redraw()
+
+	def on_scroll(self, widget, event):
+		if event.state & Gdk.ModifierType.CONTROL_MASK:
+			if event.direction == Gdk.ScrollDirection.UP:
+				self.zoom(1)
+			if event.direction == Gdk.ScrollDirection.DOWN:
+				self.zoom(-1)
+			return True
+		return False
+
+	def redraw(self, col = -1):
 		cr = self._context
 
 		w = self.get_allocated_width()
 		h = self.get_allocated_height()
 
-		if self.trk:
-			w = self.trkview.width
-
-		self._context.set_font_size(cfg.seq_font_size)
 		cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
 		cr.rectangle(0, 0, w, h)
 		cr.fill()
+		
+		redr = []
+		if col == -1:
+			redr = list(range(len(mod)))
+		else:
+			redr.append(col)
+			
+		for r in redr:
+			x = (self._txt_height * cfg.mixer_padding) * r
+			x += ((self._txt_height * cfg.mixer_padding) - self._txt_height) / 2.0
+			
+			gradient = cairo.LinearGradient(0, 0, 0, h)
+			gradient.add_color_stop_rgb(0.0, *(col * cfg.intensity_background for col in cfg.mixer_colour))
+			gradient.add_color_stop_rgb(0.05, *(col *  cfg.intensity_txt for col in cfg.mixer_colour))
+			gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_background for col in cfg.mixer_colour))
+			cr.save()
+			cr.set_source(gradient)
+			cr.rectangle(x - self._txt_height / 3, 0, self._txt_height * 1.23, h)
+			cr.fill()
+			cr.restore()
+			
+			cr.set_source_rgb(0, 0, 0)
+			cr.move_to(x, self._txt_height)
+			cr.show_text("*")
+			
+			cr.move_to(x, self._txt_height)
+			cr.save()
+			cr.rotate(math.pi / 2.0)
+			cr.show_text("seq %d" % r)
+			cr.restore()
+
+			cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.mixer_colour))
+			cr.move_to(x, h)
+			cr.show_text("=")
+			
+			cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.mixer_colour))
+			cr.set_line_width((cfg.mixer_font_size / 10.0) * cfg.seq_line_width)
+			cr.move_to(x + self._txt_height, self._txt_height / 4.0)
+			cr.line_to(x + self._txt_height, h - (self._txt_height / 4.0))
+			cr.stroke()
 
 		self.queue_draw()
 
@@ -92,5 +149,5 @@ class SequenceListView(Gtk.DrawingArea):
 		cr.paint()
 		return False
 
-	def tick(self, wdg, param):
+	def tick(self):
 		return True

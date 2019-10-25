@@ -149,7 +149,7 @@ class TrackPropView(Gtk.DrawingArea):
 	def on_mouse_move(self, widget, data):
 		if not data.window.get_toplevel().get_state() & Gdk.WindowState.FOCUSED:
 			return False
-		
+
 		if mod.mainwin.is_active():
 			if data.x >= self.button_rect.x:
 				if data.x <= self.button_rect.x + self.button_rect.width:
@@ -439,7 +439,7 @@ class TrackPropView(Gtk.DrawingArea):
 	def on_enter(self, wdg, prm):
 		if not prm.window.get_toplevel().get_state() & Gdk.WindowState.FOCUSED:
 			return False
-		
+
 		if self.trk:
 			if mod.active_track:
 				if not mod.active_track.edit:

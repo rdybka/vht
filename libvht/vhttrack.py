@@ -23,7 +23,7 @@ from libvht.vhtquicklist import VHTQuickList
 class VHTTrack(Iterable):
 	def __init__(self, vht, trk, index):
 		self._vht_handle = vht
-		self._trk_handle = trk;
+		self._trk_handle = trk
 		self.index = index
 		super()
 
@@ -253,12 +253,12 @@ class VHTTrack(Iterable):
 		ret = ""
 		for r in range(self.nrows):
 			ret = ret + ("%02d: " % (r))
-			for c in range(len(self)):
+			for c, rw in enumerate(self):
 				rw = self[c][r]
 				ret = ret + "| "
 				ret = ret + str(rw) + " "
 
-				if (rw.type == 1):
+				if rw.type == 1:
 					ret = ret + ("%03d " % (rw.velocity))
 				else:
 					ret = ret + "    "
@@ -275,5 +275,5 @@ class VHTTrack(Iterable):
 		rec = self._vht_handle.track_get_rec_update(self._trk_handle)
 		if rec:
 			return eval(rec)
-		else:
-			return None
+			
+		return None

@@ -23,12 +23,13 @@ from gi.repository import Gtk, Gdk, Gio
 from vht import *
 from vht.sequenceview import SequenceView
 from vht.statusbar import StatusBar
+from vht.sequencelistview import SequenceListView
 from vht.console import Console
 
 class MainWin(Gtk.ApplicationWindow):
 	def __init__(self, app):
 		super().__init__(application = app)
-		#Gtk.ApplicationWindow.__init__(self, application = app)
+
 		self.fs = False
 		self.app = app
 		mod.mainwin = self
@@ -114,9 +115,49 @@ class MainWin(Gtk.ApplicationWindow):
 
 		self.timeline_box = Gtk.Paned()
 		self.timeline_box.set_orientation(Gtk.Orientation.VERTICAL)
-		self.timeline = Gtk.Label("Timeline")
+		
+		self.seqlist = SequenceListView()
+		mod.seqlist = self.seqlist
+		self.seq_add_butt = Gtk.Button()
+		self.seq_mode_butt = Gtk.ToggleButton()
+		self.seq_mode_butt.set_active(True)
+		self.butt_panic = Gtk.Button()
+		
+		icon = Gio.ThemedIcon(name="list-add")
+		image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+		self.seq_add_butt.add(image)
+		self.seq_add_butt.connect("clicked", self.on_seq_add_butt_clicked)
+		self.seq_add_butt.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["seq_add"]))
 
-		self.timeline_box.pack1(self.timeline, True, True)
+		icon = Gio.ThemedIcon(name="process-stop")
+		image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+		self.butt_panic.add(image)
+		self.butt_panic.connect("clicked", self.on_butt_panic_clicked)
+		self.butt_panic.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["panic"]))
+
+		icon = Gio.ThemedIcon(name="media-playlist-repeat")
+		image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+		self.seq_mode_butt.add(image)
+		#self.seq_mode_butt.connect("clicked", self.on_butt_panic_clicked)
+		#self.seq_mode_butt.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["panic"]))
+
+		buttbox = Gtk.Box()
+		buttbox.set_orientation(Gtk.Orientation.VERTICAL)
+		buttbox.pack_start(self.seq_add_butt, False, True, 0)
+		buttbox.pack_end(self.seq_mode_butt, False, True, 0)
+		buttbox.pack_end(self.butt_panic, False, True, 0)
+
+		seqpane = Gtk.Paned()
+		seqpane.set_orientation(Gtk.Orientation.HORIZONTAL)
+		
+		self.seqlist_sw = Gtk.ScrolledWindow()
+		self.seqlist_sw.add_with_viewport(self.seqlist)
+
+		seqpane.pack1(self.seqlist_sw, True, True)
+		seqpane.pack2(buttbox, False, False)
+		
+		self.timeline_box.pack1(seqpane, False, False)
+		self.timeline_box.pack2(Gtk.Label("timeliner"), True, True)
 
 		self.vbox.pack_start(self.hbox, True, True, 0)
 		self._status_bar = StatusBar()
@@ -158,6 +199,12 @@ class MainWin(Gtk.ApplicationWindow):
 
 		mod.play = False
 
+	def on_seq_add_butt_clicked(self, butt):
+		self._sequence_view.seq_add()
+		
+	def on_butt_panic_clicked(self, butt):
+		mod.panic()
+		
 	def on_bpm_changed(self, adj):
 		mod.bpm = adj.get_value()
 

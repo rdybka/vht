@@ -1013,7 +1013,7 @@ class TrackView(Gtk.DrawingArea):
 		if event.state & Gdk.ModifierType.SHIFT_MASK:
 			shift = True
 
-		row = min(int(event.y / self.txt_height), self.trk.nsrows - 1)
+		row = min(int(event.y / self.txt_height), self.trk.nrows - 1)
 		col = int(event.x / self.txt_width)
 		offs = int(event.x) % int(self.txt_width)
 
@@ -1138,14 +1138,14 @@ class TrackView(Gtk.DrawingArea):
 				if not shift and 0 < self.trk[col][row].type < 3:
 					enter_edit = False
 					self.drag = False
-	
+
 					if fldwidth < offs < fldwidth * 2 and self.trk[col][row].type == 1:
 						self.velocity_editor = VelocityEditor(self, col, row, event)
-	
+
 					if self.show_timeshift:
 						if fldwidth * 2 < offs < fldwidth * 3:
 							self.timeshift_editor = TimeshiftEditor(self, col, row, event)
-	
+
 					self.configure()
 					self.redraw()
 					self.parent.prop_view.redraw()
