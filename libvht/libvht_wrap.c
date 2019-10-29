@@ -4077,6 +4077,27 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_module_set_curr_seq(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int arg1 ;
+  int val1 ;
+  int ecode1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:module_set_curr_seq",&obj0)) SWIG_fail;
+  ecode1 = SWIG_AsVal_int(obj0, &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "module_set_curr_seq" "', argument " "1"" of type '" "int""'");
+  } 
+  arg1 = (int)(val1);
+  module_set_curr_seq(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_module_dump_notes(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int arg1 ;
@@ -7337,6 +7358,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "module_del_sequence", _wrap_module_del_sequence, METH_VARARGS, NULL},
 	 { "module_swap_sequence", _wrap_module_swap_sequence, METH_VARARGS, NULL},
 	 { "module_get_curr_seq", _wrap_module_get_curr_seq, METH_VARARGS, NULL},
+	 { "module_set_curr_seq", _wrap_module_set_curr_seq, METH_VARARGS, NULL},
 	 { "module_dump_notes", _wrap_module_dump_notes, METH_VARARGS, NULL},
 	 { "module_get_rpb", _wrap_module_get_rpb, METH_VARARGS, NULL},
 	 { "module_set_rpb", _wrap_module_set_rpb, METH_VARARGS, NULL},

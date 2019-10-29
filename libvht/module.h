@@ -31,7 +31,6 @@
 
 struct module_t {
 	int playing;
-
 	int recording;
 
 	jack_nframes_t zero_time;

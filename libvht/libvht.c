@@ -101,6 +101,10 @@ int module_get_curr_seq() {
 	return module.curr_seq;
 }
 
+void module_set_curr_seq(int s) {
+	module.curr_seq = s;
+}
+
 int module_get_ctrlpr() {
 	return module.ctrlpr;
 }

@@ -658,8 +658,12 @@ class SequenceView(Gtk.Box):
 			self.add_track(trk)
 
 	def clear(self):
-		while len(self.seq):
-			self.del_track(self.seq[0])
+		#while len(self.seq):
+		#	self.del_track(self.seq[0])
+		for wdg in self.get_tracks():
+			self.prop_view.del_track(wdg.trk)
+			TrackView.track_views.remove(wdg)
+			wdg.destroy()
 
 		self._side_box.remove(self._side_box.get_children()[0])
 
@@ -678,6 +682,13 @@ class SequenceView(Gtk.Box):
 			self.build()
 
 			return False
+
+	def switch(self, new_seq):
+		ns = mod[new_seq]
+		if self.seq != ns:
+			self.clear()
+			self.seq = ns
+			self.build()
 
 	def recalculate_row_spacing(self):
 		if not self.get_realized():

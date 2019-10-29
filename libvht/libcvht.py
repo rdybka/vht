@@ -215,6 +215,10 @@ def module_get_curr_seq():
     return _libcvht.module_get_curr_seq()
 module_get_curr_seq = _libcvht.module_get_curr_seq
 
+def module_set_curr_seq(s):
+    return _libcvht.module_set_curr_seq(s)
+module_set_curr_seq = _libcvht.module_set_curr_seq
+
 def module_dump_notes(arg1):
     return _libcvht.module_dump_notes(arg1)
 module_dump_notes = _libcvht.module_dump_notes

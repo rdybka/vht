@@ -30,14 +30,16 @@ class SequenceListView(Gtk.DrawingArea):
 			Gdk.EventMask.SCROLL_MASK |
 			Gdk.EventMask.BUTTON_PRESS_MASK |
 			Gdk.EventMask.BUTTON_RELEASE_MASK |
+			Gdk.EventMask.LEAVE_NOTIFY_MASK |
 			Gdk.EventMask.KEY_PRESS_MASK |
 			Gdk.EventMask.KEY_RELEASE_MASK)
 
 		self.connect("button-press-event", self.on_click)
-		self.connect("motion-notify-event", self.on_mouse_move)
+		self.connect("motion-notify-event", self.on_motion)
 		self.connect("draw", self.on_draw)
 		self.connect("configure-event", self.on_configure)
 		self.connect("scroll-event", self.on_scroll)
+		self.connect("leave-notify-event", self.on_leave)
 		
 		self._surface = None
 		self._context = None
@@ -64,18 +66,50 @@ class SequenceListView(Gtk.DrawingArea):
 		(y,u,i,o,self._txt_width,p) = self._context.text_extents("0")
 		self._shining_stars = [False] * len(mod)
 		self._twinkling_lines = [(0,1)] * len(mod)
-		self._highlight = None
+		self._highlight = -1
 
+		req_w = (self._txt_height * cfg.mixer_padding) * len(mod)
+		w = self.get_allocated_width()
+		if w < req_w:
+			self.set_size_request(req_w, 2)
+		else:
+			self.set_size_request(2, 2)
+			
 	def on_configure(self, wdg, event):
 		self.configure()
 		self.redraw()
 		return True
 
-	def on_mouse_move(self, widget, data):
-		pass
+	def on_motion(self, widget, event):
+		curr = event.x / (self._txt_height * cfg.mixer_padding)
+		oldh = self._highlight
 
-	def on_click(self, widget, data):
-		pass
+		if curr < len(mod):
+			self._highlight = int(curr)
+			self.redraw(self._highlight)
+		else:
+			self._highlight = -1
+
+		if oldh > -1 and oldh != self._highlight:
+			self.redraw(oldh)
+
+	def on_click(self, widget, event):
+		old = mod.curr_seq
+		
+		curr = int(event.x / (self._txt_height * cfg.mixer_padding))
+		if curr < len(mod):
+			mod.curr_seq = curr
+			self.redraw(curr)
+
+		if old > -1:
+			self.redraw(old)
+
+		if old != mod.curr_seq:
+			mod.mainwin._sequence_view.switch(mod.curr_seq)
+
+	def on_leave(self, wdg, prm):
+		self._highlight = -1
+		self.redraw()
 
 	def zoom(self, i):
 		cfg.mixer_font_size += i	
@@ -98,13 +132,12 @@ class SequenceListView(Gtk.DrawingArea):
 		w = self.get_allocated_width()
 		h = self.get_allocated_height()
 
-		cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
-		cr.rectangle(0, 0, w, h)
-		cr.fill()
-		
 		redr = []
 		if col == -1:
 			redr = list(range(len(mod)))
+			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
+			cr.rectangle(0, 0, w, h)
+			cr.fill()
 		else:
 			redr.append(col)
 			
@@ -115,7 +148,16 @@ class SequenceListView(Gtk.DrawingArea):
 			gradient = cairo.LinearGradient(0, 0, 0, h)
 			gradient.add_color_stop_rgb(0.0, *(col * cfg.intensity_background for col in cfg.mixer_colour))
 			gradient.add_color_stop_rgb(0.05, *(col *  cfg.intensity_txt for col in cfg.mixer_colour))
-			gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_background for col in cfg.mixer_colour))
+
+			if r == self._highlight:
+				gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_txt for col in cfg.mixer_colour))
+			else:
+				gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_background for col in cfg.mixer_colour))
+
+			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
+			cr.rectangle(x - self._txt_height / 3, 0, self._txt_height * 1.23, h)
+			cr.fill()
+
 			cr.save()
 			cr.set_source(gradient)
 			cr.rectangle(x - self._txt_height / 3, 0, self._txt_height * 1.23, h)
@@ -125,6 +167,9 @@ class SequenceListView(Gtk.DrawingArea):
 			cr.set_source_rgb(0, 0, 0)
 			cr.move_to(x, self._txt_height)
 			cr.show_text("*")
+
+			if r == mod.curr_seq:
+				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.mixer_colour))
 			
 			cr.move_to(x, self._txt_height)
 			cr.save()
@@ -132,14 +177,13 @@ class SequenceListView(Gtk.DrawingArea):
 			cr.show_text("seq %d" % r)
 			cr.restore()
 
-			cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.mixer_colour))
-			cr.move_to(x, h)
-			cr.show_text("=")
+			#cr.move_to(x, h)
+			#cr.show_text("=")
 			
 			cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.mixer_colour))
 			cr.set_line_width((cfg.mixer_font_size / 10.0) * cfg.seq_line_width)
 			cr.move_to(x + self._txt_height, self._txt_height / 4.0)
-			cr.line_to(x + self._txt_height, h - (self._txt_height / 4.0))
+			cr.line_to(x + self._txt_height, h)
 			cr.stroke()
 
 		self.queue_draw()

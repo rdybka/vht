@@ -58,6 +58,7 @@ extern void module_add_sequence(sequence *seq);
 extern void module_del_sequence(int s);
 extern void module_swap_sequence(int s1, int s2);
 extern int module_get_curr_seq(void);
+extern void module_set_curr_seq(int s);
 extern void module_dump_notes(int);
 extern int module_get_rpb(void);
 extern void module_set_rpb(int rpb);

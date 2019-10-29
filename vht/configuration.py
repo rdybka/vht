@@ -39,7 +39,7 @@ class Configuration():
 		self.console_position = .7
 		self.console_show = False
 		self.timeline_show = True
-		self.console_steal_stderr = False
+		self.console_steal_stderr = True
 
 		self.mixer_colour = (0, .7, .7)
 		self.colour = (0, .7, .7)
