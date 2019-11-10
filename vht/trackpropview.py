@@ -45,6 +45,7 @@ class TrackPropView(Gtk.DrawingArea):
 		self.connect("enter-notify-event", self.on_enter)
 		self.connect("draw", self.on_draw)
 		self.connect("configure-event", self.on_configure)
+		self.connect("destroy", self.on_destroy)
 
 		self.add_tick_callback(self.tick)
 
@@ -71,7 +72,6 @@ class TrackPropView(Gtk.DrawingArea):
 
 		self.popover.set_position(Gtk.PositionType.BOTTOM)
 		self.popped = False
-
 
 	def configure(self):
 		win = self.get_window()
@@ -100,6 +100,12 @@ class TrackPropView(Gtk.DrawingArea):
 	def on_configure(self, wdg, event):
 		self.redraw()
 		return True
+
+	def on_destroy(self, wdg):
+		if self._surface:
+			self._surface.finish()
+
+		self.popover.destroy()
 
 	def add_track(self):
 		port = 0

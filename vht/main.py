@@ -215,15 +215,11 @@ def run():
 
 	autoexec.run()
 
-	#print("data:", mod.data_path)
-	#print("cfg:", mod.cfg_path)
-
 	# fix controller configs
 	mod.ctrls = ctrlcfg.load()
 	# fix patches
 	mod.bank = bankcfg.load()
 
-	#print(mod.to_xml())
 	try:
 		app = VHTApp()
 		app.run(sys.argv)

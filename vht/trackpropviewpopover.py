@@ -106,7 +106,7 @@ class TrackPropViewPopover(Gtk.Popover):
 			self.extend_grid.set_hexpand(True)
 			self.extend_grid.set_vexpand(True)
 
-			self.grid.attach(self.extend_grid,4,0,5,6)
+			self.grid.attach(self.extend_grid, 4, 0, 5, 6)
 
 			grid = Gtk.Grid()
 			grid.set_column_homogeneous(True)

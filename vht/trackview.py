@@ -469,7 +469,8 @@ class TrackView(Gtk.DrawingArea):
 		# who's calling?
 		#cf = inspect.currentframe()
 		#of = inspect.getouterframes(cf, 2)
-		#print("redraw full", of[1][3], of[1][2], of[1][1])
+		#for f in of:
+		#	print("redraw full", f[3], f[2], f[1])
 		self.queue_draw()
 
 	def redraw(self, from_row = -666, to_row = -666):

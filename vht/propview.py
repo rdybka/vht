@@ -43,19 +43,31 @@ class PropView(Gtk.ScrolledWindow):
 		self.add_with_viewport(self._track_box)
 		self._track_box.show_all()
 
+		self.trk_prop_cache = {}
+
 	def del_track(self, trk):
 		track_pv = self._track_box.get_children()[trk.index]
 		track_pv.popover.popdown()
-		track_pv.popover.destroy()
-		track_pv.destroy()
+		self._track_box.remove(track_pv)
 
 	def on_leave(self, wdg, prm):
 		pass
 
 	def add_track(self, trk, trkview):
-		t = TrackPropView(trk, trkview, self.seq, self.seqview, self)
-		self._track_box.pack_start(t, False, True, 0)
-		t.show()
+		if not trk:
+			t = TrackPropView(trk, trkview, self.seq, self.seqview, self)
+			self._track_box.pack_start(t, False, True, 0)
+			t.show()
+		else:
+			t = None
+			if int(trk) in self.trk_prop_cache:
+				t = self.trk_prop_cache[int(trk)]
+			else:
+				t = TrackPropView(trk, trkview, self.seq, self.seqview, self)
+				t.show()
+
+			self.trk_prop_cache[int(trk)] = t
+			self._track_box.pack_start(t, False, True, 0)
 
 	def reindex_tracks(self):
 		i = 0

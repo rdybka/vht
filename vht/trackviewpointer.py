@@ -43,7 +43,7 @@ class TrackviewPointer():
 
 	def draw(self, pos):
 		self.pulse.freq = mod.rpb
-		if not mod.play and pos == 0:
+		if mod[mod.curr_seq].pos == 0:
 			if self.stopped:
 				return
 

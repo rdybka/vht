@@ -19,10 +19,10 @@ from collections.abc import Iterable
 from libvht.vhttrack import VHTTrack
 
 class VHTSequence(Iterable):
-	def __init__(self, vht, seq):
+	def __init__(self, vht, seq, idx):
 		self._vht_handle = vht
 		self._seq_handle = seq;
-		self.index = 0 # some work to do
+		self.index = idx
 		super()
 
 	def __len__(self):

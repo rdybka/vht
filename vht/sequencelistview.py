@@ -30,9 +30,7 @@ class SequenceListView(Gtk.DrawingArea):
 			Gdk.EventMask.SCROLL_MASK |
 			Gdk.EventMask.BUTTON_PRESS_MASK |
 			Gdk.EventMask.BUTTON_RELEASE_MASK |
-			Gdk.EventMask.LEAVE_NOTIFY_MASK |
-			Gdk.EventMask.KEY_PRESS_MASK |
-			Gdk.EventMask.KEY_RELEASE_MASK)
+			Gdk.EventMask.LEAVE_NOTIFY_MASK)
 
 		self.connect("button-press-event", self.on_click)
 		self.connect("motion-notify-event", self.on_motion)

@@ -1,4 +1,11 @@
--------------------------------------------------------------
+- seq switching
+	- autoscroll
+- loading issues
+	- ctrl-only tracks
+	- ctrl-names and prolly other stuff in extras
+	- loading in edit mode
+------------
+- popups
 - timeline
 - seqlist
 	- clone

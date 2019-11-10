@@ -58,14 +58,7 @@ class SequenceView(Gtk.Box):
 
 		self.def_new_track_width = 0
 
-		self.highlight = cfg.highlight
-		if self.seq.index in mod.extras:
-			if "highlight" in mod.extras[self.seq.index][-1]:
-				self.highlight = mod.extras[self.seq.index][-1]["highlight"]
-		else:
-			mod.extras[self.seq.index] = {}
-			mod.extras[self.seq.index][-1] = {}
-			mod.extras[self.seq.index][-1]["highlight"] = self.highlight
+		self.fix_highlight_extras()
 
 		self._track_box = Gtk.Box()
 		self._track_box.set_spacing(0)
@@ -125,10 +118,21 @@ class SequenceView(Gtk.Box):
 
 		self.autoscroll_req = False
 		self.last_autoscroll_r = -1
-
+		self.trk_cache = {}
+		self.active_tracks = {}
 		self.build()
 
 		self.show_all()
+
+	def fix_highlight_extras(self):
+		self.highlight = cfg.highlight
+		if self.seq.index in mod.extras:
+			if "highlight" in mod.extras[self.seq.index][-1]:
+				self.highlight = mod.extras[self.seq.index][-1]["highlight"]
+		else:
+			mod.extras[self.seq.index] = {}
+			mod.extras[self.seq.index][-1] = {}
+			mod.extras[self.seq.index][-1]["highlight"] = self.highlight
 
 	def on_button_press(self, widget, event):
 		if event.button == cfg.delete_button:
@@ -231,6 +235,26 @@ class SequenceView(Gtk.Box):
 
 		if cfg.key["seq_add"].matches(event):
 			self.seq_add()
+			return True
+
+		if cfg.key["sequence_next"].matches(event):
+			if len(mod) > self.seq.index + 1:
+				self.switch(self.seq.index + 1)
+			else:
+				self.switch(0)
+			
+			mod.curr_seq = self.seq.index
+			mod.seqlist.redraw()				
+			return True
+
+		if cfg.key["sequence_prev"].matches(event):
+			if self.seq.index > 0:
+				self.switch(self.seq.index - 1)
+			else:
+				self.switch(len(mod) - 1)
+				
+			mod.curr_seq = self.seq.index
+			mod.seqlist.redraw()
 			return True
 
 		if cfg.key["sequence_double"].matches(event):
@@ -501,27 +525,36 @@ class SequenceView(Gtk.Box):
 		self._sv.grab_focus()
 
 	def seq_add(self):
-		mod.add_sequence()
+		s = mod.add_sequence()
+		s.length = self.seq.length
+		s.add_track(length = s.length)
 		mod.seqlist.configure()
 		mod.seqlist.redraw()
 	
-	def add_track(self, trk):
-		t = TrackView(self.seq, trk, self)
-
+	def add_track(self, trk, quick = False):
+		t = None
 		if trk:
+			if int(trk) in self.trk_cache:
+				t = self.trk_cache[int(trk)]
+				TrackView.track_views.append(t)
+			else:
+				t = TrackView(self.seq, trk, self)
+				t.undo_buff.reset()
+				t.undo_buff.add_state(True)
+
+			self.trk_cache[int(trk)] = t
 			self._track_box.pack_start(t, False, True, 0)
-			t.undo_buff.reset()
-			t.undo_buff.add_state(True)
-		else:
-			self._side_box.pack_start(t, False, True, 0)
 
-		if trk:
 			self.prop_view.add_track(trk, t)
 
 			if cfg.new_tracks_left and mod.record != 2:
 				self.prop_view.move_first(trk)
+		else:
+			t = TrackView(self.seq, None, self)
+			self._side_box.pack_start(t, False, True, 0)
 
-		self.recalculate_row_spacing()
+		if not quick:
+			self.recalculate_row_spacing()
 
 		t.show()
 		return t
@@ -647,7 +680,12 @@ class SequenceView(Gtk.Box):
 
 		self.queue_draw()
 
-	def build(self):
+	def build(self, quick = False):
+		self.fix_highlight_extras()
+
+		if quick:
+			self.get_window().freeze_updates()
+
 		self.highlight = mod.extras[self.seq.index][-1]["highlight"]
 		self.prop_view.seq = self.seq
 		self._side_prop.seq = self.seq
@@ -655,40 +693,56 @@ class SequenceView(Gtk.Box):
 
 		self.add_track(None)
 		for trk in self.seq:
-			self.add_track(trk)
+			self.add_track(trk, quick)
+
+		if quick:
+			self.get_window().thaw_updates()
 
 	def clear(self):
-		#while len(self.seq):
-		#	self.del_track(self.seq[0])
-		for wdg in self.get_tracks():
+		for wdg in reversed(self.get_tracks()):
 			self.prop_view.del_track(wdg.trk)
 			TrackView.track_views.remove(wdg)
-			wdg.destroy()
+			self._track_box.remove(wdg)
 
 		self._side_box.remove(self._side_box.get_children()[0])
 
 	def load(self, filename):
 		self.clear()
+		for i in self.trk_cache:
+			self.trk_cache[i].destroy()
+
+		for i in self.prop_view.trk_prop_cache:
+			self.prop_view.trk_prop_cache[i].destroy()
+
+		self.trk_cache.clear()
+		self.prop_view.trk_prop_cache.clear()
+		self.active_tracks.clear()
 
 		if mod.load(filename):
 			self.seq = mod[0]
 			self.build()
 			return True
 		else:
-			print("...")
 			mod.new()
 			randomcomposer.muzakize()
 			self.seq = mod[0]
 			self.build()
-
 			return False
 
 	def switch(self, new_seq):
+		if mod.active_track:
+			if mod.active_track.edit:
+				self.active_tracks[self.seq.index] = mod.active_track
+
+		mod.active_track = None
 		ns = mod[new_seq]
 		if self.seq != ns:
 			self.clear()
 			self.seq = ns
-			self.build()
+			self.build(quick = True)
+
+		if self.seq.index in self.active_tracks:
+			mod.active_track = self.active_tracks[self.seq.index]
 
 	def recalculate_row_spacing(self):
 		if not self.get_realized():

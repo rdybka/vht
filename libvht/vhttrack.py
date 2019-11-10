@@ -34,6 +34,9 @@ class VHTTrack(Iterable):
 		for itm in range(self.__len__()):
 			yield VHTColumn(self._vht_handle, self._trk_handle, itm)
 
+	def __int__(self):
+		return int(self._trk_handle)
+
 	def clear(self):
 		for col in self:
 			col.clear()

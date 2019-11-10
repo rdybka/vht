@@ -137,7 +137,6 @@ class Configuration():
 			"seq_play_mode" : cfgkey("", False, False, False),
 			"panic" : cfgkey("p", False, True, True),
 
-			# trackview
 			"note_off": cfgkey("backslash", False, False, False),
 			"track_add": cfgkey("t", False, True, False),
 			"track_del": cfgkey("d", False, True, False),
@@ -149,6 +148,8 @@ class Configuration():
 			"track_move_first": cfgkey("Home", False, True, False),
 			"track_clear": cfgkey("d", True, False, False),
 			"track_clone": cfgkey("n", True, True, False),
+			"sequence_next" : cfgkey("period", False, True, False),
+			"sequence_prev" : cfgkey("comma", False, True, False),
 			"sequence_double" : cfgkey("y", False, True, False),
 			"sequence_halve" : cfgkey("u", False, True, False),
 			"select_all": cfgkey("a", False, True, False),
