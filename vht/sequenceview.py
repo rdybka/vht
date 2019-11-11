@@ -707,6 +707,7 @@ class SequenceView(Gtk.Box):
 		self._side_box.remove(self._side_box.get_children()[0])
 
 	def load(self, filename):
+		TrackView.leave_all()
 		self.clear()
 		for i in self.trk_cache:
 			self.trk_cache[i].destroy()
@@ -721,12 +722,14 @@ class SequenceView(Gtk.Box):
 		if mod.load(filename):
 			self.seq = mod[0]
 			self.build()
+			mod.seqlist.redraw()
 			return True
 		else:
 			mod.new()
 			randomcomposer.muzakize()
 			self.seq = mod[0]
 			self.build()
+			mod.seqlist.redraw()
 			return False
 
 	def switch(self, new_seq):
@@ -743,6 +746,8 @@ class SequenceView(Gtk.Box):
 
 		if self.seq.index in self.active_tracks:
 			mod.active_track = self.active_tracks[self.seq.index]
+
+		self.autoscroll_req = True
 
 	def recalculate_row_spacing(self):
 		if not self.get_realized():

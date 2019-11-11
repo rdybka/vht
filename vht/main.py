@@ -16,6 +16,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# “The only Zen you’ll find on mountain tops
+# is the Zen you bring up there with you.” – Alan Watts
+
 import sys, os
 import gi
 import pkg_resources

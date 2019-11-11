@@ -175,12 +175,12 @@ class TrackPropViewPopover(Gtk.Popover):
 				mod.extras[parent.seq.index][self.trk.index]["track_name"] = ""
 
 			self.name_entry.set_text(mod.extras[parent.seq.index][self.trk.index]["track_name"])
-
+			
 			if "track_show_notes" in mod.extras[self.parent.seq.index][self.trk.index]:
-				self.show_notes_button.set_active(mod.extras[self.parent.seq.index][self.trk.index]["track_show_notes"])
 				self.show_timeshift_button.set_active(mod.extras[self.parent.seq.index][self.trk.index]["track_show_timeshift"])
 				self.show_pitchwheel_button.set_active(mod.extras[self.parent.seq.index][self.trk.index]["track_show_pitchwheel"])
 				self.show_controllers_button.set_active(mod.extras[self.parent.seq.index][self.trk.index]["track_show_controllers"])
+				self.show_notes_button.set_active(mod.extras[self.parent.seq.index][self.trk.index]["track_show_notes"])
 			else:
 				mod.extras[self.parent.seq.index][self.trk.index]["track_show_notes"] = True
 				mod.extras[self.parent.seq.index][self.trk.index]["track_show_timeshift"] = False
