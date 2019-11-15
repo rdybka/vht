@@ -15,19 +15,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-class Pulsar():
-	def __init__(self, freq):
-		self._freq = freq
 
-	@property
-	def freq(self):
-		return self._freq
+class Pulsar:
+    def __init__(self, freq):
+        self._freq = freq
 
-	@freq.setter
-	def freq(self, f):
-		self._freq = f
+    @property
+    def freq(self):
+        return self._freq
 
-	def intensity(self, pos):
-		r = .8 - ((pos % self._freq) / self._freq)
-		return max(r, 0.0)
+    @freq.setter
+    def freq(self, f):
+        self._freq = f
 
+    def intensity(self, pos):
+        r = 0.8 - ((pos % self._freq) / self._freq)
+        return max(r, 0.0)

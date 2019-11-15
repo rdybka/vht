@@ -16,180 +16,229 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import math
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gdk, Gtk
-import cairo
 from vht import cfg, mod
+import cairo
+import gi
+
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gdk, Gtk
+
 
 class SequenceListView(Gtk.DrawingArea):
-	def __init__(self):
-		super(SequenceListView, self).__init__()
+    def __init__(self):
+        super(SequenceListView, self).__init__()
 
-		self.set_events(Gdk.EventMask.POINTER_MOTION_MASK |
-			Gdk.EventMask.SCROLL_MASK |
-			Gdk.EventMask.BUTTON_PRESS_MASK |
-			Gdk.EventMask.BUTTON_RELEASE_MASK |
-			Gdk.EventMask.LEAVE_NOTIFY_MASK)
+        self.set_events(
+            Gdk.EventMask.POINTER_MOTION_MASK
+            | Gdk.EventMask.SCROLL_MASK
+            | Gdk.EventMask.BUTTON_PRESS_MASK
+            | Gdk.EventMask.BUTTON_RELEASE_MASK
+            | Gdk.EventMask.LEAVE_NOTIFY_MASK
+        )
 
-		self.connect("button-press-event", self.on_click)
-		self.connect("motion-notify-event", self.on_motion)
-		self.connect("draw", self.on_draw)
-		self.connect("configure-event", self.on_configure)
-		self.connect("scroll-event", self.on_scroll)
-		self.connect("leave-notify-event", self.on_leave)
-		
-		self._surface = None
-		self._context = None
+        self.connect("button-press-event", self.on_button_press)
+        self.connect("button-release-event", self.on_button_release)
+        self.connect("motion-notify-event", self.on_motion)
+        self.connect("draw", self.on_draw)
+        self.connect("configure-event", self.on_configure)
+        self.connect("scroll-event", self.on_scroll)
+        self.connect("leave-notify-event", self.on_leave)
 
-	def configure(self):
-		win = self.get_window()
-		if not win:
-			return
+        self._surface = None
+        self._context = None
 
-		if self._surface:
-			self._surface.finish()
+        self._drag = False
+        self._move_handle = -1
 
-		self._surface = self.get_window().create_similar_surface(cairo.CONTENT_COLOR,
-			self.get_allocated_width(),
-			self.get_allocated_height())
+    def configure(self):
+        win = self.get_window()
+        if not win:
+            return
 
-		self._context = cairo.Context(self._surface)
-		self._context.set_antialias(cairo.ANTIALIAS_DEFAULT)
-		self._context.set_line_width((cfg.mixer_font_size / 6.0) * cfg.seq_line_width)
-		self._context.select_font_face(cfg.mixer_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-		self._context.set_font_size(cfg.mixer_font_size)
-		
-		(q,w,e,self._txt_height,r,t) = self._context.text_extents("|")
-		(y,u,i,o,self._txt_width,p) = self._context.text_extents("0")
-		self._shining_stars = [False] * len(mod)
-		self._twinkling_lines = [(0,1)] * len(mod)
-		self._highlight = -1
+        if self._surface:
+            self._surface.finish()
 
-		req_w = (self._txt_height * cfg.mixer_padding) * len(mod)
-		w = self.get_allocated_width()
-		if w < req_w:
-			self.set_size_request(req_w, 2)
-		else:
-			self.set_size_request(2, 2)
-			
-	def on_configure(self, wdg, event):
-		self.configure()
-		self.redraw()
-		return True
+        self._surface = self.get_window().create_similar_surface(
+            cairo.CONTENT_COLOR, self.get_allocated_width(), self.get_allocated_height()
+        )
 
-	def on_motion(self, widget, event):
-		curr = event.x / (self._txt_height * cfg.mixer_padding)
-		oldh = self._highlight
+        self._context = cairo.Context(self._surface)
+        self._context.set_antialias(cairo.ANTIALIAS_DEFAULT)
+        self._context.set_line_width((cfg.mixer_font_size / 6.0) * cfg.seq_line_width)
+        self._context.select_font_face(
+            cfg.mixer_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD
+        )
+        self._context.set_font_size(cfg.mixer_font_size)
 
-		if curr < len(mod):
-			self._highlight = int(curr)
-			self.redraw(self._highlight)
-		else:
-			self._highlight = -1
+        (q, w, e, self._txt_height, r, t) = self._context.text_extents("|")
+        (y, u, i, o, self._txt_width, p) = self._context.text_extents("0")
+        self._shining_stars = [False] * len(mod)
+        self._twinkling_lines = [(0, 1)] * len(mod)
+        self._highlight = -1
 
-		if oldh > -1 and oldh != self._highlight:
-			self.redraw(oldh)
+        req_w = (self._txt_height * cfg.mixer_padding) * len(mod)
+        w = self.get_allocated_width()
 
-	def on_click(self, widget, event):
-		old = mod.curr_seq
-		
-		curr = int(event.x / (self._txt_height * cfg.mixer_padding))
-		if curr < len(mod):
-			mod.curr_seq = curr
-			self.redraw(curr)
+        self.set_size_request(req_w, 2)
 
-		if old > -1:
-			self.redraw(old)
+    def on_configure(self, wdg, event):
+        self.configure()
+        self.redraw()
+        return True
 
-		if old != mod.curr_seq:
-			mod.mainwin._sequence_view.switch(mod.curr_seq)
+    def on_motion(self, widget, event):
+        curr = event.x / (self._txt_height * cfg.mixer_padding)
+        oldh = self._highlight
 
-	def on_leave(self, wdg, prm):
-		self._highlight = -1
-		self.redraw()
+        if curr < len(mod):
+            if event.y > self.get_allocated_height() - self._txt_height * 2:
+                self._move_handle = int(curr)
+            else:
+                self._move_handle = -1
 
-	def zoom(self, i):
-		cfg.mixer_font_size += i	
-		cfg.mixer_font_size = min(max(1, cfg.mixer_font_size), 230)		
-		self.configure()
-		self.redraw()
+            self._highlight = int(curr)
+            self.redraw(self._highlight)
+        else:
+            self._highlight = -1
+            self._move_handle = -1
 
-	def on_scroll(self, widget, event):
-		if event.state & Gdk.ModifierType.CONTROL_MASK:
-			if event.direction == Gdk.ScrollDirection.UP:
-				self.zoom(1)
-			if event.direction == Gdk.ScrollDirection.DOWN:
-				self.zoom(-1)
-			return True
-		return False
+        if oldh > -1 and oldh != self._highlight:
+            self.redraw(oldh)
 
-	def redraw(self, col = -1):
-		cr = self._context
+    def on_button_press(self, widget, event):
+        if event.button != cfg.select_button:
+            return False
 
-		w = self.get_allocated_width()
-		h = self.get_allocated_height()
+        old = mod.curr_seq
 
-		redr = []
-		if col == -1:
-			redr = list(range(len(mod)))
-			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
-			cr.rectangle(0, 0, w, h)
-			cr.fill()
-		else:
-			redr.append(col)
-			
-		for r in redr:
-			x = (self._txt_height * cfg.mixer_padding) * r
-			x += ((self._txt_height * cfg.mixer_padding) - self._txt_height) / 2.0
-			
-			gradient = cairo.LinearGradient(0, 0, 0, h)
-			gradient.add_color_stop_rgb(0.0, *(col * cfg.intensity_background for col in cfg.mixer_colour))
-			gradient.add_color_stop_rgb(0.05, *(col *  cfg.intensity_txt for col in cfg.mixer_colour))
+        curr = int(event.x / (self._txt_height * cfg.mixer_padding))
+        if curr < len(mod):
+            mod.curr_seq = curr
+            self.redraw(curr)
 
-			if r == self._highlight:
-				gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_txt for col in cfg.mixer_colour))
-			else:
-				gradient.add_color_stop_rgb(1.0, *(col * cfg.intensity_background for col in cfg.mixer_colour))
+        if old > -1:
+            self.redraw(old)
 
-			cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
-			cr.rectangle(x - self._txt_height / 3, 0, self._txt_height * 1.23, h)
-			cr.fill()
+        if old != mod.curr_seq:
+            mod.mainwin._sequence_view.switch(mod.curr_seq)
 
-			cr.save()
-			cr.set_source(gradient)
-			cr.rectangle(x - self._txt_height / 3, 0, self._txt_height * 1.23, h)
-			cr.fill()
-			cr.restore()
-			
-			cr.set_source_rgb(0, 0, 0)
-			cr.move_to(x, self._txt_height)
-			cr.show_text("*")
+        self._drag = True
+        return True
 
-			if r == mod.curr_seq:
-				cr.set_source_rgb(*(col * cfg.intensity_txt_highlight for col in cfg.mixer_colour))
-			
-			cr.move_to(x, self._txt_height)
-			cr.save()
-			cr.rotate(math.pi / 2.0)
-			cr.show_text("seq %d" % r)
-			cr.restore()
+    def on_button_release(self, widget, event):
+        if event.button != cfg.select_button:
+            return False
 
-			#cr.move_to(x, h)
-			#cr.show_text("=")
-			
-			cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.mixer_colour))
-			cr.set_line_width((cfg.mixer_font_size / 10.0) * cfg.seq_line_width)
-			cr.move_to(x + self._txt_height, self._txt_height / 4.0)
-			cr.line_to(x + self._txt_height, h)
-			cr.stroke()
+        self._drag = False
 
-		self.queue_draw()
+        return True
 
-	def on_draw(self, widget, cr):
-		cr.set_source_surface(self._surface, 0, 0)
-		cr.paint()
-		return False
+    def on_leave(self, wdg, prm):
+        self._highlight = -1
+        self.redraw()
 
-	def tick(self):
-		return True
+    def zoom(self, i):
+        cfg.mixer_font_size += i
+        cfg.mixer_font_size = min(max(1, cfg.mixer_font_size), 230)
+        self.configure()
+        self.redraw()
+
+    def on_scroll(self, widget, event):
+        if event.state & Gdk.ModifierType.CONTROL_MASK:
+            if event.direction == Gdk.ScrollDirection.UP:
+                self.zoom(1)
+            if event.direction == Gdk.ScrollDirection.DOWN:
+                self.zoom(-1)
+            return True
+        return False
+
+    def redraw(self, col=-1):
+        cr = self._context
+
+        w = self.get_allocated_width()
+        h = self.get_allocated_height()
+
+        redr = []
+        if col == -1:
+            redr = list(range(len(mod)))
+            cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
+            cr.rectangle(0, 0, w, h)
+            cr.fill()
+        else:
+            redr.append(col)
+
+        for r in redr:
+            x = (self._txt_height * cfg.mixer_padding) * r
+            x += ((self._txt_height * cfg.mixer_padding) - self._txt_height) / 2.0
+
+            gradient = cairo.LinearGradient(0, 0, 0, h)
+            gradient.add_color_stop_rgb(
+                0.0, *(col * cfg.intensity_background for col in cfg.mixer_colour)
+            )
+            gradient.add_color_stop_rgb(
+                0.05, *(col * cfg.intensity_txt for col in cfg.mixer_colour)
+            )
+
+            if r == self._highlight:
+                gradient.add_color_stop_rgb(
+                    1.0, *(col * cfg.intensity_txt for col in cfg.mixer_colour)
+                )
+            else:
+                gradient.add_color_stop_rgb(
+                    1.0, *(col * cfg.intensity_background for col in cfg.mixer_colour)
+                )
+
+            cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
+            cr.rectangle(x - self._txt_height / 3, 0, self._txt_height * 1.23, h)
+            cr.fill()
+
+            cr.save()
+            cr.set_source(gradient)
+            cr.rectangle(x - self._txt_height / 3, 0, self._txt_height * 1.23, h)
+            cr.fill()
+            cr.restore()
+
+            cr.set_source_rgb(0, 0, 0)
+            cr.move_to(x, self._txt_height)
+            cr.show_text("*")
+
+            if r == mod.curr_seq:
+                cr.set_source_rgb(
+                    *(col * cfg.intensity_txt_highlight for col in cfg.mixer_colour)
+                )
+
+            cr.save()
+            cr.rectangle(0, 0, w, h - self._txt_height * 2)
+            cr.clip()
+            cr.move_to(x, self._txt_height)
+            cr.rotate(math.pi / 2.0)
+            cr.show_text("sequence %d" % r)
+            cr.restore()
+
+            if r == self._move_handle and r == self._highlight:
+                cr.set_source_rgb(
+                    *(col * cfg.intensity_txt_highlight for col in cfg.colour)
+                )
+            else:
+                cr.set_source_rgb(
+                    *(col * cfg.intensity_background for col in cfg.colour)
+                )
+
+            cr.move_to(x, h - self._txt_height)
+            cr.show_text("=")
+
+            cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.mixer_colour))
+            cr.set_line_width((cfg.mixer_font_size / 10.0) * cfg.seq_line_width)
+            cr.move_to(x + self._txt_height, self._txt_height / 4.0)
+            cr.line_to(x + self._txt_height, h)
+            cr.stroke()
+
+        self.queue_draw()
+
+    def on_draw(self, widget, cr):
+        cr.set_source_surface(self._surface, 0, 0)
+        cr.paint()
+        return False
+
+    def tick(self):
+        return True

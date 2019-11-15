@@ -15,26 +15,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk
-
 from vht import cfg, mod
+from gi.repository import Gtk, Gdk
+import gi
+
+gi.require_version("Gtk", "3.0")
+
 
 class NotebookLabel(Gtk.EventBox):
-	def __init__(self, name, nb, pos):
-		super(NotebookLabel, self).__init__()
+    def __init__(self, name, nb, pos):
+        super(NotebookLabel, self).__init__()
 
-		self.pos = pos
-		self.nb = nb
+        self.pos = pos
+        self.nb = nb
 
-		self.add_events(Gdk.EventMask.POINTER_MOTION_MASK)
+        self.add_events(Gdk.EventMask.POINTER_MOTION_MASK)
 
-		self.add(Gtk.Label(name))
-		if cfg.notebook_mouseover:
-			self.connect("motion-notify-event", self.motion)
-		self.show_all()
+        self.add(Gtk.Label(name))
+        if cfg.notebook_mouseover:
+            self.connect("motion-notify-event", self.motion)
+        self.show_all()
 
-	def motion(self, wdg, evt):
-		self.nb.set_current_page(self.pos)
-
+    def motion(self, wdg, evt):
+        self.nb.set_current_page(self.pos)

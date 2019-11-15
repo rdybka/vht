@@ -15,13 +15,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, os, glob
+import sys
+import os
+import glob
 from vht import mod, cfg
 
-def run():
-	aename = mod.cfg_path + os.sep + "autoexec"
-	if not os.path.exists(aename):
-		with open(aename, "w") as ph:
-			ph.write("#let yourself go")
 
-	exec(open(aename).read())
+def run():
+    aename = mod.cfg_path + os.sep + "autoexec"
+    if not os.path.exists(aename):
+        with open(aename, "w") as ph:
+            ph.write("#let yourself go")
+
+    exec(open(aename).read())

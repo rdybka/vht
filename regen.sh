@@ -20,4 +20,5 @@ rm vht.prof vht.calltree
 cd libvht
 ./beautify.sh
 cd ..
+black vht/*.py libvht/*.py
 swig -python libvht/libvht.h

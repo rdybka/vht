@@ -17,41 +17,46 @@
 
 from collections.abc import MutableSequence
 
+
 class VHTTimelineChanges(MutableSequence):
-	def __init__(self, vht, tl):
-		self._vht_handle = vht
-		self._tl_handle = tl
-		super()
+    def __init__(self, vht, tl):
+        self._vht_handle = vht
+        self._tl_handle = tl
+        super()
 
-	def __len__(self):
-		return self._vht_handle.timeline_get_nchanges(self._tl_handle)
+    def __len__(self):
+        return self._vht_handle.timeline_get_nchanges(self._tl_handle)
 
-	def __iter__(self):
-		for itm in range(self.__len__()):
-			yield eval(self._vht_handle.timeline_get_change(self._tl_handle, itm))
+    def __iter__(self):
+        for itm in range(self.__len__()):
+            yield eval(self._vht_handle.timeline_get_change(self._tl_handle, itm))
 
-	def __getitem__(self, itm):
-		if itm >= self.__len__():
-			raise IndexError()
+    def __getitem__(self, itm):
+        if itm >= self.__len__():
+            raise IndexError()
 
-		if itm < 0:
-			raise IndexError()
+        if itm < 0:
+            raise IndexError()
 
-		return eval(self._vht_handle.timeline_get_change(self._tl_handle, itm))
+        return eval(self._vht_handle.timeline_get_change(self._tl_handle, itm))
 
-	def __delitem__(self, itm):
-		self._vht_handle.timeline_change_del(self._tl_handle, itm)
+    def __delitem__(self, itm):
+        self._vht_handle.timeline_change_del(self._tl_handle, itm)
 
-	def __setitem__(self, itm, val):
-		self._vht_handle.timeline_change_set(self._tl_handle, val[0], val[1], val[2], val[3])
+    def __setitem__(self, itm, val):
+        self._vht_handle.timeline_change_set(
+            self._tl_handle, val[0], val[1], val[2], val[3]
+        )
 
-	def insert(self, itm, val):
-		self._vht_handle.timeline_change_set(self._tl_handle, val[0], val[1], val[2], val[3])
+    def insert(self, itm, val):
+        self._vht_handle.timeline_change_set(
+            self._tl_handle, val[0], val[1], val[2], val[3]
+        )
 
-	def __str__(self):
-		ret = ""
-		for r in range(self.__len__()):
-			ret = ret + str(self[r])
-			ret = ret + "\n"
+    def __str__(self):
+        ret = ""
+        for r in range(self.__len__()):
+            ret = ret + str(self[r])
+            ret = ret + "\n"
 
-		return ret
+        return ret

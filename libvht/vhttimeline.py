@@ -18,17 +18,18 @@
 from libvht.vhttimelinechanges import VHTTimelineChanges
 from libvht.vhttimelineticks import VHTTimelineTicks
 
-class VHTTimeline():
-	def __init__(self, vht):
-		self._vht_handle = vht
-		self._tl_handle = self._vht_handle.module_get_timeline()
-		self.changes = VHTTimelineChanges(self._vht_handle, self._tl_handle)
-		self.ticks = VHTTimelineTicks(self._vht_handle, self._tl_handle)
 
-	def __str__(self):
-		return "dupa"
-		#ret = ""
-		#for r in range(self.__len__()):
-		#	ret = ret + str(self[r])
-		#	ret = ret + "\n"
-		#return ret
+class VHTTimeline:
+    def __init__(self, vht):
+        self._vht_handle = vht
+        self._tl_handle = self._vht_handle.module_get_timeline()
+        self.changes = VHTTimelineChanges(self._vht_handle, self._tl_handle)
+        self.ticks = VHTTimelineTicks(self._vht_handle, self._tl_handle)
+
+    def __str__(self):
+        return "dupa"
+        # ret = ""
+        # for r in range(self.__len__()):
+        # 	ret = ret + str(self[r])
+        # 	ret = ret + "\n"
+        # return ret

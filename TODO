@@ -1,4 +1,6 @@
 - seqlist
+	- move
+	- popups
 	- clone
 	- split
 	- merge
@@ -7,19 +9,20 @@
 	- triggers
 		- don't record
 		- mute
-	- popups
+- autoscroll and moving
 - timeline
-
 - tracks:
 	- let ring?
 	- triggers?
+- panic
 - console
 	- click in statusbar
 - autoscroll and console open/close (magic row 27)
-- configuration
 - magic transposing
 - export:
 	- midi
 	- audio
 		- freewheeling
+- configuration
+- new window
 - new

@@ -17,25 +17,25 @@
 
 from collections.abc import Iterable
 
+
 class VHTTimelineTicks(Iterable):
-	def __init__(self, vht, tl):
-		self._vht_handle = vht
-		self._tl_handle = tl
-		super()
+    def __init__(self, vht, tl):
+        self._vht_handle = vht
+        self._tl_handle = tl
+        super()
 
-	def __len__(self):
-		return self._vht_handle.timeline_get_nticks(self._tl_handle)
+    def __len__(self):
+        return self._vht_handle.timeline_get_nticks(self._tl_handle)
 
-	def __iter__(self):
-		for itm in range(self.__len__()):
-			yield round(self._vht_handle.timeline_get_tick(self._tl_handle, itm), 4)
+    def __iter__(self):
+        for itm in range(self.__len__()):
+            yield round(self._vht_handle.timeline_get_tick(self._tl_handle, itm), 4)
 
-	def __getitem__(self, itm):
-		if itm >= self.__len__():
-			raise IndexError(itm, "always look on...")
+    def __getitem__(self, itm):
+        if itm >= self.__len__():
+            raise IndexError(itm, "always look on...")
 
-		if itm < 0:
-			raise IndexError(itm, "...the bright side of life")
+        if itm < 0:
+            raise IndexError(itm, "...the bright side of life")
 
-		return round(self._vht_handle.timeline_get_tick(self._tl_handle, itm), 4)
-
+        return round(self._vht_handle.timeline_get_tick(self._tl_handle, itm), 4)

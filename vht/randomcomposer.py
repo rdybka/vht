@@ -17,15 +17,17 @@
 
 from vht import mod, cfg
 
-def track_fill(trk, note = "c3", skip = 2, velocity = 100):
-	for r in range(len(trk[0])):
-		if r % skip == 0:
-			trk[0][r] = note
-			trk[0][r].velocity = velocity
+
+def track_fill(trk, note="c3", skip=2, velocity=100):
+    for r in range(len(trk[0])):
+        if r % skip == 0:
+            trk[0][r] = note
+            trk[0][r].velocity = velocity
+
 
 def muzakize():
-	mod.bpm = 123
+    mod.bpm = 123
 
-	seq = mod.add_sequence(cfg.default_seq_length)
-	trk = seq.add_track()
-	#trk.ctrl.add(1)
+    seq = mod.add_sequence(cfg.default_seq_length)
+    trk = seq.add_track()
+    # trk.ctrl.add(1)

@@ -15,105 +15,113 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-class VHTCtrlRow():
-	def __init__(self, vht, crowptr, dummy = False):
-		self._vht_handle = vht
-		self._crowptr = crowptr
-		self._dummy = dummy
 
-		self._velocity = vht.ctrlrow_get_velocity(self._crowptr)
-		self._linked = vht.ctrlrow_get_linked(self._crowptr)
-		self._smooth = vht.ctrlrow_get_smooth(self._crowptr)
-		self._anchor = vht.ctrlrow_get_anchor(self._crowptr)
+class VHTCtrlRow:
+    def __init__(self, vht, crowptr, dummy=False):
+        self._vht_handle = vht
+        self._crowptr = crowptr
+        self._dummy = dummy
 
-		self.update_strrep()
+        self._velocity = vht.ctrlrow_get_velocity(self._crowptr)
+        self._linked = vht.ctrlrow_get_linked(self._crowptr)
+        self._smooth = vht.ctrlrow_get_smooth(self._crowptr)
+        self._anchor = vht.ctrlrow_get_anchor(self._crowptr)
 
-	def __eq__(self, other):
-		if other is None:
-			return False
+        self.update_strrep()
 
-		if self._velocity != other._velocity:
-			return False
-		if self._linked != other._linked:
-			return False
-		if self._linked != other._smooth:
-			return False
-		if self._anchor != other._anchor:
-			return False
+    def __eq__(self, other):
+        if other is None:
+            return False
 
-		return True
+        if self._velocity != other._velocity:
+            return False
+        if self._linked != other._linked:
+            return False
+        if self._linked != other._smooth:
+            return False
+        if self._anchor != other._anchor:
+            return False
 
-	def update_strrep(self):
-		lnk = " "
-		if self._linked == 1:
-			lnk = "L"
+        return True
 
-		if self._velocity > -1:
-			self._strrep = "%3d %s %d %d" % (self._velocity, lnk, self._smooth, self._anchor)
-		else:
-			self._strrep = "--- - - -"
+    def update_strrep(self):
+        lnk = " "
+        if self._linked == 1:
+            lnk = "L"
 
-	def copy(self, row):
-		self._velocity = row._velocity
-		self._linked = row._linked
-		self._smooth = row._smooth
-		self._anchor = row._anchor
-		if not self._dummy:
-			self._vht_handle.ctrlrow_set(self._crowptr, self._velocity, self._linked, self._smooth, self.anchor)
-		self.update_strrep()
+        if self._velocity > -1:
+            self._strrep = "%3d %s %d %d" % (
+                self._velocity,
+                lnk,
+                self._smooth,
+                self._anchor,
+            )
+        else:
+            self._strrep = "--- - - -"
 
-	def clear(self):
-		self._velocity = -1
-		self._linked = 0
-		self._smooth = 0
-		self._anchor = 0
-		if not self._dummy:
-			self._vht_handle.ctrlrow_set(self._crowptr, -1, 0, 0, 0)
-		self.update_strrep()
+    def copy(self, row):
+        self._velocity = row._velocity
+        self._linked = row._linked
+        self._smooth = row._smooth
+        self._anchor = row._anchor
+        if not self._dummy:
+            self._vht_handle.ctrlrow_set(
+                self._crowptr, self._velocity, self._linked, self._smooth, self.anchor
+            )
+        self.update_strrep()
 
-	def dummy(self):
-		return VHTCtrlRow(self._vht_handle, self._crowptr, True)
+    def clear(self):
+        self._velocity = -1
+        self._linked = 0
+        self._smooth = 0
+        self._anchor = 0
+        if not self._dummy:
+            self._vht_handle.ctrlrow_set(self._crowptr, -1, 0, 0, 0)
+        self.update_strrep()
 
-	@property
-	def velocity(self):
-		return self._velocity
+    def dummy(self):
+        return VHTCtrlRow(self._vht_handle, self._crowptr, True)
 
-	@velocity.setter
-	def velocity(self, value):
-		self._velocity = int(value)
+    @property
+    def velocity(self):
+        return self._velocity
 
-		if not self._dummy:
-			self._vht_handle.ctrlrow_set_velocity(self._crowptr, self._velocity)
+    @velocity.setter
+    def velocity(self, value):
+        self._velocity = int(value)
 
-	@property
-	def linked(self):
-		return self._linked
+        if not self._dummy:
+            self._vht_handle.ctrlrow_set_velocity(self._crowptr, self._velocity)
 
-	@linked.setter
-	def linked(self, value):
-		self._linked = int(value)
-		if not self._dummy:
-			self._vht_handle.ctrlrow_set_linked(self._crowptr, self._linked)
+    @property
+    def linked(self):
+        return self._linked
 
-	@property
-	def smooth(self):
-		return self._smooth
+    @linked.setter
+    def linked(self, value):
+        self._linked = int(value)
+        if not self._dummy:
+            self._vht_handle.ctrlrow_set_linked(self._crowptr, self._linked)
 
-	@smooth.setter
-	def smooth(self, value):
-		self._smooth = int(value)
-		if not self._dummy:
-			self._vht_handle.ctrlrow_set_smooth(self._crowptr, self._smooth)
+    @property
+    def smooth(self):
+        return self._smooth
 
-	@property
-	def anchor(self):
-		return self._anchor
+    @smooth.setter
+    def smooth(self, value):
+        self._smooth = int(value)
+        if not self._dummy:
+            self._vht_handle.ctrlrow_set_smooth(self._crowptr, self._smooth)
 
-	@anchor.setter
-	def anchor(self, value):
-		self._anchor = int(value)
-		if not self._dummy:
-			self._vht_handle.ctrlrow_set_anchor(self._crowptr, self._anchor)
+    @property
+    def anchor(self):
+        return self._anchor
 
-	def __str__(self):
-		return self._strrep
+    @anchor.setter
+    def anchor(self, value):
+        self._anchor = int(value)
+        if not self._dummy:
+            self._vht_handle.ctrlrow_set_anchor(self._crowptr, self._anchor)
+
+    def __str__(self):
+        return self._strrep
