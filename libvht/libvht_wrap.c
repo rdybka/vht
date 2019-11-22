@@ -4572,6 +4572,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_sequence_get_index(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:sequence_get_index",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_get_index" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  result = (int)sequence_get_index(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_sequence_set_length(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   sequence *arg1 = (sequence *) 0 ;
@@ -4931,6 +4953,28 @@ SWIGINTERN PyObject *_wrap_track_get_ctrlrow_ptr(PyObject *SWIGUNUSEDPARM(self),
   arg3 = (int)(val3);
   result = (ctrlrow *)track_get_ctrlrow_ptr(arg1,arg2,arg3);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_ctrlrow, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_track_get_index(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:track_get_index",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_get_index" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  result = (int)track_get_index(arg1);
+  resultobj = SWIG_From_int((int)(result));
   return resultobj;
 fail:
   return NULL;
@@ -7379,6 +7423,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "sequence_get_ntrk", _wrap_sequence_get_ntrk, METH_VARARGS, NULL},
 	 { "sequence_get_length", _wrap_sequence_get_length, METH_VARARGS, NULL},
 	 { "sequence_get_max_length", _wrap_sequence_get_max_length, METH_VARARGS, NULL},
+	 { "sequence_get_index", _wrap_sequence_get_index, METH_VARARGS, NULL},
 	 { "sequence_set_length", _wrap_sequence_set_length, METH_VARARGS, NULL},
 	 { "sequence_get_trk", _wrap_sequence_get_trk, METH_VARARGS, NULL},
 	 { "sequence_add_track", _wrap_sequence_add_track, METH_VARARGS, NULL},
@@ -7391,6 +7436,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "sequence_halve", _wrap_sequence_halve, METH_VARARGS, NULL},
 	 { "track_get_row_ptr", _wrap_track_get_row_ptr, METH_VARARGS, NULL},
 	 { "track_get_ctrlrow_ptr", _wrap_track_get_ctrlrow_ptr, METH_VARARGS, NULL},
+	 { "track_get_index", _wrap_track_get_index, METH_VARARGS, NULL},
 	 { "track_get_length", _wrap_track_get_length, METH_VARARGS, NULL},
 	 { "track_get_ncols", _wrap_track_get_ncols, METH_VARARGS, NULL},
 	 { "track_get_port", _wrap_track_get_port, METH_VARARGS, NULL},

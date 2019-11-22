@@ -40,6 +40,7 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	trk->nrows = len;
 	trk->arows = len;
 	trk->nsrows = songlen;
+	trk->index = 0;
 	trk->loop = 1;
 	trk->ncols = 1;
 	trk->playing = 0;

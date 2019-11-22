@@ -1,5 +1,6 @@
 - seqlist
-	- move
+	* move
+        * extras
 	- popups
 	- clone
 	- split

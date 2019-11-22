@@ -46,6 +46,7 @@ typedef struct track_t {
 	int nsrows; // song rows
 	int playing;
 	double pos;
+	int index;
 
 	// used for recording
 	double last_pos;

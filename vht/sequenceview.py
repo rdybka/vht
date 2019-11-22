@@ -641,9 +641,6 @@ class SequenceView(Gtk.Box):
             del self.trk_cache[int(trk)]
             w.destroy()
 
-            for i, wdg in enumerate(self.get_tracks()):
-                wdg.trk.index = i
-
         if restore_track_index > -1:
             restore_track_index = min(restore_track_index, len(self.seq) - 1)
             if restore_track_index > -1:

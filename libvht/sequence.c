@@ -30,7 +30,14 @@ sequence *sequence_new(int length) {
 	seq->length = length;
 	seq->midi_focus = 0;
 	seq->last_period = 0;
+	seq->index = 0;
 	return seq;
+}
+
+void sequence_trk_reindex(sequence *seq) {
+	for (int t = 0; t < seq->ntrk; t++) {
+		seq->trk[t]->index = t;
+	}
 }
 
 void sequence_add_track(sequence *seq, track *trk) {
@@ -43,6 +50,7 @@ void sequence_add_track(sequence *seq, track *trk) {
 	seq->trk = realloc(seq->trk, sizeof(track *) * (seq->ntrk + 1));
 	track_wind(trk, seq->pos);
 	seq->trk[seq->ntrk++] = trk;
+	sequence_trk_reindex(seq);
 	module_excl_out();
 	return;
 }
@@ -50,6 +58,7 @@ void sequence_add_track(sequence *seq, track *trk) {
 track *sequence_clone_track(sequence *seq, track *trk) {
 	track *ntrk = track_clone(trk);
 	sequence_add_track(seq, ntrk);
+	sequence_trk_reindex(seq);
 	return ntrk;
 }
 
@@ -135,6 +144,7 @@ void sequence_del_track(sequence *seq, int t) {
 		seq->trk = realloc(seq->trk, sizeof(track *) * seq->ntrk);
 	}
 
+	sequence_trk_reindex(seq);
 	module_excl_out();
 }
 
@@ -153,7 +163,7 @@ void sequence_swap_track(sequence *seq, int t1, int t2) {
 	track *t3 = seq->trk[t1];
 	seq->trk[t1] = seq->trk[t2];
 	seq->trk[t2] = t3;
-
+	sequence_trk_reindex(seq);
 	module_excl_out();
 }
 

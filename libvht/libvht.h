@@ -86,6 +86,7 @@ extern sequence *sequence_new(int length);
 extern int sequence_get_ntrk(sequence *seq);
 extern int sequence_get_length(sequence *seq);
 extern int sequence_get_max_length(void);
+extern int sequence_get_index(sequence *seq);
 extern void sequence_set_length(sequence *seq, int length);
 extern track *sequence_get_trk(sequence *seq, int n);
 extern void sequence_add_track(sequence *seq, track *trk);
@@ -100,6 +101,7 @@ extern void sequence_halve(sequence *seq);
 // track
 extern row *track_get_row_ptr(track *, int c, int r);
 extern ctrlrow *track_get_ctrlrow_ptr(track *, int c, int r);
+extern int track_get_index(track *trk);
 extern int track_get_length(track *trk);
 extern int track_get_ncols(track *trk);
 extern int track_get_port(track *trk);

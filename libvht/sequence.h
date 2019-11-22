@@ -30,6 +30,7 @@ typedef struct sequence_t {
 	double pos;
 	double last_period;
 	int midi_focus;
+	int index;
 } sequence;
 
 sequence *sequence_new(int length);

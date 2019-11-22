@@ -299,6 +299,10 @@ def sequence_get_max_length():
     return _libcvht.sequence_get_max_length()
 sequence_get_max_length = _libcvht.sequence_get_max_length
 
+def sequence_get_index(seq):
+    return _libcvht.sequence_get_index(seq)
+sequence_get_index = _libcvht.sequence_get_index
+
 def sequence_set_length(seq, length):
     return _libcvht.sequence_set_length(seq, length)
 sequence_set_length = _libcvht.sequence_set_length
@@ -346,6 +350,10 @@ track_get_row_ptr = _libcvht.track_get_row_ptr
 def track_get_ctrlrow_ptr(arg1, c, r):
     return _libcvht.track_get_ctrlrow_ptr(arg1, c, r)
 track_get_ctrlrow_ptr = _libcvht.track_get_ctrlrow_ptr
+
+def track_get_index(trk):
+    return _libcvht.track_get_index(trk)
+track_get_index = _libcvht.track_get_index
 
 def track_get_length(trk):
     return _libcvht.track_get_length(trk)

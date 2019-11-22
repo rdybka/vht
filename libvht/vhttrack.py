@@ -22,10 +22,9 @@ from libvht.vhtquicklist import VHTQuickList
 
 
 class VHTTrack(Iterable):
-    def __init__(self, vht, trk, index):
+    def __init__(self, vht, trk):
         self._vht_handle = vht
         self._trk_handle = trk
-        self.index = index
         super()
 
     def __len__(self):
@@ -72,6 +71,10 @@ class VHTTrack(Iterable):
 
     def kill_notes(self):
         self._vht_handle.track_kill_notes(self._trk_handle)
+
+    @property
+    def index(self):
+        return self._vht_handle.track_get_index(self._trk_handle)
 
     @property
     def port(self):

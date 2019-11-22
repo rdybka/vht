@@ -49,6 +49,7 @@ class SequenceListView(Gtk.DrawingArea):
 
         self._drag = False
         self._move_handle = -1
+        self._highlight = -1
 
     def configure(self):
         win = self.get_window()
@@ -86,17 +87,47 @@ class SequenceListView(Gtk.DrawingArea):
         self.redraw()
         return True
 
+    def _swap_seq(self, s0, s1):
+        mod.swap_sequence(s0, s1)
+        mod.extras[s0], mod.extras[s1] = mod.extras[s1], mod.extras[s0]
+
+        old = s0
+        self._move_handle = s1
+        self._highlight = s1
+        if old == mod.curr_seq:
+            mod.curr_seq = self._move_handle
+            mod.mainwin._sequence_view.prop_view.redraw()
+        else:
+            if self._move_handle == mod.curr_seq:
+                mod.curr_seq = old
+                mod.mainwin._sequence_view.prop_view.redraw()
+
+        self.redraw(old)
+        self.redraw(s1)
+
     def on_motion(self, widget, event):
-        curr = event.x / (self._txt_height * cfg.mixer_padding)
+        curr = int(event.x / (self._txt_height * cfg.mixer_padding))
         oldh = self._highlight
+
+        if self._drag:
+            curr = max(min(curr, len(mod) - 1), 0)
+            if self._move_handle != curr:
+                delta = 1
+                if curr < self._move_handle:
+                    delta *= -1
+
+                for s in range(self._move_handle, curr, delta):
+                    self._swap_seq(s, s + delta)
+
+            return True
 
         if curr < len(mod):
             if event.y > self.get_allocated_height() - self._txt_height * 2:
-                self._move_handle = int(curr)
+                self._move_handle = curr
             else:
                 self._move_handle = -1
 
-            self._highlight = int(curr)
+            self._highlight = curr
             self.redraw(self._highlight)
         else:
             self._highlight = -1
@@ -112,6 +143,10 @@ class SequenceListView(Gtk.DrawingArea):
         old = mod.curr_seq
 
         curr = int(event.x / (self._txt_height * cfg.mixer_padding))
+        if curr == self._move_handle:
+            self._drag = True
+            return True
+
         if curr < len(mod):
             mod.curr_seq = curr
             self.redraw(curr)
@@ -122,7 +157,6 @@ class SequenceListView(Gtk.DrawingArea):
         if old != mod.curr_seq:
             mod.mainwin._sequence_view.switch(mod.curr_seq)
 
-        self._drag = True
         return True
 
     def on_button_release(self, widget, event):
@@ -212,7 +246,7 @@ class SequenceListView(Gtk.DrawingArea):
             cr.clip()
             cr.move_to(x, self._txt_height)
             cr.rotate(math.pi / 2.0)
-            cr.show_text("sequence %d" % r)
+            cr.show_text("sequence %d" % int(mod[r]))
             cr.restore()
 
             if r == self._move_handle and r == self._highlight:

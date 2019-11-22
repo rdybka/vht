@@ -156,6 +156,12 @@ void module_mute() {
 	module.mute = 1;
 }
 
+void module_seqs_reindex() {
+	for (int s = 0; s < module.nseq; s++) {
+		module.seq[s]->index = s;
+	}
+}
+
 void module_free() {
 	// fresh start?
 	if (module.bpm == -1) {
@@ -189,6 +195,7 @@ void module_add_sequence(sequence *seq) {
 		module.seq = malloc(sizeof(sequence *));
 		module.seq[0] = seq;
 		module.nseq = 1;
+		module_seqs_reindex();
 		module_excl_out();
 		return;
 	}
@@ -196,6 +203,7 @@ void module_add_sequence(sequence *seq) {
 	module.seq = realloc(module.seq, sizeof(sequence *) * (module.nseq + 1));
 	module.seq[module.nseq++] = seq;
 
+	module_seqs_reindex();
 	module_excl_out();
 }
 
@@ -223,6 +231,7 @@ void module_del_sequence(int s) {
 		module.seq = realloc(module.seq, sizeof(sequence *) * module.nseq);
 	}
 
+	module_seqs_reindex();
 	module_excl_out();
 }
 
@@ -242,6 +251,7 @@ void module_swap_sequence(int s1, int s2) {
 	module.seq[s1] = module.seq[s2];
 	module.seq[s2] = s3;
 
+	module_seqs_reindex();
 	module_excl_out();
 }
 

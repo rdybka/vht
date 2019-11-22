@@ -121,6 +121,10 @@ int sequence_get_length(sequence *seq) {
 	return seq->length;
 }
 
+int sequence_get_index(sequence *seq) {
+	return seq->index;
+}
+
 int sequence_get_max_length(void) {
 	return SEQUENCE_MAX_LENGTH;
 }
@@ -151,6 +155,10 @@ int track_get_port(track *trk) {
 
 int track_get_channel(track *trk) {
 	return trk->channel;
+}
+
+int track_get_index(track *trk) {
+	return trk->index;
 }
 
 int track_get_nrows(track *trk) {

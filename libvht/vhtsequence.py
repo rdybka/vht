@@ -20,21 +20,22 @@ from libvht.vhttrack import VHTTrack
 
 
 class VHTSequence(Iterable):
-    def __init__(self, vht, seq, idx):
+    def __init__(self, vht, seq):
         self._vht_handle = vht
         self._seq_handle = seq
-        self.index = idx
         super()
 
     def __len__(self):
         return self._vht_handle.sequence_get_ntrk(self._seq_handle)
+
+    def __int__(self):
+        return int(self._seq_handle)
 
     def __iter__(self):
         for itm in range(self.__len__()):
             yield VHTTrack(
                 self._vht_handle,
                 self._vht_handle.sequence_get_trk(self._seq_handle, itm),
-                itm,
             )
 
     def __getitem__(self, itm):
@@ -48,13 +49,10 @@ class VHTSequence(Iterable):
             return VHTTrack(
                 self._vht_handle,
                 self._vht_handle.sequence_get_trk(self._seq_handle, self.__len__() - 1),
-                self.__len__() - 1,
             )
 
         return VHTTrack(
-            self._vht_handle,
-            self._vht_handle.sequence_get_trk(self._seq_handle, itm),
-            itm,
+            self._vht_handle, self._vht_handle.sequence_get_trk(self._seq_handle, itm)
         )
 
     def add_track(self, port=0, channel=1, length=-1, songlength=-1, ctrlpr=-1):
@@ -111,6 +109,10 @@ class VHTSequence(Iterable):
     @property
     def max_length(self):
         return self._vht_handle.sequence_get_max_length()
+
+    @property
+    def index(self):
+        return self._vht_handle.sequence_get_index(self._seq_handle)
 
     def __str__(self):
         ret = ""

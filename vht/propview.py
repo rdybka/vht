@@ -74,17 +74,12 @@ class PropView(Gtk.ScrolledWindow):
             self.trk_prop_cache[int(trk)] = t
             self._track_box.pack_start(t, False, True, 0)
 
-    def reindex_tracks(self):
-        i = 0
-        for i, wdg in enumerate(self.seqview.get_tracks()):
-            wdg.trk.index = i
-
     def move_track(self, trk, offs):
         wdg = self._track_box.get_children()[trk.index]
         self._track_box.reorder_child(wdg, (trk.index) + offs)
         wdg = self.seqview._track_box.get_children()[trk.index]
         self.seqview._track_box.reorder_child(wdg, (trk.index) + offs)
-        self.seq.swap_track(trk.index, trk.index + offs)
+
         (
             mod.extras[self.seq.index][trk.index],
             mod.extras[self.seq.index][trk.index + offs],
@@ -92,7 +87,8 @@ class PropView(Gtk.ScrolledWindow):
             mod.extras[self.seq.index][trk.index + offs],
             mod.extras[self.seq.index][trk.index],
         )
-        self.reindex_tracks()
+
+        self.seq.swap_track(trk.index, trk.index + offs)
 
     def move_left(self, trk):
         if trk.index is 0:
