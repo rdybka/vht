@@ -152,6 +152,8 @@ class Configuration:
             "track_clone": cfgkey("n", True, True, False),
             "sequence_next": cfgkey("period", False, True, False),
             "sequence_prev": cfgkey("comma", False, True, False),
+            "sequence_move_right": cfgkey("greater", True, True, False),
+            "sequence_move_left": cfgkey("less", True, True, False),
             "sequence_double": cfgkey("y", False, True, False),
             "sequence_halve": cfgkey("u", False, True, False),
             "select_all": cfgkey("a", False, True, False),

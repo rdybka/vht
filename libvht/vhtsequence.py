@@ -74,7 +74,7 @@ class VHTSequence(Iterable):
             if tt._trk_handle == ntrk:
                 itm = t
 
-        return VHTTrack(self._vht_handle, ntrk, itm) if itm else None
+        return VHTTrack(self._vht_handle, ntrk) if itm else None
 
     def double(self):
         self._vht_handle.sequence_double(self._seq_handle)

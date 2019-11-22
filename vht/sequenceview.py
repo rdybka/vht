@@ -244,6 +244,7 @@ class SequenceView(Gtk.Box):
             return True
 
         if cfg.key["sequence_next"].matches(event):
+            mod.seqlist._highlight = -1
             if len(mod) > self.seq.index + 1:
                 self.switch(self.seq.index + 1)
             else:
@@ -254,10 +255,29 @@ class SequenceView(Gtk.Box):
             return True
 
         if cfg.key["sequence_prev"].matches(event):
+            mod.seqlist._highlight = -1
             if self.seq.index > 0:
                 self.switch(self.seq.index - 1)
             else:
                 self.switch(len(mod) - 1)
+
+            mod.curr_seq = self.seq.index
+            mod.seqlist.redraw()
+            return True
+
+        if cfg.key["sequence_move_right"].matches(event):
+            if len(mod) > self.seq.index + 1:
+                mod.seqlist._highligh = -1
+                mod.seqlist.swap_seq(self.seq.index, self.seq.index + 1)
+
+            mod.curr_seq = self.seq.index
+            mod.seqlist.redraw()
+            return True
+
+        if cfg.key["sequence_move_left"].matches(event):
+            if self.seq.index > 0:
+                mod.seqlist._highligh = -1
+                mod.seqlist.swap_seq(self.seq.index, self.seq.index - 1)
 
             mod.curr_seq = self.seq.index
             mod.seqlist.redraw()
@@ -542,6 +562,10 @@ class SequenceView(Gtk.Box):
 
     def seq_add(self):
         s = mod.add_sequence()
+        mod.extras[s.index] = {
+            -1: {"highlight": mod.extras[self.seq.index][-1]["highlight"]}
+        }
+
         s.length = self.seq.length
         s.add_track(length=s.length)
         mod.seqlist.configure()

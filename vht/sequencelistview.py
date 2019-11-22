@@ -87,7 +87,7 @@ class SequenceListView(Gtk.DrawingArea):
         self.redraw()
         return True
 
-    def _swap_seq(self, s0, s1):
+    def swap_seq(self, s0, s1):
         mod.swap_sequence(s0, s1)
         mod.extras[s0], mod.extras[s1] = mod.extras[s1], mod.extras[s0]
 
@@ -117,7 +117,7 @@ class SequenceListView(Gtk.DrawingArea):
                     delta *= -1
 
                 for s in range(self._move_handle, curr, delta):
-                    self._swap_seq(s, s + delta)
+                    self.swap_seq(s, s + delta)
 
             return True
 
