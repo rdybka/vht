@@ -2,15 +2,19 @@
 	* move
         * extras
 	- popups
-	- clone
-	- split
-	- merge
-	- strip
-	- name
-	- triggers
-		- don't record
-		- mute
+        - delete
+        - clone
+        - split
+        - merge
+        - strip
+        - name
+        - triggers
+            - don't record
+            - mute
+- silence
+    - when quitting
 - autoscroll and moving
+- ports
 - timeline
 - tracks:
 	- let ring?

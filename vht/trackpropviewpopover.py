@@ -264,13 +264,13 @@ class TrackPropViewPopover(Gtk.Popover):
                     subs[p[1]].append((p[0], p[2]))
 
                 for s in subs:
-                    sname = s
                     if s:
                         mitm = Gtk.MenuItem(s)
                         mitmm = Gtk.Menu()
                         for p in subs[s]:
                             itm = Gtk.MenuItem(p[1])
                             itm.patch = p
+                            itm.name = n
                             itm.connect("activate", self.on_patch_menu_item_activate)
                             itm.show()
                             mitmm.append(itm)
@@ -401,6 +401,7 @@ class TrackPropViewPopover(Gtk.Popover):
         self.name_entry.set_text(itm.patch[1])
         self.trk.set_bank(*itm.patch[0][:2])
         self.patch_adj.set_value(itm.patch[0][2])
+        mod.extras[self.parent.seq.index][self.trk.index]["last_patch_file"] = itm.name
 
     def refresh(self):
         if self.trkview.trk.nctrl == 1:
@@ -481,6 +482,15 @@ class TrackPropViewPopover(Gtk.Popover):
         if c == -1:
             self.trk.set_bank(0, 0)
         self.trk.send_program_change(c)
+
+        # figure out the name
+        if "last_patch_file" in mod.extras[self.parent.seq.index][self.trk.index]:
+            n = mod.extras[self.parent.seq.index][self.trk.index]["last_patch_file"]
+            if n in mod.bank:
+                pf = mod.bank[n]
+                for p in pf:
+                    if p[0][2] == c:
+                        self.name_entry.set_text(p[2])
 
     def on_leave(self, wdg, prm):
         if prm.window == self.get_window():

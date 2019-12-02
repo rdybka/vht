@@ -50,6 +50,7 @@ class SequenceListView(Gtk.DrawingArea):
         self._drag = False
         self._move_handle = -1
         self._highlight = -1
+        self._menu_handle = 1
 
     def configure(self):
         win = self.get_window()

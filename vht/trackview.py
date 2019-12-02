@@ -1310,6 +1310,16 @@ class TrackView(Gtk.DrawingArea):
         if self.trk[col][row].type == 2:  # note_off
             enter_edit = True
             self.drag = True
+
+            if self.show_timeshift:
+                if fldwidth * 2 < offs < fldwidth * 3:
+                    enter_edit = False
+                    self.drag = False
+                    self.timeshift_editor = TimeshiftEditor(self, col, row, event)
+                self.configure()
+                self.redraw()
+                self.parent.prop_view.redraw()
+                self.undo_buff.add_state()
         else:
             if offs < fldwidth:  # edit note
                 enter_edit = True

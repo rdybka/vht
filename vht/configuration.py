@@ -86,7 +86,7 @@ class Configuration:
 
         self.default_ctrl_name = "zyn"
         self.dark_theme = True
-        self.notebook_mouseover = True
+        self.notebook_mouseover = False
 
         self.quick_controls_desc = "vol/pan:"
         self.quick_control_1_ctrl = 7
