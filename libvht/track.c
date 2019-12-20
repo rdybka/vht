@@ -263,6 +263,8 @@ void track_get_ctrl_env(track *trk, int *ret, int l, int c, int n) {
 }
 
 void track_free(track *trk) {
+	track_kill_notes(trk);
+
 	pthread_mutex_destroy(&trk->excl);
 	pthread_mutex_destroy(&trk->exclrec);
 	pthread_mutex_destroy(&trk->exclctrl);

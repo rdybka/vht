@@ -1,16 +1,14 @@
 - seqlist
 	* move
         * extras
-	- popups
-        - delete
+	- popup
+        * name
+        * delete
         - clone
-        - split
-        - merge
-        - strip
-        - name
         - triggers
             - don't record
             - mute
+? ctrl antialias
 - silence
     - when quitting
 - autoscroll and moving

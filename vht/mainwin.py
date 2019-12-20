@@ -172,6 +172,8 @@ class MainWin(Gtk.ApplicationWindow):
         self.set_default_size(800, 600)
         self.show_all()
 
+        self._sequence_view._sv.grab_focus()
+
         if cfg.console_show:
             self.show_console()
 

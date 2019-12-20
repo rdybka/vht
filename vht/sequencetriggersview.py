@@ -1,4 +1,4 @@
-# triggersview.py - Valhalla Tracker
+# sequencetriggersview.py - Valhalla Tracker
 #
 # Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
@@ -22,15 +22,14 @@ import gi
 gi.require_version("Gtk", "3.0")
 
 
-class TriggersView(Gtk.Grid):
-    def __init__(self, trk, trkview, parent):
-        super(TriggersView, self).__init__()
+class SequenceTriggersView(Gtk.Grid):
+    def __init__(self, seq, parent):
+        super(SequenceTriggersView, self).__init__()
 
         self.set_orientation(Gtk.Orientation.VERTICAL)
 
         self.parent = parent
-        self.trk = trk
-        self.trkview = trkview
+        self.seq = seq
         self.capture = -1
         self.butt_handler = None
 
@@ -107,25 +106,19 @@ class TriggersView(Gtk.Grid):
         self.play_midi_entry.set_width_chars(entry_wc)
         self.attach(self.play_midi_entry, 3, 2, 1, 1)
 
-        self.play_kp_entry = Gtk.Entry()
-        self.play_kp_entry.set_tooltip_markup(cfg.tooltip_markup % ("keypad"))
-        self.play_kp_entry.props.sensitive = False
-        self.play_kp_entry.set_width_chars(1)
-        self.attach(self.play_kp_entry, 4, 2, 1, 1)
-
         button = Gtk.Button()
         icon = Gio.ThemedIcon(name="edit-delete")
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
         button.add(image)
         button.set_tooltip_markup(cfg.tooltip_markup % ("clear"))
-        button.connect("clicked", self.on_clear_clicked, 2)
+        #!button.connect("clicked", self.on_clear_clicked, 2)
         self.attach(button, 2, 2, 1, 1)
 
         self.play_mode_cb = Gtk.ComboBoxText()
         for m in ["on/off", "on", "hold"]:
             self.play_mode_cb.append_text(m)
 
-        self.play_mode_cb.set_active(trk.trg_playmode)
+        #!self.play_mode_cb.set_active(trk.trg_playmode)
         self.play_mode_cb.connect("changed", self.on_play_mode_changed)
         self.play_mode_cb.set_tooltip_markup(cfg.tooltip_markup % ("play mode"))
         self.attach(self.play_mode_cb, 1, 3, 2, 1)
@@ -133,28 +126,36 @@ class TriggersView(Gtk.Grid):
         self.quantise_scale = Gtk.Scale.new_with_range(
             Gtk.Orientation.HORIZONTAL, 0, 16, 1
         )
-        self.quantise_scale.set_value(trk.trg_quantise)
+        #!self.quantise_scale.set_value(trk.trg_quantise)
         self.quantise_scale.set_tooltip_markup(cfg.tooltip_markup % ("quantise"))
-        self.quantise_scale.connect("value-changed", self.on_quantise_changed)
+        #!self.quantise_scale.connect("value-changed", self.on_quantise_changed)
         self.attach(self.quantise_scale, 3, 3, 1, 1)
 
-        # autoplay
-        self.timeline_toggle = Gtk.CheckButton("timeline")
-        self.timeline_toggle.connect("toggled", self.on_bool_toggled, 0)
-        self.timeline_toggle.set_active(trk.trg_timeline)
-        self.attach(self.timeline_toggle, 1, 4, 2, 1)
+        self._mmute = Gtk.Label()
+        self._mmute.set_text("r")
+        evb = Gtk.EventBox()
+        evb.add(self._mmute)
+        evb.connect("button-press-event", self.on_mouse_cfg_clicked, 1)
+        self.attach(evb, 4, 0, 1, 1)
 
-        self.letring_toggle = Gtk.CheckButton("let ring")
-        self.letring_toggle.connect("toggled", self.on_bool_toggled, 1)
-        self.letring_toggle.set_active(trk.trg_letring)
-        self.attach(self.letring_toggle, 3, 4, 1, 1)
+        self._mcue = Gtk.Label()
+        self._mcue.set_text("m")
+        evb = Gtk.EventBox()
+        evb.add(self._mcue)
+        evb.connect("button-press-event", self.on_mouse_cfg_clicked, 2)
+        self.attach(evb, 4, 1, 1, 1)
 
-        self.loop_toggle = Gtk.CheckButton("loop")
-        self.loop_toggle.set_active(trk.loop)
-        self.loop_toggle.connect("toggled", self.on_bool_toggled, 2)
-        self.attach(self.loop_toggle, 4, 4, 1, 1)
+        self._mplay = Gtk.Label()
+        self._mplay.set_text("")
+        evb = Gtk.EventBox()
+        evb.add(self._mplay)
+        evb.connect("button-press-event", self.on_mouse_cfg_clicked, 3)
+        self.attach(evb, 4, 2, 1, 1)
 
-        self.refresh_desc()
+        # self.refresh_desc()
+
+        # self.attach(mcue, 4, 1, 1, 1)
+        # self.attach(mplay, 4, 2, 1, 1)
 
         self.show_all()
 
@@ -194,16 +195,12 @@ class TriggersView(Gtk.Grid):
         return desc
 
     def refresh_desc(self):
-        self.mute_entry.props.text = TriggersView.desc_trigger(self.trk.get_trig(0))
-        self.cue_entry.props.text = TriggersView.desc_trigger(self.trk.get_trig(1))
-        self.play_midi_entry.props.text = TriggersView.desc_trigger(
-            self.trk.get_trig(2)
-        )
-        if "kp" in mod.extras[self.parent.parent.seq.index][self.trk.index]:
-            if mod.extras[self.parent.parent.seq.index][self.trk.index]["kp"] > -1:
-                self.play_kp_entry.props.text = str(
-                    mod.extras[self.parent.parent.seq.index][self.trk.index]["kp"]
-                )
+        self.mute_entry.props.text = self.desc_trigger(self.trk.get_trig(0))
+        self.cue_entry.props.text = self.desc_trigger(self.trk.get_trig(1))
+        self.play_midi_entry.props.text = self.desc_trigger(self.trk.get_trig(2))
+
+    def on_mouse_cfg_clicked(self, wdg, evt, d):
+        print(d)
 
     def on_clear_clicked(self, wdg, c):
         self.trk.set_trig(c, 0, 0, 0)

@@ -575,7 +575,7 @@ class TrackView(Gtk.DrawingArea):
 
             rows_to_draw = []
 
-            (x, y, width, height, dx, dy) = cr.text_extents("0000")
+            (x, y, width, height, dx, dy) = cr.text_extents(cfg.row_number_format % 999)
 
             if complete:
                 self.configure()
@@ -615,7 +615,7 @@ class TrackView(Gtk.DrawingArea):
 
                 yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2.0)
                 cr.move_to(x, yy)
-                cr.show_text("%03d" % r)
+                cr.show_text(cfg.row_number_format % r)
 
                 if not complete:
                     (x, y, width, height, dx, dy) = cr.text_extents("|")
@@ -2022,7 +2022,9 @@ class TrackView(Gtk.DrawingArea):
             self.undo_buff.add_state()
             old = self.edit[1]
             self.trk[self.edit[0]][self.edit[1]] = note
-            self.trk[self.edit[0]][self.edit[1]].velocity = cfg.velocity
+
+            if self.trk[self.edit[0]][self.edit[1]].velocity == 0:
+                self.trk[self.edit[0]][self.edit[1]].velocity = cfg.velocity
 
             self.edit = self.edit[0], self.edit[1] + cfg.skip
             if self.edit[1] >= self.trk.nrows:

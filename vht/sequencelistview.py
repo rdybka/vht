@@ -23,6 +23,8 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gdk, Gtk
 
+from vht.sequencelistviewpopover import *
+
 
 class SequenceListView(Gtk.DrawingArea):
     def __init__(self):
@@ -50,7 +52,8 @@ class SequenceListView(Gtk.DrawingArea):
         self._drag = False
         self._move_handle = -1
         self._highlight = -1
-        self._menu_handle = 1
+        self._menu_handle = -1
+        self._popup = SequenceListViewPopover(self)
 
     def configure(self):
         win = self.get_window()
@@ -110,6 +113,9 @@ class SequenceListView(Gtk.DrawingArea):
         curr = int(event.x / (self._txt_height * cfg.mixer_padding))
         oldh = self._highlight
 
+        if self._popup.pooped:
+            return
+
         if self._drag:
             curr = max(min(curr, len(mod) - 1), 0)
             if self._move_handle != curr:
@@ -130,9 +136,23 @@ class SequenceListView(Gtk.DrawingArea):
 
             self._highlight = curr
             self.redraw(self._highlight)
+
+            if event.y < self._txt_height:
+                self._menu_handle = curr
+
+                if self._popup.pooped:
+                    self.pop_point_to(curr)
+                    self._popup.refresh()
+                    self.redraw()
+            else:
+                if self._menu_handle > -1:
+                    old = self._menu_handle
+                    self._menu_handle = -1
+                    self.redraw(old)
         else:
             self._highlight = -1
             self._move_handle = -1
+            self._menu_handle = -1
 
         if oldh > -1 and oldh != self._highlight:
             self.redraw(oldh)
@@ -149,8 +169,12 @@ class SequenceListView(Gtk.DrawingArea):
             return True
 
         if curr < len(mod):
-            mod.curr_seq = curr
-            self.redraw(curr)
+            if event.y < self._txt_height:
+                self.pop_point_to(curr)
+                self._popup.pop(curr)
+            else:
+                mod.curr_seq = curr
+                self.redraw(curr)
 
         if old > -1:
             self.redraw(old)
@@ -170,13 +194,27 @@ class SequenceListView(Gtk.DrawingArea):
 
     def on_leave(self, wdg, prm):
         self._highlight = -1
+        self._menu_handle = -1
         self.redraw()
+
+    def pop_point_to(self, r):
+        rect = Gdk.Rectangle()
+        x = (self._txt_height * cfg.mixer_padding) * r
+        x += ((self._txt_height * cfg.mixer_padding) - self._txt_height) / 2.0
+        rect.x = x
+        rect.width = self._txt_width
+        rect.height = self._txt_height
+        self._popup.set_pointing_to(rect)
+        self._popup.curr = r
 
     def zoom(self, i):
         cfg.mixer_font_size += i
         cfg.mixer_font_size = min(max(1, cfg.mixer_font_size), 230)
         self.configure()
         self.redraw()
+
+        if self._menu_handle > -1:
+            self.pop_point_to(self._menu_handle)
 
     def on_scroll(self, widget, event):
         if event.state & Gdk.ModifierType.CONTROL_MASK:
@@ -233,10 +271,21 @@ class SequenceListView(Gtk.DrawingArea):
             cr.fill()
             cr.restore()
 
-            cr.set_source_rgb(0, 0, 0)
+            if self._popup.pooped and self._popup.curr == r:
+                cr.set_source_rgb(
+                    *(col * cfg.intensity_txt_highlight for col in cfg.star_colour)
+                )
+            elif self._menu_handle == r and not self._popup.pooped:
+                cr.set_source_rgb(
+                    *(col * cfg.intensity_txt_highlight for col in cfg.star_colour)
+                )
+            else:
+                cr.set_source_rgb(0, 0, 0)
+
             cr.move_to(x, self._txt_height)
             cr.show_text("*")
 
+            cr.set_source_rgb(0, 0, 0)
             if r == mod.curr_seq:
                 cr.set_source_rgb(
                     *(col * cfg.intensity_txt_highlight for col in cfg.mixer_colour)
@@ -247,7 +296,14 @@ class SequenceListView(Gtk.DrawingArea):
             cr.clip()
             cr.move_to(x, self._txt_height)
             cr.rotate(math.pi / 2.0)
-            cr.show_text("sequence %d" % int(mod[r]))
+
+            txt = cfg.sequence_name_format % r
+            if "sequence_name" in mod.extras[r][-1]:
+                cr.show_text(mod.extras[r][-1]["sequence_name"])
+            else:
+                mod.extras[r][-1]["sequence_name"] = txt
+                cr.show_text(txt)
+
             cr.restore()
 
             if r == self._move_handle and r == self._highlight:
@@ -276,4 +332,9 @@ class SequenceListView(Gtk.DrawingArea):
         return False
 
     def tick(self):
+
+        # if self.trgview.play_mode_cb.props.popup_shown:
+        #    self.time_want_to_leave = 0
+        #    return True
+
         return True

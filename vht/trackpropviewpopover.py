@@ -16,7 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from vht.notebooklabel import NotebookLabel
-from vht.triggersview import TriggersView
 from vht.controllersview import ControllersView
 from vht import cfg, mod
 from gi.repository import Gdk, Gtk, Gio
@@ -312,7 +311,6 @@ class TrackPropViewPopover(Gtk.Popover):
             grid.set_row_spacing(2)
 
             self.ctrlsview = ControllersView(self.trk, self.trkview, self)
-            self.trgview = TriggersView(self.trk, self.trkview, self)
 
             self.extend_notebook = Gtk.Notebook()
             self.extend_notebook.set_hexpand(True)
@@ -323,9 +321,6 @@ class TrackPropViewPopover(Gtk.Popover):
             )
             self.extend_notebook.append_page(
                 self.ctrlsview, NotebookLabel("controllers", self.extend_notebook, 1)
-            )
-            self.extend_notebook.append_page(
-                self.trgview, NotebookLabel("triggers", self.extend_notebook, 2)
             )
 
             self.extend_grid.attach(self.extend_notebook, 0, 0, 5, 5)
@@ -461,10 +456,6 @@ class TrackPropViewPopover(Gtk.Popover):
             self.time_want_to_leave = 0
             return True
 
-        if self.trgview.play_mode_cb.props.popup_shown:
-            self.time_want_to_leave = 0
-            return True
-
         t = datetime.now() - self.time_want_to_leave
         t = float(t.seconds) + t.microseconds / 1000000
         if t > cfg.popup_timeout / 2.0:
@@ -508,8 +499,6 @@ class TrackPropViewPopover(Gtk.Popover):
         self.time_want_to_leave = -1
         self.parent.button_highlight = False
         self.ctrlsview.capturing = False
-        self.trgview.capture = -1
-        mod.gui_midi_capture = False
         self.parent.popped = False
         self.parent.redraw()
 

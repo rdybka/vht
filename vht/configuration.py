@@ -45,9 +45,11 @@ class Configuration:
         self.timeline_show = True
         self.console_steal_stderr = True
 
-        self.mixer_colour = (0, 0.7, 0.7)
-        self.colour = (0, 0.7, 0.7)
-        # self.mixer_colour = (.9, .8, .4)
+        c = (0.2, 0.7, 1.0)
+        self.colour = c
+
+        c = (0, 0.7, 0.7)
+        self.mixer_colour = c
 
         self.star_colour = (1, 1, 0)
         self.console_colour = self.star_colour
@@ -66,6 +68,9 @@ class Configuration:
         self.auto_scroll_delay = 0.2
         self.tooltip_markup = """<span font_family="Monospace" size="large">%s</span>"""
         self.window_opacity = 1
+
+        self.sequence_name_format = "s%02d"
+        self.row_number_format = "%03d"
 
         self.velocity_editor_char_width = 8
         self.timeshift_editor_char_width = 8
@@ -95,7 +100,7 @@ class Configuration:
         self.quick_control_2_def = 64
 
         self.new_tracks_left = False
-        self.default_seq_length = 16
+        self.default_seq_length = 32
 
         self.controller_resolution = 8
 
@@ -156,6 +161,8 @@ class Configuration:
             "sequence_move_left": cfgkey("less", True, True, False),
             "sequence_double": cfgkey("y", False, True, False),
             "sequence_halve": cfgkey("u", False, True, False),
+            "sequence_delete": cfgkey("d", True, True, False),
+            "sequence_clone": cfgkey("l", True, True, False),
             "select_all": cfgkey("a", False, True, False),
             "copy": cfgkey("c", False, True, False),
             "cut": cfgkey("x", False, True, False),
