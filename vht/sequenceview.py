@@ -267,9 +267,10 @@ class SequenceView(Gtk.Box):
 
         if cfg.key["sequence_delete"].matches(event):
             if len(mod) > 1:
-                mod.del_sequence(mod.curr_seq)
                 for r in range(mod.curr_seq, len(mod) - 1):
                     mod.extras[r] = mod.extras[r + 1]
+
+                mod.del_sequence(mod.curr_seq)
 
                 mod.curr_seq = max(0, mod.curr_seq - 1)
                 self.switch(mod.curr_seq)

@@ -229,6 +229,10 @@ class VHTModule(Iterable):
         for seq in self:
             s = {}
             s["length"] = seq.length
+            s["trg_playmode"] = seq.trg_playmode
+            s["trg_quantise"] = seq.trg_quantise
+            s["trig"] = [seq.get_trig(0), seq.get_trig(1), seq.get_trig(2)]
+
             s["trk"] = []
 
             for trk in seq:
@@ -242,11 +246,6 @@ class VHTModule(Iterable):
                 t["program"] = trk.get_program()
                 t["qc"] = trk.get_qc()
                 t["loop"] = trk.loop
-                t["trg_timeline"] = trk.trg_timeline
-                t["trg_letring"] = trk.trg_letring
-                t["trg_playmode"] = trk.trg_playmode
-                t["trg_quantise"] = trk.trg_quantise
-                t["trig"] = [trk.get_trig(0), trk.get_trig(1), trk.get_trig(2)]
 
                 t["ctrl"] = []
                 for cn, ctrl in enumerate(trk.ctrl):
@@ -324,6 +323,21 @@ class VHTModule(Iterable):
             for seq in jm["seq"]:
                 s = self.add_sequence()
                 s.length = seq["length"]
+
+                if "trg_playmode" in seq:
+                    s.trg_playmode = seq["trg_playmode"]
+                    s.trg_quantise = seq["trg_quantise"]
+
+                    s.set_trig(
+                        0, seq["trig"][0][0], seq["trig"][0][1], seq["trig"][0][2]
+                    )
+                    s.set_trig(
+                        1, seq["trig"][1][0], seq["trig"][1][1], seq["trig"][1][2]
+                    )
+                    s.set_trig(
+                        2, seq["trig"][2][0], seq["trig"][2][1], seq["trig"][2][2]
+                    )
+
                 for trk in seq["trk"]:
                     t = s.add_track(
                         trk["port"],
@@ -339,20 +353,6 @@ class VHTModule(Iterable):
                     t.set_qc2(trk["qc"][2], trk["qc"][3])
 
                     t.loop = trk["loop"]
-                    t.trg_timeline = trk["trg_timeline"]
-                    t.trg_letring = trk["trg_letring"]
-                    t.trg_playmode = trk["trg_playmode"]
-                    t.trg_quantise = trk["trg_quantise"]
-
-                    t.set_trig(
-                        0, trk["trig"][0][0], trk["trig"][0][1], trk["trig"][0][2]
-                    )
-                    t.set_trig(
-                        1, trk["trig"][1][0], trk["trig"][1][1], trk["trig"][1][2]
-                    )
-                    t.set_trig(
-                        2, trk["trig"][2][0], trk["trig"][2][1], trk["trig"][2][2]
-                    )
 
                     nctrl = 0
                     for ctrl in trk["ctrl"]:

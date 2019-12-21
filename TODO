@@ -1,3 +1,6 @@
+- flashing seq
+- clone track to sequence
+- fix clone icon
 - seqlist
 	* move
         * extras
@@ -8,6 +11,8 @@
         - triggers
             - don't record
             - mute
+    - trigging
+    - animate
 ? ctrl antialias
 - silence
     - when quitting

@@ -149,44 +149,6 @@ class VHTTrack(Iterable):
     def loop(self, value):
         self._vht_handle.track_set_loop(self._trk_handle, value)
 
-    @property
-    def trg_timeline(self):
-        return self._vht_handle.track_get_trg_timeline(self._trk_handle)
-
-    @trg_timeline.setter
-    def trg_timeline(self, value):
-        self._vht_handle.track_set_trg_timeline(self._trk_handle, value)
-
-    @property
-    def trg_letring(self):
-        return self._vht_handle.track_get_trg_letring(self._trk_handle)
-
-    @trg_letring.setter
-    def trg_letring(self, value):
-        self._vht_handle.track_set_trg_letring(self._trk_handle, value)
-
-    @property
-    def trg_playmode(self):
-        return self._vht_handle.track_get_trg_playmode(self._trk_handle)
-
-    @trg_playmode.setter
-    def trg_playmode(self, value):
-        self._vht_handle.track_set_trg_playmode(self._trk_handle, value)
-
-    @property
-    def trg_quantise(self):
-        return self._vht_handle.track_get_trg_quantise(self._trk_handle)
-
-    @trg_quantise.setter
-    def trg_quantise(self, value):
-        self._vht_handle.track_set_trg_quantise(self._trk_handle, value)
-
-    def get_trig(self, t):
-        return eval(self._vht_handle.track_get_trig(self._trk_handle, t))
-
-    def set_trig(self, t, tp, ch, nt):
-        self._vht_handle.track_set_trig(self._trk_handle, t, tp, ch, nt)
-
     def send_program_change(self, prog):
         self._vht_handle.track_set_program(self._trk_handle, prog)
 

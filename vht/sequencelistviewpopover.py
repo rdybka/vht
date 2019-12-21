@@ -102,6 +102,10 @@ class SequenceListViewPopover(Gtk.Popover):
         if self.time_want_to_leave == -1:  # closed - stop callback
             return False
 
+        if self._trgview.play_mode_cb.props.popup_shown:
+            self.time_want_to_leave = 0
+            return True
+
         t = datetime.now() - self.time_want_to_leave
         t = float(t.seconds) + t.microseconds / 1000000
         if t > cfg.popup_timeout / 2.0:
@@ -111,6 +115,7 @@ class SequenceListViewPopover(Gtk.Popover):
             if t < 0:
                 self.hide()
                 self.pooped = False
+                self._trgview.capture = -1
                 self._parent._menu_handle = -1
                 self._parent.redraw()
                 return False
@@ -130,6 +135,8 @@ class SequenceListViewPopover(Gtk.Popover):
         else:
             self._del_button.set_sensitive(True)
 
+        self._trgview.seq = self.curr
+        self._trgview.refresh()
         self.get_window().thaw_updates()
 
     def pop(self, curr):
@@ -140,6 +147,7 @@ class SequenceListViewPopover(Gtk.Popover):
         self.add_tick_callback(self.tick)
         self.pooped = True
         self.curr = curr
+        self._trgview.capture = -1
         self.refresh()
         self.show()
 

@@ -31,6 +31,13 @@ sequence *sequence_new(int length) {
 	seq->midi_focus = 0;
 	seq->last_period = 0;
 	seq->index = 0;
+
+	for (int t = 0; t < 3; t ++) {
+		seq->triggers[t].type = seq->triggers[t].channel = seq->triggers[t].note = 0;
+	}
+
+	seq->trg_playmode = 0;
+	seq->trg_quantise = 0;
 	return seq;
 }
 

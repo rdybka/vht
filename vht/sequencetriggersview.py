@@ -111,14 +111,13 @@ class SequenceTriggersView(Gtk.Grid):
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
         button.add(image)
         button.set_tooltip_markup(cfg.tooltip_markup % ("clear"))
-        #!button.connect("clicked", self.on_clear_clicked, 2)
+        button.connect("clicked", self.on_clear_clicked, 2)
         self.attach(button, 2, 2, 1, 1)
 
         self.play_mode_cb = Gtk.ComboBoxText()
-        for m in ["on/off", "on", "hold"]:
+        for m in ["on/off", "one shot", "hold"]:
             self.play_mode_cb.append_text(m)
 
-        #!self.play_mode_cb.set_active(trk.trg_playmode)
         self.play_mode_cb.connect("changed", self.on_play_mode_changed)
         self.play_mode_cb.set_tooltip_markup(cfg.tooltip_markup % ("play mode"))
         self.attach(self.play_mode_cb, 1, 3, 2, 1)
@@ -126,33 +125,34 @@ class SequenceTriggersView(Gtk.Grid):
         self.quantise_scale = Gtk.Scale.new_with_range(
             Gtk.Orientation.HORIZONTAL, 0, 16, 1
         )
-        #!self.quantise_scale.set_value(trk.trg_quantise)
+
         self.quantise_scale.set_tooltip_markup(cfg.tooltip_markup % ("quantise"))
-        #!self.quantise_scale.connect("value-changed", self.on_quantise_changed)
+        self.quantise_scale.connect("value-changed", self.on_quantise_changed)
         self.attach(self.quantise_scale, 3, 3, 1, 1)
 
         self._mmute = Gtk.Label()
-        self._mmute.set_text("r")
+        self._mmute.set_text("")
         evb = Gtk.EventBox()
         evb.add(self._mmute)
-        evb.connect("button-press-event", self.on_mouse_cfg_clicked, 1)
+        evb.connect("button-press-event", self.on_mouse_cfg_clicked, 0)
         self.attach(evb, 4, 0, 1, 1)
 
         self._mcue = Gtk.Label()
-        self._mcue.set_text("m")
+        self._mcue.set_text("")
         evb = Gtk.EventBox()
         evb.add(self._mcue)
-        evb.connect("button-press-event", self.on_mouse_cfg_clicked, 2)
+        evb.connect("button-press-event", self.on_mouse_cfg_clicked, 1)
         self.attach(evb, 4, 1, 1, 1)
 
         self._mplay = Gtk.Label()
         self._mplay.set_text("")
         evb = Gtk.EventBox()
         evb.add(self._mplay)
-        evb.connect("button-press-event", self.on_mouse_cfg_clicked, 3)
+        evb.connect("button-press-event", self.on_mouse_cfg_clicked, 2)
         self.attach(evb, 4, 2, 1, 1)
 
-        # self.refresh_desc()
+        self.refreshing = False
+        self.refresh()
 
         # self.attach(mcue, 4, 1, 1, 1)
         # self.attach(mplay, 4, 2, 1, 1)
@@ -194,36 +194,55 @@ class SequenceTriggersView(Gtk.Grid):
 
         return desc
 
-    def refresh_desc(self):
-        self.mute_entry.props.text = self.desc_trigger(self.trk.get_trig(0))
-        self.cue_entry.props.text = self.desc_trigger(self.trk.get_trig(1))
-        self.play_midi_entry.props.text = self.desc_trigger(self.trk.get_trig(2))
+    def refresh(self):
+        if self.seq > -1:
+            self.refreshing = True
+            self.quantise_scale.set_value(mod[self.seq].trg_quantise)
+            self.play_mode_cb.set_active(mod[self.seq].trg_playmode)
+            self.mute_entry.props.text = self.desc_trigger(mod[self.seq].get_trig(0))
+            self.cue_entry.props.text = self.desc_trigger(mod[self.seq].get_trig(1))
+            self.play_midi_entry.props.text = self.desc_trigger(
+                mod[self.seq].get_trig(2)
+            )
+
+            if not "mouse_cfg" in mod.extras[self.seq][-1]:
+                mod.extras[self.seq][-1]["mouse_cfg"] = [3, 2, 0]
+
+            ms = mod.extras[self.seq][-1]["mouse_cfg"]
+            l = ["   ", " l ", " m ", " r "]
+            self._mmute.set_text(l[ms[0]])
+            self._mcue.set_text(l[ms[1]])
+            self._mplay.set_text(l[ms[2]])
+            self.refreshing = False
 
     def on_mouse_cfg_clicked(self, wdg, evt, d):
-        print(d)
+        if evt.button < 2:
+            return
+
+        ms = mod.extras[self.seq][-1]["mouse_cfg"]
+
+        for b in range(len(ms)):
+            if ms[b] == evt.button:
+                ms[b] = 0
+
+        ms[d] = evt.button
+        self.refresh()
 
     def on_clear_clicked(self, wdg, c):
-        self.trk.set_trig(c, 0, 0, 0)
-        self.refresh_desc()
-        if c is 2:
-            self.play_kp_entry.props.text = ""
-            mod.extras[self.parent.parent.seq.index][self.trk.index]["kp"] = -1
-
-    def on_bool_toggled(self, wdg, t):
-        if t == 0:
-            self.trk.trg_timeline = 1 if wdg.get_active() else 0
-
-        if t == 1:
-            self.trk.trg_letring = 1 if wdg.get_active() else 0
-
-        if t == 2:
-            self.trk.loop = 1 if wdg.get_active() else 0
+        mod[self.seq].set_trig(c, 0, 0, 0)
+        self.refresh()
 
     def on_quantise_changed(self, adj):
-        self.trk.trg_quantise = int(adj.get_value())
+        if self.refreshing:
+            return
+
+        mod[self.seq].trg_quantise = int(adj.get_value())
 
     def on_play_mode_changed(self, wdg):
-        self.trk.trg_playmode = wdg.get_active()
+        if self.refreshing:
+            return
+
+        mod[self.seq].trg_playmode = wdg.get_active()
 
     def on_capture_toggled(self, wdg, capt):
         if wdg.get_active():
@@ -241,23 +260,10 @@ class SequenceTriggersView(Gtk.Grid):
             if capt == 2:
                 self.cue_capture_button.set_active(False)
                 self.mute_capture_button.set_active(False)
-                self.connect("key-press-event", self.on_key_press)
         else:
             if capt == self.capture:
                 self.capture = -1
                 mod.gui_midi_capture = False
-
-    def on_key_press(self, wdg, evt):
-        if self.capture == 2:
-            # let's hardcode some shit
-            k = evt.keyval
-            if 65456 <= k <= 65465:
-                kp = k - 65456
-                self.play_kp_entry.props.text = str(kp)
-                mod.extras[self.parent.parent.seq.index][self.trk.index]["kp"] = kp
-                return True
-
-        return False
 
     def tick(self, wdg, param):
         if self.capture == -1:
@@ -271,10 +277,10 @@ class SequenceTriggersView(Gtk.Grid):
         while midin:
             if midin["type"] in [1, 4]:
                 if self.capture > -1:
-                    self.trk.set_trig(
+                    mod[self.seq].set_trig(
                         self.capture, midin["type"], midin["channel"], midin["note"]
                     )
-                    self.refresh_desc()
+                    self.refresh()
 
             midin = mod.get_midi_in_event()
 

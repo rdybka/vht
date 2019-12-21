@@ -84,15 +84,6 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	track_reset(trk);
 	trk->playing = 1;
 
-	for (int t = 0; t < 3; t ++) {
-		trk->triggers[t].type = trk->triggers[t].channel = trk->triggers[t].note = 0;
-	}
-
-	trk->trg_timeline = 1;
-	trk->trg_letring = 0;
-	trk->trg_playmode = 0;
-	trk->trg_quantise = 0;
-
 	return trk;
 };
 
@@ -357,13 +348,6 @@ track *track_clone(track *src) {
 		dst->qc2_last = src->qc2_last;
 		dst->qc2_val = src->qc2_val;
 		dst->loop = src->loop;
-		dst->trg_timeline = src->trg_timeline;
-		dst->trg_letring = src->trg_letring;
-		dst->trg_playmode = src->trg_playmode;
-		dst->trg_quantise = src->trg_quantise;
-		for (int t = 0; t < 3; t++) {
-			dst->triggers[t] = src->triggers[t];
-		}
 	}
 
 	return dst;

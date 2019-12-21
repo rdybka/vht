@@ -113,8 +113,8 @@ class SequenceListView(Gtk.DrawingArea):
         curr = int(event.x / (self._txt_height * cfg.mixer_padding))
         oldh = self._highlight
 
-        if self._popup.pooped:
-            return
+        # if self._popup.pooped:
+        #    return
 
         if self._drag:
             curr = max(min(curr, len(mod) - 1), 0)
@@ -161,6 +161,9 @@ class SequenceListView(Gtk.DrawingArea):
         if event.button != cfg.select_button:
             return False
 
+        # if self._popup.pooped:
+        #    return True
+
         old = mod.curr_seq
 
         curr = int(event.x / (self._txt_height * cfg.mixer_padding))
@@ -169,6 +172,9 @@ class SequenceListView(Gtk.DrawingArea):
             return True
 
         if curr < len(mod):
+            if not "mouse_cfg" in mod.extras[curr][-1]:
+                mod.extras[curr][-1]["mouse_cfg"] = [3, 2, 0]
+
             if event.y < self._txt_height:
                 self.pop_point_to(curr)
                 self._popup.pop(curr)
@@ -297,10 +303,15 @@ class SequenceListView(Gtk.DrawingArea):
             cr.move_to(x, self._txt_height)
             cr.rotate(math.pi / 2.0)
 
-            txt = cfg.sequence_name_format % r
+            txt = cfg.sequence_name_format % (len(mod) - 1)
             if "sequence_name" in mod.extras[r][-1]:
                 cr.show_text(mod.extras[r][-1]["sequence_name"])
             else:
+                for rr in mod.extras.values():
+                    if "sequence_name" in rr[-1]:
+                        if rr[-1]["sequence_name"] == txt:
+                            txt = txt + "_"
+
                 mod.extras[r][-1]["sequence_name"] = txt
                 cr.show_text(txt)
 
@@ -332,7 +343,6 @@ class SequenceListView(Gtk.DrawingArea):
         return False
 
     def tick(self):
-
         # if self.trgview.play_mode_cb.props.popup_shown:
         #    self.time_want_to_leave = 0
         #    return True

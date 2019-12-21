@@ -523,49 +523,33 @@ def track_set_loop(trk, v):
     return _libcvht.track_set_loop(trk, v)
 track_set_loop = _libcvht.track_set_loop
 
-def track_set_trg_timeline(trk, v):
-    return _libcvht.track_set_trg_timeline(trk, v)
-track_set_trg_timeline = _libcvht.track_set_trg_timeline
-
-def track_set_trg_letring(trk, v):
-    return _libcvht.track_set_trg_letring(trk, v)
-track_set_trg_letring = _libcvht.track_set_trg_letring
-
-def track_set_trg_playmode(trk, v):
-    return _libcvht.track_set_trg_playmode(trk, v)
-track_set_trg_playmode = _libcvht.track_set_trg_playmode
-
-def track_set_trg_quantise(trk, v):
-    return _libcvht.track_set_trg_quantise(trk, v)
-track_set_trg_quantise = _libcvht.track_set_trg_quantise
-
 def track_get_loop(trk):
     return _libcvht.track_get_loop(trk)
 track_get_loop = _libcvht.track_get_loop
 
-def track_get_trg_timeline(trk):
-    return _libcvht.track_get_trg_timeline(trk)
-track_get_trg_timeline = _libcvht.track_get_trg_timeline
+def sequence_set_trg_playmode(seq, v):
+    return _libcvht.sequence_set_trg_playmode(seq, v)
+sequence_set_trg_playmode = _libcvht.sequence_set_trg_playmode
 
-def track_get_trg_letring(trk):
-    return _libcvht.track_get_trg_letring(trk)
-track_get_trg_letring = _libcvht.track_get_trg_letring
+def sequence_set_trg_quantise(seq, v):
+    return _libcvht.sequence_set_trg_quantise(seq, v)
+sequence_set_trg_quantise = _libcvht.sequence_set_trg_quantise
 
-def track_get_trg_playmode(trk):
-    return _libcvht.track_get_trg_playmode(trk)
-track_get_trg_playmode = _libcvht.track_get_trg_playmode
+def sequence_get_trg_playmode(seq):
+    return _libcvht.sequence_get_trg_playmode(seq)
+sequence_get_trg_playmode = _libcvht.sequence_get_trg_playmode
 
-def track_get_trg_quantise(trk):
-    return _libcvht.track_get_trg_quantise(trk)
-track_get_trg_quantise = _libcvht.track_get_trg_quantise
+def sequence_get_trg_quantise(seq):
+    return _libcvht.sequence_get_trg_quantise(seq)
+sequence_get_trg_quantise = _libcvht.sequence_get_trg_quantise
 
-def track_set_trig(trk, t, tp, ch, nt):
-    return _libcvht.track_set_trig(trk, t, tp, ch, nt)
-track_set_trig = _libcvht.track_set_trig
+def sequence_set_trig(seq, t, tp, ch, nt):
+    return _libcvht.sequence_set_trig(seq, t, tp, ch, nt)
+sequence_set_trig = _libcvht.sequence_set_trig
 
-def track_get_trig(trk, t):
-    return _libcvht.track_get_trig(trk, t)
-track_get_trig = _libcvht.track_get_trig
+def sequence_get_trig(seq, t):
+    return _libcvht.sequence_get_trig(seq, t)
+sequence_get_trig = _libcvht.sequence_get_trig
 
 def track_new(port, channel, len, songlen, ctrlpr):
     return _libcvht.track_new(port, channel, len, songlen, ctrlpr)

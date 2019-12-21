@@ -233,53 +233,37 @@ int track_get_loop(track *trk) {
 	return trk->loop;
 }
 
-void track_set_trg_timeline(track *trk, int v) {
-	trk->trg_timeline = v;
+void sequence_set_trg_quantise(sequence *seq, int v) {
+	seq->trg_quantise = v;
 }
 
-int track_get_trg_timeline(track *trk) {
-	return trk->trg_timeline;
+int sequence_get_trg_quantise(sequence *seq) {
+	return seq->trg_quantise;
 }
 
-void track_set_trg_letring(track *trk, int v) {
-	trk->trg_letring = v;
+void sequence_set_trg_playmode(sequence *seq, int v) {
+	seq->trg_playmode = v;
 }
 
-int track_get_trg_letring(track *trk) {
-	return trk->trg_letring;
+int sequence_get_trg_playmode(sequence *seq) {
+	return seq->trg_playmode;
 }
 
-void track_set_trg_quantise(track *trk, int v) {
-	trk->trg_quantise = v;
-}
-
-int track_get_trg_quantise(track *trk) {
-	return trk->trg_quantise;
-}
-
-void track_set_trg_playmode(track *trk, int v) {
-	trk->trg_playmode = v;
-}
-
-int track_get_trg_playmode(track *trk) {
-	return trk->trg_playmode;
-}
-
-void track_set_trig(track *trk, int t, int tp, int ch, int nt) {
+void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt) {
 	if ((t > 2) || (t < 0))
 		return;
-	trk->triggers[t].type = tp;
-	trk->triggers[t].channel = ch;
-	trk->triggers[t].note = nt;
+	seq->triggers[t].type = tp;
+	seq->triggers[t].channel = ch;
+	seq->triggers[t].note = nt;
 }
 
-char *track_get_trig(track *trk, int t) {
+char *sequence_get_trig(sequence *seq, int t) {
 	static char rc[256];
 
 	if ((t > 2) || (t < 0))
 		return "[0,0,0]";
 
-	sprintf(rc, "[%3d, %3d, %3d]", trk->triggers[t].type, trk->triggers[t].channel, trk->triggers[t].note);
+	sprintf(rc, "[%3d, %3d, %3d]", seq->triggers[t].type, seq->triggers[t].channel, seq->triggers[t].note);
 	return rc;
 }
 

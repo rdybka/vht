@@ -151,18 +151,15 @@ extern void track_set_qc1(track *trk, int ctrl, int val);
 extern void track_set_qc2(track *trk, int ctrl, int val);
 extern char *track_get_qc(track *trk);
 extern void track_set_loop(track *trk, int v);
-extern void track_set_trg_timeline(track *trk, int v);
-extern void track_set_trg_letring(track *trk, int v);
-extern void track_set_trg_playmode(track *trk, int v);
-extern void track_set_trg_quantise(track *trk, int v);
 extern int track_get_loop(track *trk);
-extern int track_get_trg_timeline(track *trk);
-extern int track_get_trg_letring(track *trk);
-extern int track_get_trg_playmode(track *trk);
-extern int track_get_trg_quantise(track *trk);
 
-extern void track_set_trig(track *trk, int t, int tp, int ch, int nt);
-extern char *track_get_trig(track *trk, int t);
+extern void sequence_set_trg_playmode(sequence *seq, int v);
+extern void sequence_set_trg_quantise(sequence *seq, int v);
+extern int sequence_get_trg_playmode(sequence *seq);
+extern int sequence_get_trg_quantise(sequence *seq);
+
+extern void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt);
+extern char *sequence_get_trig(sequence *seq, int t);
 
 extern track *track_new(int port, int channel, int len, int songlen, int ctrlpr);
 

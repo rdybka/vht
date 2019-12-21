@@ -114,6 +114,28 @@ class VHTSequence(Iterable):
     def index(self):
         return self._vht_handle.sequence_get_index(self._seq_handle)
 
+    @property
+    def trg_playmode(self):
+        return self._vht_handle.sequence_get_trg_playmode(self._seq_handle)
+
+    @trg_playmode.setter
+    def trg_playmode(self, value):
+        self._vht_handle.sequence_set_trg_playmode(self._seq_handle, value)
+
+    @property
+    def trg_quantise(self):
+        return self._vht_handle.sequence_get_trg_quantise(self._seq_handle)
+
+    @trg_quantise.setter
+    def trg_quantise(self, value):
+        self._vht_handle.sequence_set_trg_quantise(self._seq_handle, value)
+
+    def get_trig(self, t):
+        return eval(self._vht_handle.sequence_get_trig(self._seq_handle, t))
+
+    def set_trig(self, t, tp, ch, nt):
+        self._vht_handle.sequence_set_trig(self._seq_handle, t, tp, ch, nt)
+
     def __str__(self):
         ret = ""
         for itm in self:

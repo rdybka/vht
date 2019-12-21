@@ -21,7 +21,17 @@
 #include "midi_event.h"
 #include "track.h"
 
-#define SEQUENCE_MAX_LENGTH	256
+#define SEQUENCE_MAX_LENGTH	512
+
+#define TRIGGER_ONOFF 	0
+#define TRIGGER_ONESHOT	1
+#define TRIGGER_HOLD	2
+
+typedef struct trigger_t {
+	int channel;
+	int type;
+	int note;
+} trigger;
 
 typedef struct sequence_t {
 	track **trk;
@@ -31,6 +41,12 @@ typedef struct sequence_t {
 	double last_period;
 	int midi_focus;
 	int index;
+
+	// triggers
+	trigger triggers[3];
+
+	int trg_playmode;
+	int trg_quantise;
 } sequence;
 
 sequence *sequence_new(int length);
@@ -45,4 +61,13 @@ void sequence_free(sequence *);
 void sequence_advance(sequence *seq, double period);
 
 void sequence_handle_record(sequence *seq, midi_event evt);
+
+void sequence_set_trg_quantise(sequence *seq, int v);
+void sequence_set_trg_playmode(sequence *seq, int v);
+int sequence_get_trg_quantise(sequence *seq);
+int sequence_get_trg_playmode(sequence *seq);
+
+void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt);
+char *sequence_get_trig(sequence *seq, int t);
+
 #endif //__SEQUENCE_H__

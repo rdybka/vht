@@ -119,6 +119,8 @@ class PropView(Gtk.ScrolledWindow):
                     wdg.popped = False
                     wdg.redraw()
 
+        mod.seqlist._popup.hide()
+
     def redraw(self, index=-1):
         for wdg in self._track_box.get_children():
             if wdg.trk.index == index or index == -1:
