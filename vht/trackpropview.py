@@ -129,6 +129,8 @@ class TrackPropView(Gtk.DrawingArea):
 
     def clone_track(self, trk):
         ntrk = self.seq.clone_track(trk.trk)
+        if trk.trk.playing:
+            ntrk.playing = 0
 
         mod.extras[self.seq.index][ntrk.index] = mod.extras[self.seq.index][
             trk.trk.index

@@ -37,7 +37,7 @@ sequence *sequence_new(int length) {
 	}
 
 	seq->trg_playmode = 0;
-	seq->trg_quantise = 0;
+	seq->trg_quantise = 1;
 	return seq;
 }
 

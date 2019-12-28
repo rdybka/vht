@@ -130,7 +130,9 @@ class MainWin(Gtk.ApplicationWindow):
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
         self.seq_add_butt.add(image)
         self.seq_add_butt.connect("clicked", self.on_seq_add_butt_clicked)
-        self.seq_add_butt.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["seq_add"]))
+        self.seq_add_butt.set_tooltip_markup(
+            cfg.tooltip_markup % (cfg.key["sequence_add"])
+        )
 
         icon = Gio.ThemedIcon(name="process-stop")
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)

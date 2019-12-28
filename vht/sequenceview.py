@@ -239,7 +239,7 @@ class SequenceView(Gtk.Box):
                 mod.reset()
             return True
 
-        if cfg.key["seq_add"].matches(event):
+        if cfg.key["sequence_add"].matches(event):
             self.seq_add()
             return True
 
@@ -269,7 +269,9 @@ class SequenceView(Gtk.Box):
             if len(mod) > 1:
                 for r in range(mod.curr_seq, len(mod) - 1):
                     mod.extras[r] = mod.extras[r + 1]
+                    del mod.extras[r + 1]
 
+                del mod.extras[mod.curr_seq]
                 mod.del_sequence(mod.curr_seq)
 
                 mod.curr_seq = max(0, mod.curr_seq - 1)
@@ -579,7 +581,7 @@ class SequenceView(Gtk.Box):
         }
 
         s.length = self.seq.length
-        s.add_track(length=s.length)
+        # s.add_track(length=s.length)
         mod.seqlist.configure()
         mod.seqlist.redraw()
 
@@ -801,6 +803,7 @@ class SequenceView(Gtk.Box):
             mod.active_track = self.active_tracks[self.seq.index]
 
         self.autoscroll_req = True
+        self.recalculate_row_spacing()
 
     def recalculate_row_spacing(self):
         if not self.get_realized():

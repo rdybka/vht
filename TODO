@@ -1,18 +1,10 @@
-- flashing seq
-- clone track to sequence
-- fix clone icon
 - seqlist
-	* move
-        * extras
 	- popup
-        * name
-        * delete
         - clone
         - triggers
-            - don't record
-            - mute
     - trigging
     - animate
+- playmode/triggers
 ? ctrl antialias
 - silence
     - when quitting

@@ -154,7 +154,7 @@ class SequenceListView(Gtk.DrawingArea):
             self._move_handle = -1
             self._menu_handle = -1
 
-        if oldh > -1 and oldh != self._highlight:
+        if -1 < oldh < len(mod) and oldh != self._highlight:
             self.redraw(oldh)
 
     def on_button_press(self, widget, event):
