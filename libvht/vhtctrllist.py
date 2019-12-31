@@ -21,11 +21,11 @@ from libvht.vhtctrl import VHTCtrl
 
 class VHTCtrlList(Iterable):
     def __init__(self, vht, trk):
+        super(VHTCtrlList, self).__init__()
         self._vht_handle = vht
         self._trk_handle = trk
         self._ctrls = []
         self._update()
-        super()
 
     def __len__(self):
         return self._vht_handle.track_get_nctrl(self._trk_handle)

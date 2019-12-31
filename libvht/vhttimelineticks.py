@@ -20,9 +20,9 @@ from collections.abc import Iterable
 
 class VHTTimelineTicks(Iterable):
     def __init__(self, vht, tl):
+        super(VHTTimelineTicks, self).__init__()
         self._vht_handle = vht
         self._tl_handle = tl
-        super()
 
     def __len__(self):
         return self._vht_handle.timeline_get_nticks(self._tl_handle)

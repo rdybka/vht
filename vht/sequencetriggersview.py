@@ -205,9 +205,6 @@ class SequenceTriggersView(Gtk.Grid):
                 mod[self.seq].get_trig(2)
             )
 
-            if not "mouse_cfg" in mod.extras[self.seq][-1]:
-                mod.extras[self.seq][-1]["mouse_cfg"] = [3, 2, 0]
-
             ms = mod.extras[self.seq][-1]["mouse_cfg"]
             l = ["   ", " l ", " m ", " r "]
             self._mmute.set_text(l[ms[0]])

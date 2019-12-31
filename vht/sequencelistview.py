@@ -172,9 +172,6 @@ class SequenceListView(Gtk.DrawingArea):
             return True
 
         if curr < len(mod):
-            if not "mouse_cfg" in mod.extras[curr][-1]:
-                mod.extras[curr][-1]["mouse_cfg"] = [3, 2, 0]
-
             if event.y < self._txt_height:
                 self.pop_point_to(curr)
                 self._popup.pop(curr)
@@ -233,6 +230,9 @@ class SequenceListView(Gtk.DrawingArea):
 
     def redraw(self, col=-1):
         cr = self._context
+
+        if not cr:
+            return
 
         w = self.get_allocated_width()
         h = self.get_allocated_height()
@@ -303,17 +303,7 @@ class SequenceListView(Gtk.DrawingArea):
             cr.move_to(x, self._txt_height)
             cr.rotate(math.pi / 2.0)
 
-            txt = cfg.sequence_name_format % (len(mod) - 1)
-            if "sequence_name" in mod.extras[r][-1]:
-                cr.show_text(mod.extras[r][-1]["sequence_name"])
-            else:
-                for rr in mod.extras.values():
-                    if "sequence_name" in rr[-1]:
-                        if rr[-1]["sequence_name"] == txt:
-                            txt = txt + "_"
-
-                mod.extras[r][-1]["sequence_name"] = txt
-                cr.show_text(txt)
+            cr.show_text(mod.extras[r][-1]["sequence_name"])
 
             cr.restore()
 

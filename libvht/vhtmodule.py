@@ -25,11 +25,15 @@ import pickle
 class VHTModule(Iterable):
     # a somewhat pythonic interface to the vht magic
     def __init__(self):
+        super(VHTModule, self).__init__()
         self.active_track = None
         libcvht.module_new()
         self.extras = {}  # will be saved - for stuff like names of tracks
+
         self.timeline = VHTTimeline(libcvht)
-        super()
+
+        self.cb_new_sequence = []  # will be called
+        self.cb_new_track = []  # will be called
 
     def __del__(self):
         libcvht.module_free()
@@ -62,7 +66,7 @@ class VHTModule(Iterable):
 
     def __iter__(self):
         for itm in range(self.__len__()):
-            yield VHTSequence(libcvht, libcvht.module_get_seq(itm))
+            yield VHTSequence(libcvht, libcvht.module_get_seq(itm), self.cb_new_track)
 
     def __getitem__(self, itm):
         if itm >= self.__len__():
@@ -71,12 +75,14 @@ class VHTModule(Iterable):
         if itm < 0:
             raise IndexError()
 
-        return VHTSequence(libcvht, libcvht.module_get_seq(itm))
+        return VHTSequence(libcvht, libcvht.module_get_seq(itm), self.cb_new_track)
 
     def add_sequence(self, length=-1):
         seq = libcvht.sequence_new(length)
         libcvht.module_add_sequence(seq)
-        return VHTSequence(libcvht, seq)
+        for cb in self.cb_new_sequence:
+            cb(libcvht.sequence_get_index(seq))
+        return VHTSequence(libcvht, seq, self.cb_new_track)
 
     def swap_sequence(self, s1, s2):
         libcvht.module_swap_sequence(s1, s2)

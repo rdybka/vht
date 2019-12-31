@@ -17,13 +17,15 @@
 
 from collections.abc import Iterable
 from libvht.vhttrack import VHTTrack
+import libvht
 
 
 class VHTSequence(Iterable):
-    def __init__(self, vht, seq):
+    def __init__(self, vht, seq, cb_new_track=[]):
+        super(VHTSequence, self).__init__()
         self._vht_handle = vht
         self._seq_handle = seq
-        super()
+        self.cb_new_track = cb_new_track
 
     def __len__(self):
         return self._vht_handle.sequence_get_ntrk(self._seq_handle)
@@ -64,6 +66,8 @@ class VHTSequence(Iterable):
 
         trk = self._vht_handle.track_new(port, channel, length, songlength, ctrlpr)
         self._vht_handle.sequence_add_track(self._seq_handle, trk)
+        for cb in self.cb_new_track:
+            cb(self.index, self._vht_handle.track_get_index(trk))
         return self[self.__len__() - 1]
 
     def clone_track(self, trk, dest=-1):
@@ -71,7 +75,8 @@ class VHTSequence(Iterable):
             dest = self
         ntrk = self._vht_handle.sequence_clone_track(dest._seq_handle, trk._trk_handle)
         # self._vht_handle.track_set_playing(ntrk, 0)
-
+        for cb in self.cb_new_track:
+            cb(self.index, self._vht_handle.track_get_index(ntrk))
         return VHTTrack(self._vht_handle, ntrk)
 
     def double(self):

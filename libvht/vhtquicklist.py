@@ -22,9 +22,9 @@ from collections.abc import Iterable
 
 class VHTQuickList(Iterable):
     def __init__(self, i, l):
+        super(VHTQuickList, self).__init__()
         self._i = i
         self._l = l
-        super()
 
     def __len__(self):
         return self._l

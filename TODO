@@ -1,3 +1,4 @@
+- 27 rows
 - seqlist
 	- popup
         - clone
@@ -5,6 +6,7 @@
     - trigging
     - animate
 - playmode/triggers
+- first row not playing
 ? ctrl antialias
 - silence
     - when quitting

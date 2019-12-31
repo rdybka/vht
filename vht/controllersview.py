@@ -78,15 +78,6 @@ class ControllersView(Gtk.Box):
 
         self.last_ctrl = cfg.default_ctrl_name
 
-        if not parent.parent.seq.index in mod.extras:
-            mod.extras[parent.parent.seq.index] = {}
-
-        if not self.trk.index in mod.extras[parent.parent.seq.index]:
-            mod.extras[parent.parent.seq.index][self.trk.index] = {}
-
-        if not "ctrl_names" in mod.extras[parent.parent.seq.index][self.trk.index]:
-            mod.extras[parent.parent.seq.index][self.trk.index]["ctrl_names"] = {}
-
         self.ctrl_names = mod.extras[parent.parent.seq.index][self.trk.index][
             "ctrl_names"
         ]

@@ -20,6 +20,7 @@ from vht.sequencelistview import SequenceListView
 from vht.statusbar import StatusBar
 from vht.sequenceview import SequenceView
 from vht import *
+import vht.extras
 
 import gi
 import os

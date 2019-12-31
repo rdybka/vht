@@ -131,14 +131,7 @@ class SequenceView(Gtk.Box):
         self.show_all()
 
     def fix_highlight_extras(self):
-        self.highlight = cfg.highlight
-        if self.seq.index in mod.extras:
-            if "highlight" in mod.extras[self.seq.index][-1]:
-                self.highlight = mod.extras[self.seq.index][-1]["highlight"]
-        else:
-            mod.extras[self.seq.index] = {}
-            mod.extras[self.seq.index][-1] = {}
-            mod.extras[self.seq.index][-1]["highlight"] = self.highlight
+        self.highlight = mod.extras[self.seq.index][-1]["highlight"]
 
     def on_button_press(self, widget, event):
         if event.button == cfg.delete_button:
@@ -575,10 +568,10 @@ class SequenceView(Gtk.Box):
         self._sv.grab_focus()
 
     def seq_add(self):
-        s = mod.add_sequence()
-        mod.extras[s.index] = {
-            -1: {"highlight": mod.extras[self.seq.index][-1]["highlight"]}
-        }
+        s = mod.add_sequence(cfg.default_seq_length)
+        mod.extras[s.index][-1]["highlight"] = mod.extras[self.seq.index][-1][
+            "highlight"
+        ]
 
         s.length = self.seq.length
         # s.add_track(length=s.length)

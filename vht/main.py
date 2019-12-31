@@ -22,6 +22,7 @@
 from vht.mainwin import MainWin
 from vht import mod, cfg, ctrlcfg, autoexec, bankcfg, randomcomposer
 from gi.repository import GLib, Gtk, Gio, GdkPixbuf
+import vht.extras
 import sys
 import os
 import gi
@@ -214,6 +215,8 @@ def run():
     midig = []
     for val in cfg.midi_in.values():
         midig.append(tuple(val[:-1]))
+
+    vht.extras.register(mod)
 
     mod.set_midi_record_ignore(midig)
     randomcomposer.muzakize()

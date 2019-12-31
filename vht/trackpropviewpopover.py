@@ -197,53 +197,29 @@ class TrackPropViewPopover(Gtk.Popover):
             grid.attach(Gtk.Label("name:"), 0, 3, 1, 1)
             grid.attach(self.name_entry, 1, 3, 4, 1)
 
-            if not parent.seq.index in mod.extras:
-                mod.extras[parent.seq.index] = {}
-
-            if not self.trk.index in mod.extras[parent.seq.index]:
-                mod.extras[parent.seq.index][self.trk.index] = {}
-
-            if not "track_name" in mod.extras[parent.seq.index][self.trk.index]:
-                mod.extras[parent.seq.index][self.trk.index]["track_name"] = ""
-
             self.name_entry.set_text(
                 mod.extras[parent.seq.index][self.trk.index]["track_name"]
             )
 
-            if "track_show_notes" in mod.extras[self.parent.seq.index][self.trk.index]:
-                self.show_timeshift_button.set_active(
-                    mod.extras[self.parent.seq.index][self.trk.index][
-                        "track_show_timeshift"
-                    ]
-                )
-                self.show_pitchwheel_button.set_active(
-                    mod.extras[self.parent.seq.index][self.trk.index][
-                        "track_show_pitchwheel"
-                    ]
-                )
-                self.show_controllers_button.set_active(
-                    mod.extras[self.parent.seq.index][self.trk.index][
-                        "track_show_controllers"
-                    ]
-                )
-                self.show_notes_button.set_active(
-                    mod.extras[self.parent.seq.index][self.trk.index][
-                        "track_show_notes"
-                    ]
-                )
-            else:
-                mod.extras[self.parent.seq.index][self.trk.index][
-                    "track_show_notes"
-                ] = True
+            self.show_timeshift_button.set_active(
                 mod.extras[self.parent.seq.index][self.trk.index][
                     "track_show_timeshift"
-                ] = False
+                ]
+            )
+
+            self.show_pitchwheel_button.set_active(
                 mod.extras[self.parent.seq.index][self.trk.index][
                     "track_show_pitchwheel"
-                ] = False
+                ]
+            )
+            self.show_controllers_button.set_active(
                 mod.extras[self.parent.seq.index][self.trk.index][
                     "track_show_controllers"
-                ] = False
+                ]
+            )
+            self.show_notes_button.set_active(
+                mod.extras[self.parent.seq.index][self.trk.index]["track_show_notes"]
+            )
 
             grid.attach(Gtk.Label("patch:"), 0, 2, 1, 1)
 
@@ -422,15 +398,35 @@ class TrackPropViewPopover(Gtk.Popover):
                 mitm.show()
                 m.append(mitm)
 
+        mitm = Gtk.SeparatorMenuItem()
+        mitm.show()
+        m.append(mitm)
+
+        mitm = Gtk.MenuItem("new")
+        mitm.seq = -23
+        mitm.connect("activate", self.on_clone_menu_item_activate)
+        mitm.show()
+        m.append(mitm)
+
     def on_clone_menu_item_activate(self, itm):
         if itm.seq == -1:
             self.parent.clone_track(self.trkview)
             return
 
-        ntrk = self.parent.seq.clone_track(self.trkview.trk, mod[itm.seq])
-        mod.extras[itm.seq][ntrk.index] = mod.extras[self.parent.seq.index][
+        if itm.seq == -23:
+            s = mod.add_sequence(mod[mod.curr_seq].length)
+
+            mod.seqlist.configure()
+            mod.seqlist.redraw()
+
+        seq = itm.seq if itm.seq != -23 else len(mod) - 1
+
+        ntrk = self.parent.seq.clone_track(self.trkview.trk, mod[seq])
+        mod.extras[seq][ntrk.index] = mod.extras[self.parent.seq.index][
             self.trk.index
         ].copy()
+
+        self.build_clone_menu()
 
     def on_patch_menu_item_activate(self, itm):
         self.name_entry.set_text(itm.patch[1])

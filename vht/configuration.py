@@ -42,8 +42,8 @@ class Configuration:
         self.timeline_position = 0.75
         self.console_position = 0.7
         self.console_show = False
-        self.timeline_show = True
-        self.console_steal_stderr = False
+        self.timeline_show = False
+        self.console_steal_stderr = True
 
         c = (0.2, 0.7, 1.0)
         self.colour = c
@@ -100,7 +100,7 @@ class Configuration:
         self.quick_control_2_def = 64
 
         self.new_tracks_left = False
-        self.default_seq_length = 32
+        self.default_seq_length = 16
 
         self.controller_resolution = 8
 

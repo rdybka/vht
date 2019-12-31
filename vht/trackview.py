@@ -138,39 +138,18 @@ class TrackView(Gtk.DrawingArea):
         if trk:
             self.undo_buff = TrackUndoBuffer(trk)
 
-            if self.parent.seq.index in mod.extras:
-                if self.trk.index in mod.extras[self.parent.seq.index]:
-                    if (
-                        "track_show_notes"
-                        in mod.extras[self.parent.seq.index][self.trk.index]
-                    ):
-                        self.show_timeshift = mod.extras[self.parent.seq.index][
-                            self.trk.index
-                        ]["track_show_timeshift"]
-                        self.show_pitchwheel = mod.extras[self.parent.seq.index][
-                            self.trk.index
-                        ]["track_show_pitchwheel"]
-                        self.show_controllers = mod.extras[self.parent.seq.index][
-                            self.trk.index
-                        ]["track_show_controllers"]
-                        self.show_notes = mod.extras[self.parent.seq.index][
-                            self.trk.index
-                        ]["track_show_notes"]
-            else:
-                if not self.parent.seq.index in mod.extras:
-                    mod.extras[self.parent.seq.index] = {}
-                mod.extras[self.parent.seq.index][self.trk.index][
-                    "track_show_notes"
-                ] = True
-                mod.extras[self.parent.seq.index][self.trk.index][
-                    "track_show_timeshift"
-                ] = False
-                mod.extras[self.parent.seq.index][self.trk.index][
-                    "track_show_pitchwheel"
-                ] = False
-                mod.extras[self.parent.seq.index][self.trk.index][
-                    "track_show_controllers"
-                ] = False
+            self.show_timeshift = mod.extras[self.parent.seq.index][self.trk.index][
+                "track_show_timeshift"
+            ]
+            self.show_pitchwheel = mod.extras[self.parent.seq.index][self.trk.index][
+                "track_show_pitchwheel"
+            ]
+            self.show_controllers = mod.extras[self.parent.seq.index][self.trk.index][
+                "track_show_controllers"
+            ]
+            self.show_notes = mod.extras[self.parent.seq.index][self.trk.index][
+                "track_show_notes"
+            ]
 
         self._surface = None
         self._context = None

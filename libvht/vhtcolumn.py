@@ -21,10 +21,10 @@ from libvht.vhtrow import VHTRow
 
 class VHTColumn(Iterable):
     def __init__(self, vht, trk, col):
+        super(VHTColumn, self).__init__()
         self._vht_handle = vht
         self._trk_handle = trk
         self._col = col
-        super()
 
     def __len__(self):
         return self._vht_handle.track_get_length(self._trk_handle)

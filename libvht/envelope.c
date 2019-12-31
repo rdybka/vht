@@ -85,7 +85,7 @@ void envelope_draw_cluster(envelope *env, int nf, int nl) {
 	float ly = 0;
 	float lz = 0;
 
-	for (int n = nf; n < nl + 1; n++) {
+	for (int n = nf; n <= nl; n++) {
 		float x, y, z;				// present
 		float nx, ny;	 			// future
 
@@ -117,12 +117,11 @@ void envelope_draw_cluster(envelope *env, int nf, int nl) {
 
 		int y0 = y2bz(env, ly);
 		int y1 = y2bz(env, y);
-
 		float dx = (x - lx) / (y - ly);
 		float lny = fabs(y2bz(env, y) - y2bz(env, ly));
-
 		int yend = y2bz(env, env->nodes[nl].y);
 		int ystart = y2bz(env, env->nodes[nf].y);
+
 		// straight line from previous node
 		float xx = lx + (lz * (x - lx));
 		for (int yy = y0 + (lz * lny); yy <  y1; yy++) {

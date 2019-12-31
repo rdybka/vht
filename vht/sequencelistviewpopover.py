@@ -125,10 +125,7 @@ class SequenceListViewPopover(Gtk.Popover):
     def refresh(self):
         self.get_window().freeze_updates()
 
-        if "sequence_name" in mod.extras[self.curr][-1]:
-            self._entry.set_text(mod.extras[self.curr][-1]["sequence_name"])
-        else:
-            self._entry.set_text("")
+        self._entry.set_text(mod.extras[self.curr][-1]["sequence_name"])
 
         if len(mod) == 1:
             self._del_button.set_sensitive(False)

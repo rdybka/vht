@@ -21,12 +21,12 @@ from libvht.vhtctrlrow import VHTCtrlRow
 
 class VHTCtrl(Iterable):
     def __init__(self, vht, trk, ctrl, ctrlnum, on_change=None):
+        super(VHTCtrl, self).__init__()
         self._vht_handle = vht
         self._trk_handle = trk
         self._ctrl = ctrl
         self._ctrlnum = ctrlnum
         self.on_change = on_change
-        super()
 
     def __len__(self):
         return self._vht_handle.track_get_length(self._trk_handle)
