@@ -20,9 +20,11 @@ from libvht.vhttimelineticks import VHTTimelineTicks
 
 
 class VHTTimeline:
-    def __init__(self, vht):
+    def __init__(self, vht, mod):
+        self._mod_handle = mod
         self._vht_handle = vht
-        self._tl_handle = self._vht_handle.module_get_timeline()
+
+        self._tl_handle = self._vht_handle.module_get_timeline(self._mod_handle)
         self.changes = VHTTimelineChanges(self._vht_handle, self._tl_handle)
         self.ticks = VHTTimelineTicks(self._vht_handle, self._tl_handle)
 

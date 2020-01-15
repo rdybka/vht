@@ -1,6 +1,6 @@
 # configuration.py - Valhalla Tracker
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,8 +42,8 @@ class Configuration:
         self.timeline_position = 0.75
         self.console_position = 0.7
         self.console_show = False
-        self.timeline_show = False
-        self.console_steal_stderr = True
+        self.timeline_show = True
+        self.console_steal_stderr = False
 
         c = (0.2, 0.7, 1.0)
         self.colour = c
@@ -63,7 +63,7 @@ class Configuration:
         self.intensity_lines = 0.6
         self.even_highlight = 1.4
         self.intensity_select = 0.7
-        self.pointer_opacity = 0.7
+        self.pointer_opacity = 0.9
         self.pointer_width = 5
         self.auto_scroll_delay = 0.2
         self.tooltip_markup = """<span font_family="Monospace" size="large">%s</span>"""

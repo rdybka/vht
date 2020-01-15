@@ -22,16 +22,25 @@
 #include <pthread.h>
 #include <math.h>
 
-#include "jack_client.h"
+#include "midi_client.h"
 #include "module.h"
 #include "track.h"
 #include "row.h"
-#include "libvht.h"
+
+void trk_mod_excl_in(track *trk) {
+	if (trk->mod_excl)
+		pthread_mutex_lock(trk->mod_excl);
+}
+
+void trk_mod_excl_out(track *trk) {
+	if (trk->mod_excl)
+		pthread_mutex_unlock(trk->mod_excl);
+}
 
 track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	track *trk = malloc(sizeof(track));
 	if (len == -1)
-		len = module.def_nrows;
+		len = 32;
 
 	if (songlen == -1)
 		songlen = len;
@@ -61,6 +70,7 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	pthread_mutex_init(&trk->excl, NULL);
 	pthread_mutex_init(&trk->exclrec, NULL);
 	pthread_mutex_init(&trk->exclctrl, NULL);
+	trk->mod_excl = NULL;
 
 	trk->rows = malloc(sizeof(row*) * trk->ncols);
 	trk->ring = malloc(sizeof(int) * trk->ncols);
@@ -72,6 +82,8 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	}
 
 	trk->ctrlpr = ctrlpr;
+	if (trk->ctrlpr < 1)
+		trk->ctrlpr = TRACK_DEF_CTRLPR;
 	trk->nctrl = 0;
 	trk->ctrl = 0;
 	trk->ctrlnum = 0;
@@ -83,7 +95,7 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	track_add_ctrl(trk, -1);
 	track_reset(trk);
 	trk->playing = 1;
-
+	trk->clt = NULL;
 	return trk;
 };
 
@@ -488,7 +500,7 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 			evt.type = note_off;
 			evt.note = trk->ring[c];
 			evt.velocity = 0;
-			midi_buffer_add(trk->port, evt);
+			midi_buffer_add(trk->clt, trk->port, evt);
 			trk->ring[c] = -1;
 		}
 	}
@@ -499,7 +511,7 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 		evt.type = r.type;
 		evt.note = r.note;
 		evt.velocity = r.velocity;
-		midi_buffer_add(trk->port, evt);
+		midi_buffer_add(trk->clt, trk->port, evt);
 
 		// fix wandering notes
 		int wanderer = track_get_wandering_note(trk, c, pos);
@@ -542,9 +554,11 @@ void track_advance(track *trk, double speriod) {
 		return;
 	}
 
+	midi_client *clt = (midi_client *)trk->clt;
+
 	// length of period in track time
 	double tperiod = ((double)trk->nrows / (double)trk->nsrows) * speriod;
-	double tmul = (double) jack_buffer_size / tperiod;
+	double tmul = (double) clt->jack_buffer_size / tperiod;
 
 	int row_start = floorf(trk->pos);
 	int row_end = floorf(trk->pos + tperiod) + 1;
@@ -565,7 +579,7 @@ void track_advance(track *trk, double speriod) {
 			evt.data = trk->bank_msb;
 
 			if (trk->bank_msb > -1)
-				midi_buffer_add(trk->port, evt);
+				midi_buffer_add(clt, trk->port, evt);
 
 			evt.time = 0;
 			evt.channel = trk->channel;
@@ -574,7 +588,7 @@ void track_advance(track *trk, double speriod) {
 			evt.data = trk->bank_lsb;
 
 			if (trk->bank_lsb > -1)
-				midi_buffer_add(trk->port, evt);
+				midi_buffer_add(clt, trk->port, evt);
 
 			evt.time = 0;
 			evt.channel = trk->channel;
@@ -582,7 +596,7 @@ void track_advance(track *trk, double speriod) {
 			evt.control = trk->prog;
 			evt.data = 0;
 
-			midi_buffer_add(trk->port, evt);
+			midi_buffer_add(clt, trk->port, evt);
 
 		}
 	}
@@ -600,7 +614,7 @@ void track_advance(track *trk, double speriod) {
 			if (trk->qc1_val != trk->qc1_last) {
 				evt.control = trk->qc1_ctrl;
 				evt.data = trk->qc1_val;
-				midi_buffer_add(trk->port, evt);
+				midi_buffer_add(clt, trk->port, evt);
 
 				trk->qc1_last = trk->qc1_val;
 			}
@@ -610,7 +624,7 @@ void track_advance(track *trk, double speriod) {
 			if (trk->qc2_val != trk->qc2_last) {
 				evt.control = trk->qc2_ctrl;
 				evt.data = trk->qc2_val;
-				midi_buffer_add(trk->port, evt);
+				midi_buffer_add(clt, trk->port, evt);
 
 				trk->qc2_last = trk->qc2_val;
 			}
@@ -689,7 +703,7 @@ void track_advance(track *trk, double speriod) {
 					if (trk->playing)
 						if (data != trk->lctrlval[c]) {
 							trk->lctrlval[c] = data;
-							midi_buffer_add(trk->port, evt);
+							midi_buffer_add(clt, trk->port, evt);
 						}
 				}
 			}
@@ -718,7 +732,15 @@ void track_wind(track *trk, double period) {
 void track_kill_notes(track *trk) {
 	for (int c = 0; c < trk->ncols; c++) {
 		if (trk->ring[c] != -1) {
-			queue_midi_note_off(0, 0, trk->channel, trk->ring[c]);
+			midi_event evt;
+
+			evt.type = note_off;
+			evt.channel = trk->channel;
+			evt.note = trk->ring[c];
+			evt.velocity = 0;
+			evt.time = 0;
+			if (trk->clt)
+				midi_buffer_add(trk->clt, trk->port, evt);
 
 			trk->ring[c] = -1;
 		}
@@ -784,7 +806,7 @@ void track_del_col(track *trk, int c) {
 		return;
 	}
 
-	module_excl_in();
+	trk_mod_excl_in(trk);
 
 	for (int cc = c; cc < trk->ncols - 1; cc++) {
 		trk->rows[cc] = trk->rows[cc+1];
@@ -796,7 +818,7 @@ void track_del_col(track *trk, int c) {
 	trk->rows = realloc(trk->rows, sizeof(row*) * trk->ncols);
 	trk->ring = realloc(trk->ring, sizeof(int) * trk->ncols);
 
-	module_excl_out();
+	trk_mod_excl_out(trk);
 }
 
 void track_del_ctrl(track *trk, int c) {
@@ -831,11 +853,11 @@ void track_swap_col(track *trk, int c, int c2) {
 		return;
 	}
 
-	module_excl_in();
+	trk_mod_excl_in(trk);
 	row *c3 = trk->rows[c];
 	trk->rows[c] = trk->rows[c2];
 	trk->rows[c2] = c3;
-	module_excl_out();
+	trk_mod_excl_out(trk);
 }
 
 void track_swap_ctrl(track *trk, int c, int c2) {
@@ -871,6 +893,14 @@ void track_swap_ctrl(track *trk, int c, int c2) {
 	trk->env[c2] = env3;
 
 	pthread_mutex_unlock(&trk->exclctrl);
+}
+
+void track_clear_updates(track *trk) {
+	pthread_mutex_lock(&trk->exclrec);
+
+	trk->cur_rec_update = 0;
+
+	pthread_mutex_unlock(&trk->exclrec);
 }
 
 void track_resize(track *trk, int size) {
@@ -945,7 +975,7 @@ void track_double(track *trk) {
 	track_resize(trk, trk->nrows * 2);
 	trk->nsrows *= 2;
 
-	module_excl_in();
+	trk_mod_excl_in(trk);
 
 	for (int c = 0; c < trk->ncols; c++) {
 		for (int r = 0; r < offs; r++) {
@@ -967,7 +997,7 @@ void track_double(track *trk) {
 		track_ctrl_refresh_envelope(trk, c);
 	}
 
-	module_excl_out();
+	trk_mod_excl_out(trk);
 }
 
 void track_halve(track *trk) {
@@ -1031,14 +1061,6 @@ void track_insert_rec_update(track *trk, int col, int row) {
 	pthread_mutex_unlock(&trk->exclrec);
 }
 
-void track_clear_updates(track *trk) {
-	pthread_mutex_lock(&trk->exclrec);
-
-	trk->cur_rec_update = 0;
-
-	pthread_mutex_unlock(&trk->exclrec);
-}
-
 int col_has_note(track *trk, int col, int note) {
 	int found_notes = 0;
 	for (int y = 0; y < trk->nrows; y++) {
@@ -1057,7 +1079,8 @@ int col_has_note(track *trk, int col, int note) {
 
 // shit gets real
 void track_handle_record(track *trk, midi_event evt) {
-	double pos = trk->last_pos + ((trk->last_period / (double)jack_buffer_size) * evt.time);
+	midi_client *clt = (midi_client *)trk->clt;
+	double pos = trk->last_pos + ((trk->last_period / (double)clt->jack_buffer_size) * evt.time);
 
 	int p = floorf(pos);
 	double rem = pos - p;
@@ -1203,3 +1226,35 @@ int track_get_lctrlval(track *trk, int c) {
 	return ret;
 }
 
+// from python, we will access envelopes through track
+// all controllers will have envs added automatically
+void track_envelope_add_node(track *trk, int c, float x, float y, float z, int linked) {
+	envelope_add_node(trk->env[c], x, y, z, linked);
+}
+
+void track_envelope_del_node(track *trk, int c, int n) {
+	envelope_del_node(trk->env[c], n);
+}
+
+void track_envelope_set_node(track *trk, int c, int n, float x, float y, float z, int linked) {
+	envelope_set_node(trk->env[c], n, x, y, z, linked);
+}
+
+
+// don't do this
+char *track_get_envelope(track *trk, int c) {
+	static char ret[(ENV_MAX_NNODES * 50) + 2];
+
+	sprintf(ret, "[");
+
+	for (int n = 0; n < trk->env[c]->nnodes; n++) {
+		char buff[256];
+		sprintf(buff, "{\"x\":%07.2f,\"y\":%07.2f,\"z\":%07.2f,\"l\":%d},", trk->env[c]->nodes[n].x,
+		        trk->env[c]->nodes[n].y, trk->env[c]->nodes[n].z, trk->env[c]->nodes[n].linked);
+
+		strcat(ret, buff);
+	}
+
+	strcat(ret, "]");
+	return ret;
+}

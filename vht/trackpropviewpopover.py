@@ -415,7 +415,9 @@ class TrackPropViewPopover(Gtk.Popover):
 
         if itm.seq == -23:
             s = mod.add_sequence(mod[mod.curr_seq].length)
-
+            mod.extras[len(mod) - 1][-1]["highlight"] = mod.extras[
+                self.parent.seq.index
+            ][-1]["highlight"]
             mod.seqlist.configure()
             mod.seqlist.redraw()
 
@@ -461,7 +463,7 @@ class TrackPropViewPopover(Gtk.Popover):
         self.nsrows_adj.set_upper(self.parent.seq.length)
         self.nsrows_adj.set_value(self.trk.nsrows)
         self.nrows_adj.set_value(self.trk.nrows)
-        self.port_adj.set_upper(mod.nports - 1)
+        self.port_adj.set_upper(mod.max_ports - 1)
 
         # self.loop_button.set_active(self.trk.loop) // not yet implemented in vhtlib
         # self.show_notes_button.set_sensitive(False)

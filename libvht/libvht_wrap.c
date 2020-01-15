@@ -3001,12 +3001,14 @@ SWIG_Python_NonDynamicSetAttr(PyObject *obj, PyObject *name, PyObject *value) {
 #define SWIGTYPE_p_ctrlrow swig_types[1]
 #define SWIGTYPE_p_int swig_types[2]
 #define SWIGTYPE_p_int_array swig_types[3]
-#define SWIGTYPE_p_row swig_types[4]
-#define SWIGTYPE_p_sequence swig_types[5]
-#define SWIGTYPE_p_timeline swig_types[6]
-#define SWIGTYPE_p_track swig_types[7]
-static swig_type_info *swig_types[9];
-static swig_module_info swig_module = {swig_types, 8, 0, 0, 0, 0};
+#define SWIGTYPE_p_midi_client swig_types[4]
+#define SWIGTYPE_p_module swig_types[5]
+#define SWIGTYPE_p_row swig_types[6]
+#define SWIGTYPE_p_sequence swig_types[7]
+#define SWIGTYPE_p_timeline swig_types[8]
+#define SWIGTYPE_p_track swig_types[9]
+static swig_type_info *swig_types[11];
+static swig_module_info swig_module = {swig_types, 10, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -3730,36 +3732,33 @@ SWIGINTERN PyObject *int_array_swigregister(PyObject *SWIGUNUSEDPARM(self), PyOb
   return SWIG_Py_Void();
 }
 
-SWIGINTERN PyObject *_wrap_start(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_module_new(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  char *arg1 = (char *) 0 ;
-  int res1 ;
-  char *buf1 = 0 ;
-  int alloc1 = 0 ;
-  PyObject * obj0 = 0 ;
-  int result;
+  module *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:start",&obj0)) SWIG_fail;
-  res1 = SWIG_AsCharPtrAndSize(obj0, &buf1, NULL, &alloc1);
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "start" "', argument " "1"" of type '" "char *""'");
-  }
-  arg1 = (char *)(buf1);
-  result = (int)start(arg1);
-  resultobj = SWIG_From_int((int)(result));
-  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
+  if (!PyArg_ParseTuple(args,(char *)":module_new")) SWIG_fail;
+  result = (module *)module_new();
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_module, 0 |  0 );
   return resultobj;
 fail:
-  if (alloc1 == SWIG_NEWOBJ) free((char*)buf1);
   return NULL;
 }
 
 
-SWIGINTERN PyObject *_wrap_stop(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_module_free(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":stop")) SWIG_fail;
-  stop();
+  if (!PyArg_ParseTuple(args,(char *)"O:module_free",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_free" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  module_free(arg1);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -3767,12 +3766,119 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_get_jack_error(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_module_reset(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:module_reset",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_reset" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  module_reset(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_module_get_midi_client(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  midi_client *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:module_get_midi_client",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_get_midi_client" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (midi_client *)module_get_midi_client(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_midi_client, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_midi_start(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:midi_start",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "midi_start" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  res2 = SWIG_AsCharPtrAndSize(obj1, &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "midi_start" "', argument " "2"" of type '" "char *""'");
+  }
+  arg2 = (char *)(buf2);
+  result = (int)midi_start(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_midi_stop(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:midi_stop",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "midi_stop" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  midi_stop(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_get_midi_error(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   char *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":get_jack_error")) SWIG_fail;
-  result = (char *)get_jack_error();
+  if (!PyArg_ParseTuple(args,(char *)"O:get_midi_error",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "get_midi_error" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (char *)get_midi_error(arg1);
   resultobj = SWIG_FromCharPtr((const char *)result);
   return resultobj;
 fail:
@@ -3782,10 +3888,19 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_get_time(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   char *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":module_get_time")) SWIG_fail;
-  result = (char *)module_get_time();
+  if (!PyArg_ParseTuple(args,(char *)"O:module_get_time",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_get_time" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (char *)module_get_time(arg1);
   resultobj = SWIG_FromCharPtr((const char *)result);
   return resultobj;
 fail:
@@ -3793,37 +3908,22 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_get_jack_max_ports(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_module_get_max_ports(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":get_jack_max_ports")) SWIG_fail;
-  result = (int)get_jack_max_ports();
+  if (!PyArg_ParseTuple(args,(char *)"O:module_get_max_ports",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_get_max_ports" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (int)module_get_max_ports(arg1);
   resultobj = SWIG_From_int((int)(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_module_new(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  
-  if (!PyArg_ParseTuple(args,(char *)":module_new")) SWIG_fail;
-  module_new();
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_module_free(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  
-  if (!PyArg_ParseTuple(args,(char *)":module_free")) SWIG_fail;
-  module_free();
-  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -3832,18 +3932,27 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_play(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  int arg1 ;
-  int val1 ;
-  int ecode1 = 0 ;
+  module *arg1 = (module *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:module_play",&obj0)) SWIG_fail;
-  ecode1 = SWIG_AsVal_int(obj0, &val1);
-  if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "module_play" "', argument " "1"" of type '" "int""'");
+  if (!PyArg_ParseTuple(args,(char *)"OO:module_play",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_play" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "module_play" "', argument " "2"" of type '" "int""'");
   } 
-  arg1 = (int)(val1);
-  module_play(arg1);
+  arg2 = (int)(val2);
+  module_play(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -3853,10 +3962,19 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_is_playing(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":module_is_playing")) SWIG_fail;
-  result = (int)module_is_playing();
+  if (!PyArg_ParseTuple(args,(char *)"O:module_is_playing",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_is_playing" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (int)module_is_playing(arg1);
   resultobj = SWIG_From_int((int)(result));
   return resultobj;
 fail:
@@ -3866,18 +3984,27 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_record(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  int arg1 ;
-  int val1 ;
-  int ecode1 = 0 ;
+  module *arg1 = (module *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:module_record",&obj0)) SWIG_fail;
-  ecode1 = SWIG_AsVal_int(obj0, &val1);
-  if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "module_record" "', argument " "1"" of type '" "int""'");
+  if (!PyArg_ParseTuple(args,(char *)"OO:module_record",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_record" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "module_record" "', argument " "2"" of type '" "int""'");
   } 
-  arg1 = (int)(val1);
-  module_record(arg1);
+  arg2 = (int)(val2);
+  module_record(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -3887,23 +4014,20 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_is_recording(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":module_is_recording")) SWIG_fail;
-  result = (int)module_is_recording();
+  if (!PyArg_ParseTuple(args,(char *)"O:module_is_recording",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_is_recording" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (int)module_is_recording(arg1);
   resultobj = SWIG_From_int((int)(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_module_reset(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  
-  if (!PyArg_ParseTuple(args,(char *)":module_reset")) SWIG_fail;
-  module_reset();
-  resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
   return NULL;
@@ -3912,10 +4036,19 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_get_bpm(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   float result;
   
-  if (!PyArg_ParseTuple(args,(char *)":module_get_bpm")) SWIG_fail;
-  result = (float)module_get_bpm();
+  if (!PyArg_ParseTuple(args,(char *)"O:module_get_bpm",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_get_bpm" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (float)module_get_bpm(arg1);
   resultobj = SWIG_From_float((float)(result));
   return resultobj;
 fail:
@@ -3925,32 +4058,28 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_set_bpm(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  float arg1 ;
-  float val1 ;
-  int ecode1 = 0 ;
+  module *arg1 = (module *) 0 ;
+  float arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:module_set_bpm",&obj0)) SWIG_fail;
-  ecode1 = SWIG_AsVal_float(obj0, &val1);
-  if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "module_set_bpm" "', argument " "1"" of type '" "float""'");
+  if (!PyArg_ParseTuple(args,(char *)"OO:module_set_bpm",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_set_bpm" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  ecode2 = SWIG_AsVal_float(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "module_set_bpm" "', argument " "2"" of type '" "float""'");
   } 
-  arg1 = (float)(val1);
-  module_set_bpm(arg1);
+  arg2 = (float)(val2);
+  module_set_bpm(arg1,arg2);
   resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_module_get_nports(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  int result;
-  
-  if (!PyArg_ParseTuple(args,(char *)":module_get_nports")) SWIG_fail;
-  result = (int)module_get_nports();
-  resultobj = SWIG_From_int((int)(result));
   return resultobj;
 fail:
   return NULL;
@@ -3959,10 +4088,19 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_get_nseq(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":module_get_nseq")) SWIG_fail;
-  result = (int)module_get_nseq();
+  if (!PyArg_ParseTuple(args,(char *)"O:module_get_nseq",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_get_nseq" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (int)module_get_nseq(arg1);
   resultobj = SWIG_From_int((int)(result));
   return resultobj;
 fail:
@@ -3972,19 +4110,28 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_get_seq(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  int arg1 ;
-  int val1 ;
-  int ecode1 = 0 ;
+  module *arg1 = (module *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   sequence *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:module_get_seq",&obj0)) SWIG_fail;
-  ecode1 = SWIG_AsVal_int(obj0, &val1);
-  if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "module_get_seq" "', argument " "1"" of type '" "int""'");
+  if (!PyArg_ParseTuple(args,(char *)"OO:module_get_seq",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_get_seq" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "module_get_seq" "', argument " "2"" of type '" "int""'");
   } 
-  arg1 = (int)(val1);
-  result = (sequence *)module_get_seq(arg1);
+  arg2 = (int)(val2);
+  result = (sequence *)module_get_seq(arg1,arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_sequence, 0 |  0 );
   return resultobj;
 fail:
@@ -3994,18 +4141,27 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_add_sequence(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  sequence *arg1 = (sequence *) 0 ;
+  module *arg1 = (module *) 0 ;
+  sequence *arg2 = (sequence *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
   PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:module_add_sequence",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"OO:module_add_sequence",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_add_sequence" "', argument " "1"" of type '" "sequence *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_add_sequence" "', argument " "1"" of type '" "module *""'"); 
   }
-  arg1 = (sequence *)(argp1);
-  module_add_sequence(arg1);
+  arg1 = (module *)(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "module_add_sequence" "', argument " "2"" of type '" "sequence *""'"); 
+  }
+  arg2 = (sequence *)(argp2);
+  module_add_sequence(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4015,18 +4171,27 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_del_sequence(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  int arg1 ;
-  int val1 ;
-  int ecode1 = 0 ;
+  module *arg1 = (module *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:module_del_sequence",&obj0)) SWIG_fail;
-  ecode1 = SWIG_AsVal_int(obj0, &val1);
-  if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "module_del_sequence" "', argument " "1"" of type '" "int""'");
+  if (!PyArg_ParseTuple(args,(char *)"OO:module_del_sequence",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_del_sequence" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "module_del_sequence" "', argument " "2"" of type '" "int""'");
   } 
-  arg1 = (int)(val1);
-  module_del_sequence(arg1);
+  arg2 = (int)(val2);
+  module_del_sequence(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4036,27 +4201,36 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_swap_sequence(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  int arg1 ;
+  module *arg1 = (module *) 0 ;
   int arg2 ;
-  int val1 ;
-  int ecode1 = 0 ;
+  int arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
   int val2 ;
   int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:module_swap_sequence",&obj0,&obj1)) SWIG_fail;
-  ecode1 = SWIG_AsVal_int(obj0, &val1);
-  if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "module_swap_sequence" "', argument " "1"" of type '" "int""'");
-  } 
-  arg1 = (int)(val1);
+  if (!PyArg_ParseTuple(args,(char *)"OOO:module_swap_sequence",&obj0,&obj1,&obj2)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_swap_sequence" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "module_swap_sequence" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = (int)(val2);
-  module_swap_sequence(arg1,arg2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "module_swap_sequence" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  module_swap_sequence(arg1,arg2,arg3);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4066,10 +4240,19 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_get_curr_seq(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":module_get_curr_seq")) SWIG_fail;
-  result = (int)module_get_curr_seq();
+  if (!PyArg_ParseTuple(args,(char *)"O:module_get_curr_seq",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_get_curr_seq" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (int)module_get_curr_seq(arg1);
   resultobj = SWIG_From_int((int)(result));
   return resultobj;
 fail:
@@ -4079,18 +4262,27 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_set_curr_seq(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  int arg1 ;
-  int val1 ;
-  int ecode1 = 0 ;
+  module *arg1 = (module *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:module_set_curr_seq",&obj0)) SWIG_fail;
-  ecode1 = SWIG_AsVal_int(obj0, &val1);
-  if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "module_set_curr_seq" "', argument " "1"" of type '" "int""'");
+  if (!PyArg_ParseTuple(args,(char *)"OO:module_set_curr_seq",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_set_curr_seq" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "module_set_curr_seq" "', argument " "2"" of type '" "int""'");
   } 
-  arg1 = (int)(val1);
-  module_set_curr_seq(arg1);
+  arg2 = (int)(val2);
+  module_set_curr_seq(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4100,18 +4292,27 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_dump_notes(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  int arg1 ;
-  int val1 ;
-  int ecode1 = 0 ;
+  module *arg1 = (module *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:module_dump_notes",&obj0)) SWIG_fail;
-  ecode1 = SWIG_AsVal_int(obj0, &val1);
-  if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "module_dump_notes" "', argument " "1"" of type '" "int""'");
+  if (!PyArg_ParseTuple(args,(char *)"OO:module_dump_notes",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_dump_notes" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "module_dump_notes" "', argument " "2"" of type '" "int""'");
   } 
-  arg1 = (int)(val1);
-  module_dump_notes(arg1);
+  arg2 = (int)(val2);
+  module_dump_notes(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4121,10 +4322,19 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_get_rpb(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":module_get_rpb")) SWIG_fail;
-  result = (int)module_get_rpb();
+  if (!PyArg_ParseTuple(args,(char *)"O:module_get_rpb",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_get_rpb" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (int)module_get_rpb(arg1);
   resultobj = SWIG_From_int((int)(result));
   return resultobj;
 fail:
@@ -4134,18 +4344,27 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_set_rpb(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  int arg1 ;
-  int val1 ;
-  int ecode1 = 0 ;
+  module *arg1 = (module *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:module_set_rpb",&obj0)) SWIG_fail;
-  ecode1 = SWIG_AsVal_int(obj0, &val1);
-  if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "module_set_rpb" "', argument " "1"" of type '" "int""'");
+  if (!PyArg_ParseTuple(args,(char *)"OO:module_set_rpb",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_set_rpb" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "module_set_rpb" "', argument " "2"" of type '" "int""'");
   } 
-  arg1 = (int)(val1);
-  module_set_rpb(arg1);
+  arg2 = (int)(val2);
+  module_set_rpb(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4155,10 +4374,19 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_get_ctrlpr(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)":module_get_ctrlpr")) SWIG_fail;
-  result = (int)module_get_ctrlpr();
+  if (!PyArg_ParseTuple(args,(char *)"O:module_get_ctrlpr",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_get_ctrlpr" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (int)module_get_ctrlpr(arg1);
   resultobj = SWIG_From_int((int)(result));
   return resultobj;
 fail:
@@ -4168,171 +4396,27 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_set_ctrlpr(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  int arg1 ;
-  int val1 ;
-  int ecode1 = 0 ;
-  PyObject * obj0 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:module_set_ctrlpr",&obj0)) SWIG_fail;
-  ecode1 = SWIG_AsVal_int(obj0, &val1);
-  if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "module_set_ctrlpr" "', argument " "1"" of type '" "int""'");
-  } 
-  arg1 = (int)(val1);
-  module_set_ctrlpr(arg1);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_queue_midi_note_on(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  sequence *arg1 = (sequence *) 0 ;
+  module *arg1 = (module *) 0 ;
   int arg2 ;
-  int arg3 ;
-  int arg4 ;
-  int arg5 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int val2 ;
   int ecode2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  int val4 ;
-  int ecode4 = 0 ;
-  int val5 ;
-  int ecode5 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  PyObject * obj4 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:queue_midi_note_on",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!PyArg_ParseTuple(args,(char *)"OO:module_set_ctrlpr",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "queue_midi_note_on" "', argument " "1"" of type '" "sequence *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_set_ctrlpr" "', argument " "1"" of type '" "module *""'"); 
   }
-  arg1 = (sequence *)(argp1);
+  arg1 = (module *)(argp1);
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "queue_midi_note_on" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "module_set_ctrlpr" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = (int)(val2);
-  ecode3 = SWIG_AsVal_int(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "queue_midi_note_on" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = (int)(val3);
-  ecode4 = SWIG_AsVal_int(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "queue_midi_note_on" "', argument " "4"" of type '" "int""'");
-  } 
-  arg4 = (int)(val4);
-  ecode5 = SWIG_AsVal_int(obj4, &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "queue_midi_note_on" "', argument " "5"" of type '" "int""'");
-  } 
-  arg5 = (int)(val5);
-  queue_midi_note_on(arg1,arg2,arg3,arg4,arg5);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_queue_midi_note_off(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  sequence *arg1 = (sequence *) 0 ;
-  int arg2 ;
-  int arg3 ;
-  int arg4 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  int val4 ;
-  int ecode4 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:queue_midi_note_off",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "queue_midi_note_off" "', argument " "1"" of type '" "sequence *""'"); 
-  }
-  arg1 = (sequence *)(argp1);
-  ecode2 = SWIG_AsVal_int(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "queue_midi_note_off" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = (int)(val2);
-  ecode3 = SWIG_AsVal_int(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "queue_midi_note_off" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = (int)(val3);
-  ecode4 = SWIG_AsVal_int(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "queue_midi_note_off" "', argument " "4"" of type '" "int""'");
-  } 
-  arg4 = (int)(val4);
-  queue_midi_note_off(arg1,arg2,arg3,arg4);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_queue_midi_ctrl(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  sequence *arg1 = (sequence *) 0 ;
-  track *arg2 = (track *) 0 ;
-  int arg3 ;
-  int arg4 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  void *argp2 = 0 ;
-  int res2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  int val4 ;
-  int ecode4 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OOOO:queue_midi_ctrl",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "queue_midi_ctrl" "', argument " "1"" of type '" "sequence *""'"); 
-  }
-  arg1 = (sequence *)(argp1);
-  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_track, 0 |  0 );
-  if (!SWIG_IsOK(res2)) {
-    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "queue_midi_ctrl" "', argument " "2"" of type '" "track *""'"); 
-  }
-  arg2 = (track *)(argp2);
-  ecode3 = SWIG_AsVal_int(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "queue_midi_ctrl" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = (int)(val3);
-  ecode4 = SWIG_AsVal_int(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "queue_midi_ctrl" "', argument " "4"" of type '" "int""'");
-  } 
-  arg4 = (int)(val4);
-  queue_midi_ctrl(arg1,arg2,arg3,arg4);
+  module_set_ctrlpr(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4385,10 +4469,19 @@ fail:
 
 SWIGINTERN PyObject *_wrap_midi_in_get_event(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   char *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":midi_in_get_event")) SWIG_fail;
-  result = (char *)midi_in_get_event();
+  if (!PyArg_ParseTuple(args,(char *)"O:midi_in_get_event",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "midi_in_get_event" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  result = (char *)midi_in_get_event(arg1);
   resultobj = SWIG_FromCharPtr((const char *)result);
   return resultobj;
 fail:
@@ -4398,9 +4491,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_midi_in_clear_events(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":midi_in_clear_events")) SWIG_fail;
-  midi_in_clear_events();
+  if (!PyArg_ParseTuple(args,(char *)"O:midi_in_clear_events",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "midi_in_clear_events" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  midi_in_clear_events(arg1);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4410,9 +4512,18 @@ fail:
 
 SWIGINTERN PyObject *_wrap_midi_ignore_buffer_clear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":midi_ignore_buffer_clear")) SWIG_fail;
-  midi_ignore_buffer_clear();
+  if (!PyArg_ParseTuple(args,(char *)"O:midi_ignore_buffer_clear",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "midi_ignore_buffer_clear" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  midi_ignore_buffer_clear(arg1);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4422,25 +4533,29 @@ fail:
 
 SWIGINTERN PyObject *_wrap_midi_ignore_buffer_add(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  int arg1 ;
+  midi_client *arg1 = (midi_client *) 0 ;
   int arg2 ;
   int arg3 ;
-  int val1 ;
-  int ecode1 = 0 ;
+  int arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
   int val2 ;
   int ecode2 = 0 ;
   int val3 ;
   int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OOO:midi_ignore_buffer_add",&obj0,&obj1,&obj2)) SWIG_fail;
-  ecode1 = SWIG_AsVal_int(obj0, &val1);
-  if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "midi_ignore_buffer_add" "', argument " "1"" of type '" "int""'");
-  } 
-  arg1 = (int)(val1);
+  if (!PyArg_ParseTuple(args,(char *)"OOOO:midi_ignore_buffer_add",&obj0,&obj1,&obj2,&obj3)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "midi_ignore_buffer_add" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "midi_ignore_buffer_add" "', argument " "2"" of type '" "int""'");
@@ -4451,7 +4566,192 @@ SWIGINTERN PyObject *_wrap_midi_ignore_buffer_add(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "midi_ignore_buffer_add" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  midi_ignore_buffer_add(arg1,arg2,arg3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "midi_ignore_buffer_add" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = (int)(val4);
+  midi_ignore_buffer_add(arg1,arg2,arg3,arg4);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_queue_midi_note_on(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  sequence *arg2 = (sequence *) 0 ;
+  int arg3 ;
+  int arg4 ;
+  int arg5 ;
+  int arg6 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  int val6 ;
+  int ecode6 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  PyObject * obj5 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOOOO:queue_midi_note_on",&obj0,&obj1,&obj2,&obj3,&obj4,&obj5)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "queue_midi_note_on" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "queue_midi_note_on" "', argument " "2"" of type '" "sequence *""'"); 
+  }
+  arg2 = (sequence *)(argp2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "queue_midi_note_on" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "queue_midi_note_on" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = (int)(val4);
+  ecode5 = SWIG_AsVal_int(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "queue_midi_note_on" "', argument " "5"" of type '" "int""'");
+  } 
+  arg5 = (int)(val5);
+  ecode6 = SWIG_AsVal_int(obj5, &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "queue_midi_note_on" "', argument " "6"" of type '" "int""'");
+  } 
+  arg6 = (int)(val6);
+  queue_midi_note_on(arg1,arg2,arg3,arg4,arg5,arg6);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_queue_midi_note_off(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  sequence *arg2 = (sequence *) 0 ;
+  int arg3 ;
+  int arg4 ;
+  int arg5 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOOO:queue_midi_note_off",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "queue_midi_note_off" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "queue_midi_note_off" "', argument " "2"" of type '" "sequence *""'"); 
+  }
+  arg2 = (sequence *)(argp2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "queue_midi_note_off" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "queue_midi_note_off" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = (int)(val4);
+  ecode5 = SWIG_AsVal_int(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "queue_midi_note_off" "', argument " "5"" of type '" "int""'");
+  } 
+  arg5 = (int)(val5);
+  queue_midi_note_off(arg1,arg2,arg3,arg4,arg5);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_queue_midi_ctrl(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  sequence *arg2 = (sequence *) 0 ;
+  track *arg3 = (track *) 0 ;
+  int arg4 ;
+  int arg5 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  void *argp3 = 0 ;
+  int res3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOOO:queue_midi_ctrl",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "queue_midi_ctrl" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  res2 = SWIG_ConvertPtr(obj1, &argp2,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "queue_midi_ctrl" "', argument " "2"" of type '" "sequence *""'"); 
+  }
+  arg2 = (sequence *)(argp2);
+  res3 = SWIG_ConvertPtr(obj2, &argp3,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "queue_midi_ctrl" "', argument " "3"" of type '" "track *""'"); 
+  }
+  arg3 = (track *)(argp3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "queue_midi_ctrl" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = (int)(val4);
+  ecode5 = SWIG_AsVal_int(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "queue_midi_ctrl" "', argument " "5"" of type '" "int""'");
+  } 
+  arg5 = (int)(val5);
+  queue_midi_ctrl(arg1,arg2,arg3,arg4,arg5);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4461,18 +4761,27 @@ fail:
 
 SWIGINTERN PyObject *_wrap_set_default_midi_port(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
-  int arg1 ;
-  int val1 ;
-  int ecode1 = 0 ;
+  module *arg1 = (module *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:set_default_midi_port",&obj0)) SWIG_fail;
-  ecode1 = SWIG_AsVal_int(obj0, &val1);
-  if (!SWIG_IsOK(ecode1)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "set_default_midi_port" "', argument " "1"" of type '" "int""'");
+  if (!PyArg_ParseTuple(args,(char *)"OO:set_default_midi_port",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "set_default_midi_port" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "set_default_midi_port" "', argument " "2"" of type '" "int""'");
   } 
-  arg1 = (int)(val1);
-  set_default_midi_port(arg1);
+  arg2 = (int)(val2);
+  set_default_midi_port(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -4482,10 +4791,19 @@ fail:
 
 SWIGINTERN PyObject *_wrap_module_get_timeline(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
   timeline *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)":module_get_timeline")) SWIG_fail;
-  result = (timeline *)module_get_timeline();
+  if (!PyArg_ParseTuple(args,(char *)"O:module_get_timeline",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_get_timeline" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (timeline *)module_get_timeline(arg1);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_timeline, 0 |  0 );
   return resultobj;
 fail:
@@ -4873,6 +5191,198 @@ SWIGINTERN PyObject *_wrap_sequence_halve(PyObject *SWIGUNUSEDPARM(self), PyObje
   arg1 = (sequence *)(argp1);
   sequence_halve(arg1);
   resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_set_trg_playmode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:sequence_set_trg_playmode",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_set_trg_playmode" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_set_trg_playmode" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  sequence_set_trg_playmode(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_set_trg_quantise(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:sequence_set_trg_quantise",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_set_trg_quantise" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_set_trg_quantise" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  sequence_set_trg_quantise(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_get_trg_playmode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:sequence_get_trg_playmode",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_get_trg_playmode" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  result = (int)sequence_get_trg_playmode(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_get_trg_quantise(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:sequence_get_trg_quantise",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_get_trg_quantise" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  result = (int)sequence_get_trg_quantise(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_set_trig(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int arg4 ;
+  int arg5 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  PyObject * obj2 = 0 ;
+  PyObject * obj3 = 0 ;
+  PyObject * obj4 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OOOOO:sequence_set_trig",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_set_trig" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_set_trig" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  ecode3 = SWIG_AsVal_int(obj2, &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "sequence_set_trig" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  ecode4 = SWIG_AsVal_int(obj3, &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "sequence_set_trig" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = (int)(val4);
+  ecode5 = SWIG_AsVal_int(obj4, &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "sequence_set_trig" "', argument " "5"" of type '" "int""'");
+  } 
+  arg5 = (int)(val5);
+  sequence_set_trig(arg1,arg2,arg3,arg4,arg5);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_get_trig(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  char *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:sequence_get_trig",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_get_trig" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_get_trig" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  result = (char *)sequence_get_trig(arg1,arg2);
+  resultobj = SWIG_FromCharPtr((const char *)result);
   return resultobj;
 fail:
   return NULL;
@@ -6269,198 +6779,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_sequence_set_trg_playmode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  sequence *arg1 = (sequence *) 0 ;
-  int arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:sequence_set_trg_playmode",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_set_trg_playmode" "', argument " "1"" of type '" "sequence *""'"); 
-  }
-  arg1 = (sequence *)(argp1);
-  ecode2 = SWIG_AsVal_int(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_set_trg_playmode" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = (int)(val2);
-  sequence_set_trg_playmode(arg1,arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_sequence_set_trg_quantise(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  sequence *arg1 = (sequence *) 0 ;
-  int arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:sequence_set_trg_quantise",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_set_trg_quantise" "', argument " "1"" of type '" "sequence *""'"); 
-  }
-  arg1 = (sequence *)(argp1);
-  ecode2 = SWIG_AsVal_int(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_set_trg_quantise" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = (int)(val2);
-  sequence_set_trg_quantise(arg1,arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_sequence_get_trg_playmode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  sequence *arg1 = (sequence *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  int result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:sequence_get_trg_playmode",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_get_trg_playmode" "', argument " "1"" of type '" "sequence *""'"); 
-  }
-  arg1 = (sequence *)(argp1);
-  result = (int)sequence_get_trg_playmode(arg1);
-  resultobj = SWIG_From_int((int)(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_sequence_get_trg_quantise(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  sequence *arg1 = (sequence *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  int result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:sequence_get_trg_quantise",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_get_trg_quantise" "', argument " "1"" of type '" "sequence *""'"); 
-  }
-  arg1 = (sequence *)(argp1);
-  result = (int)sequence_get_trg_quantise(arg1);
-  resultobj = SWIG_From_int((int)(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_sequence_set_trig(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  sequence *arg1 = (sequence *) 0 ;
-  int arg2 ;
-  int arg3 ;
-  int arg4 ;
-  int arg5 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  int val4 ;
-  int ecode4 = 0 ;
-  int val5 ;
-  int ecode5 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  PyObject * obj2 = 0 ;
-  PyObject * obj3 = 0 ;
-  PyObject * obj4 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OOOOO:sequence_set_trig",&obj0,&obj1,&obj2,&obj3,&obj4)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_set_trig" "', argument " "1"" of type '" "sequence *""'"); 
-  }
-  arg1 = (sequence *)(argp1);
-  ecode2 = SWIG_AsVal_int(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_set_trig" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = (int)(val2);
-  ecode3 = SWIG_AsVal_int(obj2, &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "sequence_set_trig" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = (int)(val3);
-  ecode4 = SWIG_AsVal_int(obj3, &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "sequence_set_trig" "', argument " "4"" of type '" "int""'");
-  } 
-  arg4 = (int)(val4);
-  ecode5 = SWIG_AsVal_int(obj4, &val5);
-  if (!SWIG_IsOK(ecode5)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "sequence_set_trig" "', argument " "5"" of type '" "int""'");
-  } 
-  arg5 = (int)(val5);
-  sequence_set_trig(arg1,arg2,arg3,arg4,arg5);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_sequence_get_trig(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  sequence *arg1 = (sequence *) 0 ;
-  int arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  char *result = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:sequence_get_trig",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_get_trig" "', argument " "1"" of type '" "sequence *""'"); 
-  }
-  arg1 = (sequence *)(argp1);
-  ecode2 = SWIG_AsVal_int(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_get_trig" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = (int)(val2);
-  result = (char *)sequence_get_trig(arg1,arg2);
-  resultobj = SWIG_FromCharPtr((const char *)result);
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_track_new(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int arg1 ;
@@ -7277,21 +7595,21 @@ static PyMethodDef SwigMethods[] = {
 	 { "int_array_cast", _wrap_int_array_cast, METH_VARARGS, NULL},
 	 { "int_array_frompointer", _wrap_int_array_frompointer, METH_VARARGS, NULL},
 	 { "int_array_swigregister", int_array_swigregister, METH_VARARGS, NULL},
-	 { "start", _wrap_start, METH_VARARGS, NULL},
-	 { "stop", _wrap_stop, METH_VARARGS, NULL},
-	 { "get_jack_error", _wrap_get_jack_error, METH_VARARGS, NULL},
-	 { "module_get_time", _wrap_module_get_time, METH_VARARGS, NULL},
-	 { "get_jack_max_ports", _wrap_get_jack_max_ports, METH_VARARGS, NULL},
 	 { "module_new", _wrap_module_new, METH_VARARGS, NULL},
 	 { "module_free", _wrap_module_free, METH_VARARGS, NULL},
+	 { "module_reset", _wrap_module_reset, METH_VARARGS, NULL},
+	 { "module_get_midi_client", _wrap_module_get_midi_client, METH_VARARGS, NULL},
+	 { "midi_start", _wrap_midi_start, METH_VARARGS, NULL},
+	 { "midi_stop", _wrap_midi_stop, METH_VARARGS, NULL},
+	 { "get_midi_error", _wrap_get_midi_error, METH_VARARGS, NULL},
+	 { "module_get_time", _wrap_module_get_time, METH_VARARGS, NULL},
+	 { "module_get_max_ports", _wrap_module_get_max_ports, METH_VARARGS, NULL},
 	 { "module_play", _wrap_module_play, METH_VARARGS, NULL},
 	 { "module_is_playing", _wrap_module_is_playing, METH_VARARGS, NULL},
 	 { "module_record", _wrap_module_record, METH_VARARGS, NULL},
 	 { "module_is_recording", _wrap_module_is_recording, METH_VARARGS, NULL},
-	 { "module_reset", _wrap_module_reset, METH_VARARGS, NULL},
 	 { "module_get_bpm", _wrap_module_get_bpm, METH_VARARGS, NULL},
 	 { "module_set_bpm", _wrap_module_set_bpm, METH_VARARGS, NULL},
-	 { "module_get_nports", _wrap_module_get_nports, METH_VARARGS, NULL},
 	 { "module_get_nseq", _wrap_module_get_nseq, METH_VARARGS, NULL},
 	 { "module_get_seq", _wrap_module_get_seq, METH_VARARGS, NULL},
 	 { "module_add_sequence", _wrap_module_add_sequence, METH_VARARGS, NULL},
@@ -7304,15 +7622,15 @@ static PyMethodDef SwigMethods[] = {
 	 { "module_set_rpb", _wrap_module_set_rpb, METH_VARARGS, NULL},
 	 { "module_get_ctrlpr", _wrap_module_get_ctrlpr, METH_VARARGS, NULL},
 	 { "module_set_ctrlpr", _wrap_module_set_ctrlpr, METH_VARARGS, NULL},
-	 { "queue_midi_note_on", _wrap_queue_midi_note_on, METH_VARARGS, NULL},
-	 { "queue_midi_note_off", _wrap_queue_midi_note_off, METH_VARARGS, NULL},
-	 { "queue_midi_ctrl", _wrap_queue_midi_ctrl, METH_VARARGS, NULL},
 	 { "track_get_rec_update", _wrap_track_get_rec_update, METH_VARARGS, NULL},
 	 { "track_clear_updates", _wrap_track_clear_updates, METH_VARARGS, NULL},
 	 { "midi_in_get_event", _wrap_midi_in_get_event, METH_VARARGS, NULL},
 	 { "midi_in_clear_events", _wrap_midi_in_clear_events, METH_VARARGS, NULL},
 	 { "midi_ignore_buffer_clear", _wrap_midi_ignore_buffer_clear, METH_VARARGS, NULL},
 	 { "midi_ignore_buffer_add", _wrap_midi_ignore_buffer_add, METH_VARARGS, NULL},
+	 { "queue_midi_note_on", _wrap_queue_midi_note_on, METH_VARARGS, NULL},
+	 { "queue_midi_note_off", _wrap_queue_midi_note_off, METH_VARARGS, NULL},
+	 { "queue_midi_ctrl", _wrap_queue_midi_ctrl, METH_VARARGS, NULL},
 	 { "set_default_midi_port", _wrap_set_default_midi_port, METH_VARARGS, NULL},
 	 { "module_get_timeline", _wrap_module_get_timeline, METH_VARARGS, NULL},
 	 { "sequence_new", _wrap_sequence_new, METH_VARARGS, NULL},
@@ -7330,6 +7648,12 @@ static PyMethodDef SwigMethods[] = {
 	 { "sequence_set_midi_focus", _wrap_sequence_set_midi_focus, METH_VARARGS, NULL},
 	 { "sequence_double", _wrap_sequence_double, METH_VARARGS, NULL},
 	 { "sequence_halve", _wrap_sequence_halve, METH_VARARGS, NULL},
+	 { "sequence_set_trg_playmode", _wrap_sequence_set_trg_playmode, METH_VARARGS, NULL},
+	 { "sequence_set_trg_quantise", _wrap_sequence_set_trg_quantise, METH_VARARGS, NULL},
+	 { "sequence_get_trg_playmode", _wrap_sequence_get_trg_playmode, METH_VARARGS, NULL},
+	 { "sequence_get_trg_quantise", _wrap_sequence_get_trg_quantise, METH_VARARGS, NULL},
+	 { "sequence_set_trig", _wrap_sequence_set_trig, METH_VARARGS, NULL},
+	 { "sequence_get_trig", _wrap_sequence_get_trig, METH_VARARGS, NULL},
 	 { "track_get_row_ptr", _wrap_track_get_row_ptr, METH_VARARGS, NULL},
 	 { "track_get_ctrlrow_ptr", _wrap_track_get_ctrlrow_ptr, METH_VARARGS, NULL},
 	 { "track_get_index", _wrap_track_get_index, METH_VARARGS, NULL},
@@ -7376,12 +7700,6 @@ static PyMethodDef SwigMethods[] = {
 	 { "track_get_qc", _wrap_track_get_qc, METH_VARARGS, NULL},
 	 { "track_set_loop", _wrap_track_set_loop, METH_VARARGS, NULL},
 	 { "track_get_loop", _wrap_track_get_loop, METH_VARARGS, NULL},
-	 { "sequence_set_trg_playmode", _wrap_sequence_set_trg_playmode, METH_VARARGS, NULL},
-	 { "sequence_set_trg_quantise", _wrap_sequence_set_trg_quantise, METH_VARARGS, NULL},
-	 { "sequence_get_trg_playmode", _wrap_sequence_get_trg_playmode, METH_VARARGS, NULL},
-	 { "sequence_get_trg_quantise", _wrap_sequence_get_trg_quantise, METH_VARARGS, NULL},
-	 { "sequence_set_trig", _wrap_sequence_set_trig, METH_VARARGS, NULL},
-	 { "sequence_get_trig", _wrap_sequence_get_trig, METH_VARARGS, NULL},
 	 { "track_new", _wrap_track_new, METH_VARARGS, NULL},
 	 { "row_get_type", _wrap_row_get_type, METH_VARARGS, NULL},
 	 { "row_get_note", _wrap_row_get_note, METH_VARARGS, NULL},
@@ -7421,6 +7739,8 @@ static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_ctrlrow = {"_p_ctrlrow", "ctrlrow *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int = {"_p_int", "int *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int_array = {"_p_int_array", "int_array *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_midi_client = {"_p_midi_client", "midi_client *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_module = {"_p_module", "module *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_row = {"_p_row", "row *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_sequence = {"_p_sequence", "sequence *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_timeline = {"_p_timeline", "timeline *", 0, 0, (void*)0, 0};
@@ -7431,6 +7751,8 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_ctrlrow,
   &_swigt__p_int,
   &_swigt__p_int_array,
+  &_swigt__p_midi_client,
+  &_swigt__p_module,
   &_swigt__p_row,
   &_swigt__p_sequence,
   &_swigt__p_timeline,
@@ -7441,6 +7763,8 @@ static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0,
 static swig_cast_info _swigc__p_ctrlrow[] = {  {&_swigt__p_ctrlrow, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int[] = {  {&_swigt__p_int, 0, 0, 0},  {&_swigt__p_int_array, _p_int_arrayTo_p_int, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int_array[] = {  {&_swigt__p_int_array, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_midi_client[] = {  {&_swigt__p_midi_client, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_module[] = {  {&_swigt__p_module, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_row[] = {  {&_swigt__p_row, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_sequence[] = {  {&_swigt__p_sequence, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_timeline[] = {  {&_swigt__p_timeline, 0, 0, 0},{0, 0, 0, 0}};
@@ -7451,6 +7775,8 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_ctrlrow,
   _swigc__p_int,
   _swigc__p_int_array,
+  _swigc__p_midi_client,
+  _swigc__p_module,
   _swigc__p_row,
   _swigc__p_sequence,
   _swigc__p_timeline,

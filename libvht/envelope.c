@@ -1,6 +1,6 @@
 /* envelope.c - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include <string.h>
 #include <math.h>
 #include "envelope.h"
-#include "track.h"
+
 
 envelope *envelope_new(int nrows, int res) {
 	envelope *env = malloc(sizeof(envelope));
@@ -303,36 +303,4 @@ void envelope_set_node(envelope *env, int n, float x, float y, float z, int link
 
 	if (linked != -1)
 		env->nodes[n].linked = linked;
-}
-
-// from python, we will access envelopes through track
-// all controllers will have envs added automatically
-void track_envelope_add_node(track *trk, int c, float x, float y, float z, int linked) {
-	envelope_add_node(trk->env[c], x, y, z, linked);
-}
-
-void track_envelope_del_node(track *trk, int c, int n) {
-	envelope_del_node(trk->env[c], n);
-}
-
-void track_envelope_set_node(track *trk, int c, int n, float x, float y, float z, int linked) {
-	envelope_set_node(trk->env[c], n, x, y, z, linked);
-}
-
-// don't do this
-char *track_get_envelope(track *trk, int c) {
-	static char ret[(ENV_MAX_NNODES * 50) + 2];
-
-	sprintf(ret, "[");
-
-	for (int n = 0; n < trk->env[c]->nnodes; n++) {
-		char buff[256];
-		sprintf(buff, "{\"x\":%07.2f,\"y\":%07.2f,\"z\":%07.2f,\"l\":%d},", trk->env[c]->nodes[n].x,
-		        trk->env[c]->nodes[n].y, trk->env[c]->nodes[n].z, trk->env[c]->nodes[n].linked);
-
-		strcat(ret, buff);
-	}
-
-	strcat(ret, "]");
-	return ret;
 }

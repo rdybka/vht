@@ -18,99 +18,97 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "jack_client.h"
+#include "midi_client.h"
 #include "jack_process.h"
 
-#include "libvht.h"
 #include "module.h"
+#include "libvht.h"
 
 // getters/setters and global stuff
 
-int start(char *name) {
-	return jack_start(name);
+midi_client *module_get_midi_client(module *mod) {
+	return mod->clt;
 }
 
-void stop() {
-	jack_stop();
+char *get_midi_error(module *mod) {
+	return mod->clt->error;
 }
 
-float module_get_bpm() {
-	return module.bpm;
+int module_get_max_ports(module *mod) {
+	return MIDI_CLIENT_MAX_PORTS;
 }
 
-int get_jack_max_ports() {
-	return JACK_CLIENT_MAX_PORTS;
+float module_get_bpm(module *mod) {
+	return mod->bpm;
 }
 
-void module_set_bpm(float bpm) {
-	module.bpm = bpm;
+int get_max_ports(module *mod) {
+	return MIDI_CLIENT_MAX_PORTS;
 }
 
-int get_nseq(void) {
-	return module.nseq;
+void module_set_bpm(module *mod, float bpm) {
+	mod->bpm = bpm;
 }
 
-void module_play(int play) {
-	module.playing = play;
+void module_play(module *mod, int play) {
+	mod->playing = play;
 	if (play == 0)
-		module_mute();
+		module_mute(mod);
 }
 
-int module_is_playing() {
-	return module.playing;
+int module_is_playing(module *mod) {
+	return mod->playing;
 }
 
-void module_record(int rec) {
-	module.recording = rec;
+void module_record(module *mod, int rec) {
+	mod->recording = rec;
 }
 
-int module_is_recording() {
-	return module.recording;
+int module_is_recording(module *mod) {
+	return mod->recording;
 }
 
-int module_get_rpb() {
-	return module.rpb;
+int module_get_rpb(module *mod) {
+	return mod->rpb;
 }
 
-void module_set_rpb(int v) {
-	module_excl_in();
-	module.rpb = v;
-	module_excl_out();
+void module_set_rpb(module *mod, int v) {
+	module_excl_in(mod);
+	mod->rpb = v;
+	module_excl_out(mod);
 }
 
-void module_reset() {
-	module.seq[0]->pos = 0;
-	module.zero_time = 0;
-	for (int t = 0; t < module.seq[0]->ntrk; t++)
-		track_reset(module.seq[0]->trk[t]);
+void module_reset(module *mod) {
+	mod->zero_time = 0;
+	for (int s = 0; s < mod->nseq; s++) {
+		mod->seq[0]->pos = 0;
+		for (int t = 0; t < mod->seq[0]->ntrk; t++)
+			track_reset(mod->seq[0]->trk[t]);
+	}
 }
 
-struct module_t *get_module(void) {
-	return &module;
+int module_get_nseq(module *mod) {
+	return mod->nseq;
 }
 
-int module_get_nseq(void) {
-	return module.nseq;
+sequence *module_get_seq(module *mod, int n) {
+	return mod->seq[n];
 }
 
-sequence *module_get_seq(int n) {
-	return module.seq[n];
+int module_get_curr_seq(module *mod) {
+	return mod->curr_seq;
 }
 
-int module_get_curr_seq() {
-	return module.curr_seq;
+void module_set_curr_seq(module *mod, int s) {
+	mod->curr_seq = s;
 }
 
-void module_set_curr_seq(int s) {
-	module.curr_seq = s;
+int module_get_ctrlpr(module *mod) {
+	return mod->ctrlpr;
 }
 
-int module_get_ctrlpr() {
-	return module.ctrlpr;
-}
-
-void module_set_ctrlpr(int ctrlpr) {
-	module.ctrlpr = ctrlpr;
+void module_set_ctrlpr(module *mod, int ctrlpr) {
+	mod->ctrlpr = ctrlpr;
 }
 
 int sequence_get_ntrk(sequence *seq) {
@@ -267,13 +265,6 @@ char *sequence_get_trig(sequence *seq, int t) {
 	return rc;
 }
 
-int module_get_nports() {
-	return JACK_CLIENT_MAX_PORTS;
-}
-
-char *get_jack_error() {
-	return jack_error;
-}
 
 double sequence_get_pos(sequence *seq) {
 	return seq->pos;

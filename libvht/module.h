@@ -24,12 +24,13 @@
 #include <jack/midiport.h>
 #include <pthread.h>
 #include "midi_event.h"
+#include "midi_client.h"
 #include "sequence.h"
 #include "timeline.h"
 
 #define DEFAULT_CTRLPR 16
 
-struct module_t {
+typedef struct module_t {
 	int playing;
 	int recording;
 
@@ -41,32 +42,31 @@ struct module_t {
 	int rpb; // rows per beat
 
 	int ctrlpr;
-	int def_nrows;
 	sequence **seq;
 	timeline *tline;
 	int nseq;
 	int curr_seq;
 	int mute;
 
-	int jack_running;
-	int dump_notes;
+	int cur_rec_update;
 	pthread_mutex_t excl; // to block structural changes when jack thread advances module
-};
+	midi_client *clt;
+} module;
 
-extern struct module_t module;
+void module_advance(module *mod, jack_nframes_t curr_frames);
+module *module_new(void);
+void module_free(module *mod);
+void module_mute(module *mod);
+void module_dump_notes(module *mod, int n);
 
-void module_advance(jack_nframes_t curr_frames);
-void module_new(void);
-void module_free(void);
-void module_mute(void);
-void module_dump_notes(int n);
+void module_excl_in(module *mod);
+void module_excl_out(module *mod);
 
-void module_excl_in(void);
-void module_excl_out(void);
+void module_add_sequence(module *mod, sequence *seq);
+void module_del_sequence(module *mod, int s);
+void module_swap_sequence(module *mod, int s1, int s2);
+char *modue_get_time(module *mod);
+void module_synch_output_ports(module *mod);
 
-void module_add_sequence(sequence *seq);
-void module_del_sequence(int s);
-void module_swap_sequence(int s1, int s2);
-char *modue_get_time(void);
-
+void sequence_handle_record(module *mod, sequence *seq, midi_event evt);
 #endif //__MODULE_H__

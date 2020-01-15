@@ -1,6 +1,6 @@
 # extras.py - Valhalla Tracker
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ def fix_extras_new_trk(s, t):
 def fix_extras_new_seq(s):
     mod.extras[s] = {}
     mod.extras[s][-1] = {}
+
     mod.extras[s][-1]["highlight"] = cfg.highlight
     mod.extras[s][-1]["mouse_cfg"] = [3, 2, 0]
     txt = cfg.sequence_name_format % (len(mod) - 1)
@@ -43,6 +44,14 @@ def fix_extras_new_seq(s):
     mod.extras[s][-1]["sequence_name"] = txt
 
 
+def fix_extras_post_load(m):
+    x = m["extras"]
+    for s in x:
+        for t in x[s]:
+            mod.extras[s][t] = {**mod.extras[s][t], **x[s][t]}
+
+
 def register(mod):
     mod.cb_new_sequence = [fix_extras_new_seq]
     mod.cb_new_track = [fix_extras_new_trk]
+    mod.cb_post_load = [fix_extras_post_load]

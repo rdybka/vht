@@ -22,6 +22,16 @@
 #include "sequence.h"
 #include "track.h"
 
+void seq_mod_excl_in(sequence *seq) {
+	if (seq->mod_excl)
+		pthread_mutex_lock(seq->mod_excl);
+}
+
+void seq_mod_excl_out(sequence *seq) {
+	if (seq->mod_excl)
+		pthread_mutex_unlock(seq->mod_excl);
+}
+
 sequence *sequence_new(int length) {
 	sequence *seq = malloc(sizeof(sequence));
 	seq->ntrk = 0;
@@ -38,6 +48,8 @@ sequence *sequence_new(int length) {
 
 	seq->trg_playmode = 0;
 	seq->trg_quantise = 1;
+	seq->mod_excl = NULL;
+	seq->clt = NULL;
 	return seq;
 }
 
@@ -48,7 +60,7 @@ void sequence_trk_reindex(sequence *seq) {
 }
 
 void sequence_add_track(sequence *seq, track *trk) {
-	module_excl_in();
+	seq_mod_excl_in(seq);
 	// fresh?
 	if (seq->ntrk == 0) {
 		seq->trk = malloc(sizeof(track *));
@@ -57,8 +69,10 @@ void sequence_add_track(sequence *seq, track *trk) {
 	seq->trk = realloc(seq->trk, sizeof(track *) * (seq->ntrk + 1));
 	track_wind(trk, seq->pos);
 	seq->trk[seq->ntrk++] = trk;
+	trk->mod_excl = seq->mod_excl;
+	trk->clt = seq->clt;
 	sequence_trk_reindex(seq);
-	module_excl_out();
+	seq_mod_excl_out(seq);
 	return;
 }
 
@@ -134,7 +148,7 @@ void sequence_del_track(sequence *seq, int t) {
 	if ((t >= seq->ntrk) || (t < 0))
 		return;
 
-	module_excl_in();
+	seq_mod_excl_in(seq);
 
 	track_free(seq->trk[t]);
 
@@ -152,7 +166,7 @@ void sequence_del_track(sequence *seq, int t) {
 	}
 
 	sequence_trk_reindex(seq);
-	module_excl_out();
+	seq_mod_excl_out(seq);
 }
 
 void sequence_swap_track(sequence *seq, int t1, int t2) {
@@ -165,13 +179,13 @@ void sequence_swap_track(sequence *seq, int t1, int t2) {
 	if (t1 == t2)
 		return;
 
-	module_excl_in();
+	seq_mod_excl_in(seq);
 
 	track *t3 = seq->trk[t1];
 	seq->trk[t1] = seq->trk[t2];
 	seq->trk[t2] = t3;
 	sequence_trk_reindex(seq);
-	module_excl_out();
+	seq_mod_excl_out(seq);
 }
 
 void sequence_set_midi_focus(sequence *seq, int foc) {
@@ -179,7 +193,7 @@ void sequence_set_midi_focus(sequence *seq, int foc) {
 }
 
 void sequence_set_length(sequence *seq, int length) {
-	module_excl_in();
+	seq_mod_excl_in(seq);
 	for (int t = 0; t < seq->ntrk; t++) {
 		if((seq->trk[t]->nrows == seq->trk[t]->nsrows) && (seq->trk[t]->nrows == seq->length)) {
 			track_resize(seq->trk[t], length);
@@ -188,22 +202,22 @@ void sequence_set_length(sequence *seq, int length) {
 	}
 
 	seq->length = length;
-	module_excl_out();
+	seq_mod_excl_out(seq);
 }
 
-void sequence_handle_record(sequence *seq, midi_event evt) {
-	if (module.recording == 1)
+void sequence_handle_record(module *mod, sequence *seq, midi_event evt) {
+	if (mod->recording == 1)
 		if (seq->midi_focus >= 0 && seq->midi_focus < seq->ntrk) {
 			track_handle_record(seq->trk[seq->midi_focus], evt);
 			evt.channel = seq->trk[seq->midi_focus]->channel;
-			midi_buffer_add(seq->trk[seq->midi_focus]->port, evt);
+			midi_buffer_add(mod->clt, seq->trk[seq->midi_focus]->port, evt);
 		}
 
-	if (module.recording == 2) {
-		midi_buffer_add(default_midi_port, evt);
+	if (mod->recording == 2) {
+		midi_buffer_add(mod->clt, mod->clt->default_midi_port, evt);
 		int found = 0;
 		for (int tr = seq->ntrk - 1; tr > -1 && !found; tr--) {
-			if ((seq->trk[tr]->channel == evt.channel) && (seq->trk[tr]->port == default_midi_port)) {
+			if ((seq->trk[tr]->channel == evt.channel) && (seq->trk[tr]->port == mod->clt->default_midi_port)) {
 				track_handle_record(seq->trk[tr], evt);
 				found = 1;
 			}
@@ -211,7 +225,7 @@ void sequence_handle_record(sequence *seq, midi_event evt) {
 
 		if (!found) {
 			track *trk;
-			trk = track_new(default_midi_port, evt.channel, seq->length, seq->length, module.ctrlpr);
+			trk = track_new(mod->clt->default_midi_port, evt.channel, seq->length, seq->length, mod->ctrlpr);
 			sequence_add_track(seq, trk);
 
 			trk->last_pos = seq->pos - seq->last_period;

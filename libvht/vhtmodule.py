@@ -1,6 +1,6 @@
 # vhtmodule.py - Valhalla Tracker (libvht)
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,28 +23,36 @@ import pickle
 
 
 class VHTModule(Iterable):
-    # a somewhat pythonic interface to the vht magic
+    """
+    This is your interface to the VHT magic
+
+    libvht.new_mod()
+    """
+
     def __init__(self):
         super(VHTModule, self).__init__()
         self.active_track = None
-        libcvht.module_new()
+        self._mod_handle = libcvht.module_new()
+        self._clt_handle = libcvht.module_get_midi_client(self._mod_handle)
         self.extras = {}  # will be saved - for stuff like names of tracks
 
-        self.timeline = VHTTimeline(libcvht)
+        self.timeline = VHTTimeline(libcvht, self._mod_handle)
 
-        self.cb_new_sequence = []  # will be called
-        self.cb_new_track = []  # will be called
+        # these are ment to fix extras
+        self.cb_new_sequence = []  # will be called after new seq with seq_id as param
+        self.cb_new_track = []  # will be called after new track with trk_id as param
+        self.cb_post_load = []  # will be called after loading with module_dict
 
     def __del__(self):
-        libcvht.module_free()
+        libcvht.module_free(self._mod_handle)
 
     # this will connect and initialise an empty module
-    def jack_start(self, name=None):
-        return libcvht.start(name)
+    def midi_start(self, name=None):
+        return libcvht.midi_start(self._clt_handle, name)
 
     # disconnect from jack
-    def jack_stop(self):
-        libcvht.stop()
+    def midi_stop(self):
+        libcvht.midi_stop(self._clt_handle)
 
     def __str__(self):
         r = {}
@@ -54,19 +62,26 @@ class VHTModule(Iterable):
 
         return r.__str__()
 
-    def reset(self):
-        libcvht.module_reset()
-
     def new(self):
-        libcvht.module_new()
-        self.timeline = VHTTimeline(libcvht)
+        for s in range(len(self)):
+            self.del_sequence(0)
+
+        # libcvht.module_free(self._mod_handle)
+        # self._mod_handle = libcvht.module_new()
+        # self._clt_handle = libcvht.module_get_midi_client(self._mod_handle)
+        self.extras = {}
+        # self.timeline = VHTTimeline(libcvht, self._mod_handle)
 
     def __len__(self):
-        return libcvht.module_get_nseq()
+        return libcvht.module_get_nseq(self._mod_handle)
 
     def __iter__(self):
         for itm in range(self.__len__()):
-            yield VHTSequence(libcvht, libcvht.module_get_seq(itm), self.cb_new_track)
+            yield VHTSequence(
+                libcvht,
+                libcvht.module_get_seq(self._mod_handle, itm),
+                self.cb_new_track,
+            )
 
     def __getitem__(self, itm):
         if itm >= self.__len__():
@@ -75,20 +90,22 @@ class VHTModule(Iterable):
         if itm < 0:
             raise IndexError()
 
-        return VHTSequence(libcvht, libcvht.module_get_seq(itm), self.cb_new_track)
+        return VHTSequence(
+            libcvht, libcvht.module_get_seq(self._mod_handle, itm), self.cb_new_track
+        )
 
     def add_sequence(self, length=-1):
         seq = libcvht.sequence_new(length)
-        libcvht.module_add_sequence(seq)
+        libcvht.module_add_sequence(self._mod_handle, seq)
         for cb in self.cb_new_sequence:
             cb(libcvht.sequence_get_index(seq))
         return VHTSequence(libcvht, seq, self.cb_new_track)
 
     def swap_sequence(self, s1, s2):
-        libcvht.module_swap_sequence(s1, s2)
+        libcvht.module_swap_sequence(self._mod_handle, s1, s2)
 
     def del_sequence(self, s=-1):
-        libcvht.module_del_sequence(s)
+        libcvht.module_del_sequence(self._mod_handle, s)
 
     def __str__(self):
         ret = "seq: %d\n" % self.__len__()
@@ -98,68 +115,68 @@ class VHTModule(Iterable):
 
     # sneaky as a dead parrot...
     def sneakily_queue_midi_note_on(self, seq, port, chn, note, velocity):
-        libcvht.queue_midi_note_on(seq, port, chn, note, velocity)
+        libcvht.queue_midi_note_on(self._clt_handle, seq, port, chn, note, velocity)
 
     def sneakily_queue_midi_note_off(self, seq, port, chn, note):
-        libcvht.queue_midi_note_off(seq, port, chn, note)
+        libcvht.queue_midi_note_off(self._clt_handle, seq, port, chn, note)
 
     def sneakily_queue_midi_ctrl(self, seq, trk, value, ctrl):
-        libcvht.queue_midi_ctrl(seq, trk, value, ctrl)
+        libcvht.queue_midi_ctrl(self._clt_handle, seq, trk, value, ctrl)
 
-    def free(self):
-        libcvht.module_free()
+    def reset(self):
+        libcvht.module_reset(self._mod_handle)
 
     @property
     def jack_error(self):
-        return libcvht.get_jack_error()
+        return libcvht.module_get_midi_error(self._mod_handle)
 
     @property
     def play(self):
-        return libcvht.module_is_playing()
+        return libcvht.module_is_playing(self._mod_handle)
 
     @property
     def record(self):
-        return libcvht.module_is_recording()
+        return libcvht.module_is_recording(self._mod_handle)
 
     @property
     def curr_seq(self):
-        return libcvht.module_get_curr_seq()
+        return libcvht.module_get_curr_seq(self._mod_handle)
 
     @curr_seq.setter
     def curr_seq(self, val):
-        libcvht.module_set_curr_seq(val)
+        libcvht.module_set_curr_seq(self._mod_handle, val)
 
     @property
     def rpb(self):
-        return libcvht.module_get_rpb()
+        return libcvht.module_get_rpb(self._mod_handle)
 
     @rpb.setter
     def rpb(self, value):
         if value:
-            libcvht.module_set_rpb(min(max(1, value), 32))
+            libcvht.module_set_rpb(self._mod_handle, min(max(1, value), 32))
             self.timeline.changes[0] = [0, self.bpm, self.rpb, 0]
 
     @property
     def ctrlpr(self):
-        return libcvht.module_get_ctrlpr()
+        return libcvht.module_get_ctrlpr(self._mod_handle)
 
     @ctrlpr.setter
     def ctrlpr(self, value):
-        libcvht.module_set_ctrlpr(value)
+        libcvht.module_set_ctrlpr(self._mod_handle, value)
 
     @record.setter
     def record(self, value):
         if value:
-            libcvht.module_record(value)
+            libcvht.module_record(self._mod_handle, value)
         else:
-            libcvht.module_record(0)
+            libcvht.module_record(self._mod_handle, 0)
 
     @play.setter
     def play(self, value):
         if value:
-            libcvht.module_play(1)
+            libcvht.module_play(self._mod_handle, 1)
         else:
-            libcvht.module_play(0)
+            libcvht.module_play(self._mod_handle, 0)
             self.record = 0
 
     @property
@@ -168,29 +185,29 @@ class VHTModule(Iterable):
 
     @dump_notes.setter
     def dump_notes(self, n):
-        libcvht.module_dump_notes(n)
+        libcvht.module_dump_notes(self._mod_handle, n)
 
     @property
     def bpm(self):
-        return libcvht.module_get_bpm()
+        return libcvht.module_get_bpm(self._mod_handle)
 
     @bpm.setter
     def bpm(self, value):
         value = min(max(value, self.min_bpm), self.max_bpm)
-        libcvht.module_set_bpm(value)
+        libcvht.module_set_bpm(self._mod_handle, value)
         self.timeline.changes[0] = [0, self.bpm, self.rpb, 0]
 
     @property
-    def nports(self):
-        return libcvht.module_get_nports()
+    def max_ports(self):
+        return libcvht.module_get_max_ports(self._mod_handle)
 
     @property
     def time(self):
-        return libcvht.module_get_time()
+        return libcvht.module_get_time(self._mod_handle)
 
     @property
     def max_ports(self):
-        return libcvht.get_jack_max_ports()
+        return libcvht.module_get_max_ports(self._mod_handle)
 
     @property
     def min_bpm(self):
@@ -203,10 +220,10 @@ class VHTModule(Iterable):
     # those two work non-realtime,
     # actual recording happens in c
     def clear_midi_in(self):
-        libcvht.midi_in_clear_events()
+        libcvht.midi_in_clear_events(self._clt_handle)
 
     def get_midi_in_event(self):
-        midin = libcvht.midi_in_get_event()
+        midin = libcvht.midi_in_get_event(self._clt_handle)
         if midin:
             return eval(midin)
         else:
@@ -215,12 +232,12 @@ class VHTModule(Iterable):
     # so we don't record control midi events
     # expects a list of (channel, evt_type, note) tuples
     def set_midi_record_ignore(self, midig):
-        libcvht.midi_ignore_buffer_clear()
+        libcvht.midi_ignore_buffer_clear(self._clt_handle)
         for ig in midig:
-            libcvht.midi_ignore_buffer_add(ig[0], ig[1], ig[2])
+            libcvht.midi_ignore_buffer_add(self._clt_handle, ig[0], ig[1], ig[2])
 
     def set_default_midi_port(self, port):
-        libcvht.set_default_midi_port(port)
+        libcvht.set_default_midi_port(self._clt_handle, port)
 
     def panic(self):
         print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFUUUUUUUUUUUUUUUUUUUUUUUU!!!!!!!")
@@ -319,9 +336,10 @@ class VHTModule(Iterable):
                 return False
 
             p = self.play
-
-            self.reset()
+            self.play = 0
             self.new()
+            self.reset()
+
             self.bpm = jm["bpm"]
             self.rpb = jm["rpb"]
             self.ctrlpr = jm["ctrlpr"]
@@ -396,6 +414,7 @@ class VHTModule(Iterable):
                             rr.delay = row["delay"]
 
             self.play = p
-            self.extras = jm["extras"]
+            for cb in self.cb_post_load:
+                cb(jm)
 
         return True

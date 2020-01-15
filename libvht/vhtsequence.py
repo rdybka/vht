@@ -61,9 +61,6 @@ class VHTSequence(Iterable):
         if length == -1:
             length = self.length
 
-        if ctrlpr == -1:
-            ctrlpr = self._vht_handle.module_get_ctrlpr()
-
         trk = self._vht_handle.track_new(port, channel, length, songlength, ctrlpr)
         self._vht_handle.sequence_add_track(self._seq_handle, trk)
         for cb in self.cb_new_track:

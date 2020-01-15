@@ -315,7 +315,7 @@ class TrackView(Gtk.DrawingArea):
             self.empty_pattern_surface = self._back_surface.create_similar(
                 cairo.CONTENT_COLOR_ALPHA,
                 round(self.width),
-                round(self.txt_height * empl),
+                math.ceil(self.txt_height * empl),
             )
             cr = cairo.Context(self.empty_pattern_surface)
 
@@ -364,9 +364,7 @@ class TrackView(Gtk.DrawingArea):
             matrix.translate(0, 0)
             # because rowheight is float
             matrix.scale(
-                1.0,
-                round(self.txt_height * self.zero_pattern_highlight)
-                / (self.txt_height * self.zero_pattern_highlight),
+                1.0, math.ceil(self.txt_height * empl) / (self.txt_height * empl),
             )
             self.empty_pattern.set_matrix(matrix)
 

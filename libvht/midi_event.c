@@ -1,6 +1,6 @@
 /* midi_event.c - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,51 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <jack/midiport.h>
-#include "jack_client.h"
+
 #include "midi_event.h"
-#include "module.h"
-
-midi_event midi_buffer[JACK_CLIENT_MAX_PORTS][EVT_BUFFER_LENGTH];
-midi_event midi_queue_buffer[JACK_CLIENT_MAX_PORTS][EVT_BUFFER_LENGTH];
-
-midi_event midi_in_buffer[EVT_BUFFER_LENGTH];
-midi_event midi_ignore_buffer[EVT_BUFFER_LENGTH];
-
-int curr_midi_in_event;
-int curr_midi_ignore_event;
-int curr_midi_event[JACK_CLIENT_MAX_PORTS];
-int curr_midi_queue_event[JACK_CLIENT_MAX_PORTS];
-
-pthread_mutex_t midi_buff_exl;
-
-void midi_buff_excl_in(void) {
-	pthread_mutex_lock(&midi_buff_exl);
-}
-
-void midi_buff_excl_out(void) {
-	pthread_mutex_unlock(&midi_buff_exl);
-}
-
-pthread_mutex_t midi_ignore_buff_exl;
-void midi_ignore_buff_excl_in(void) {
-	pthread_mutex_lock(&midi_ignore_buff_exl);
-}
-void midi_ignore_buff_excl_out() {
-	pthread_mutex_unlock(&midi_ignore_buff_exl);
-}
-
-pthread_mutex_t midi_in_buff_exl;
-void midi_in_buff_excl_in(void) {
-	pthread_mutex_lock(&midi_in_buff_exl);
-}
-void midi_in_buff_excl_out(void) {
-	pthread_mutex_unlock(&midi_in_buff_exl);
-}
 
 int midi_encode_event(midi_event evt, unsigned char *buff) {
 	if (evt.type == none)
@@ -173,67 +130,6 @@ char *i2n(unsigned char i) {
 	return buff;
 }
 
-void midi_buffer_clear(void) {
-	for (int i = 0; i < JACK_CLIENT_MAX_PORTS; i++)
-		curr_midi_event[i] = 0;
-}
-
-void midi_buffer_add(int port, midi_event evt) {
-	if (curr_midi_event[port] == EVT_BUFFER_LENGTH)
-		return;
-
-	midi_buffer[port][curr_midi_event[port]++] = evt;
-}
-
-int midi_buffer_compare(const void *a, const void *b) {
-	return ((midi_event *)a)->time - ((midi_event *)b)->time;
-}
-
-void midi_buffer_flush_port(int port) {
-	void *outp = jack_port_get_buffer(jack_output_ports[port], jack_buffer_size);
-	jack_midi_clear_buffer(outp);
-
-	midi_buff_excl_in();
-	for (int f = 0; f < curr_midi_queue_event[port]; f++) {
-		midi_buffer_add(port, midi_queue_buffer[port][f]);
-	}
-
-	curr_midi_queue_event[port] = 0;
-	midi_buff_excl_out();
-
-	if (curr_midi_event[port] == 0)
-		return;
-
-	qsort(midi_buffer[port], curr_midi_event[port], sizeof(midi_event), midi_buffer_compare);
-
-	for (int i = 0; i < curr_midi_event[port]; i++) {
-		unsigned char buff[3];
-		if (midi_encode_event(midi_buffer[port][i], buff)) {
-			int l = 3;
-
-			if (midi_buffer[port][i].type == program_change) {
-				l = 2;
-			}
-
-			jack_midi_event_write(outp, midi_buffer[port][i].time, buff, l);
-		}
-
-		if (module.dump_notes) {
-			char desc[256];
-			midi_describe_event(midi_buffer[port][i], desc, 256);
-			printf("%02d:%02d:%03d pt: %02d, %s\n", module.min, module.sec, module.ms, port, desc);
-		}
-
-	}
-}
-
-void midi_buffer_flush(void) {
-	for (int p = 0; p < JACK_CLIENT_MAX_PORTS; p++) {
-		if (jack_output_ports[p])
-			midi_buffer_flush_port(p);
-	}
-}
-
 int parse_note(char *buff) {
 	char b[256];
 	int note = 0;
@@ -269,143 +165,4 @@ int parse_note(char *buff) {
 	}
 
 	return note + octave * 12;
-}
-
-void queue_midi_note_on(sequence *seq, int port, int chn, int note, int velocity) {
-	midi_event evt;
-	evt.type = note_on;
-	evt.channel = chn;
-	evt.note = note;
-	evt.velocity = velocity;
-	evt.time = 0;
-
-	if (module.recording && module.playing) {
-		jack_nframes_t jft = jack_frame_time(jack_client);
-		evt.time = jft - jack_last_frame;
-
-		if (jft < jack_last_frame)
-			evt.time = 0;
-
-		if (seq)
-			sequence_handle_record(seq, evt);
-	}
-
-	midi_buff_excl_in();
-	midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
-	midi_buff_excl_out();
-}
-
-void queue_midi_note_off(sequence *seq, int port, int chn, int note) {
-	midi_event evt;
-	evt.type = note_off;
-	evt.channel = chn;
-	evt.note = note;
-	evt.velocity = 0;
-	evt.time = 0;
-
-	if (module.recording && module.playing) {
-		jack_nframes_t jft = jack_frame_time(jack_client);
-		evt.time = jft - jack_last_frame;
-
-		if (jft < jack_last_frame) {
-			evt.time = 0;
-		}
-
-		if (seq)
-			sequence_handle_record(seq, evt);
-	}
-
-	midi_buff_excl_in();
-	midi_queue_buffer[port][curr_midi_queue_event[port]++] = evt;
-	midi_buff_excl_out();
-}
-
-void queue_midi_ctrl(sequence *seq, track *trk, int val, int ctrl) {
-	midi_event evt;
-	evt.type = pitch_wheel;
-	evt.channel = trk->channel;
-	evt.note = 0;
-	evt.velocity = val;
-	evt.time = 0;
-
-	if (ctrl > -1) {
-		evt.type = control_change;
-		evt.note = ctrl;
-	}
-
-	if (module.recording && module.playing) {
-		jack_nframes_t jft = jack_frame_time(jack_client);
-		evt.time = jft - jack_last_frame;
-
-		if (jft < jack_last_frame)
-			evt.time = 0;
-
-		if (seq)
-			sequence_handle_record(seq, evt);
-	}
-
-	// update lctrlvals in track
-	pthread_mutex_lock(&trk->exclctrl);
-	if (ctrl == -1) {
-		trk->lctrlval[0] = val * 127;
-	} else {
-		for (int c = 0; c < trk->nctrl; c++) {
-			if (trk->ctrlnum[c] == ctrl)
-				trk->lctrlval[c] = val;
-		}
-	}
-
-	pthread_mutex_unlock(&trk->exclctrl);
-
-	midi_buff_excl_in();
-	midi_queue_buffer[trk->port][curr_midi_queue_event[trk->port]++] = evt;
-	midi_buff_excl_out();
-}
-
-void midi_in_buffer_add(midi_event evt) {
-	midi_in_buff_excl_in();
-	if (curr_midi_in_event == EVT_BUFFER_LENGTH) {
-		midi_in_buff_excl_out();
-		return;
-	}
-
-	midi_in_buffer[curr_midi_in_event++] = evt;
-	midi_in_buff_excl_out();
-}
-
-char *midi_in_get_event(void) {
-	if (curr_midi_in_event == 0)
-		return NULL;
-
-	midi_in_buff_excl_in();
-	midi_event evt = midi_in_buffer[--curr_midi_in_event];
-
-	static char buff[1024];
-	sprintf(buff, "{\"channel\" :%d, \"type\" :%d, \"note\" : %d, \"velocity\" : %d, \"time\" : %d}", evt.channel, evt.type, evt.note, evt.velocity, evt.time);
-	midi_in_buff_excl_out();
-	return buff;
-}
-
-void midi_in_clear_events(void) {
-	midi_in_buff_excl_in();
-	curr_midi_in_event = 0;
-	midi_in_buff_excl_out();
-}
-
-void midi_ignore_buffer_clear(void) {
-	midi_ignore_buff_excl_in();
-	curr_midi_ignore_event = 0;
-	midi_ignore_buff_excl_out();
-}
-
-void midi_ignore_buffer_add(int channel, int type, int note) {
-	midi_event evt;
-	evt.channel = channel;
-	evt.type = type;
-	evt.note = note;
-	evt.velocity = evt.time = 0;
-
-	midi_ignore_buff_excl_out();
-	midi_ignore_buffer[curr_midi_ignore_event++] = evt;
-	midi_ignore_buff_excl_out();
 }

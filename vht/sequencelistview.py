@@ -55,6 +55,8 @@ class SequenceListView(Gtk.DrawingArea):
         self._menu_handle = -1
         self._popup = SequenceListViewPopover(self)
 
+        self._llen = -1
+
     def configure(self):
         win = self.get_window()
         if not win:
@@ -333,8 +335,8 @@ class SequenceListView(Gtk.DrawingArea):
         return False
 
     def tick(self):
-        # if self.trgview.play_mode_cb.props.popup_shown:
-        #    self.time_want_to_leave = 0
-        #    return True
+        if self._llen != len(mod):
+            self._llen = len(mod)
+            self.redraw()
 
         return True

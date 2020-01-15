@@ -89,6 +89,7 @@ class VHTApp(Gtk.Application):
             self.main_win.adj.set_value(mod.bpm)
 
         self.add_window(self.main_win)
+
         self.main_win.show_all()
 
         mod.play = True
@@ -206,7 +207,7 @@ def run():
     print("Valhalla Tracker %s" % (pkg.version))
 
     mod.start_error = None
-    if mod.jack_start() != 0:
+    if mod.midi_start() != 0:
         mod.start_error = "you will need JACK for this"
 
     mod.ctrlpr = cfg.controller_resolution
@@ -217,7 +218,6 @@ def run():
         midig.append(tuple(val[:-1]))
 
     vht.extras.register(mod)
-
     mod.set_midi_record_ignore(midig)
     randomcomposer.muzakize()
 
@@ -257,12 +257,10 @@ def run():
         app = VHTApp()
         app.run(sys.argv)
     except:
-        mod.jack_stop()
+        mod.midi_stop()
         sys.exit()
 
-    mod.play = False
-    mod.jack_stop()
-    mod.free()
+    mod.midi_stop()
 
 
 if __name__ == "__main__":

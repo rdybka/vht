@@ -21,12 +21,12 @@
 #include <math.h>
 #include "module.h"
 
-void timeline_excl_in() {
-	pthread_mutex_lock(&module.tline->excl);
+void timeline_excl_in(timeline *tl) {
+	pthread_mutex_lock(&tl->excl);
 }
 
-void timeline_excl_out() {
-	pthread_mutex_unlock(&module.tline->excl);
+void timeline_excl_out(timeline *tl) {
+	pthread_mutex_unlock(&tl->excl);
 }
 
 timeline *timeline_new(void) {
@@ -196,7 +196,7 @@ void timeline_update(timeline *tl) {
 }
 
 void timeline_change_del(timeline *tl, int id) {
-	timeline_excl_in();
+	timeline_excl_in(tl);
 
 	for (int r = id; r < tl->nchanges; r++) {
 		tl->changes[r] = tl->changes[r+1];
@@ -205,11 +205,11 @@ void timeline_change_del(timeline *tl, int id) {
 	tl->changes = realloc(tl->changes, sizeof(timechange) * --tl->nchanges);
 
 	timeline_update(tl);
-	timeline_excl_out();
+	timeline_excl_out(tl);
 }
 
 int timeline_change_set(timeline *tl, long row, float bpm, int rpb, int linked) {
-	timeline_excl_in();
+	timeline_excl_in(tl);
 
 	int r = timeline_change_id_for_row(tl, row);
 
@@ -223,18 +223,13 @@ int timeline_change_set(timeline *tl, long row, float bpm, int rpb, int linked) 
 	tl->changes[r].rpb = rpb;
 	tl->changes[r].linked = linked;
 	timeline_update(tl);
-	timeline_excl_out();
+	timeline_excl_out(tl);
 	return r;
 }
 
 void timeline_advance(timeline *tl, double period) {
-	timeline_excl_in();
+	timeline_excl_in(tl);
 	tl->pos += period;
 
-	sequence *seq = module.seq[0];
-
-	if (module.playing)
-		sequence_advance(seq, period);
-
-	timeline_excl_out();
+	timeline_excl_out(tl);
 }

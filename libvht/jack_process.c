@@ -17,7 +17,7 @@
  */
 
 #include "jack_process.h"
-#include "jack_client.h"
+#include "midi_client.h"
 #include "module.h"
 
 int jack_process(jack_nframes_t nframes, void *arg) {
@@ -26,23 +26,23 @@ int jack_process(jack_nframes_t nframes, void *arg) {
 	jack_time_t next_usecs;
 	float period_usecs;
 
-	//void *outp = jack_port_get_buffer(jack_output_ports[0], nframes);
-	//void *inp = jack_port_get_buffer(jack_input_port, nframes);
+	midi_client *clt = (midi_client *)arg;
+	module *mod = (module *)clt->mod_ref;
 
-	jack_get_cycle_times(jack_client, &curr_frames, &curr_usecs, &next_usecs, &period_usecs);
-	jack_last_frame = jack_last_frame_time(jack_client);
-	jack_synch_output_ports();
-	module_advance(curr_frames);
-	midi_buffer_flush();
+	jack_get_cycle_times(clt->jack_client, &curr_frames, &curr_usecs, &next_usecs, &period_usecs);
+	clt->jack_last_frame = jack_last_frame_time(clt->jack_client);
+	midi_synch_output_ports(clt);
+	module_advance(mod, curr_frames);
+	midi_buffer_flush(clt);
 	return 0;
 }
 
 int jack_sample_rate_changed(jack_nframes_t srate, void *arg) {
-	jack_sample_rate = srate;
+	((midi_client *)arg)->jack_sample_rate = srate;
 	return 0;
 }
 
 int jack_buffer_size_changed(jack_nframes_t size, void *arg) {
-	jack_buffer_size = size;
+	((midi_client *)arg)->jack_buffer_size = size;
 	return 0;
 }

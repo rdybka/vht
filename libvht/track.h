@@ -1,6 +1,6 @@
 /* track.h - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,11 +18,14 @@
 
 #ifndef __TRACK_H__
 #define __TRACK_H__
+
 #include <pthread.h>
 #include "midi_event.h"
 #include "row.h"
 #include "ctrlrow.h"
 #include "envelope.h"
+
+#define TRACK_DEF_CTRLPR 16
 
 typedef struct rec_update_t {
 	int col;
@@ -72,7 +75,7 @@ typedef struct track_t {
 
 	int resync;
 
-	rec_upd updates[EVT_BUFFER_LENGTH];
+	rec_upd updates[MIDI_EVT_BUFFER_LENGTH];
 	int cur_rec_update;
 
 	int loop;  // extend in timeline
@@ -81,6 +84,9 @@ typedef struct track_t {
 	pthread_mutex_t excl; // for atomic row access
 	pthread_mutex_t exclrec; // for row changes
 	pthread_mutex_t exclctrl; // for ctrls
+	pthread_mutex_t *mod_excl;
+
+	void *clt;
 } track;
 
 track *track_new(int port, int channel, int len, int songlen, int ctrlpr);

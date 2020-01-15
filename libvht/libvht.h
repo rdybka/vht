@@ -30,56 +30,54 @@
 
 #include "module.h"
 
-extern int start(char *name);
-extern void stop(void);
-
-extern char *get_jack_error(void);
-extern char *module_get_time(void);
-extern int get_jack_max_ports(void);
-
 // module
-extern void module_new(void);
-extern void module_free(void);
-extern void module_play(int);
-extern int module_is_playing(void);
-extern void module_record(int);
-extern int module_is_recording(void);
+extern module *module_new(void);
+extern void module_free(module *mod);
+extern void module_reset(module *mod);
+extern midi_client *module_get_midi_client(module *mod);
+int midi_start(midi_client *clt, char *clt_name);
+void midi_stop(midi_client *clt);
 
-extern void module_reset(void);
+extern char *get_midi_error(module *mod);
+extern char *module_get_time(module *mod);
+extern int module_get_max_ports(module *mod);
 
-extern float module_get_bpm(void);
-extern void module_set_bpm(float);
+extern void module_play(module *mod, int);
+extern int module_is_playing(module *mod);
+extern void module_record(module *mod, int);
+extern int module_is_recording(module *mod);
 
-extern int module_get_nports(void);
+extern float module_get_bpm(module *mod);
+extern void module_set_bpm(module *mod, float);
 
-extern int module_get_nseq(void);
-extern sequence *module_get_seq(int);
-extern void module_add_sequence(sequence *seq);
-extern void module_del_sequence(int s);
-extern void module_swap_sequence(int s1, int s2);
-extern int module_get_curr_seq(void);
-extern void module_set_curr_seq(int s);
-extern void module_dump_notes(int);
-extern int module_get_rpb(void);
-extern void module_set_rpb(int rpb);
-extern int module_get_ctrlpr(void);
-extern void module_set_ctrlpr(int);
-
-extern void queue_midi_note_on(sequence *seq, int port, int chn, int note, int velocity);
-extern void queue_midi_note_off(sequence *seq, int port, int chn, int note);
-extern void queue_midi_ctrl(sequence *seq, track *trk, int val, int ctrl);
+extern int module_get_nseq(module *mod);
+extern sequence *module_get_seq(module *mod, int);
+extern void module_add_sequence(module *mod, sequence *seq);
+extern void module_del_sequence(module *mod, int s);
+extern void module_swap_sequence(module *mod, int s1, int s2);
+extern int module_get_curr_seq(module *mod);
+extern void module_set_curr_seq(module *mod, int s);
+extern void module_dump_notes(module *mod, int n);
+extern int module_get_rpb(module *mod);
+extern void module_set_rpb(module *mod, int rpb);
+extern int module_get_ctrlpr(module *mod);
+extern void module_set_ctrlpr(module *mod, int);
 
 extern char *track_get_rec_update(track *trk);
 extern void track_clear_updates(track *trk);
 
-extern char *midi_in_get_event(void);
-extern void midi_in_clear_events(void);
+extern char *midi_in_get_event(midi_client *clt);
+extern void midi_in_clear_events(midi_client *clt);
 
-extern void midi_ignore_buffer_clear(void);
-extern void midi_ignore_buffer_add(int channel, int type, int note);
+extern void midi_ignore_buffer_clear(midi_client *clt);
+extern void midi_ignore_buffer_add(midi_client *clt, int channel, int type, int note);
 
-extern void set_default_midi_port(int port);
-extern timeline *module_get_timeline(void);
+extern void queue_midi_note_on(midi_client *clt, sequence *seq, int port, int chn, int note, int velocity);
+extern void queue_midi_note_off(midi_client *clt, sequence *seq, int port, int chn, int note);
+extern void queue_midi_ctrl(midi_client *clt, sequence *seq, track *trk, int val, int ctrl);
+
+extern void set_default_midi_port(module *mod, int port);
+extern timeline *module_get_timeline(module *mod);
 
 // sequence
 extern sequence *sequence_new(int length);
@@ -97,6 +95,13 @@ extern double sequence_get_pos(sequence *seq);
 extern void sequence_set_midi_focus(sequence *seq, int foc);
 extern void sequence_double(sequence *seq);
 extern void sequence_halve(sequence *seq);
+extern void sequence_set_trg_playmode(sequence *seq, int v);
+extern void sequence_set_trg_quantise(sequence *seq, int v);
+extern int sequence_get_trg_playmode(sequence *seq);
+extern int sequence_get_trg_quantise(sequence *seq);
+
+extern void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt);
+extern char *sequence_get_trig(sequence *seq, int t);
 
 // track
 extern row *track_get_row_ptr(track *, int c, int r);
@@ -153,14 +158,6 @@ extern char *track_get_qc(track *trk);
 extern void track_set_loop(track *trk, int v);
 extern int track_get_loop(track *trk);
 
-extern void sequence_set_trg_playmode(sequence *seq, int v);
-extern void sequence_set_trg_quantise(sequence *seq, int v);
-extern int sequence_get_trg_playmode(sequence *seq);
-extern int sequence_get_trg_quantise(sequence *seq);
-
-extern void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt);
-extern char *sequence_get_trig(sequence *seq, int t);
-
 extern track *track_new(int port, int channel, int len, int songlen, int ctrlpr);
 
 // row
@@ -198,4 +195,5 @@ extern int timeline_get_nticks(timeline *tl);
 extern double timeline_get_tick(timeline *tl, int n);
 
 extern int parse_note(char *);
+
 #endif //__LIBVHT_H__

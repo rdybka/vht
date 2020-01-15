@@ -18,8 +18,10 @@
 
 #ifndef __SEQUENCE_H__
 #define __SEQUENCE_H__
+#include <pthread.h>
 #include "midi_event.h"
 #include "track.h"
+
 
 #define SEQUENCE_MAX_LENGTH	512
 
@@ -47,6 +49,8 @@ typedef struct sequence_t {
 
 	int trg_playmode;
 	int trg_quantise;
+	pthread_mutex_t *mod_excl;
+	void *clt;
 } sequence;
 
 sequence *sequence_new(int length);
@@ -59,8 +63,6 @@ void sequence_double(sequence *seq);
 void sequence_halve(sequence *seq);
 void sequence_free(sequence *);
 void sequence_advance(sequence *seq, double period);
-
-void sequence_handle_record(sequence *seq, midi_event evt);
 
 void sequence_set_trg_quantise(sequence *seq, int v);
 void sequence_set_trg_playmode(sequence *seq, int v);
