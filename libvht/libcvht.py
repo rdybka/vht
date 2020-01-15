@@ -167,6 +167,10 @@ def module_get_max_ports(mod):
     return _libcvht.module_get_max_ports(mod)
 module_get_max_ports = _libcvht.module_get_max_ports
 
+def module_synch_output_ports(mod):
+    return _libcvht.module_synch_output_ports(mod)
+module_synch_output_ports = _libcvht.module_synch_output_ports
+
 def module_play(mod, arg2):
     return _libcvht.module_play(mod, arg2)
 module_play = _libcvht.module_play

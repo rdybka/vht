@@ -3930,6 +3930,27 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_module_synch_output_ports(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:module_synch_output_ports",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_synch_output_ports" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  module_synch_output_ports(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_module_play(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   module *arg1 = (module *) 0 ;
@@ -7604,6 +7625,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "get_midi_error", _wrap_get_midi_error, METH_VARARGS, NULL},
 	 { "module_get_time", _wrap_module_get_time, METH_VARARGS, NULL},
 	 { "module_get_max_ports", _wrap_module_get_max_ports, METH_VARARGS, NULL},
+	 { "module_synch_output_ports", _wrap_module_synch_output_ports, METH_VARARGS, NULL},
 	 { "module_play", _wrap_module_play, METH_VARARGS, NULL},
 	 { "module_is_playing", _wrap_module_is_playing, METH_VARARGS, NULL},
 	 { "module_record", _wrap_module_record, METH_VARARGS, NULL},

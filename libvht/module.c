@@ -251,11 +251,11 @@ void module_synch_output_ports(module *mod) {
 			mod->clt->ports_to_open[p] = 1;
 	}
 
-	midi_buff_excl_out(mod->clt);
-
 	mod->clt->ports_to_open[mod->clt->default_midi_port] = 1;
 
 	for (int s = 0; s < mod->nseq; s++)
 		for (int t = 0; t < mod->seq[s]->ntrk; t++)
 			mod->clt->ports_to_open[mod->seq[s]->trk[t]->port] = 1;
+
+	midi_buff_excl_out(mod->clt);
 }

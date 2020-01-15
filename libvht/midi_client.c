@@ -115,7 +115,6 @@ void midi_synch_output_ports(midi_client *clt) {
 			clt->jack_output_ports[p] = jack_port_register (clt->jack_client, pname, JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
 		}
 	}
-
 }
 
 void midi_stop(midi_client *clt) {

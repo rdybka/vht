@@ -43,7 +43,7 @@ class Configuration:
         self.console_position = 0.7
         self.console_show = False
         self.timeline_show = True
-        self.console_steal_stderr = False
+        self.console_steal_stderr = True
 
         c = (0.2, 0.7, 1.0)
         self.colour = c

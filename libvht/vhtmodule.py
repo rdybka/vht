@@ -54,6 +54,9 @@ class VHTModule(Iterable):
     def midi_stop(self):
         libcvht.midi_stop(self._clt_handle)
 
+    def midi_synch_ports(self):
+        libcvht.module_synch_output_ports(self._mod_handle)
+
     def __str__(self):
         r = {}
         r["bpm"] = self.bpm
@@ -413,8 +416,10 @@ class VHTModule(Iterable):
                             rr.velocity = row["velocity"]
                             rr.delay = row["delay"]
 
-            self.play = p
             for cb in self.cb_post_load:
                 cb(jm)
+
+            self.midi_synch_ports()
+            self.play = p
 
         return True

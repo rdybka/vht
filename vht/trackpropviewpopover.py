@@ -612,6 +612,7 @@ class TrackPropViewPopover(Gtk.Popover):
 
     def on_port_changed(self, adj):
         self.trk.port = int(adj.get_value())
+        mod.midi_synch_ports()
         self.parent.redraw()
 
     def on_channel_changed(self, adj):

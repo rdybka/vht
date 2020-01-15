@@ -41,6 +41,7 @@ void midi_stop(midi_client *clt);
 extern char *get_midi_error(module *mod);
 extern char *module_get_time(module *mod);
 extern int module_get_max_ports(module *mod);
+extern void module_synch_output_ports(module *mod);
 
 extern void module_play(module *mod, int);
 extern int module_is_playing(module *mod);
@@ -68,7 +69,6 @@ extern void track_clear_updates(track *trk);
 
 extern char *midi_in_get_event(midi_client *clt);
 extern void midi_in_clear_events(midi_client *clt);
-
 extern void midi_ignore_buffer_clear(midi_client *clt);
 extern void midi_ignore_buffer_add(midi_client *clt, int channel, int type, int note);
 
