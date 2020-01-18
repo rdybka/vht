@@ -23,13 +23,17 @@
 #include "track.h"
 
 void seq_mod_excl_in(sequence *seq) {
+	//printf("mod_excl in");
 	if (seq->mod_excl)
 		pthread_mutex_lock(seq->mod_excl);
+	//printf(".\n");
 }
 
 void seq_mod_excl_out(sequence *seq) {
+	//printf("mod_excl out");
 	if (seq->mod_excl)
 		pthread_mutex_unlock(seq->mod_excl);
+	//printf(".\n");
 }
 
 sequence *sequence_new(int length) {
@@ -61,10 +65,6 @@ void sequence_trk_reindex(sequence *seq) {
 
 void sequence_add_track(sequence *seq, track *trk) {
 	seq_mod_excl_in(seq);
-	// fresh?
-	if (seq->ntrk == 0) {
-		seq->trk = malloc(sizeof(track *));
-	}
 
 	seq->trk = realloc(seq->trk, sizeof(track *) * (seq->ntrk + 1));
 	track_wind(trk, seq->pos);
@@ -79,7 +79,6 @@ void sequence_add_track(sequence *seq, track *trk) {
 track *sequence_clone_track(sequence *seq, track *trk) {
 	track *ntrk = track_clone(trk);
 	sequence_add_track(seq, ntrk);
-	sequence_trk_reindex(seq);
 	return ntrk;
 }
 
@@ -226,7 +225,13 @@ void sequence_handle_record(module *mod, sequence *seq, midi_event evt) {
 		if (!found) {
 			track *trk;
 			trk = track_new(mod->clt->default_midi_port, evt.channel, seq->length, seq->length, mod->ctrlpr);
-			sequence_add_track(seq, trk);
+
+			// sequence_add_track(seq, trk); can't call it from here because of mutex - copy code, bad design
+			seq->trk = realloc(seq->trk, sizeof(track *) * (seq->ntrk + 1));
+			seq->trk[seq->ntrk++] = trk;
+			trk->mod_excl = seq->mod_excl;
+			trk->clt = seq->clt;
+			sequence_trk_reindex(seq);
 
 			trk->last_pos = seq->pos - seq->last_period;
 			trk->pos = seq->pos;

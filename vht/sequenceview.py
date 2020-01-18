@@ -19,6 +19,7 @@ from vht.trackpropview import TrackPropView
 from vht.propview import PropView
 from vht.trackview import TrackView
 from vht import *
+
 import cairo
 
 import gi
@@ -586,6 +587,7 @@ class SequenceView(Gtk.Box):
                 TrackView.track_views.append(t)
             else:
                 t = TrackView(self.seq, trk, self)
+
                 t.undo_buff.reset()
                 t.undo_buff.add_state(True)
 
@@ -594,7 +596,7 @@ class SequenceView(Gtk.Box):
 
             self.prop_view.add_track(trk, t)
 
-            if cfg.new_tracks_left and mod.record != 2:
+            if cfg.new_tracks_left:
                 self.prop_view.move_first(trk)
         else:
             t = TrackView(self.seq, None, self)
@@ -966,6 +968,10 @@ class SequenceView(Gtk.Box):
                             found = True
 
                     if not found:
+                        # track added from c library - has no extras
+                        for cb in mod.cb_new_track:
+                            cb(self.seq.index, trk.index)
+
                         self.add_track(trk)
 
         return True

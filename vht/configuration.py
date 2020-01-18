@@ -99,7 +99,7 @@ class Configuration:
         self.quick_control_2_ctrl = 10
         self.quick_control_2_def = 64
 
-        self.new_tracks_left = False
+        self.new_tracks_left = True
         self.default_seq_length = 16
 
         self.controller_resolution = 8
