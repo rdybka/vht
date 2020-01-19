@@ -103,6 +103,8 @@ extern int sequence_get_trg_quantise(sequence *seq);
 extern void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt);
 extern char *sequence_get_trig(sequence *seq, int t);
 
+extern sequence *sequence_clone(sequence *seq);
+
 // track
 extern row *track_get_row_ptr(track *, int c, int r);
 extern ctrlrow *track_get_ctrlrow_ptr(track *, int c, int r);

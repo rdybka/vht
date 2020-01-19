@@ -273,6 +273,20 @@ class SequenceView(Gtk.Box):
                 mod.seqlist.redraw()
             return True
 
+        if cfg.key["sequence_clone"].matches(event):
+            idx = mod.clone_sequence(mod.curr_seq).index
+            mod.extras[idx][-1]["mouse_cfg"] = mod.extras[mod.curr_seq][-1]["mouse_cfg"]
+            mod.extras[idx][-1]["highlight"] = mod.extras[mod.curr_seq][-1]["highlight"]
+            mod.extras[idx][-1]["sequence_name"] = extras.get_name(
+                mod.extras[mod.curr_seq][-1]["sequence_name"]
+            )
+            for t in range(len(mod[idx])):
+                mod.extras[idx][t] = mod.extras[mod.curr_seq][t].copy()
+
+            self.switch(idx)
+            mod.curr_seq = idx
+            return True
+
         if cfg.key["sequence_move_right"].matches(event):
             if len(mod) > self.seq.index + 1:
                 mod.seqlist._highligh = -1
@@ -353,6 +367,9 @@ class SequenceView(Gtk.Box):
 
         if cfg.key["track_add"].matches(event):
             self._side_prop.add_track()
+            if cfg.new_tracks_left:
+                self.prop_view.move_first(self.seq[-1])
+
             return True
 
         if cfg.key["track_clone"].matches(event):
@@ -596,8 +613,6 @@ class SequenceView(Gtk.Box):
 
             self.prop_view.add_track(trk, t)
 
-            if cfg.new_tracks_left:
-                self.prop_view.move_first(trk)
         else:
             t = TrackView(self.seq, None, self)
             self._side_box.pack_start(t, False, True, 0)
@@ -973,6 +988,8 @@ class SequenceView(Gtk.Box):
                             cb(self.seq.index, trk.index)
 
                         self.add_track(trk)
+                        if cfg.new_tracks_left:
+                            self.prop_view.move_first(self.seq[-1])
 
         return True
 

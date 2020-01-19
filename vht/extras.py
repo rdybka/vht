@@ -28,18 +28,27 @@ def fix_extras_new_trk(s, t):
     mod.extras[s][t]["track_show_controllers"] = False
 
 
+def get_name(n):
+    nm = n
+    valid = False
+    while not valid:
+        valid = True
+        for rr in mod.extras.values():
+            if rr[-1]["sequence_name"] == nm:
+                nm = nm + "_"
+                valid = False
+    return nm
+
+
 def fix_extras_new_seq(s):
     mod.extras[s] = {}
     mod.extras[s][-1] = {}
 
     mod.extras[s][-1]["highlight"] = cfg.highlight
     mod.extras[s][-1]["mouse_cfg"] = [3, 2, 0]
-    txt = cfg.sequence_name_format % (len(mod) - 1)
+    mod.extras[s][-1]["sequence_name"] = ""
 
-    for rr in mod.extras.values():
-        if "sequence_name" in rr[-1]:
-            if rr[-1]["sequence_name"] == txt:
-                txt = txt + "_"
+    txt = get_name(cfg.sequence_name_format % (len(mod) - 1))
 
     mod.extras[s][-1]["sequence_name"] = txt
 

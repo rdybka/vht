@@ -1,6 +1,6 @@
 # vhttimelinechanges.py - Valhalla Tracker (libvht)
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,19 +17,20 @@
 
 from collections.abc import MutableSequence
 
+from libvht import libcvht
+
 
 class VHTTimelineChanges(MutableSequence):
-    def __init__(self, vht, tl):
+    def __init__(self, tl):
         super(VHTTimelineChanges, self).__init__()
-        self._vht_handle = vht
         self._tl_handle = tl
 
     def __len__(self):
-        return self._vht_handle.timeline_get_nchanges(self._tl_handle)
+        return libcvht.timeline_get_nchanges(self._tl_handle)
 
     def __iter__(self):
         for itm in range(self.__len__()):
-            yield eval(self._vht_handle.timeline_get_change(self._tl_handle, itm))
+            yield eval(libcvht.timeline_get_change(self._tl_handle, itm))
 
     def __getitem__(self, itm):
         if itm >= self.__len__():
@@ -38,20 +39,16 @@ class VHTTimelineChanges(MutableSequence):
         if itm < 0:
             raise IndexError()
 
-        return eval(self._vht_handle.timeline_get_change(self._tl_handle, itm))
+        return eval(libcvht.timeline_get_change(self._tl_handle, itm))
 
     def __delitem__(self, itm):
-        self._vht_handle.timeline_change_del(self._tl_handle, itm)
+        libcvht.timeline_change_del(self._tl_handle, itm)
 
     def __setitem__(self, itm, val):
-        self._vht_handle.timeline_change_set(
-            self._tl_handle, val[0], val[1], val[2], val[3]
-        )
+        libcvht.timeline_change_set(self._tl_handle, val[0], val[1], val[2], val[3])
 
     def insert(self, itm, val):
-        self._vht_handle.timeline_change_set(
-            self._tl_handle, val[0], val[1], val[2], val[3]
-        )
+        libcvht.timeline_change_set(self._tl_handle, val[0], val[1], val[2], val[3])
 
     def __str__(self):
         ret = ""

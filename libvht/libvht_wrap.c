@@ -5410,6 +5410,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_sequence_clone(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  sequence *result = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:sequence_clone",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_clone" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  result = (sequence *)sequence_clone(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_sequence, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_track_get_row_ptr(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   track *arg1 = (track *) 0 ;
@@ -7676,6 +7698,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "sequence_get_trg_quantise", _wrap_sequence_get_trg_quantise, METH_VARARGS, NULL},
 	 { "sequence_set_trig", _wrap_sequence_set_trig, METH_VARARGS, NULL},
 	 { "sequence_get_trig", _wrap_sequence_get_trig, METH_VARARGS, NULL},
+	 { "sequence_clone", _wrap_sequence_clone, METH_VARARGS, NULL},
 	 { "track_get_row_ptr", _wrap_track_get_row_ptr, METH_VARARGS, NULL},
 	 { "track_get_ctrlrow_ptr", _wrap_track_get_ctrlrow_ptr, METH_VARARGS, NULL},
 	 { "track_get_index", _wrap_track_get_index, METH_VARARGS, NULL},

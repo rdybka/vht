@@ -63,6 +63,35 @@ void sequence_trk_reindex(sequence *seq) {
 	}
 }
 
+sequence *sequence_clone(sequence *seq) {
+	sequence *ns = sequence_new(seq->length);
+	ns->mod_excl = seq->mod_excl;
+	ns->clt = seq->clt;
+	ns->pos = seq->pos;
+
+	for (int t = 0; t < seq->ntrk; t++) {
+		track *trk = track_clone(seq->trk[t]);
+		ns->trk = realloc(ns->trk, sizeof(track *) * (ns->ntrk + 1));
+		track_wind(trk, seq->pos);
+		ns->trk[ns->ntrk++] = trk;
+		trk->mod_excl = seq->mod_excl;
+		trk->clt = seq->clt;
+	}
+
+	sequence_trk_reindex(ns);
+
+	ns->trg_playmode = seq->trg_playmode;
+	ns->trg_quantise = seq->trg_quantise;
+
+	for (int t = 0; t < 3; t ++) {
+		ns->triggers[t].type = seq->triggers[t].type;
+		ns->triggers[t].channel = seq->triggers[t].channel;
+		ns->triggers[t].note = seq->triggers[t].note;
+	}
+
+	return ns;
+}
+
 void sequence_add_track(sequence *seq, track *trk) {
 	seq_mod_excl_in(seq);
 

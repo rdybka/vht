@@ -1,6 +1,6 @@
 # vhtctrl.py - Valhalla Tracker (libvht)
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,19 +17,19 @@
 
 from collections.abc import Iterable
 from libvht.vhtctrlrow import VHTCtrlRow
+from libvht import libcvht
 
 
 class VHTCtrl(Iterable):
-    def __init__(self, vht, trk, ctrl, ctrlnum, on_change=None):
+    def __init__(self, trk, ctrl, ctrlnum, on_change=None):
         super(VHTCtrl, self).__init__()
-        self._vht_handle = vht
         self._trk_handle = trk
         self._ctrl = ctrl
         self._ctrlnum = ctrlnum
         self.on_change = on_change
 
     def __len__(self):
-        return self._vht_handle.track_get_length(self._trk_handle)
+        return libcvht.track_get_length(self._trk_handle)
 
     def clear(self):
         for r in self:
@@ -38,8 +38,7 @@ class VHTCtrl(Iterable):
     def __iter__(self):
         for i in range(self.__len__()):
             yield VHTCtrlRow(
-                self._vht_handle,
-                self._vht_handle.track_get_ctrlrow_ptr(self._trk_handle, self._ctrl, i),
+                libcvht.track_get_ctrlrow_ptr(self._trk_handle, self._ctrl, i),
             )
 
     def __setitem__(self, itm, val):
@@ -56,12 +55,11 @@ class VHTCtrl(Iterable):
             raise IndexError(itm)
 
         return VHTCtrlRow(
-            self._vht_handle,
-            self._vht_handle.track_get_ctrlrow_ptr(self._trk_handle, self._ctrl, itm),
+            libcvht.track_get_ctrlrow_ptr(self._trk_handle, self._ctrl, itm),
         )
 
     def refresh(self):
-        self._vht_handle.track_ctrl_refresh_envelope(self._trk_handle, self._ctrl)
+        libcvht.track_ctrl_refresh_envelope(self._trk_handle, self._ctrl)
 
     @property
     def ctrlnum(self):
@@ -73,7 +71,7 @@ class VHTCtrl(Iterable):
             return
 
         self._ctrlnum = int(value)
-        self._vht_handle.track_set_ctrl_num(self._trk_handle, self._ctrl, self._ctrlnum)
+        libcvht.track_set_ctrl_num(self._trk_handle, self._ctrl, self._ctrlnum)
         if self.on_change:
             self.on_change()
 
@@ -86,4 +84,4 @@ class VHTCtrl(Iterable):
         return ret
 
     def swap(self, c1, c2):
-        self._vht_handle.track_swap_ctrl(self._trk_handle, c1, c2)
+        libcvht.track_swap_ctrl(self._trk_handle, c1, c2)

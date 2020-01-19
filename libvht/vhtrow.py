@@ -1,6 +1,6 @@
 # vhtrow.py - Valhalla Tracker (libvht)
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,16 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from libvht import libcvht
+
 
 class VHTRow:
-    def __init__(self, vht, rowptr):
-        self._vht_handle = vht
+    def __init__(self, rowptr):
         self._rowptr = rowptr
 
-        self._type = vht.row_get_type(self._rowptr)
-        self._note = vht.row_get_note(self._rowptr)
-        self._velocity = vht.row_get_velocity(self._rowptr)
-        self._delay = vht.row_get_delay(self._rowptr)
+        self._type = libcvht.row_get_type(self._rowptr)
+        self._note = libcvht.row_get_note(self._rowptr)
+        self._velocity = libcvht.row_get_velocity(self._rowptr)
+        self._delay = libcvht.row_get_delay(self._rowptr)
         self.update_strrep()
 
     def __eq__(self, other):
@@ -61,7 +62,7 @@ class VHTRow:
         self._note = row._note
         self._velocity = row._velocity
         self._delay = row._delay
-        self._vht_handle.row_set(
+        libcvht.row_set(
             self._rowptr, self._type, self._note, self._velocity, self._delay
         )
         self.update_strrep()
@@ -71,7 +72,7 @@ class VHTRow:
         self._note = 0
         self._velocity = 0
         self._delay = 0
-        self._vht_handle.row_set(self._rowptr, 0, 0, 0, 0)
+        libcvht.row_set(self._rowptr, 0, 0, 0, 0)
         self.update_strrep()
 
     @property
@@ -81,7 +82,7 @@ class VHTRow:
     @type.setter
     def type(self, value):
         self._type = value
-        self._vht_handle.row_set_type(self._rowptr, self._type)
+        libcvht.row_set_type(self._rowptr, self._type)
 
     @property
     def note(self):
@@ -91,11 +92,11 @@ class VHTRow:
     def note(self, value):
         if isinstance(value, int):
             self._note = value
-            self._vht_handle.row_set_note(self._rowptr, self._note)
+            libcvht.row_set_note(self._rowptr, self._note)
 
         if isinstance(value, str):
-            self._note = self._vht_handle.parse_note(value)
-            self._vht_handle.row_set_note(self._rowptr, self._note)
+            self._note = libcvht.parse_note(value)
+            libcvht.row_set_note(self._rowptr, self._note)
             self.type = 1
             if self.velocity == 0:
                 self.velocity = 100
@@ -109,7 +110,7 @@ class VHTRow:
     @velocity.setter
     def velocity(self, value):
         self._velocity = int(value)
-        self._vht_handle.row_set_velocity(self._rowptr, self._velocity)
+        libcvht.row_set_velocity(self._rowptr, self._velocity)
 
     @property
     def delay(self):
@@ -118,7 +119,7 @@ class VHTRow:
     @delay.setter
     def delay(self, value):
         self._delay = int(value)
-        self._vht_handle.row_set_delay(self._rowptr, self._delay)
+        libcvht.row_set_delay(self._rowptr, self._delay)
 
     def __str__(self):
         return self._strrep

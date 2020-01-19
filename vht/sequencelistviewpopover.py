@@ -1,6 +1,6 @@
 # sequencelistviewpopover.py - Valhalla Tracker
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 from vht.notebooklabel import NotebookLabel
 from vht.sequencetriggersview import SequenceTriggersView
 from vht.controllersview import ControllersView
-from vht import cfg, mod
+from vht import cfg, mod, extras
 from gi.repository import Gdk, Gtk, Gio
 from datetime import datetime
 import gi
@@ -177,4 +177,13 @@ class SequenceListViewPopover(Gtk.Popover):
         self._parent.redraw()
 
     def on_clone_button_clicked(self, wdg):
-        print("clone")
+        idx = mod.clone_sequence(self.curr).index
+
+        mod.extras[idx][-1]["mouse_cfg"] = mod.extras[self.curr][-1]["mouse_cfg"]
+        mod.extras[idx][-1]["highlight"] = mod.extras[self.curr][-1]["highlight"]
+        mod.extras[idx][-1]["sequence_name"] = extras.get_name(
+            mod.extras[self.curr][-1]["sequence_name"]
+        )
+
+        for t in range(len(mod[idx])):
+            mod.extras[idx][t] = mod.extras[self.curr][t].copy()

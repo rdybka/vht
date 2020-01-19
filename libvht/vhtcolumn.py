@@ -1,6 +1,6 @@
 # vhtcolumn.py - Valhalla Tracker (libvht)
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,17 +17,17 @@
 
 from collections.abc import Iterable
 from libvht.vhtrow import VHTRow
+from libvht import libcvht
 
 
 class VHTColumn(Iterable):
-    def __init__(self, vht, trk, col):
+    def __init__(self, trk, col):
         super(VHTColumn, self).__init__()
-        self._vht_handle = vht
         self._trk_handle = trk
         self._col = col
 
     def __len__(self):
-        return self._vht_handle.track_get_length(self._trk_handle)
+        return libcvht.track_get_length(self._trk_handle)
 
     def clear(self):
         for r in self:
@@ -35,10 +35,7 @@ class VHTColumn(Iterable):
 
     def __iter__(self):
         for i in range(self.__len__()):
-            yield VHTRow(
-                self._vht_handle,
-                self._vht_handle.track_get_row_ptr(self._trk_handle, self._col, i),
-            )
+            yield VHTRow(libcvht.track_get_row_ptr(self._trk_handle, self._col, i),)
 
     def __setitem__(self, itm, val):
         self[itm].note = val
@@ -50,10 +47,7 @@ class VHTColumn(Iterable):
         if itm < 0:
             raise IndexError()
 
-        return VHTRow(
-            self._vht_handle,
-            self._vht_handle.track_get_row_ptr(self._trk_handle, self._col, itm),
-        )
+        return VHTRow(libcvht.track_get_row_ptr(self._trk_handle, self._col, itm),)
 
     def __str__(self):
         ret = ""

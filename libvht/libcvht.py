@@ -371,6 +371,10 @@ def sequence_get_trig(seq, t):
     return _libcvht.sequence_get_trig(seq, t)
 sequence_get_trig = _libcvht.sequence_get_trig
 
+def sequence_clone(seq):
+    return _libcvht.sequence_clone(seq)
+sequence_clone = _libcvht.sequence_clone
+
 def track_get_row_ptr(arg1, c, r):
     return _libcvht.track_get_row_ptr(arg1, c, r)
 track_get_row_ptr = _libcvht.track_get_row_ptr

@@ -1,6 +1,6 @@
 # vhttrack.py - Valhalla Tracker (libvht)
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,19 +17,20 @@
 
 from collections.abc import Iterable
 
+from libvht import libcvht
+
 
 class VHTTimelineTicks(Iterable):
-    def __init__(self, vht, tl):
+    def __init__(self, tl):
         super(VHTTimelineTicks, self).__init__()
-        self._vht_handle = vht
         self._tl_handle = tl
 
     def __len__(self):
-        return self._vht_handle.timeline_get_nticks(self._tl_handle)
+        return libcvht.timeline_get_nticks(self._tl_handle)
 
     def __iter__(self):
         for itm in range(self.__len__()):
-            yield round(self._vht_handle.timeline_get_tick(self._tl_handle, itm), 4)
+            yield round(libcvht.timeline_get_tick(self._tl_handle, itm), 4)
 
     def __getitem__(self, itm):
         if itm >= self.__len__():
@@ -38,4 +39,4 @@ class VHTTimelineTicks(Iterable):
         if itm < 0:
             raise IndexError(itm, "...the bright side of life")
 
-        return round(self._vht_handle.timeline_get_tick(self._tl_handle, itm), 4)
+        return round(libcvht.timeline_get_tick(self._tl_handle, itm), 4)

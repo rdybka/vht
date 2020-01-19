@@ -1,6 +1,6 @@
 # vhtctrlrow.py - Valhalla Tracker (libvht)
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,17 +15,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from libvht import libcvht
+
 
 class VHTCtrlRow:
-    def __init__(self, vht, crowptr, dummy=False):
-        self._vht_handle = vht
+    def __init__(self, crowptr, dummy=False):
         self._crowptr = crowptr
         self._dummy = dummy
 
-        self._velocity = vht.ctrlrow_get_velocity(self._crowptr)
-        self._linked = vht.ctrlrow_get_linked(self._crowptr)
-        self._smooth = vht.ctrlrow_get_smooth(self._crowptr)
-        self._anchor = vht.ctrlrow_get_anchor(self._crowptr)
+        self._velocity = libcvht.ctrlrow_get_velocity(self._crowptr)
+        self._linked = libcvht.ctrlrow_get_linked(self._crowptr)
+        self._smooth = libcvht.ctrlrow_get_smooth(self._crowptr)
+        self._anchor = libcvht.ctrlrow_get_anchor(self._crowptr)
 
         self.update_strrep()
 
@@ -65,7 +66,7 @@ class VHTCtrlRow:
         self._smooth = row._smooth
         self._anchor = row._anchor
         if not self._dummy:
-            self._vht_handle.ctrlrow_set(
+            libcvht.ctrlrow_set(
                 self._crowptr, self._velocity, self._linked, self._smooth, self.anchor
             )
         self.update_strrep()
@@ -76,11 +77,11 @@ class VHTCtrlRow:
         self._smooth = 0
         self._anchor = 0
         if not self._dummy:
-            self._vht_handle.ctrlrow_set(self._crowptr, -1, 0, 0, 0)
+            libcvht.ctrlrow_set(self._crowptr, -1, 0, 0, 0)
         self.update_strrep()
 
     def dummy(self):
-        return VHTCtrlRow(self._vht_handle, self._crowptr, True)
+        return VHTCtrlRow(self._crowptr, True)
 
     @property
     def velocity(self):
@@ -91,7 +92,7 @@ class VHTCtrlRow:
         self._velocity = int(value)
 
         if not self._dummy:
-            self._vht_handle.ctrlrow_set_velocity(self._crowptr, self._velocity)
+            libcvht.ctrlrow_set_velocity(self._crowptr, self._velocity)
 
     @property
     def linked(self):
@@ -101,7 +102,7 @@ class VHTCtrlRow:
     def linked(self, value):
         self._linked = int(value)
         if not self._dummy:
-            self._vht_handle.ctrlrow_set_linked(self._crowptr, self._linked)
+            libcvht.ctrlrow_set_linked(self._crowptr, self._linked)
 
     @property
     def smooth(self):
@@ -111,7 +112,7 @@ class VHTCtrlRow:
     def smooth(self, value):
         self._smooth = int(value)
         if not self._dummy:
-            self._vht_handle.ctrlrow_set_smooth(self._crowptr, self._smooth)
+            libcvht.ctrlrow_set_smooth(self._crowptr, self._smooth)
 
     @property
     def anchor(self):
@@ -121,7 +122,7 @@ class VHTCtrlRow:
     def anchor(self, value):
         self._anchor = int(value)
         if not self._dummy:
-            self._vht_handle.ctrlrow_set_anchor(self._crowptr, self._anchor)
+            libcvht.ctrlrow_set_anchor(self._crowptr, self._anchor)
 
     def __str__(self):
         return self._strrep

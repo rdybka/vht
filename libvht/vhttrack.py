@@ -1,6 +1,6 @@
 # vhttrack.py - Valhalla Tracker (libvht)
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,20 +19,20 @@ from collections.abc import Iterable
 from libvht.vhtcolumn import VHTColumn
 from libvht.vhtctrllist import VHTCtrlList
 from libvht.vhtquicklist import VHTQuickList
+from libvht import libcvht
 
 
 class VHTTrack(Iterable):
-    def __init__(self, vht, trk):
-        self._vht_handle = vht
+    def __init__(self, trk):
         self._trk_handle = trk
         super()
 
     def __len__(self):
-        return self._vht_handle.track_get_ncols(self._trk_handle)
+        return libcvht.track_get_ncols(self._trk_handle)
 
     def __iter__(self):
         for itm in range(self.__len__()):
-            yield VHTColumn(self._vht_handle, self._trk_handle, itm)
+            yield VHTColumn(self._trk_handle, itm)
 
     def __int__(self):
         return int(self._trk_handle)
@@ -48,7 +48,7 @@ class VHTTrack(Iterable):
         if itm < 0:
             raise IndexError(itm, "...the bright side of life")
 
-        return VHTColumn(self._vht_handle, self._trk_handle, itm)
+        return VHTColumn(self._trk_handle, itm)
 
     def __setitem__(self, itm, val):
         pass
@@ -57,168 +57,166 @@ class VHTTrack(Iterable):
         pass
 
     def add_column(self):
-        self._vht_handle.track_add_col(self._trk_handle)
+        libcvht.track_add_col(self._trk_handle)
         return self[self.__len__() - 1]
 
     def swap_column(self, c1, c2):
-        self._vht_handle.track_swap_col(self._trk_handle, c1, c2)
+        libcvht.track_swap_col(self._trk_handle, c1, c2)
 
     def del_column(self, c=-1):
         if c == -1:
-            self._vht_handle.track_del_col(self._trk_handle, self.__len__() - 1)
+            libcvht.track_del_col(self._trk_handle, self.__len__() - 1)
         else:
-            self._vht_handle.track_del_col(self._trk_handle, c)
+            libcvht.track_del_col(self._trk_handle, c)
 
     def kill_notes(self):
-        self._vht_handle.track_kill_notes(self._trk_handle)
+        libcvht.track_kill_notes(self._trk_handle)
 
     @property
     def index(self):
-        return self._vht_handle.track_get_index(self._trk_handle)
+        return libcvht.track_get_index(self._trk_handle)
 
     @property
     def port(self):
-        return self._vht_handle.track_get_port(self._trk_handle)
+        return libcvht.track_get_port(self._trk_handle)
 
     @port.setter
     def port(self, value):
         self.kill_notes()
-        self._vht_handle.track_set_port(self._trk_handle, value)
+        libcvht.track_set_port(self._trk_handle, value)
 
     @property
     def channel(self):
-        return self._vht_handle.track_get_channel(self._trk_handle)
+        return libcvht.track_get_channel(self._trk_handle)
 
     @channel.setter
     def channel(self, value):
         self.kill_notes()
-        self._vht_handle.track_set_channel(self._trk_handle, value)
+        libcvht.track_set_channel(self._trk_handle, value)
 
     @property
     def nrows(self):
-        return self._vht_handle.track_get_nrows(self._trk_handle)
+        return libcvht.track_get_nrows(self._trk_handle)
 
     @nrows.setter
     def nrows(self, value):
-        self._vht_handle.track_set_nrows(self._trk_handle, value)
+        libcvht.track_set_nrows(self._trk_handle, value)
 
     @property
     def nsrows(self):
-        return self._vht_handle.track_get_nsrows(self._trk_handle)
+        return libcvht.track_get_nsrows(self._trk_handle)
 
     @nsrows.setter
     def nsrows(self, value):
-        self._vht_handle.track_set_nsrows(self._trk_handle, value)
+        libcvht.track_set_nsrows(self._trk_handle, value)
 
     @property
     def playing(self):
-        return self._vht_handle.track_get_playing(self._trk_handle)
+        return libcvht.track_get_playing(self._trk_handle)
 
     @playing.setter
     def playing(self, value):
-        self._vht_handle.track_set_playing(self._trk_handle, value)
+        libcvht.track_set_playing(self._trk_handle, value)
 
     @property
     def pos(self):
-        return self._vht_handle.track_get_pos(self._trk_handle)
+        return libcvht.track_get_pos(self._trk_handle)
 
     @property
     def ctrl(self):
-        return VHTCtrlList(self._vht_handle, self._trk_handle)
+        return VHTCtrlList(self._trk_handle)
 
     # number of controllers / envelopes
     @property
     def nctrl(self):
-        return self._vht_handle.track_get_nctrl(self._trk_handle)
+        return libcvht.track_get_nctrl(self._trk_handle)
 
     # controller rows per row
     @property
     def ctrlpr(self):
-        return self._vht_handle.track_get_ctrlpr(self._trk_handle)
+        return libcvht.track_get_ctrlpr(self._trk_handle)
 
     # controller numbers
     @property
     def ctrls(self):
-        return eval(self._vht_handle.track_get_ctrl_nums(self._trk_handle))
+        return eval(libcvht.track_get_ctrl_nums(self._trk_handle))
 
     @property
     def loop(self):
-        return self._vht_handle.track_get_loop(self._trk_handle)
+        return libcvht.track_get_loop(self._trk_handle)
 
     @loop.setter
     def loop(self, value):
-        self._vht_handle.track_set_loop(self._trk_handle, value)
+        libcvht.track_set_loop(self._trk_handle, value)
 
     def send_program_change(self, prog):
-        self._vht_handle.track_set_program(self._trk_handle, prog)
+        libcvht.track_set_program(self._trk_handle, prog)
 
     def set_qc1(self, ctrl, val):
-        self._vht_handle.track_set_qc1(self._trk_handle, ctrl, val)
+        libcvht.track_set_qc1(self._trk_handle, ctrl, val)
 
     def set_qc2(self, ctrl, val):
-        self._vht_handle.track_set_qc2(self._trk_handle, ctrl, val)
+        libcvht.track_set_qc2(self._trk_handle, ctrl, val)
 
     def set_bank(self, msb, lsb):
-        self._vht_handle.track_set_bank(self._trk_handle, msb, lsb)
+        libcvht.track_set_bank(self._trk_handle, msb, lsb)
 
     def get_program(self):
-        return eval(self._vht_handle.track_get_program(self._trk_handle))
+        return eval(libcvht.track_get_program(self._trk_handle))
 
     def get_qc(self):
-        return eval(self._vht_handle.track_get_qc(self._trk_handle))
+        return eval(libcvht.track_get_qc(self._trk_handle))
 
     # sets control, r = row * ctrlpr + offset
     def set_ctrl(self, c, r, val):
-        return self._vht_handle.track_set_ctrl(self._trk_handle, c, r, val)
+        return libcvht.track_set_ctrl(self._trk_handle, c, r, val)
 
     # gets all controls for given row (as they will be played)
     def get_ctrl(self, c, r):
         lpr = self.ctrlpr
-        ret_arr = self._vht_handle.int_array(lpr)
-        self._vht_handle.track_get_ctrl(self._trk_handle, ret_arr, lpr, c, r)
+        ret_arr = libcvht.int_array(lpr)
+        libcvht.track_get_ctrl(self._trk_handle, ret_arr, lpr, c, r)
 
         return VHTQuickList(ret_arr, lpr)
 
     # gets all controls for given row (recorded/rendered part/doodles)
     def get_ctrl_rec(self, c, r):
         lpr = self.ctrlpr
-        ret_arr = self._vht_handle.int_array(lpr)
-        self._vht_handle.track_get_ctrl_rec(self._trk_handle, ret_arr, lpr, c, r)
+        ret_arr = libcvht.int_array(lpr)
+        libcvht.track_get_ctrl_rec(self._trk_handle, ret_arr, lpr, c, r)
 
         return VHTQuickList(ret_arr, lpr)
 
     # gets all controls for given row (env part)
     def get_ctrl_env(self, c, r):
         lpr = self.ctrlpr
-        ret_arr = self._vht_handle.int_array(lpr)
-        self._vht_handle.track_get_ctrl_env(self._trk_handle, ret_arr, lpr, c, r)
+        ret_arr = libcvht.int_array(lpr)
+        libcvht.track_get_ctrl_env(self._trk_handle, ret_arr, lpr, c, r)
 
         return VHTQuickList(ret_arr, lpr)
 
     # gets last sent controller value
     def get_lctrlval(self, c):
-        return self._vht_handle.track_get_lctrlval(self._trk_handle, c)
+        return libcvht.track_get_lctrlval(self._trk_handle, c)
 
     # get envelope for ctrl c
     def env(self, c):
-        return eval(self._vht_handle.track_get_envelope(self._trk_handle, c))
+        return eval(libcvht.track_get_envelope(self._trk_handle, c))
 
     def env_del_node(self, c, n):
-        self._vht_handle.track_envelope_del_node(self._trk_handle, c, n)
+        libcvht.track_envelope_del_node(self._trk_handle, c, n)
 
     def env_add_node(self, c, x, y, z, linked):
-        self._vht_handle.track_envelope_add_node(self._trk_handle, c, x, y, z, linked)
+        libcvht.track_envelope_add_node(self._trk_handle, c, x, y, z, linked)
 
     def env_set_node(self, c, n, x, y, z, linked=-1):
-        self._vht_handle.track_envelope_set_node(
-            self._trk_handle, c, n, x, y, z, linked
-        )
+        libcvht.track_envelope_set_node(self._trk_handle, c, n, x, y, z, linked)
 
     def get_envelope(self, c):
-        return eval(self._vht_handle.track_get_envelope(self._trk_handle, c))
+        return eval(libcvht.track_get_envelope(self._trk_handle, c))
 
     def trigger(self):
-        self._vht_handle.track_trigger(self._trk_handle)
+        libcvht.track_trigger(self._trk_handle)
 
     def __str__(self):
         ret = ""
@@ -240,10 +238,10 @@ class VHTTrack(Iterable):
         return ret
 
     def clear_updates(self):
-        self._vht_handle.track_clear_updates(self._trk_handle)
+        libcvht.track_clear_updates(self._trk_handle)
 
     def get_rec_update(self):
-        rec = self._vht_handle.track_get_rec_update(self._trk_handle)
+        rec = libcvht.track_get_rec_update(self._trk_handle)
         if rec:
             return eval(rec)
 

@@ -63,6 +63,7 @@ void sequence_double(sequence *seq);
 void sequence_halve(sequence *seq);
 void sequence_free(sequence *);
 void sequence_advance(sequence *seq, double period);
+sequence *sequence_clone(sequence *seq);
 
 void sequence_set_trg_quantise(sequence *seq, int v);
 void sequence_set_trg_playmode(sequence *seq, int v);

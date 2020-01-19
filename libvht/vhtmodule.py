@@ -36,7 +36,7 @@ class VHTModule(Iterable):
         self._clt_handle = libcvht.module_get_midi_client(self._mod_handle)
         self.extras = {}  # will be saved - for stuff like names of tracks
 
-        self.timeline = VHTTimeline(libcvht, self._mod_handle)
+        self.timeline = VHTTimeline(self._mod_handle)
 
         # these are ment to fix extras
         self.cb_new_sequence = []  # will be called after new seq with seq_id as param
@@ -81,9 +81,7 @@ class VHTModule(Iterable):
     def __iter__(self):
         for itm in range(self.__len__()):
             yield VHTSequence(
-                libcvht,
-                libcvht.module_get_seq(self._mod_handle, itm),
-                self.cb_new_track,
+                libcvht.module_get_seq(self._mod_handle, itm), self.cb_new_track,
             )
 
     def __getitem__(self, itm):
@@ -94,7 +92,7 @@ class VHTModule(Iterable):
             raise IndexError()
 
         return VHTSequence(
-            libcvht, libcvht.module_get_seq(self._mod_handle, itm), self.cb_new_track
+            libcvht.module_get_seq(self._mod_handle, itm), self.cb_new_track
         )
 
     def add_sequence(self, length=-1):
@@ -102,13 +100,25 @@ class VHTModule(Iterable):
         libcvht.module_add_sequence(self._mod_handle, seq)
         for cb in self.cb_new_sequence:
             cb(libcvht.sequence_get_index(seq))
-        return VHTSequence(libcvht, seq, self.cb_new_track)
+        return VHTSequence(seq, self.cb_new_track)
 
     def swap_sequence(self, s1, s2):
         libcvht.module_swap_sequence(self._mod_handle, s1, s2)
 
-    def del_sequence(self, s=-1):
+    def del_sequence(self, s):
         libcvht.module_del_sequence(self._mod_handle, s)
+
+    def clone_sequence(self, s):
+        seq = libcvht.sequence_clone(self[s]._seq_handle)
+        libcvht.module_add_sequence(self._mod_handle, seq)
+        for cb in self.cb_new_sequence:
+            cb(libcvht.sequence_get_index(seq))
+
+        for t in self[len(self) - 1]:
+            for cb in self.cb_new_track:
+                cb(libcvht.sequence_get_index(seq), t.index)
+
+        return VHTSequence(seq, self.cb_new_track)
 
     def __str__(self):
         ret = "seq: %d\n" % self.__len__()
