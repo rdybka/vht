@@ -225,8 +225,8 @@ class SequenceView(Gtk.Box):
 
         if cfg.key["exit_edit"].matches(event):
             if mod.active_track:
-                # if mod.active_track.edit:
-                return mod.active_track.on_key_press(widget, event)
+                if mod.active_track.edit:
+                    return mod.active_track.on_key_press(widget, event)
 
         if cfg.key["reset"].matches(event):
             if not mod.play:
