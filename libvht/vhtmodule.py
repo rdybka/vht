@@ -152,6 +152,10 @@ class VHTModule(Iterable):
         return libcvht.module_is_recording(self._mod_handle)
 
     @property
+    def jack_pos(self):
+        return libcvht.module_get_jack_pos(self._mod_handle)
+
+    @property
     def curr_seq(self):
         return libcvht.module_get_curr_seq(self._mod_handle)
 
@@ -209,6 +213,14 @@ class VHTModule(Iterable):
         value = min(max(value, self.min_bpm), self.max_bpm)
         libcvht.module_set_bpm(self._mod_handle, value)
         self.timeline.changes[0] = [0, self.bpm, self.rpb, 0]
+
+    @property
+    def play_mode(self):
+        return libcvht.module_get_play_mode(self._mod_handle)
+
+    @play_mode.setter
+    def play_mode(self, value):
+        libcvht.module_get_play_mode(self._mod_handle, value)
 
     @property
     def max_ports(self):

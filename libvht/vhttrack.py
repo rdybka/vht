@@ -24,8 +24,8 @@ from libvht import libcvht
 
 class VHTTrack(Iterable):
     def __init__(self, trk):
+        super(VHTTrack, self).__init__()
         self._trk_handle = trk
-        super()
 
     def __len__(self):
         return libcvht.track_get_ncols(self._trk_handle)
@@ -84,6 +84,14 @@ class VHTTrack(Iterable):
     def port(self, value):
         self.kill_notes()
         libcvht.track_set_port(self._trk_handle, value)
+
+    @property
+    def indicators(self):
+        return libcvht.track_get_indicators(self._trk_handle)
+
+    @indicators.setter
+    def indicators(self, value):
+        libcvht.track_set_indicators(self._trk_handle, value)
 
     @property
     def channel(self):

@@ -1,6 +1,6 @@
 # poormanspiano.py - Valhalla Tracker
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -92,6 +92,7 @@ class PoorMansPiano:
                 mod.sneakily_queue_midi_ctrl(
                     self.seq._seq_handle, self.trk._trk_handle, val, ctrl
                 )
+                self.trk.indicators = self.trk.indicators | 8
             return True
 
         return False
@@ -122,11 +123,13 @@ class PoorMansPiano:
                 )
                 self.note_on = mnt
                 self.ringing.append(mnt)
+                self.trk.indicators = self.trk.indicators | 5
         else:
             self.note_on = None
             mod.sneakily_queue_midi_note_off(
                 self.seq._seq_handle, self.trk.port, self.trk.channel, mnt
             )
+            self.trk.indicators = self.trk.indicators | 5
             while mnt in self.ringing:
                 self.ringing.remove(mnt)
 

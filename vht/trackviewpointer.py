@@ -1,6 +1,6 @@
 # trackviewpointer.py - Valhalla Tracker
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from libvht.vhtsequence import VHTSequence
+from libvht.vhttrack import VHTTrack
+
 from vht.pulsar import Pulsar
 from vht import cfg, mod
 import cairo
@@ -44,18 +46,22 @@ class TrackviewPointer:
 
     def draw(self, pos):
         self.pulse.freq = mod.rpb
-        if mod[mod.curr_seq].pos == 0:
-            if self.stopped:
-                return
 
-            self._parent.reblit()
-            self.stopped = True
-            return
+        if isinstance(self.trk, VHTTrack):
+            if mod[mod.curr_seq].playing == 0:
+                if self.stopped:
+                    return
+
+                self._parent.reblit()
+                self.stopped = True
+                return
 
         self.stopped = False
 
         w = self._parent.get_allocated_width()
-        self.height = cfg.seq_font_size
+
+        self.height = self._parent.parent.font_size  # oh yeah
+
         cr = self._parent._context
 
         y = pos - 1
@@ -101,20 +107,6 @@ class TrackviewPointer:
 
             cr.rectangle(x, y, xx, self.height)
             cr.fill()
-
-            if int(pos) == 0:
-                self._parent.reblit(self._parent.seq.length - 1)
-
-                cr.set_source_rgb(
-                    *(col * cfg.intensity_background for col in cfg.colour)
-                )
-                cr.rectangle(
-                    0,
-                    self._parent.seq.length * self._parent.txt_height,
-                    w,
-                    self._parent.txt_height,
-                )
-                cr.fill()
 
             return
 
@@ -201,6 +193,8 @@ class TrackviewPointer:
 
                 x = 0
                 xx = 0
+                if c > len(self._parent.controller_editors):
+                    break
 
                 if c == 0:
                     x = self._parent.pitchwheel_editor.x_from
@@ -279,11 +273,3 @@ class TrackviewPointer:
                     )
                     cr.rectangle(x0, y + (self.height / 2) - 1, xx, 2)
                     cr.fill()
-
-        if int(pos) == 0:
-            self._parent.reblit(self.trk.nrows - 1)
-            cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
-            cr.rectangle(
-                0, self.trk.nrows * self._parent.txt_height, w, self._parent.txt_height
-            )
-            cr.fill()

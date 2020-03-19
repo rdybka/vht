@@ -92,6 +92,21 @@ class VHTSequence(Iterable):
         return libcvht.sequence_get_pos(self._seq_handle)
 
     @property
+    def cue(self):
+        if libcvht.sequence_get_cue(self._seq_handle) > 0:
+            return True
+        else:
+            return False
+
+    @property
+    def playing(self):
+        return libcvht.sequence_get_playing(self._seq_handle)
+
+    @playing.setter
+    def playing(self, value):
+        libcvht.sequence_set_playing(self._seq_handle, value)
+
+    @property
     def length(self):
         return libcvht.sequence_get_length(self._seq_handle)
 
@@ -128,6 +143,18 @@ class VHTSequence(Iterable):
 
     def set_trig(self, t, tp, ch, nt):
         libcvht.sequence_set_trig(self._seq_handle, t, tp, ch, nt)
+
+    def trigger_mute(self):
+        libcvht.sequence_trigger_mute(self._seq_handle)
+
+    def trigger_cue(self):
+        libcvht.sequence_trigger_cue(self._seq_handle)
+
+    def trigger_play_on(self, time=-1):
+        libcvht.sequence_trigger_play_on(self._seq_handle, time)
+
+    def trigger_play_off(self, time=-1):
+        libcvht.sequence_trigger_play_off(self._seq_handle, time)
 
     def __str__(self):
         ret = ""

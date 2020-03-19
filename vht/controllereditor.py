@@ -1,6 +1,6 @@
 # controllereditor.py - Valhalla Tracker
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@ class ControllerEditor:
             self.env_cr.select_font_face(
                 cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD
             )
-            self.env_cr.set_font_size(cfg.seq_font_size)
+            self.env_cr.set_font_size(self.tv.parent.font_size)
 
             self.ctrl_sf = self.tv._back_surface.create_similar(
                 cairo.CONTENT_COLOR_ALPHA, 128, self.trk.nrows * self.trk.ctrlpr
@@ -205,7 +205,7 @@ class ControllerEditor:
             cr.select_font_face(
                 cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD
             )
-            cr.set_font_size(cfg.seq_font_size)
+            cr.set_font_size(self.tv.parent.font_size)
 
             (x, y, width, height, dx, dy) = cr.text_extents("0000")
 
@@ -265,13 +265,12 @@ class ControllerEditor:
         self.env = self.env = self.trk.get_envelope(self.ctrlnum)
 
         if self.env:
-            if self.env:
-                cr.set_source_rgba(
-                    *(col * cfg.intensity_lines * 1 for col in cfg.star_colour), 1
-                )
-                (x, y, width, height, dx, dy) = cr.text_extents("*")
-                node_size = dx
-                self.node_size = dx  # / 2
+            cr.set_source_rgba(
+                *(col * cfg.intensity_lines * 1 for col in cfg.star_colour), 1
+            )
+            (x, y, width, height, dx, dy) = cr.text_extents("*")
+            node_size = dx
+            self.node_size = dx  # / 2
 
             # nodes
             for n, node in enumerate(self.env):
@@ -738,7 +737,7 @@ class ControllerEditor:
             ):
                 self.selection = None
                 self.edit = -1
-                self.tv.redraw()
+                self.tv.redraw(ctrl=self)
                 return True
 
             self.selection = (0, self.trk.nrows - 1)
@@ -848,7 +847,7 @@ class ControllerEditor:
             self.trk.ctrl[self.ctrlnum].refresh()
             self.env = self.trk.get_envelope(self.ctrlnum)
             self.redraw_env()
-            self.tv.redraw()
+            self.tv.redraw(ctrl=self)
             self.undo_buff.add_state()
             return True
 
@@ -904,7 +903,7 @@ class ControllerEditor:
                 if not shift:
                     if self.selection:  # remove selection?
                         self.selection = None
-                        self.tv.redraw(oldsel[0], oldsel[1])
+                        self.tv.redraw(oldsel[0], oldsel[1], ctrl=self)
                 else:  # expand selection
                     if self.edit > olded:  # going down
                         if self.selection:
@@ -947,10 +946,10 @@ class ControllerEditor:
                         min(oldsel[0], self.selection[0]),
                         max(oldsel[1], self.selection[1]),
                     )
-                    self.tv.redraw(updsel[0], updsel[1])
+                    self.tv.redraw(updsel[0], updsel[1], ctrl=self)
                 else:
-                    self.tv.redraw(olded)
-                    self.tv.redraw(self.edit)
+                    self.tv.redraw(olded, ctrl=self)
+                    self.tv.redraw(self.edit, ctrl=self)
                 return True
 
         return False
@@ -1009,7 +1008,11 @@ class ControllerEditor:
             if event.state & Gdk.ModifierType.SHIFT_MASK:
                 shift = True
 
-            r = min(int(event.y / self.tv.txt_height), self.trk.nrows - 1)
+            r = int(event.y / self.tv.txt_height)
+            if r >= self.trk.nrows:
+                return
+
+            r = min(r, self.trk.nrows - 1)
 
             right = False
             if event.button == cfg.delete_button:
@@ -1054,7 +1057,7 @@ class ControllerEditor:
                 else:
                     self.moving = True
 
-                self.tv.redraw()
+                self.tv.redraw(ctrl=self)
 
             # expand selection
             if shift:
@@ -1065,7 +1068,7 @@ class ControllerEditor:
                     self.selection = (r, self.last_selected)
 
                 self.selecting = True
-                self.tv.redraw()
+                self.tv.redraw(ctrl=self)
 
             # delete row or clear selection
             if right:
@@ -1073,13 +1076,13 @@ class ControllerEditor:
                     self.tv.leave_all()
                     self.selection = None
                     self.edit = -1
-                    self.tv.redraw()
+                    self.tv.redraw(ctrl=self)
                 else:
                     self.trk.ctrl[self.ctrlnum][int(r)].clear()
                     self.trk.ctrl[self.ctrlnum].refresh()
                     self.env = self.trk.get_envelope(self.ctrlnum)
                     self.redraw_env()
-                    self.tv.redraw()
+                    self.tv.redraw(ctrl=self)
             return
 
         # right pane
@@ -1098,7 +1101,7 @@ class ControllerEditor:
                 self.active_node = -1
                 self.env = self.trk.get_envelope(self.ctrlnum)
                 self.redraw_env()
-                self.tv.redraw()
+                self.tv.redraw(ctrl=self)
                 return
 
             if event.button == cfg.select_button:
@@ -1121,7 +1124,7 @@ class ControllerEditor:
                     self.on_motion(widget, event)
                     self.redraw_env()
                     self.edit = -1
-                    self.tv.redraw()
+                    self.tv.redraw(ctrl=self)
 
                     return
                 else:
@@ -1181,7 +1184,7 @@ class ControllerEditor:
             self.on_motion(widget, event)
             self.moving = True
             self.redraw_env()
-            self.tv.redraw()
+            self.tv.redraw(ctrl=self)
 
         return
 
@@ -1206,7 +1209,7 @@ class ControllerEditor:
             self.moving = False
             self.on_motion(widget, event)
             self.redraw_env()
-            self.tv.redraw()
+            self.tv.redraw(ctrl=self)
 
         if self.drag:
             self.drag = False
@@ -1216,7 +1219,7 @@ class ControllerEditor:
                     self.last_selected = self.edit
 
             self.redraw_env()
-            self.tv.redraw()
+            self.tv.redraw(ctrl=self)
 
         self.undo_buff.add_state()
         return True
@@ -1350,6 +1353,15 @@ class ControllerEditor:
                 lrow = self.trk.ctrl[self.ctrlnum][self.active_row]
 
             if r == self.active_row:
+                if self.trk.ctrl[self.ctrlnum][self.active_row].velocity != -1:
+                    if self.trk.ctrl[self.ctrlnum][self.active_row].velocity != v:
+                        mod.sneakily_queue_midi_ctrl(
+                            self.tv.seq._seq_handle,
+                            self.trk._trk_handle,
+                            v,
+                            self.trk.ctrls[self.ctrlnum],
+                        )
+
                 self.trk.ctrl[self.ctrlnum][self.active_row].velocity = v
                 self.trk.ctrl[self.ctrlnum][self.active_row].anchor = anchor
                 self.trk.ctrl[self.ctrlnum][self.active_row].smooth = smooth
@@ -1371,7 +1383,7 @@ class ControllerEditor:
                         self.edit = r
 
                 self.redraw_env()
-                self.tv.redraw()
+                self.tv.redraw(ctrl=self)
                 self.tv.parent.autoscroll_req = True
                 return
 
@@ -1384,7 +1396,7 @@ class ControllerEditor:
                 if r <= self.last_selected:
                     self.selection = (r, self.last_selected)
 
-                self.tv.redraw()
+                self.tv.redraw(ctrl=self)
             return
 
         if self.drag:
@@ -1423,7 +1435,7 @@ class ControllerEditor:
             self.trk.ctrl[self.ctrlnum].refresh()
             self.env = self.trk.get_envelope(self.ctrlnum)
             self.redraw_env()
-            self.tv.redraw()
+            self.tv.redraw(ctrl=self)
             return
 
         l_act_node = self.active_node
@@ -1465,11 +1477,11 @@ class ControllerEditor:
                 self.redraw_env()
                 if l_act_node != -1:
                     r = int(self.env[l_act_node]["y"])
-                    self.tv.redraw(r - 1, r + 1)
+                    self.tv.redraw(r - 1, r + 1, ctrl=self)
 
                 if self.active_node != -1:
                     r = int(self.env[self.active_node]["y"])
-                    self.tv.redraw(r - 1, r + 1)
+                    self.tv.redraw(r - 1, r + 1, ctrl=self)
 
         # handle doodle-hint
         r = int(
@@ -1485,17 +1497,17 @@ class ControllerEditor:
                 if self.doodle_hint_row > -1:
                     dh = self.doodle_hint_row
                     self.doodle_hint_row = -1
-                    self.tv.redraw(dh)
+                    self.tv.redraw(dh, ctrl=self)
 
             self.doodle_hint_row = r
             self.doodle_hint_offs = rr
             self.doodle_hint = v / 129 if self.ctrlnum == 0 else v
-            self.tv.redraw(r)
+            self.tv.redraw(r, ctrl=self)
         else:
             if self.doodle_hint_row != -1 and self.doodle_hint_row != r:
                 dh = self.doodle_hint_row
                 self.doodle_hint_row = -1
-                self.tv.redraw(dh)
+                self.tv.redraw(dh, ctrl=self)
 
         return
 
@@ -1509,8 +1521,8 @@ class ControllerEditor:
                 self.edit = int(
                     min(max(0, self.edit + event.delta_y), self.trk.nrows - 1)
                 )
-                self.tv.redraw(old)
-                self.tv.redraw(self.edit)
+                self.tv.redraw(old, ctrl=self)
+                self.tv.redraw(self.edit, ctrl=self)
                 self.tv.parent.autoscroll_req = True
                 return True
             return False
@@ -1529,7 +1541,7 @@ class ControllerEditor:
         self.trk.ctrl[self.ctrlnum].refresh()
         self.env = self.trk.get_envelope(self.ctrlnum)
         self.redraw_env()
-        self.tv.redraw()
+        self.tv.redraw(ctrl=self)
         self.undo_buff.add_state()
         return True
 

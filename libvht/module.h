@@ -1,6 +1,6 @@
 /* module.h - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ typedef struct module_t {
 	int min, sec, ms;
 
 	float bpm;
-	int rpb; // rows per beat
+	int rpb;
 
 	int ctrlpr;
 	sequence **seq;
@@ -49,13 +49,14 @@ typedef struct module_t {
 	int mute;
 
 	int cur_rec_update;
-	pthread_mutex_t excl; // to block structural changes when jack thread advances module
+	pthread_mutex_t excl;
 	midi_client *clt;
+	int play_mode; // 0 - seq_loop, 1 - timeline
 } module;
 
-void module_advance(module *mod, jack_nframes_t curr_frames);
 module *module_new(void);
 void module_free(module *mod);
+void module_advance(module *mod, jack_nframes_t curr_frames);
 void module_mute(module *mod);
 void module_dump_notes(module *mod, int n);
 
@@ -66,7 +67,13 @@ void module_add_sequence(module *mod, sequence *seq);
 void module_del_sequence(module *mod, int s);
 void module_swap_sequence(module *mod, int s1, int s2);
 char *modue_get_time(module *mod);
+double module_get_jack_pos(module *mod);
 void module_synch_output_ports(module *mod);
 
+void module_set_play_mode(module *mod, int m);
+int module_get_play_mode(module *mod);
+
+
 void sequence_handle_record(module *mod, sequence *seq, midi_event evt);
+
 #endif //__MODULE_H__

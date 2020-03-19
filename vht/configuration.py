@@ -28,7 +28,6 @@ class Configuration:
         self.console_font = "Monospace"
         self.mixer_font = "Monospace"
 
-        # just a default - seq's will have their own (saved in mod.extras)
         self.highlight = 4
 
         self.seq_font_size = 16
@@ -59,6 +58,7 @@ class Configuration:
 
         self.intensity_background = 0.2
         self.intensity_txt = 1
+        self.intensity_indicator = 0.75
         self.intensity_txt_highlight = 3
         self.intensity_lines = 0.6
         self.even_highlight = 1.4
@@ -89,7 +89,8 @@ class Configuration:
         self.select_button = 1
         self.delete_button = 3
 
-        self.default_ctrl_name = "zyn"
+        self.default_ctrl_name = "sxd"
+
         self.dark_theme = True
         self.notebook_mouseover = False
 
@@ -100,6 +101,7 @@ class Configuration:
         self.quick_control_2_def = 64
 
         self.new_tracks_left = True
+        self.new_seqs_with_tracks = True
         self.default_seq_length = 16
 
         self.controller_resolution = 8
@@ -107,6 +109,7 @@ class Configuration:
         self.last_load_path = ""
         self.last_save_path = ""
         self.save_indication_time = 0.23
+        self.track_indication_time = 0.05
 
         self.key = {
             # sequenceview		shift, ctrl, alt

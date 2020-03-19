@@ -1,6 +1,6 @@
 /* sequence.h - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,11 +46,13 @@ typedef struct sequence_t {
 
 	// triggers
 	trigger triggers[3];
-
+	int trg_times[4]; // dear children, we will contain whatever these mean in sequence.c so we can let ourselves go a bit
 	int trg_playmode;
 	int trg_quantise;
 	pthread_mutex_t *mod_excl;
 	void *clt;
+	int playing;
+	int lost;
 } sequence;
 
 sequence *sequence_new(int length);
@@ -69,6 +71,14 @@ void sequence_set_trg_quantise(sequence *seq, int v);
 void sequence_set_trg_playmode(sequence *seq, int v);
 int sequence_get_trg_quantise(sequence *seq);
 int sequence_get_trg_playmode(sequence *seq);
+
+int sequence_get_playing(sequence *seq);
+void sequence_set_playing(sequence *seq, int p);
+
+void sequence_trigger_mute(sequence *seq);
+void sequence_trigger_cue(sequence *seq);
+void sequence_trigger_play_on(sequence *seq, double time);
+void sequence_trigger_play_off(sequence *seq, double time);
 
 void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt);
 char *sequence_get_trig(sequence *seq, int t);

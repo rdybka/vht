@@ -51,13 +51,18 @@ def fix_extras_new_seq(s):
     txt = get_name(cfg.sequence_name_format % (len(mod) - 1))
 
     mod.extras[s][-1]["sequence_name"] = txt
+    mod.extras[s][-1]["font_size"] = cfg.seq_font_size
 
 
 def fix_extras_post_load(m):
     x = m["extras"]
     for s in x:
-        for t in x[s]:
-            mod.extras[s][t] = {**mod.extras[s][t], **x[s][t]}
+        if s in mod.extras:
+            for t in x[s]:
+                if t in mod.extras[s]:
+                    mod.extras[s][t] = {**mod.extras[s][t], **x[s][t]}
+        else:
+            print(s, "not in extras")
 
 
 def register(mod):

@@ -1,6 +1,6 @@
 /* sequence.c - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "module.h"
 #include "sequence.h"
 #include "track.h"
@@ -50,10 +51,16 @@ sequence *sequence_new(int length) {
 		seq->triggers[t].type = seq->triggers[t].channel = seq->triggers[t].note = 0;
 	}
 
+	for (int t = 0; t < 4; t++) {
+		seq->trg_times[t] = 0;
+	}
+
 	seq->trg_playmode = 0;
 	seq->trg_quantise = 1;
 	seq->mod_excl = NULL;
 	seq->clt = NULL;
+	seq->playing = 0;
+	seq->lost = 1;
 	return seq;
 }
 
@@ -96,10 +103,10 @@ void sequence_add_track(sequence *seq, track *trk) {
 	seq_mod_excl_in(seq);
 
 	seq->trk = realloc(seq->trk, sizeof(track *) * (seq->ntrk + 1));
-	track_wind(trk, seq->pos);
 	seq->trk[seq->ntrk++] = trk;
 	trk->mod_excl = seq->mod_excl;
 	trk->clt = seq->clt;
+	track_wind(trk, seq->pos);
 	sequence_trk_reindex(seq);
 	seq_mod_excl_out(seq);
 	return;
@@ -143,23 +150,127 @@ void sequence_free(sequence *seq) {
 }
 
 void sequence_advance(sequence *seq, double period) {
-	seq->last_period = period;
-	for (int t = 0; t < seq->ntrk; t++) {
-		track_advance(seq->trk[t], period);
+	if ((seq->trg_quantise == 0) && (seq->trg_times[2] == -2)) {
+		seq->trg_times[2] = 0;
+		if (seq->playing && seq->trg_times[3] != -2) {
+			seq->playing = 0;
+			seq->lost = 1;
+			for (int t = 0; t < seq->ntrk; t++)
+				track_reset(seq->trk[t]);
 
-		// if track past end, stop playing
-		if (seq->trk[t]->pos > seq->trk[t]->nrows)
-			if (!seq->trk[t]->loop)
-				seq->trk[t]->playing = 0;
+		} else {
+			seq->playing = 1;
+			seq->pos = 0;
+			if (seq->trg_playmode == TRIGGER_ONESHOT)
+				seq->trg_times[3] = -4;
+
+			for (int t = 0; t < seq->ntrk; t++) {
+				track_reset(seq->trk[t]);
+			}
+		}
 	}
 
-	// resync tracks
-	for (int t = 0; t < seq->ntrk; t++) {
-		if (seq->trk[t]->resync) {
+	double p = ceil(seq->pos) - seq->pos;
+	if (period > p) {
+		period -= p;
+		sequence_advance(seq, p);
+	}
+
+	if (seq->pos == floor(seq->pos)) {
+		int r = (int)seq->pos;
+		while (r >= seq->length)
+			r-=seq->length;
+
+		// printf("%d %d %d %d\n", seq->trg_times[0], seq->trg_times[1], seq->trg_times[2], seq->trg_times[3]);
+
+		if (seq->trg_playmode == TRIGGER_HOLD && seq->trg_times[3] == -23 && seq->playing) {
+			// let it go, let it go
+			seq->trg_times[3] = 0;
+			seq->playing = 0;
+			seq->lost = 1;
+			for (int t = 0; t < seq->ntrk; t++)
+				track_reset(seq->trk[t]);
+		}
+
+		if(r == 0 && seq->trg_playmode == TRIGGER_ONESHOT && seq->playing) {
+			if (seq->trg_times[3] < 0) {
+				seq->trg_times[3]++;
+			}
+
+			if (seq->trg_times[3] == -1) {
+
+				seq->trg_times[3] = 0;
+				seq->playing = 0;
+				seq->lost = 1;
+				for (int t = 0; t < seq->ntrk; t++)
+					track_reset(seq->trk[t]);
+			}
+		}
+
+		// cue trigger
+		if (r == 0) {
+			if (seq->trg_times[1] > -1) {
+				seq->trg_times[1] = -1;
+
+				if (seq->playing) {
+					seq->playing = 0;
+					for (int t = 0; t < seq->ntrk; t++)
+						track_reset(seq->trk[t]);
+				} else {
+					seq->playing = 1;
+					for (int t = 0; t < seq->ntrk; t++)
+						track_reset(seq->trk[t]);
+				}
+			}
+		}
+	}
+
+	int resync = 0;
+	// mute trigger
+	if (seq->trg_times[0] > -1) {
+		seq->trg_times[0] = -1;
+
+		if(seq->playing) {
+			seq->playing = 0;
+			for (int t = 0; t < seq->ntrk; t++) {
+				track_kill_notes(seq->trk[t]);
+			}
+		} else {
+			seq->playing = 1;
+			resync = 1;
+		}
+	}
+
+	if (resync) {
+		for (int t = 0; t < seq->ntrk; t++) {
 			seq->trk[t]->resync = 0;
 			seq->trk[t]->pos = 0;
 			track_wind(seq->trk[t], seq->pos);
 			track_advance(seq->trk[t], period);
+		}
+	}
+
+	seq->last_period = period;
+	if (seq->playing) {
+		// resync tracks
+		for (int t = 0; t < seq->ntrk; t++) {
+			if (seq->trk[t]->resync) {
+				seq->trk[t]->resync = 0;
+				seq->trk[t]->pos = 0;
+				track_wind(seq->trk[t], seq->pos);
+				track_advance(seq->trk[t], period);
+			}
+		}
+
+		// do we need this?
+		for (int t = 0; t < seq->ntrk; t++) {
+			track_advance(seq->trk[t], period);
+
+			// if track past end, stop playing
+			if (seq->trk[t]->pos > seq->trk[t]->nrows)
+
+				if (!seq->trk[t]->loop)
+					seq->trk[t]->playing = 0;
 		}
 	}
 
@@ -230,7 +341,28 @@ void sequence_set_length(sequence *seq, int length) {
 	}
 
 	seq->length = length;
+	seq->lost = 1;
 	seq_mod_excl_out(seq);
+}
+
+int sequence_get_playing(sequence *seq) {
+	return seq->playing;
+}
+
+int sequence_get_cue(sequence *seq) {
+	if (seq->trg_times[1] == -1) {
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
+void sequence_set_playing(sequence *seq, int p) {
+	if (!p) {
+		seq->playing = 0;
+	} else {
+		seq->playing = 1;
+	}
 }
 
 void sequence_handle_record(module *mod, sequence *seq, midi_event evt) {
@@ -273,5 +405,33 @@ void sequence_handle_record(module *mod, sequence *seq, midi_event evt) {
 			track_handle_record(trk, evt);
 			trk->pos = seq->pos;
 		}
+	}
+}
+
+void sequence_trigger_mute(sequence *seq) {
+	seq->trg_times[0] = 0;
+}
+
+
+void sequence_trigger_cue(sequence *seq) {
+	if (seq->trg_times[1] == -1) {
+		seq->trg_times[1] = 0;
+	} else {
+		seq->trg_times[1] = -1;
+	}
+}
+
+void sequence_trigger_play_on(sequence *seq, double time) {
+	printf("play! %f\n", time);
+	if (seq->trg_quantise == 0) {
+		seq->trg_times[2] = -2;
+	}
+}
+
+void sequence_trigger_play_off(sequence *seq, double time) {
+	printf("release! %f\n", time);
+	if (seq->trg_playmode == TRIGGER_HOLD) {
+		seq->trg_times[3] = -23;
+		printf("let go\n");
 	}
 }

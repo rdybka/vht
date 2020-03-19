@@ -1,6 +1,6 @@
 # propview.py - Valhalla Tracker
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class PropView(Gtk.ScrolledWindow):
         self.seqview = seqview
         self.seq = seqview.seq
 
-        self.last_font_size = cfg.seq_font_size
+        self.last_font_size = self.seqview.font_size
 
         self._track_box = Gtk.Box()
         self._track_box.set_spacing(0)
@@ -138,8 +138,8 @@ class PropView(Gtk.ScrolledWindow):
         cr.fill()
 
         for wdg in self._track_box.get_children():
-            if self.last_font_size != cfg.seq_font_size:
+            if self.last_font_size != self.seqview.font_size:
                 wdg.redraw()
 
-        self.last_font_size = cfg.seq_font_size
+        self.last_font_size = self.seqview.font_size
         super()

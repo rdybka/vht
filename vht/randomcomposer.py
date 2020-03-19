@@ -1,6 +1,6 @@
 # randomcomposer.py - Valhalla Tracker
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,4 +30,5 @@ def muzakize():
 
     seq = mod.add_sequence(cfg.default_seq_length)
     trk = seq.add_track()
+    seq.playing = 1
     # trk.ctrl.add(1)

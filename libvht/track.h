@@ -87,6 +87,7 @@ typedef struct track_t {
 	pthread_mutex_t *mod_excl;
 
 	void *clt;
+	int indicators;
 } track;
 
 track *track_new(int port, int channel, int len, int songlen, int ctrlpr);

@@ -1,6 +1,6 @@
 # sequenceview.py - Valhalla Tracker
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -58,6 +58,10 @@ class SequenceView(Gtk.Box):
         self.add_tick_callback(self.tick)
 
         self.seq = seq
+
+        self.font_size = cfg.seq_font_size
+        if seq.index in mod.extras:
+            self.font_size = mod.extras[seq.index][-1]["font_size"]
 
         self.last_count = len(seq)
 
@@ -132,7 +136,8 @@ class SequenceView(Gtk.Box):
         self.show_all()
 
     def fix_highlight_extras(self):
-        self.highlight = mod.extras[self.seq.index][-1]["highlight"]
+        if self.seq.index in mod.extras:
+            self.highlight = mod.extras[self.seq.index][-1]["highlight"]
 
     def on_button_press(self, widget, event):
         if event.button == cfg.delete_button:
@@ -263,9 +268,8 @@ class SequenceView(Gtk.Box):
             if len(mod) > 1:
                 for r in range(mod.curr_seq, len(mod) - 1):
                     mod.extras[r] = mod.extras[r + 1]
-                    del mod.extras[r + 1]
 
-                del mod.extras[mod.curr_seq]
+                del mod.extras[len(mod) - 1]
                 mod.del_sequence(mod.curr_seq)
 
                 mod.curr_seq = max(0, mod.curr_seq - 1)
@@ -555,12 +559,14 @@ class SequenceView(Gtk.Box):
         pass
 
     def zoom(self, i):
-        cfg.seq_font_size += i
+        self.font_size += i
 
-        if cfg.seq_font_size < 1:
-            cfg.seq_font_size = 1
+        mod.extras[self.seq.index][-1]["font_size"] = self.font_size
+        if self.font_size < 1:
+            self.font_size = 1
 
-        cfg.pointer_height = 0.7 * cfg.seq_font_size
+        cfg.seq_font_size = self.font_size
+        cfg.pointer_height = 0.7 * self.font_size
         self.redraw_track(None)
         self._side_prop.redraw()
         self.prop_view.redraw()
@@ -592,7 +598,8 @@ class SequenceView(Gtk.Box):
         ]
 
         s.length = self.seq.length
-        # s.add_track(length=s.length)
+        if cfg.new_seqs_with_tracks:
+            s.add_track(length=s.length)
         mod.seqlist.configure()
         mod.seqlist.redraw()
 
@@ -751,7 +758,8 @@ class SequenceView(Gtk.Box):
         if quick:
             self.get_window().freeze_updates()
 
-        self.highlight = mod.extras[self.seq.index][-1]["highlight"]
+        if self.seq.index in mod.extras:
+            self.highlight = mod.extras[self.seq.index][-1]["highlight"]
         self.prop_view.seq = self.seq
         self._side_prop.seq = self.seq
         self._side_prop.popover.seq = self.seq
@@ -786,6 +794,7 @@ class SequenceView(Gtk.Box):
 
         if mod.load(filename):
             self.seq = mod[0]
+            self.font_size = mod.extras[self.seq.index][-1]["font_size"]
             self.build()
             mod.seqlist.redraw()
             return True
@@ -807,6 +816,7 @@ class SequenceView(Gtk.Box):
         if self.seq != ns:
             self.clear()
             self.seq = ns
+            self.font_size = mod.extras[ns.index][-1]["font_size"]
             self.build(quick=True)
 
         if self.seq.index in self.active_tracks:
@@ -902,10 +912,6 @@ class SequenceView(Gtk.Box):
 
     def tick(self, wdg, param):
         mod.seqlist.tick()
-        for wdg in self.get_tracks(True):
-            wdg.tick()
-            if wdg.edit and wdg.trk:
-                self.auto_scroll(wdg)
 
         # this is for things like start/stop/record/rewind/clear track
         if not mod.gui_midi_capture:
@@ -955,9 +961,10 @@ class SequenceView(Gtk.Box):
         if mod.record > -1:
             for trk in self.get_tracks():
                 redr_props = False
+                redr_trk = False
                 r = trk.trk.get_rec_update()
                 while r:
-                    trk.configure()
+                    # trk.configure()
                     trk.redraw(r["row"])
 
                     if mod.record:
@@ -965,10 +972,24 @@ class SequenceView(Gtk.Box):
                         redr_props = True
 
                         ctr = r["col"] - len(trk.trk)
+
                         if ctr > len(trk.controller_editors):
-                            trk.redraw_full()
+                            trk.show_controllers = True
+                            empty = True
+                            for c in trk.trk:
+                                for r in c:
+                                    if r.type > 0:
+                                        empty = False
+
+                            if empty:
+                                trk.show_notes = False
+
+                        redr_trk = True
 
                     r = trk.trk.get_rec_update()
+
+                if redr_trk:
+                    trk.redraw_full()
 
                 if redr_props:
                     self.prop_view.redraw(trk.trk.index)
@@ -987,9 +1008,28 @@ class SequenceView(Gtk.Box):
                         for cb in mod.cb_new_track:
                             cb(self.seq.index, trk.index)
 
-                        self.add_track(trk)
+                        t = self.add_track(trk)
+
+                        empty = True
+                        for c in trk:
+                            for r in c:
+                                if r.type > 0:
+                                    empty = False
+
+                        if empty:
+                            t.show_controllers = True
+                            t.show_notes = False
+                            t.redraw_full()
+
+                            self.prop_view.redraw()
+
                         if cfg.new_tracks_left:
                             self.prop_view.move_first(self.seq[-1])
+
+        for wdg in self.get_tracks(True):
+            wdg.tick()
+            if wdg.edit and wdg.trk:
+                self.auto_scroll(wdg)
 
         return True
 

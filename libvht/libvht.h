@@ -1,6 +1,6 @@
 /* libvht.h - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,7 +63,9 @@ extern int module_get_rpb(module *mod);
 extern void module_set_rpb(module *mod, int rpb);
 extern int module_get_ctrlpr(module *mod);
 extern void module_set_ctrlpr(module *mod, int);
-
+extern void module_set_play_mode(module *mod, int m);
+extern int module_get_play_mode(module *mod);
+extern double module_get_jack_pos(module *mod);
 extern char *track_get_rec_update(track *trk);
 extern void track_clear_updates(track *trk);
 
@@ -103,6 +105,14 @@ extern int sequence_get_trg_quantise(sequence *seq);
 extern void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt);
 extern char *sequence_get_trig(sequence *seq, int t);
 
+extern int sequence_get_playing(sequence *seq);
+extern void sequence_set_playing(sequence *seq, int p);
+
+extern void sequence_trigger_mute(sequence *seq);
+extern void sequence_trigger_cue(sequence *seq);
+extern void sequence_trigger_play_on(sequence *seq, double time);
+extern void sequence_trigger_play_off(sequence *seq, double time);
+extern int sequence_get_cue(sequence *seq);
 extern sequence *sequence_clone(sequence *seq);
 
 // track
@@ -159,6 +169,8 @@ extern void track_set_qc2(track *trk, int ctrl, int val);
 extern char *track_get_qc(track *trk);
 extern void track_set_loop(track *trk, int v);
 extern int track_get_loop(track *trk);
+extern int track_get_indicators(track *trk);
+extern void track_set_indicators(track *trk, int i);
 
 extern track *track_new(int port, int channel, int len, int songlen, int ctrlpr);
 

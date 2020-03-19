@@ -1,20 +1,26 @@
 - seqlist
     - trigging
     - animate
-- playmode/triggers
-- first row not playing
-? ctrl antialias
-- silence
-    - when quitting
-- autoscroll and moving
-- ports
+    - playmode/triggers
+    - upscale/downscale
 - timeline
+- loop
+    -reset
 - tracks:
 	- let ring?
-	- triggers?
+- standarise midin for media buttons
 - panic
 - console
 	- click in statusbar
+    - documentation
+    - updates from puthin
+    - autofill
+? first row not playing
+- silence
+    - when quitting
+- autoscroll and moving
+? ctrl antialias
+- ports
 - autoscroll and console open/close (magic row 27)
 - magic transposing
 - export:
@@ -22,5 +28,5 @@
 	- audio
 		- freewheeling
 - configuration
-- new window
-- new
+? new window
+? new

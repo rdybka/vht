@@ -1,6 +1,6 @@
 # controllersview.py - Valhalla Tracker
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -72,7 +72,12 @@ class ControllersView(Gtk.Box):
         self.new_ctrl.pack_start(self.new_ctrl_button)
 
         self.new_ctrl_entry = Gtk.Entry()
-        self.new_ctrl_entry.set_text(mod.ctrls[cfg.default_ctrl_name][1])
+
+        self.new_ctrl_entry.set_text(
+            ""
+            if 1 not in mod.ctrls[cfg.default_ctrl_name]
+            else mod.ctrls[cfg.default_ctrl_name][1]
+        )
 
         self.new_ctrl.pack_end(self.new_ctrl_entry)
 
@@ -163,7 +168,7 @@ class ControllersView(Gtk.Box):
 
         for i, c in enumerate(self.trk.ctrls):
             if c != -1:
-                parn = (self.last_ctrl, self.new_ctrl_entry.get_text())
+                parn = ("", "")
                 if i in self.ctrl_names:
                     parn = self.ctrl_names[i]
                 else:
@@ -202,6 +207,11 @@ class ControllersView(Gtk.Box):
         self.trk.ctrl.add(int(self.new_ctrl_adj.get_value()))
         self.trkview.controller_editors.append(
             ControllerEditor(self.trkview, len(self.trk.ctrl) - 1)
+        )
+
+        self.ctrl_names[self.trk.nctrl - 1] = (
+            self.last_ctrl,
+            self.new_ctrl_entry.get_text(),
         )
         self.trkview.show_controllers = True
         self.rebuild()

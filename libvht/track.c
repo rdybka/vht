@@ -1,6 +1,6 @@
 /* track.c - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,6 +96,7 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	track_reset(trk);
 	trk->playing = 1;
 	trk->clt = NULL;
+	trk->indicators = 0;
 	return trk;
 };
 
@@ -104,7 +105,7 @@ void track_reset(track *trk) {
 	trk->prog_sent = 0;
 	trk->qc1_last = -1;
 	trk->qc2_last = -1;
-
+	trk->loop = 1;
 	track_kill_notes(trk);
 }
 
@@ -360,6 +361,10 @@ track *track_clone(track *src) {
 		dst->qc2_last = src->qc2_last;
 		dst->qc2_val = src->qc2_val;
 		dst->loop = src->loop;
+		dst->pos = src->pos;
+		dst->last_pos = src->last_pos;
+		dst->last_period = src->last_period;
+		dst->indicators = src->indicators;
 	}
 
 	return dst;
@@ -501,6 +506,7 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 			evt.note = trk->ring[c];
 			evt.velocity = 0;
 			midi_buffer_add(trk->clt, trk->port, evt);
+			trk->indicators |= 4;
 			trk->ring[c] = -1;
 		}
 	}
@@ -597,7 +603,7 @@ void track_advance(track *trk, double speriod) {
 			evt.data = 0;
 
 			midi_buffer_add(clt, trk->port, evt);
-
+			trk->indicators |= 8;
 		}
 	}
 
@@ -615,7 +621,7 @@ void track_advance(track *trk, double speriod) {
 				evt.control = trk->qc1_ctrl;
 				evt.data = trk->qc1_val;
 				midi_buffer_add(clt, trk->port, evt);
-
+				trk->indicators |= 4;
 				trk->qc1_last = trk->qc1_val;
 			}
 		}
@@ -625,7 +631,7 @@ void track_advance(track *trk, double speriod) {
 				evt.control = trk->qc2_ctrl;
 				evt.data = trk->qc2_val;
 				midi_buffer_add(clt, trk->port, evt);
-
+				trk->indicators |= 4;
 				trk->qc2_last = trk->qc2_val;
 			}
 		}
@@ -704,6 +710,7 @@ void track_advance(track *trk, double speriod) {
 						if (data != trk->lctrlval[c]) {
 							trk->lctrlval[c] = data;
 							midi_buffer_add(clt, trk->port, evt);
+							trk->indicators |= 8;
 						}
 				}
 			}
@@ -720,6 +727,11 @@ void track_advance(track *trk, double speriod) {
 		if (trk->pos > trk->nrows)
 			trk->pos -= trk->nrows;
 	}
+
+	// update midi_out ind if ringing
+	for (int c = 0; c < trk->ncols; c++)
+		if (trk->ring[c] != -1)
+			trk->indicators |= 4;
 }
 
 void track_wind(track *trk, double period) {
@@ -1084,6 +1096,8 @@ void track_handle_record(track *trk, midi_event evt) {
 
 	int p = floorf(pos);
 	double rem = pos - p;
+
+	trk->indicators |= 2;
 
 	if (rem >= .5) {
 		p++;

@@ -1,6 +1,6 @@
 /* libvht.c - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -230,6 +230,19 @@ void track_set_loop(track *trk, int v) {
 int track_get_loop(track *trk) {
 	return trk->loop;
 }
+
+int track_get_indicators(track *trk) {
+	return trk->indicators;
+}
+
+void track_set_indicators(track *trk, int i) {
+	trk->indicators = i;
+}
+
+void track_clear_indicators(track *trk) {
+	trk->indicators = 0;
+}
+
 
 void sequence_set_trg_quantise(sequence *seq, int v) {
 	seq->trg_quantise = v;

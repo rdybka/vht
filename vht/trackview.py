@@ -1,6 +1,6 @@
 # trackview.py - Valhalla Tracker
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,6 +47,7 @@ class TrackView(Gtk.DrawingArea):
                 redr = True
 
             if wdg.pitchwheel_editor:
+                wdg.pitchwheel_editor.undo_buff.add_state()
                 if wdg.pitchwheel_editor.edit > -1 or wdg.pitchwheel_editor.selection:
                     redr = True
 
@@ -58,6 +59,7 @@ class TrackView(Gtk.DrawingArea):
                 wdg.pitchwheel_editor.doodle_hint_row = -1
 
             for ctrl in wdg.controller_editors:
+                ctrl.undo_buff.add_state()
                 if ctrl.edit > -1 or ctrl.selection:
                     redr = True
 
@@ -187,18 +189,37 @@ class TrackView(Gtk.DrawingArea):
         return True
 
     def configure(self):
-        if self.trk and not self.controller_editors:
+        if self.trk:  # and not self.controller_editors:
             for cn, ctrl in enumerate(self.trk.ctrls):
                 if ctrl == -1:
                     if not self.pitchwheel_editor:
                         self.pitchwheel_editor = ControllerEditor(self, cn)
                 else:
-                    self.controller_editors.append(ControllerEditor(self, cn))
+                    append = True
+                    for ed in self.controller_editors:
+                        if ed.ctrlnum == cn:
+                            append = False
+
+                    if append:
+                        self.controller_editors.append(ControllerEditor(self, cn))
+                        # we could be called on the fly while recording so let's
+                        # check the extras for new ctrls
+                        if (
+                            cn
+                            not in mod.extras[self.parent.seq.index][self.trk.index][
+                                "ctrl_names"
+                            ]
+                        ):
+                            n = mod.ctrls[cfg.default_ctrl_name]
+                            if ctrl in n:
+                                mod.extras[self.parent.seq.index][self.trk.index][
+                                    "ctrl_names"
+                                ][cn] = (cfg.default_ctrl_name, n[ctrl])
 
         self._back_context.select_font_face(
             cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD
         )
-        self._back_context.set_font_size(cfg.seq_font_size)
+        self._back_context.set_font_size(self.parent.font_size)
 
         w = self.get_allocated_width()
         h = self.get_allocated_height()
@@ -322,7 +343,7 @@ class TrackView(Gtk.DrawingArea):
             cr.select_font_face(
                 cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD
             )
-            cr.set_font_size(cfg.seq_font_size)
+            cr.set_font_size(self.parent.font_size)
 
             for r in range(empl):
                 even_high = cfg.even_highlight
@@ -481,7 +502,7 @@ class TrackView(Gtk.DrawingArea):
             crf.paint()
             self.queue_draw()
 
-    # reconfigure and redraw trackpropview
+    # reconfigure and redraw
     def redraw_full(self):
         # may be called before realising
         if not self._back_context:
@@ -511,7 +532,7 @@ class TrackView(Gtk.DrawingArea):
         # 	print("redraw full", f[3], f[2], f[1])
         self.queue_draw()
 
-    def redraw(self, from_row=-666, to_row=-666):
+    def redraw(self, from_row=-666, to_row=-666, ctrl=None):
         cr = self._back_context
         crf = self._context
         crf.set_source_surface(self._back_surface)
@@ -600,7 +621,9 @@ class TrackView(Gtk.DrawingArea):
                         *(col * cfg.intensity_lines for col in cfg.colour)
                     )
                     cr.set_antialias(cairo.ANTIALIAS_NONE)
-                    cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
+                    cr.set_line_width(
+                        (self.parent.font_size / 6.0) * cfg.seq_line_width
+                    )
                     cr.move_to(self.txt_width - (dx / 2), 0)
                     cr.line_to(
                         self.txt_width - (dx / 2), (self.seq.length) * self.txt_height
@@ -619,7 +642,7 @@ class TrackView(Gtk.DrawingArea):
                 (x, y, width, height, dx, dy) = cr.text_extents("|")
                 cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
                 cr.set_antialias(cairo.ANTIALIAS_NONE)
-                cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
+                cr.set_line_width((self.parent.font_size / 6.0) * cfg.seq_line_width)
                 cr.move_to(self.txt_width - (dx / 2), 0)
                 cr.line_to(
                     self.txt_width - (dx / 2), (self.seq.length) * self.txt_height
@@ -632,26 +655,43 @@ class TrackView(Gtk.DrawingArea):
             return
 
         # normal view
-
+        rows_to_draw = []
         if complete:
-            cr.set_source(self.zero_pattern)
-            cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
-            cr.rectangle(0, 0, w, h)
-            cr.fill()
-            # self.configure()
-            self.trk.clear_updates()
+            if not ctrl:
+                cr.set_source(self.zero_pattern)
+                cr.set_source_rgb(
+                    *(col * cfg.intensity_background for col in cfg.colour)
+                )
+                cr.rectangle(0, 0, w, h)
+                cr.fill()
+                # self.configure()
+                self.trk.clear_updates()
+            rows_to_draw = range(self.trk.nrows)
+        else:
+            for r in range(self.trk.nrows):
+                if from_row <= r <= to_row:
+                    rows_to_draw.append(r)
+
+        if ctrl:
+            for r in rows_to_draw:
+                ctrl.draw(cr, r)
+                ir.x = 0
+                ir.width = w
+                ir.y = r * self.txt_height
+                ir.height = self.txt_height * 2
+                crf.set_source_surface(self._back_surface)
+                crf.rectangle(ir.x, ir.y, ir.width, ir.height)
+                crf.fill()
+                wnd.invalidate_rect(ir, False)
+
+            if complete:
+                crf.paint()
+                self.queue_draw()
+
+            return
 
         last_c = len(self.trk) - 1
         for c in range(len(self.trk)):
-            rows_to_draw = []
-
-            if complete:
-                rows_to_draw = range(self.trk.nrows)
-            else:
-                for r in range(self.trk.nrows):
-                    if from_row <= r <= to_row:
-                        rows_to_draw.append(r)
-
             for r in rows_to_draw:
                 veled = 0
                 tsed = 0
@@ -853,7 +893,7 @@ class TrackView(Gtk.DrawingArea):
                             *(col * cfg.intensity_lines for col in cfg.colour)
                         )
                         cr.set_line_width(
-                            (cfg.seq_font_size / 6.0) * cfg.seq_line_width
+                            (self.parent.font_size / 6.0) * cfg.seq_line_width
                         )
                         cr.move_to(self.width - (width / 2), 0)
                         cr.line_to(
@@ -872,7 +912,7 @@ class TrackView(Gtk.DrawingArea):
         if complete:
             (x, y, width, height, dx, dy) = cr.text_extents("0")
             cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
-            cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
+            cr.set_line_width((self.parent.font_size / 6.0) * cfg.seq_line_width)
             cr.move_to(self.width - (width / 2), 0)
             cr.line_to(self.width - (width / 2), (self.trk.nrows) * self.txt_height)
             cr.stroke()
@@ -1166,7 +1206,7 @@ class TrackView(Gtk.DrawingArea):
         if event.state & Gdk.ModifierType.SHIFT_MASK:
             shift = True
 
-        row = min(int(event.y / self.txt_height), self.trk.nrows - 1)
+        row = int(event.y / self.txt_height)
         col = int(event.x / self.txt_width)
         offs = int(event.x) % int(self.txt_width)
 
@@ -1186,8 +1226,18 @@ class TrackView(Gtk.DrawingArea):
             return False
 
         if event.button == cfg.delete_button:
+            trk = mod.active_track
+
+            if row >= self.trk.nrows:
+                if trk:
+                    mod.record = 0
+                    self.leave_all()
+                    self.parent.redraw_track(mod.active_track.trk)
+                    self.select = None
+                self.parent.change_active_track(self)
+                return True
+
             if self.trk[col][row].type == 0:
-                trk = mod.active_track
                 if trk:
                     mod.record = 0
                     self.leave_all()
@@ -1769,6 +1819,7 @@ class TrackView(Gtk.DrawingArea):
         m_note = midin["note"]
         m_type = midin["type"]
         m_velocity = midin["velocity"]
+        m_channel = midin["channel"]
 
         if m_type == 1:  # or m_type == 2:
             if self.edit and m_note and mod.record == 0:
@@ -1789,6 +1840,31 @@ class TrackView(Gtk.DrawingArea):
                 self.redraw(old)
                 self.undo_buff.add_state()
                 return True
+
+        # fix controller edit
+        if m_type == 4 and mod.record == 0:
+            for c in self.controller_editors:
+                if (
+                    c.edit
+                    > -1
+                    # and self.trk.channel == m_channel
+                    # and m_note == self.trk.ctrls[c.ctrlnum]
+                ):
+                    if self.trk.ctrl[c.ctrlnum][c.edit].velocity != m_velocity:
+                        if self.trk.ctrl[c.ctrlnum][c.edit].velocity == -1:  # new node
+                            c.undo_buff.add_state()
+                            empty = True
+                            for r in c.env:
+                                if int(r["y"]) < c.edit:
+                                    empty = False
+
+                            self.trk.ctrl[c.ctrlnum][c.edit].linked = 0 if empty else 1
+
+                        self.trk.ctrl[c.ctrlnum][c.edit].velocity = m_velocity
+                        self.trk.ctrl[c.ctrlnum].refresh()
+                        c.redraw_env()
+                        self.redraw(ctrl=c)
+                        self.reblit()
 
         return False
 

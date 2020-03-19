@@ -243,6 +243,18 @@ def module_set_ctrlpr(mod, arg2):
     return _libcvht.module_set_ctrlpr(mod, arg2)
 module_set_ctrlpr = _libcvht.module_set_ctrlpr
 
+def module_set_play_mode(mod, m):
+    return _libcvht.module_set_play_mode(mod, m)
+module_set_play_mode = _libcvht.module_set_play_mode
+
+def module_get_play_mode(mod):
+    return _libcvht.module_get_play_mode(mod)
+module_get_play_mode = _libcvht.module_get_play_mode
+
+def module_get_jack_pos(mod):
+    return _libcvht.module_get_jack_pos(mod)
+module_get_jack_pos = _libcvht.module_get_jack_pos
+
 def track_get_rec_update(trk):
     return _libcvht.track_get_rec_update(trk)
 track_get_rec_update = _libcvht.track_get_rec_update
@@ -370,6 +382,34 @@ sequence_set_trig = _libcvht.sequence_set_trig
 def sequence_get_trig(seq, t):
     return _libcvht.sequence_get_trig(seq, t)
 sequence_get_trig = _libcvht.sequence_get_trig
+
+def sequence_get_playing(seq):
+    return _libcvht.sequence_get_playing(seq)
+sequence_get_playing = _libcvht.sequence_get_playing
+
+def sequence_set_playing(seq, p):
+    return _libcvht.sequence_set_playing(seq, p)
+sequence_set_playing = _libcvht.sequence_set_playing
+
+def sequence_trigger_mute(seq):
+    return _libcvht.sequence_trigger_mute(seq)
+sequence_trigger_mute = _libcvht.sequence_trigger_mute
+
+def sequence_trigger_cue(seq):
+    return _libcvht.sequence_trigger_cue(seq)
+sequence_trigger_cue = _libcvht.sequence_trigger_cue
+
+def sequence_trigger_play_on(seq, time):
+    return _libcvht.sequence_trigger_play_on(seq, time)
+sequence_trigger_play_on = _libcvht.sequence_trigger_play_on
+
+def sequence_trigger_play_off(seq, time):
+    return _libcvht.sequence_trigger_play_off(seq, time)
+sequence_trigger_play_off = _libcvht.sequence_trigger_play_off
+
+def sequence_get_cue(seq):
+    return _libcvht.sequence_get_cue(seq)
+sequence_get_cue = _libcvht.sequence_get_cue
 
 def sequence_clone(seq):
     return _libcvht.sequence_clone(seq)
@@ -558,6 +598,14 @@ track_set_loop = _libcvht.track_set_loop
 def track_get_loop(trk):
     return _libcvht.track_get_loop(trk)
 track_get_loop = _libcvht.track_get_loop
+
+def track_get_indicators(trk):
+    return _libcvht.track_get_indicators(trk)
+track_get_indicators = _libcvht.track_get_indicators
+
+def track_set_indicators(trk, i):
+    return _libcvht.track_set_indicators(trk, i)
+track_set_indicators = _libcvht.track_set_indicators
 
 def track_new(port, channel, len, songlen, ctrlpr):
     return _libcvht.track_new(port, channel, len, songlen, ctrlpr)

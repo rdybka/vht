@@ -1,6 +1,6 @@
-/* module.h - Valhalla Tracker (libvht)
+/* module.c - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,13 +37,22 @@ void module_excl_out(module *mod) {
 	pthread_mutex_unlock(&mod->excl);
 }
 
-// the GOD function
+int trg_equal(trigger *trg, midi_event *mev) {
+	int eq = 0;
+	if ((mev->channel == trg->channel) && \
+	        (mev->type == trg->type) && \
+	        (mev->note == trg->note))
+		eq = 1;
+
+	return eq;
+}
+
+// the god-function
 void module_advance(module *mod, jack_nframes_t curr_frames) {
 	if (mod->nseq == 0)
 		return;
 
 	module_excl_in(mod);
-
 	midi_buffer_clear(mod->clt);
 
 	if (!mod->playing) {
@@ -73,14 +82,7 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 
 	mod->ms = (time - floorf(time)) * 1000;
 
-	if (mod->playing) {
-		// play mode and stuff will go here later
-		sequence *seq = mod->seq[0];
-		sequence_advance(seq, period);
-		timeline_advance(mod->tline, period);
-	}
-
-// handle input from MIDI
+	// handle input from MIDI
 	void *inp = jack_port_get_buffer(mod->clt->jack_input_port, mod->clt->jack_buffer_size);
 
 	jack_nframes_t ninp;
@@ -100,6 +102,23 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 				midi_buffer_add(mod->clt, mod->clt->default_midi_port, mev);
 			}
 
+			double tt = mod->song_pos + ((double)mev.time / 60.0 / ((double)mod->rpb * (double)mod->bpm));
+
+			// handle triggers
+			for (int s = 0; s < mod->nseq; s++) {
+				if ((mod->seq[s]->triggers[0].type) && trg_equal(&mod->seq[s]->triggers[0], &mev)) {
+					sequence_trigger_mute(mod->seq[s]);
+				}
+
+				if ((mod->seq[s]->triggers[1].type) && trg_equal(&mod->seq[s]->triggers[1], &mev)) {
+					sequence_trigger_cue(mod->seq[s]);
+				}
+
+				if ((mod->seq[s]->triggers[2].type) && trg_equal(&mod->seq[s]->triggers[2], &mev)) {
+					sequence_trigger_play_on(mod->seq[s], tt);
+				}
+			}
+
 			midi_in_buffer_add(mod->clt, mev);
 
 			int ignore = 0;
@@ -113,11 +132,34 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 							ignore = 1;
 			}
 
-			midi_ignore_buff_excl_out(mod->clt);
 
 			if (mod->recording && !ignore) {
 				sequence_handle_record(mod, mod->seq[mod->curr_seq], mev);
 			}
+
+			for (int t = 0; t < mod->seq[mod->curr_seq]->ntrk; t++) {
+				if (mod->seq[mod->curr_seq]->trk[t]->channel == mev.channel) {
+					mod->seq[mod->curr_seq]->trk[t]->indicators |= 1;
+				}
+			}
+
+			midi_ignore_buff_excl_out(mod->clt);
+		}
+	}
+
+	if (mod->playing) {
+		if (mod->play_mode == 0) {
+			for (int s = 0; s < mod->nseq; s++) {
+				sequence *seq = mod->seq[s];
+				if (seq->lost) {
+					seq->pos = fmod(mod->song_pos, seq->length);
+					seq->lost = 0;
+				}
+
+				sequence_advance(seq, period);
+			}
+		} else {
+			timeline_advance(mod->tline, period);
 		}
 	}
 
@@ -144,6 +186,7 @@ module *module_new() {
 	mod->seq = malloc(sizeof(sequence *));
 	pthread_mutex_init(&mod->excl, NULL);
 	mod->clt = midi_client_new(mod);
+	mod->play_mode = 0;
 	return mod;
 }
 
@@ -175,10 +218,22 @@ void module_dump_notes(module *mod, int n) {
 void module_add_sequence(module *mod, sequence *seq) {
 	module_excl_in(mod);
 
+	double pos = 0;
+	if (mod->nseq) {
+		pos = mod->seq[0]->pos;
+	}
+
 	mod->seq = realloc(mod->seq, sizeof(sequence *) * (mod->nseq + 1));
 	mod->seq[mod->nseq++] = seq;
 	seq->mod_excl = &mod->excl;
 	seq->clt = mod->clt;
+
+	if (pos > 0.0) {
+		seq->pos = pos;
+		for (int t = 0; t < seq->ntrk; t++) {
+			track_wind(seq->trk[t], pos);
+		}
+	}
 
 	module_seqs_reindex(mod);
 	module_excl_out(mod);
@@ -242,6 +297,11 @@ char *module_get_time(module *mod) {
 	return buff;
 }
 
+double module_get_jack_pos(module *mod) {
+	double row_length = 60.0 / ((double)mod->rpb * (double)mod->bpm);
+	return (mod->song_pos + (((jack_frame_time(mod->clt->jack_client) - mod->clt->jack_last_frame) / (double)mod->clt->jack_sample_rate) / row_length));
+}
+
 void module_synch_output_ports(module *mod) {
 	midi_buff_excl_in(mod->clt);
 
@@ -258,4 +318,16 @@ void module_synch_output_ports(module *mod) {
 			mod->clt->ports_to_open[mod->seq[s]->trk[t]->port] = 1;
 
 	midi_buff_excl_out(mod->clt);
+}
+
+void module_set_play_mode(module *mod, int m) {
+	if (!m) {
+		mod->play_mode = 0;
+	} else {
+		mod->play_mode = 1;
+	}
+}
+
+int module_get_play_mode(module *mod) {
+	return mod->play_mode;
 }

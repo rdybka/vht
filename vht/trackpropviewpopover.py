@@ -1,6 +1,6 @@
 # trackpropviewpopover.py - Valhalla Tracker
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,334 +46,319 @@ class TrackPropViewPopover(Gtk.Popover):
 
         self.time_want_to_leave = 0
 
-        if trk:
-            button = Gtk.Button()
-            icon = Gio.ThemedIcon(name="edit-delete")
-            image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-            button.add(image)
-            button.connect("clicked", self.on_remove_button_clicked)
-            button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_del"]))
-            self.grid.attach(button, 2, 0, 1, 1)
+        button = Gtk.Button()
+        icon = Gio.ThemedIcon(name="edit-delete")
+        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+        button.add(image)
+        button.connect("clicked", self.on_remove_button_clicked)
+        button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_del"]))
+        self.grid.attach(button, 2, 0, 1, 1)
 
-            self.clone_button = Gtk.MenuButton()
-            icon = Gio.ThemedIcon(name="edit-copy")
-            image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-            self.clone_button.add(image)
+        self.clone_button = Gtk.MenuButton()
+        icon = Gio.ThemedIcon(name="edit-copy")
+        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+        self.clone_button.add(image)
 
-            self.clone_button.set_tooltip_markup(
-                cfg.tooltip_markup % (cfg.key["track_clone"])
-            )
+        self.clone_button.set_tooltip_markup(
+            cfg.tooltip_markup % (cfg.key["track_clone"])
+        )
 
-            self.clone_button.set_popup(Gtk.Menu())
-            self.grid.attach(self.clone_button, 3, 0, 1, 1)
+        self.clone_button.set_popup(Gtk.Menu())
+        self.grid.attach(self.clone_button, 3, 0, 1, 1)
 
-            button = Gtk.Button()
-            icon = Gio.ThemedIcon(name="list-remove")
-            image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-            button.add(image)
-            button.connect("clicked", self.on_retract_button_clicked)
-            button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_shrink"]))
-            self.grid.attach(button, 0, 0, 1, 1)
+        button = Gtk.Button()
+        icon = Gio.ThemedIcon(name="list-remove")
+        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+        button.add(image)
+        button.connect("clicked", self.on_retract_button_clicked)
+        button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_shrink"]))
+        self.grid.attach(button, 0, 0, 1, 1)
 
-            button = Gtk.Button()
-            icon = Gio.ThemedIcon(name="list-add")
-            image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-            button.add(image)
-            button.connect("clicked", self.on_expand_button_clicked)
-            button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_expand"]))
-            self.grid.attach(button, 1, 0, 1, 1)
+        button = Gtk.Button()
+        icon = Gio.ThemedIcon(name="list-add")
+        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+        button.add(image)
+        button.connect("clicked", self.on_expand_button_clicked)
+        button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_expand"]))
+        self.grid.attach(button, 1, 0, 1, 1)
 
-            button = Gtk.Button()
-            icon = Gio.ThemedIcon(name="go-previous")
-            image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-            button.add(image)
-            button.connect("clicked", self.on_move_left_button_clicked)
-            button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_move_left"]))
-            self.grid.attach(button, 1, 1, 1, 1)
+        button = Gtk.Button()
+        icon = Gio.ThemedIcon(name="go-previous")
+        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+        button.add(image)
+        button.connect("clicked", self.on_move_left_button_clicked)
+        button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_move_left"]))
+        self.grid.attach(button, 1, 1, 1, 1)
 
-            button = Gtk.Button()
-            icon = Gio.ThemedIcon(name="go-next")
-            image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-            button.add(image)
-            button.connect("clicked", self.on_move_right_button_clicked)
-            button.set_tooltip_markup(
-                cfg.tooltip_markup % (cfg.key["track_move_right"])
-            )
-            self.grid.attach(button, 2, 1, 1, 1)
+        button = Gtk.Button()
+        icon = Gio.ThemedIcon(name="go-next")
+        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+        button.add(image)
+        button.connect("clicked", self.on_move_right_button_clicked)
+        button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_move_right"]))
+        self.grid.attach(button, 2, 1, 1, 1)
 
-            button = Gtk.Button()
-            icon = Gio.ThemedIcon(name="go-first")
-            image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-            button.add(image)
-            button.connect("clicked", self.on_move_first_button_clicked)
-            button.set_tooltip_markup(
-                cfg.tooltip_markup % (cfg.key["track_move_first"])
-            )
-            self.grid.attach(button, 0, 1, 1, 1)
+        button = Gtk.Button()
+        icon = Gio.ThemedIcon(name="go-first")
+        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+        button.add(image)
+        button.connect("clicked", self.on_move_first_button_clicked)
+        button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_move_first"]))
+        self.grid.attach(button, 0, 1, 1, 1)
 
-            button = Gtk.Button()
-            icon = Gio.ThemedIcon(name="go-last")
-            image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-            button.add(image)
-            button.connect("clicked", self.on_move_last_button_clicked)
-            button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_move_last"]))
-            self.grid.attach(button, 3, 1, 1, 1)
+        button = Gtk.Button()
+        icon = Gio.ThemedIcon(name="go-last")
+        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+        button.add(image)
+        button.connect("clicked", self.on_move_last_button_clicked)
+        button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_move_last"]))
+        self.grid.attach(button, 3, 1, 1, 1)
 
-            self.extend_grid = Gtk.Grid()
-            self.extend_grid.set_hexpand(True)
-            self.extend_grid.set_vexpand(True)
+        self.extend_grid = Gtk.Grid()
+        self.extend_grid.set_hexpand(True)
+        self.extend_grid.set_vexpand(True)
 
-            self.grid.attach(self.extend_grid, 4, 0, 5, 6)
+        self.grid.attach(self.extend_grid, 4, 0, 5, 6)
 
-            grid = Gtk.Grid()
-            grid.set_column_homogeneous(True)
-            grid.set_row_homogeneous(False)
-            grid.set_column_spacing(3)
-            grid.set_row_spacing(3)
+        grid = Gtk.Grid()
+        grid.set_column_homogeneous(True)
+        grid.set_row_homogeneous(False)
+        grid.set_column_spacing(3)
+        grid.set_row_spacing(3)
 
-            self.show_notes_button = Gtk.ToggleButton("notes")
-            self.show_notes_button.set_tooltip_markup(
-                cfg.tooltip_markup % (cfg.key["toggle_notes"])
-            )
-            self.show_timeshift_button = Gtk.ToggleButton("time")
-            self.show_timeshift_button.set_tooltip_markup(
-                cfg.tooltip_markup % (cfg.key["toggle_time"])
-            )
-            self.show_pitchwheel_button = Gtk.ToggleButton("pitch")
-            self.show_pitchwheel_button.set_tooltip_markup(
-                cfg.tooltip_markup % (cfg.key["toggle_pitch"])
-            )
-            self.show_controllers_button = Gtk.ToggleButton("ctrl")
-            self.show_controllers_button.set_tooltip_markup(
-                cfg.tooltip_markup % (cfg.key["toggle_controls"])
-            )
+        self.show_notes_button = Gtk.ToggleButton("notes")
+        self.show_notes_button.set_tooltip_markup(
+            cfg.tooltip_markup % (cfg.key["toggle_notes"])
+        )
+        self.show_timeshift_button = Gtk.ToggleButton("time")
+        self.show_timeshift_button.set_tooltip_markup(
+            cfg.tooltip_markup % (cfg.key["toggle_time"])
+        )
+        self.show_pitchwheel_button = Gtk.ToggleButton("pitch")
+        self.show_pitchwheel_button.set_tooltip_markup(
+            cfg.tooltip_markup % (cfg.key["toggle_pitch"])
+        )
+        self.show_controllers_button = Gtk.ToggleButton("ctrl")
+        self.show_controllers_button.set_tooltip_markup(
+            cfg.tooltip_markup % (cfg.key["toggle_controls"])
+        )
 
-            self.show_notes_button.connect("toggled", self.on_show_notes_toggled)
-            self.show_timeshift_button.connect(
-                "toggled", self.on_show_timeshift_toggled
-            )
-            self.show_pitchwheel_button.connect(
-                "toggled", self.on_show_pitchwheel_toggled
-            )
-            self.show_controllers_button.connect(
-                "toggled", self.on_show_controllers_toggled
-            )
+        self.show_notes_button.connect("toggled", self.on_show_notes_toggled)
+        self.show_timeshift_button.connect("toggled", self.on_show_timeshift_toggled)
+        self.show_pitchwheel_button.connect("toggled", self.on_show_pitchwheel_toggled)
+        self.show_controllers_button.connect(
+            "toggled", self.on_show_controllers_toggled
+        )
 
-            lab = Gtk.Label("show:")
-            lab.set_vexpand(True)
-            grid.attach(lab, 0, 0, 1, 1)
-            grid.attach(self.show_notes_button, 1, 0, 1, 1)
-            grid.attach(self.show_timeshift_button, 2, 0, 1, 1)
-            grid.attach(self.show_pitchwheel_button, 3, 0, 1, 1)
-            grid.attach(self.show_controllers_button, 4, 0, 1, 1)
+        lab = Gtk.Label("show:")
+        lab.set_vexpand(True)
+        grid.attach(lab, 0, 0, 1, 1)
+        grid.attach(self.show_notes_button, 1, 0, 1, 1)
+        grid.attach(self.show_timeshift_button, 2, 0, 1, 1)
+        grid.attach(self.show_pitchwheel_button, 3, 0, 1, 1)
+        grid.attach(self.show_controllers_button, 4, 0, 1, 1)
 
-            grid.attach(Gtk.Label(cfg.quick_controls_desc), 0, 1, 1, 1)
+        grid.attach(Gtk.Label(cfg.quick_controls_desc), 0, 1, 1, 1)
 
-            self.quick_control_scale_1 = Gtk.Scale.new_with_range(
-                Gtk.Orientation.HORIZONTAL, 0, 127, 1
-            )
-            self.quick_control_scale_2 = Gtk.Scale.new_with_range(
-                Gtk.Orientation.HORIZONTAL, 0, 127, 1
-            )
+        self.quick_control_scale_1 = Gtk.Scale.new_with_range(
+            Gtk.Orientation.HORIZONTAL, 0, 127, 1
+        )
+        self.quick_control_scale_2 = Gtk.Scale.new_with_range(
+            Gtk.Orientation.HORIZONTAL, 0, 127, 1
+        )
 
-            qc = trk.get_qc()
-            v1 = qc[1] if qc[1] > -1 else cfg.quick_control_1_def
-            v2 = qc[3] if qc[3] > -1 else cfg.quick_control_2_def
+        qc = trk.get_qc()
+        v1 = qc[1] if qc[1] > -1 else cfg.quick_control_1_def
+        v2 = qc[3] if qc[3] > -1 else cfg.quick_control_2_def
 
-            self.quick_control_scale_1.set_value(v1)
-            self.quick_control_scale_2.set_value(v2)
+        self.quick_control_scale_1.set_value(v1)
+        self.quick_control_scale_2.set_value(v2)
 
-            grid.attach(self.quick_control_scale_1, 1, 1, 2, 1)
-            grid.attach(self.quick_control_scale_2, 3, 1, 2, 1)
+        grid.attach(self.quick_control_scale_1, 1, 1, 2, 1)
+        grid.attach(self.quick_control_scale_2, 3, 1, 2, 1)
 
-            self.quick_control_scale_1.connect("value-changed", self.on_qc1_changed)
-            self.quick_control_scale_2.connect("value-changed", self.on_qc2_changed)
+        self.quick_control_scale_1.connect("value-changed", self.on_qc1_changed)
+        self.quick_control_scale_2.connect("value-changed", self.on_qc2_changed)
 
-            self.name_entry = Gtk.Entry()
-            self.name_entry.connect("changed", self.on_name_changed)
+        self.name_entry = Gtk.Entry()
+        self.name_entry.connect("changed", self.on_name_changed)
 
-            self.name_entry.set_activates_default(False)
+        self.name_entry.set_activates_default(False)
 
-            grid.attach(Gtk.Label("name:"), 0, 3, 1, 1)
-            grid.attach(self.name_entry, 1, 3, 4, 1)
+        grid.attach(Gtk.Label("name:"), 0, 3, 1, 1)
+        grid.attach(self.name_entry, 1, 3, 4, 1)
 
-            self.name_entry.set_text(
-                mod.extras[parent.seq.index][self.trk.index]["track_name"]
-            )
+        self.name_entry.set_text(
+            mod.extras[parent.seq.index][self.trk.index]["track_name"]
+        )
 
-            self.show_timeshift_button.set_active(
-                mod.extras[self.parent.seq.index][self.trk.index][
-                    "track_show_timeshift"
-                ]
-            )
+        self.show_timeshift_button.set_active(
+            mod.extras[self.parent.seq.index][self.trk.index]["track_show_timeshift"]
+        )
 
-            self.show_pitchwheel_button.set_active(
-                mod.extras[self.parent.seq.index][self.trk.index][
-                    "track_show_pitchwheel"
-                ]
-            )
-            self.show_controllers_button.set_active(
-                mod.extras[self.parent.seq.index][self.trk.index][
-                    "track_show_controllers"
-                ]
-            )
-            self.show_notes_button.set_active(
-                mod.extras[self.parent.seq.index][self.trk.index]["track_show_notes"]
-            )
+        self.show_pitchwheel_button.set_active(
+            mod.extras[self.parent.seq.index][self.trk.index]["track_show_pitchwheel"]
+        )
+        self.show_controllers_button.set_active(
+            mod.extras[self.parent.seq.index][self.trk.index]["track_show_controllers"]
+        )
+        self.show_notes_button.set_active(
+            mod.extras[self.parent.seq.index][self.trk.index]["track_show_notes"]
+        )
 
-            grid.attach(Gtk.Label("patch:"), 0, 2, 1, 1)
+        grid.attach(Gtk.Label("patch:"), 0, 2, 1, 1)
 
-            box = Gtk.Box()
+        box = Gtk.Box()
 
-            self.patch_adj = Gtk.Adjustment(1, -1, 127, 1.0, 1.0)
-            self.patch_button = Gtk.SpinButton()
-            self.patch_button.set_adjustment(self.patch_adj)
-            self.patch_adj.set_value(self.trk.get_program()[2])
+        self.patch_adj = Gtk.Adjustment(1, -1, 127, 1.0, 1.0)
+        self.patch_button = Gtk.SpinButton()
+        self.patch_button.set_adjustment(self.patch_adj)
+        self.patch_adj.set_value(self.trk.get_program()[2])
 
-            self.patch_adj.connect("value-changed", self.on_patch_value_changed)
+        self.patch_adj.connect("value-changed", self.on_patch_value_changed)
 
-            self.patch_menu = Gtk.Menu()
+        self.patch_menu = Gtk.Menu()
 
-            i = 0
-            for n, c in mod.bank.items():
-                m = Gtk.MenuItem(n)
-                sub = Gtk.Menu()
-                subs = {}
-                for p in c:
-                    if p[1] not in subs:
-                        subs[p[1]] = []
+        i = 0
+        for n, c in mod.bank.items():
+            m = Gtk.MenuItem(n)
+            sub = Gtk.Menu()
+            subs = {}
+            for p in c:
+                if p[1] not in subs:
+                    subs[p[1]] = []
 
-                    subs[p[1]].append((p[0], p[2]))
+                subs[p[1]].append((p[0], p[2]))
 
-                for s in subs:
-                    if s:
-                        mitm = Gtk.MenuItem(s)
-                        mitmm = Gtk.Menu()
-                        for p in subs[s]:
-                            itm = Gtk.MenuItem(p[1])
-                            itm.patch = p
-                            itm.name = n
-                            itm.connect("activate", self.on_patch_menu_item_activate)
-                            itm.show()
-                            mitmm.append(itm)
-                        mitm.set_submenu(mitmm)
+            for s in subs:
+                if s:
+                    mitm = Gtk.MenuItem(s)
+                    mitmm = Gtk.Menu()
+                    for p in subs[s]:
+                        itm = Gtk.MenuItem(p[1])
+                        itm.patch = p
+                        itm.name = n
+                        itm.connect("activate", self.on_patch_menu_item_activate)
+                        itm.show()
+                        mitmm.append(itm)
+                    mitm.set_submenu(mitmm)
+                    mitm.show()
+                    sub.append(mitm)
+                else:
+                    for p in subs[s]:
+                        mitm = Gtk.MenuItem(p[1])
+                        mitm.patch = p
+                        mitm.connect("activate", self.on_patch_menu_item_activate)
                         mitm.show()
                         sub.append(mitm)
-                    else:
-                        for p in subs[s]:
-                            mitm = Gtk.MenuItem(p[1])
-                            mitm.patch = p
-                            mitm.connect("activate", self.on_patch_menu_item_activate)
-                            mitm.show()
-                            sub.append(mitm)
 
-                sub.show()
-                m.set_submenu(sub)
-                m.show()
+            sub.show()
+            m.set_submenu(sub)
+            m.show()
 
-                self.patch_menu.append(m)
-                i += 1
+            self.patch_menu.append(m)
+            i += 1
 
-            self.patch_menu_button = Gtk.MenuButton()
-            self.patch_menu_button.set_popup(self.patch_menu)
+        self.patch_menu_button = Gtk.MenuButton()
+        self.patch_menu_button.set_popup(self.patch_menu)
 
-            box.add(self.patch_button)
-            box.add(self.patch_menu_button)
+        box.add(self.patch_button)
+        box.add(self.patch_menu_button)
 
-            grid.attach(box, 1, 2, 2, 1)
+        grid.attach(box, 1, 2, 2, 1)
 
-            self.extend_track_grid = grid
+        self.extend_track_grid = grid
 
-            self.extend_controllers_grid = Gtk.Grid()
+        self.extend_controllers_grid = Gtk.Grid()
 
-            grid = self.extend_controllers_grid
+        grid = self.extend_controllers_grid
 
-            grid.set_column_homogeneous(True)
-            grid.set_row_homogeneous(True)
-            grid.set_column_spacing(2)
-            grid.set_row_spacing(2)
+        grid.set_column_homogeneous(True)
+        grid.set_row_homogeneous(True)
+        grid.set_column_spacing(2)
+        grid.set_row_spacing(2)
 
-            self.ctrlsview = ControllersView(self.trk, self.trkview, self)
+        self.extend_notebook = Gtk.Notebook()
+        self.extend_notebook.set_hexpand(True)
+        self.extend_notebook.set_vexpand(True)
 
-            self.extend_notebook = Gtk.Notebook()
-            self.extend_notebook.set_hexpand(True)
-            self.extend_notebook.set_vexpand(True)
+        self.extend_notebook.append_page(
+            self.extend_track_grid, NotebookLabel("track", self.extend_notebook, 0)
+        )
 
-            self.extend_notebook.append_page(
-                self.extend_track_grid, NotebookLabel("track", self.extend_notebook, 0)
-            )
-            self.extend_notebook.append_page(
-                self.ctrlsview, NotebookLabel("controllers", self.extend_notebook, 1)
-            )
+        self.extend_grid.attach(self.extend_notebook, 0, 0, 3, 3)
+        self.extend_grid.show()
 
-            self.extend_grid.attach(self.extend_notebook, 0, 0, 3, 3)
-            self.extend_grid.show()
+        self.port_adj = Gtk.Adjustment(0, 0, 15, 1.0, 1.0)
+        self.port_button = Gtk.SpinButton()
+        self.port_button.set_adjustment(self.port_adj)
+        self.port_adj.set_value(trk.port)
+        self.port_adj.connect("value-changed", self.on_port_changed)
 
-            self.port_adj = Gtk.Adjustment(0, 0, 15, 1.0, 1.0)
-            self.port_button = Gtk.SpinButton()
-            self.port_button.set_adjustment(self.port_adj)
-            self.port_adj.set_value(trk.port)
-            self.port_adj.connect("value-changed", self.on_port_changed)
+        lbl = Gtk.Label("port:")
+        lbl.set_xalign(1.0)
 
-            lbl = Gtk.Label("port:")
-            lbl.set_xalign(1.0)
+        self.grid.attach(lbl, 0, 2, 1, 1)
+        self.grid.attach(self.port_button, 1, 2, 2, 1)
 
-            self.grid.attach(lbl, 0, 2, 1, 1)
-            self.grid.attach(self.port_button, 1, 2, 2, 1)
+        self.channel_adj = Gtk.Adjustment(1, 1, 16, 1.0, 1.0)
+        self.channel_button = Gtk.SpinButton()
+        self.channel_button.set_adjustment(self.channel_adj)
+        self.channel_adj.set_value(trk.channel)
+        self.channel_adj.connect("value-changed", self.on_channel_changed)
 
-            self.channel_adj = Gtk.Adjustment(1, 1, 16, 1.0, 1.0)
-            self.channel_button = Gtk.SpinButton()
-            self.channel_button.set_adjustment(self.channel_adj)
-            self.channel_adj.set_value(trk.channel)
-            self.channel_adj.connect("value-changed", self.on_channel_changed)
+        lbl = Gtk.Label("channel:")
+        lbl.set_xalign(1.0)
 
-            lbl = Gtk.Label("channel:")
-            lbl.set_xalign(1.0)
+        self.grid.attach(lbl, 0, 3, 1, 1)
+        self.grid.attach(self.channel_button, 1, 3, 2, 1)
 
-            self.grid.attach(lbl, 0, 3, 1, 1)
-            self.grid.attach(self.channel_button, 1, 3, 2, 1)
+        self.nsrows_adj = Gtk.Adjustment(1, 1, self.parent.seq.length, 1.0, 1.0)
+        self.nsrows_button = Gtk.SpinButton()
+        self.nsrows_button.set_adjustment(self.nsrows_adj)
+        self.nsrows_adj.set_value(trk.nsrows)
+        self.nsrows_adj.connect("value-changed", self.on_nsrows_changed)
 
-            self.nsrows_adj = Gtk.Adjustment(1, 1, self.parent.seq.length, 1.0, 1.0)
-            self.nsrows_button = Gtk.SpinButton()
-            self.nsrows_button.set_adjustment(self.nsrows_adj)
-            self.nsrows_adj.set_value(trk.nsrows)
-            self.nsrows_adj.connect("value-changed", self.on_nsrows_changed)
+        lbl = Gtk.Label("rows:")
+        lbl.set_xalign(1.0)
 
-            lbl = Gtk.Label("rows:")
-            lbl.set_xalign(1.0)
+        self.nsrows_check_button = Gtk.CheckButton()
+        self.nsrows_check_button.connect("toggled", self.on_nsrows_toggled)
 
-            self.nsrows_check_button = Gtk.CheckButton()
-            self.nsrows_check_button.connect("toggled", self.on_nsrows_toggled)
+        self.grid.attach(lbl, 0, 4, 1, 1)
+        self.grid.attach(self.nsrows_button, 1, 4, 2, 1)
+        self.grid.attach(self.nsrows_check_button, 3, 4, 1, 1)
 
-            self.grid.attach(lbl, 0, 4, 1, 1)
-            self.grid.attach(self.nsrows_button, 1, 4, 2, 1)
-            self.grid.attach(self.nsrows_check_button, 3, 4, 1, 1)
+        self.nrows_adj = Gtk.Adjustment(1, 1, 256, 1.0, 1.0)
+        self.nrows_button = Gtk.SpinButton()
+        self.nrows_button.set_adjustment(self.nrows_adj)
+        self.nrows_adj.set_value(trk.nsrows)
+        self.nrows_adj.connect("value-changed", self.on_nrows_changed)
 
-            self.nrows_adj = Gtk.Adjustment(1, 1, 256, 1.0, 1.0)
-            self.nrows_button = Gtk.SpinButton()
-            self.nrows_button.set_adjustment(self.nrows_adj)
-            self.nrows_adj.set_value(trk.nsrows)
-            self.nrows_adj.connect("value-changed", self.on_nrows_changed)
+        lbl = Gtk.Label("funk:")
+        lbl.set_xalign(1.0)
 
-            lbl = Gtk.Label("funk:")
-            lbl.set_xalign(1.0)
+        self.nrows_check_button = Gtk.CheckButton()
+        self.nrows_check_button.connect("toggled", self.on_nrows_toggled)
 
-            self.nrows_check_button = Gtk.CheckButton()
-            self.nrows_check_button.connect("toggled", self.on_nrows_toggled)
+        self.grid.attach(lbl, 0, 5, 1, 1)
+        self.grid.attach(self.nrows_button, 1, 5, 2, 1)
+        self.grid.attach(self.nrows_check_button, 3, 5, 1, 1)
 
-            self.grid.attach(lbl, 0, 5, 1, 1)
-            self.grid.attach(self.nrows_button, 1, 5, 2, 1)
-            self.grid.attach(self.nrows_check_button, 3, 5, 1, 1)
+        self.nrows_button.set_sensitive(False)
+        self.nsrows_button.set_sensitive(False)
+        self.nrows_check_button.set_sensitive(False)
 
-            self.nrows_button.set_sensitive(False)
-            self.nsrows_button.set_sensitive(False)
-            self.nrows_check_button.set_sensitive(False)
+        self.ctrlsview = ControllersView(self.trk, self.trkview, self)
+        self.extend_notebook.append_page(
+            self.ctrlsview, NotebookLabel("controllers", self.extend_notebook, 1)
+        )
 
-            self.grid.show_all()
-            self.add(self.grid)
+        self.grid.show_all()
+        self.add(self.grid)
 
-            self.extend_notebook.set_current_page(0)
-            self.set_modal(False)
+        self.extend_notebook.set_current_page(0)
+        self.set_modal(False)
 
     def build_clone_menu(self):
         m = self.clone_button.get_popup()
@@ -455,6 +440,14 @@ class TrackPropViewPopover(Gtk.Popover):
             self.show_notes_button.set_sensitive(False)
         else:
             self.show_notes_button.set_sensitive(True)
+
+        if self.trkview.trk.nrows != self.parent.seq.length:
+            self.nsrows_button.set_sensitive(True)
+            self.nsrows_check_button.set_active(True)
+
+        if self.trkview.trk.nrows != self.trkview.trk.nsrows:
+            self.nrows_button.set_sensitive(True)
+            self.nrows_check_button.set_active(True)
 
     def pop(self):
         mod.clear_popups(self)
@@ -638,21 +631,20 @@ class TrackPropViewPopover(Gtk.Popover):
             self.nsrows_check_button.set_sensitive(True)
         else:
             self.nrows_button.set_sensitive(False)
-            self.nrows_check_button.set_active(False)
             self.nrows_adj.set_value(self.nsrows_adj.get_value())
+            self.nrows_check_button.set_active(False)
 
     def on_nsrows_toggled(self, wdg):
         if wdg.get_active():
             self.nsrows_button.set_sensitive(True)
             self.nrows_check_button.set_sensitive(True)
         else:
+            self.nrows_adj.set_value(self.parent.seq.length)
+            self.nsrows_adj.set_value(self.parent.seq.length)
             self.nsrows_button.set_sensitive(False)
             self.nrows_button.set_sensitive(False)
             self.nrows_check_button.set_active(False)
             self.nrows_check_button.set_sensitive(False)
-
-            self.nrows_adj.set_value(self.parent.seq.length)
-            self.nsrows_adj.set_value(self.parent.seq.length)
 
     def on_move_left_button_clicked(self, switch):
         self.parent.move_left()

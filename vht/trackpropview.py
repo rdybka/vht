@@ -1,6 +1,6 @@
 # trackpropview.py - Valhalla Tracker
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -77,6 +77,9 @@ class TrackPropView(Gtk.DrawingArea):
         self.popover.set_position(Gtk.PositionType.BOTTOM)
         self.popped = False
 
+        self.ind = [0, 0, 0]
+        self.ind_time = [0, 0, 0]
+
     def configure(self):
         win = self.get_window()
         if not win:
@@ -102,7 +105,9 @@ class TrackPropView(Gtk.DrawingArea):
 
         self._context = cairo.Context(self._surface)
         self._context.set_antialias(cairo.ANTIALIAS_NONE)
-        self._context.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
+        self._context.set_line_width(
+            (mod.extras[self.seq.index][-1]["font_size"] / 6.0) * cfg.seq_line_width
+        )
         self._context.select_font_face(
             cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD
         )
@@ -217,7 +222,7 @@ class TrackPropView(Gtk.DrawingArea):
         if self.trk:
             w = self.trkview.width
 
-        self._context.set_font_size(cfg.seq_font_size)
+        self._context.set_font_size(mod.extras[self.seq.index][-1]["font_size"])
         cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
         cr.rectangle(0, 0, w, h)
         cr.fill()
@@ -283,7 +288,9 @@ class TrackPropView(Gtk.DrawingArea):
             self.button_rect.y = 0
             self.button_rect.height = height * cfg.seq_spacing * 2
 
-            cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
+            cr.set_line_width(
+                (mod.extras[self.seq.index][-1]["font_size"] / 6.0) * cfg.seq_line_width
+            )
             (x, y, width, height, dx, dy) = cr.text_extents("|")
             cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
             cr.set_antialias(cairo.ANTIALIAS_NONE)
@@ -292,11 +299,13 @@ class TrackPropView(Gtk.DrawingArea):
             )
             cr.line_to(
                 self.txt_width - (dx / 2),
-                (self.seq.length) * self.txt_height * cfg.seq_spacing,
+                (self.seq.length + 1) * self.txt_height * cfg.seq_spacing,
             )
             cr.stroke()
             self.queue_draw()
             return
+
+        # normal track
 
         (x, y, width, height, dx, dy) = cr.text_extents("000 00_|")
         if self.trkview.show_timeshift:
@@ -438,9 +447,32 @@ class TrackPropView(Gtk.DrawingArea):
         stars_x = self.trkview.width - (dx + x)
         cr.move_to(stars_x, self.txt_height * 2 * cfg.seq_spacing)
 
-        cr.show_text("***")
+        for i in range(3):
+            if self.popped or self.button_highlight:
+                if self.ind[i]:
+                    cr.set_source_rgb(
+                        *(
+                            col * cfg.intensity_txt_highlight
+                            for col in cfg.record_colour
+                        )
+                    )
+                else:
+                    cr.set_source_rgb(
+                        *(col * cfg.intensity_txt_highlight for col in cfg.star_colour)
+                    )
+            else:
+                if self.ind[i]:
+                    cr.set_source_rgb(
+                        *(col * cfg.intensity_indicator for col in cfg.star_colour)
+                    )
+                else:
+                    cr.set_source_rgb(
+                        *(col * cfg.intensity_background for col in cfg.colour)
+                    )
 
-        cr.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
+            cr.show_text("*")
+
+        cr.set_line_width((self.seqview.font_size / 6.0) * cfg.seq_line_width)
 
         (x, y, width, height, dx, dy) = cr.text_extents("0")
         cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
@@ -462,13 +494,13 @@ class TrackPropView(Gtk.DrawingArea):
                 if mod.record == 1:
                     cr.set_source_rgb(*(cfg.record_colour))
 
-        cr.move_to(x, self.txt_height * 0.95 * cfg.seq_spacing)
+        cr.move_to(x, self.txt_height * 0.99 * cfg.seq_spacing)
 
         trkname = mod.extras[self.seq.index][self.trk.index]["track_name"]
 
         if trkname:
-            cr.move_to(x, self.txt_height * 0.8 * cfg.seq_spacing)
-            self._context.set_font_size(cfg.seq_font_size * 0.6)
+            # cr.move_to(x, self.txt_height * 0.8 * cfg.seq_spacing)
+            # self._context.set_font_size(self.seqview.font_size * 1.0)
             pref = ""
             if not self.trkview.show_notes and self.trk.nctrl > 2:
                 pref = "p%02dc%02d " % (self.trk.port, self.trk.channel)
@@ -477,7 +509,7 @@ class TrackPropView(Gtk.DrawingArea):
         else:
             cr.show_text("p%02d c%02d" % (self.trk.port, self.trk.channel))
 
-        self._context.set_font_size(cfg.seq_font_size * 0.6)
+        self._context.set_font_size(self.seqview.font_size * 0.6)
 
         cr.set_source_rgb(
             *(col * cfg.intensity_txt_highlight for col in cfg.star_colour)
@@ -504,12 +536,11 @@ class TrackPropView(Gtk.DrawingArea):
 
                 ctrllabel = " ctrl %d" % self.trkview.trk.ctrls[c.ctrlnum]
                 if i + 1 in mod.extras[self.seq.index][self.trk.index]["ctrl_names"]:
-                    ctrllabel = (
-                        "%s"
-                        % mod.extras[self.seq.index][self.trk.index]["ctrl_names"][
-                            i + 1
-                        ][1][:12]
-                    )
+                    lbl = mod.extras[self.seq.index][self.trk.index]["ctrl_names"][
+                        i + 1
+                    ]
+                    if len(lbl[1].strip()):
+                        ctrllabel = "%s" % lbl[1][:12]
 
                 cr.show_text(ctrllabel)
 
@@ -547,7 +578,39 @@ class TrackPropView(Gtk.DrawingArea):
             if t > cfg.save_indication_time:
                 self.time_to_wiggle = None
 
+    def check_indicators(self):
+        if not self.trk:
+            return
+
+        i = self.trk.indicators
+        changed = False
+
+        if i & 1:
+            self.ind[0] = 1
+            self.ind_time[0] = datetime.now()
+            changed = True
+        if i & 2:
+            self.ind[1] = 1
+            self.ind_time[1] = datetime.now()
+            changed = True
+        if i & 4 or i & 8:
+            self.ind[2] = 1
+            self.ind_time[2] = datetime.now()
+            changed = True
+
+        t = datetime.now()
+        for i in range(3):
+            if self.ind[i]:
+                tt = t - self.ind_time[i]
+                tt = float(tt.seconds) + tt.microseconds / 1000000
+                if tt > cfg.track_indication_time:
+                    self.ind[i] = 0
+
+        self.trk.indicators = 0
+
     def tick(self, wdg, param):
         self.redraw()
         self.check_saving()
+        self.check_indicators()
+
         return True

@@ -80,6 +80,7 @@ int y2bz(envelope *env, float y) {
 	return (int)y * env->res + (int)((y - floorf(y)) * env->res);
 }
 
+// pozdrowienia dla mojego mentora - Konrada Wicyńskiego
 void envelope_draw_cluster(envelope *env, int nf, int nl) {
 	float lx = 0;					// past
 	float ly = 0;

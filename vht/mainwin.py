@@ -1,6 +1,6 @@
 # mainwin.py - Valhalla Tracker
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ class MainWin(Gtk.ApplicationWindow):
         self.timeline_visible = False
         mod.console_visible = False
         self.last_filename = None
+        self.last_filename_naked = None
 
         # here we GUI
         st = self.get_settings()
@@ -119,6 +120,7 @@ class MainWin(Gtk.ApplicationWindow):
 
         self.timeline_box = Gtk.Paned()
         self.timeline_box.set_orientation(Gtk.Orientation.VERTICAL)
+        self.timeline_box.set_wide_handle(True)
 
         self.seqlist = SequenceListView()
         mod.seqlist = self.seqlist
@@ -149,9 +151,9 @@ class MainWin(Gtk.ApplicationWindow):
 
         buttbox = Gtk.Box()
         buttbox.set_orientation(Gtk.Orientation.VERTICAL)
-        buttbox.pack_start(self.seq_add_butt, False, True, 0)
         buttbox.pack_end(self.seq_mode_butt, False, True, 0)
         buttbox.pack_end(self.butt_panic, False, True, 0)
+        buttbox.pack_end(self.seq_add_butt, False, True, 0)
 
         seqpane = Gtk.Paned()
         seqpane.set_orientation(Gtk.Orientation.HORIZONTAL)
@@ -164,6 +166,7 @@ class MainWin(Gtk.ApplicationWindow):
 
         self.timeline_box.pack1(seqpane, False, False)
         self.timeline_box.pack2(Gtk.Label("timeliner"), True, True)
+        self.timeline_box.set_position(230)
 
         self.vbox.pack_start(self.hbox, True, True, 0)
         self._status_bar = StatusBar()

@@ -1,6 +1,6 @@
 # statusbar.py - Valhalla Tracker
 #
-# Copyright (C) 2019 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@ class StatusBar(Gtk.DrawingArea):
             cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
         txt = " vel:%d" % cfg.velocity
-        (x, y, width, height, dx, dy) = cr.text_extents(txt)
+        *_, dx, _ = cr.text_extents(txt)
         cr.move_to(self.pos[-1], h)
         cr.show_text(txt)
         xx += dx
@@ -165,7 +165,7 @@ class StatusBar(Gtk.DrawingArea):
             cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
         txt = " skp:%d" % cfg.skip
-        (x, y, width, height, dx, dy) = cr.text_extents(txt)
+        *_, dx, _ = cr.text_extents(txt)
         cr.move_to(self.pos[-1], h)
         cr.show_text(txt)
         xx += dx
@@ -183,7 +183,7 @@ class StatusBar(Gtk.DrawingArea):
         if mod.mainwin._sequence_view.highlight == 1:
             txt = " hig:0"
 
-        (x, y, width, height, dx, dy) = cr.text_extents(txt)
+        *_, dx, _ = cr.text_extents(txt)
         cr.move_to(self.pos[-1], h)
         cr.show_text(txt)
         xx += dx
@@ -197,7 +197,7 @@ class StatusBar(Gtk.DrawingArea):
             cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
         txt = " bpm:%6.2f" % mod.bpm
-        (x, y, width, height, dx, dy) = cr.text_extents(txt)
+        *_, dx, _ = cr.text_extents(txt)
         cr.move_to(self.pos[-1], h)
         cr.show_text(txt)
         xx += dx
@@ -211,7 +211,7 @@ class StatusBar(Gtk.DrawingArea):
             cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
         txt = " rpb:%d" % mod.rpb
-        (x, y, width, height, dx, dy) = cr.text_extents(txt)
+        *_, dx, _ = cr.text_extents(txt)
         cr.move_to(self.pos[-1], h)
         cr.show_text(txt)
         xx += dx
@@ -225,7 +225,7 @@ class StatusBar(Gtk.DrawingArea):
             cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
         txt = " prt:%d" % cfg.default_midi_out_port
-        (x, y, width, height, dx, dy) = cr.text_extents(txt)
+        *_, dx, _ = cr.text_extents(txt)
         cr.move_to(self.pos[-1], h)
         cr.show_text(txt)
         xx += dx
@@ -241,12 +241,21 @@ class StatusBar(Gtk.DrawingArea):
             int(mod[cs].pos),
             (mod[cs].pos - int(mod[cs].pos)) * 1000,
         )
-        (x, y, width, height, dx, dy) = cr.text_extents(txt)
+        *_, dx, _ = cr.text_extents(txt)
         cr.move_to(w - dx, h)
         cr.show_text(txt)
+        end_x = w - dx
+
+        if mod.mainwin.fs and mod.mainwin.hb.props.title:
+            *_, dx, _ = cr.text_extents(" ")
+            cr.set_source_rgba(*(col * intensity for col in cfg.record_colour), 0.666)
+            cr.rectangle(0, 0, end_x - dx, h)
+            cr.clip()
+            cr.move_to(xx + dx, h)
+            cr.show_text(mod.mainwin.hb.props.title)
+            cr.reset_clip()
 
         cr.set_source_rgb(*(col * 0 for col in cfg.colour))
-
         cr.move_to(0, 0)
         cr.line_to(w, 0)
         cr.stroke()
@@ -273,7 +282,6 @@ class StatusBar(Gtk.DrawingArea):
 
         self._context = cairo.Context(self._surface)
         self._context.set_antialias(cairo.ANTIALIAS_NONE)
-        self._context.set_line_width((cfg.seq_font_size / 6.0) * cfg.seq_line_width)
 
         self._context.select_font_face(
             cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD
@@ -283,13 +291,13 @@ class StatusBar(Gtk.DrawingArea):
         fits = False
         while not fits:
             self._context.set_font_size(fs)
-            (x, y, width, height, dx, dy) = self._context.text_extents(
-                "X" * self.min_char_width
-            )
+            _, _, width, *_ = self._context.text_extents("X" * self.min_char_width)
             if w > width:
                 fits = True
             else:
                 fs -= 1
+
+        self._context.set_line_width((fs / 6.0) * cfg.seq_line_width)
 
         self.redraw()
         return True

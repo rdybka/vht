@@ -29,7 +29,6 @@ gi.require_version("Gtk", "3.0")
 class SequenceListViewPopover(Gtk.Popover):
     def __init__(self, parent):
         super(SequenceListViewPopover, self).__init__()
-        self.set_relative_to(parent)
 
         self.add_events(
             Gdk.EventMask.LEAVE_NOTIFY_MASK
@@ -78,6 +77,8 @@ class SequenceListViewPopover(Gtk.Popover):
         self.pooped = False
         self.curr = -1
 
+        self.set_relative_to(parent)
+        self.set_position(Gtk.PositionType.LEFT)
         # mod.gui_midi_capture = False
 
     def on_leave(self, wdg, prm):
@@ -138,7 +139,6 @@ class SequenceListViewPopover(Gtk.Popover):
 
     def pop(self, curr):
         mod.clear_popups(self)
-        self.set_position(Gtk.PositionType.BOTTOM)
         self.time_want_to_leave = 0
         self.set_opacity(1)
         self.add_tick_callback(self.tick)
@@ -171,6 +171,7 @@ class SequenceListViewPopover(Gtk.Popover):
         for r in range(self.curr, len(mod) - 1):
             mod.extras[r] = mod.extras[r + 1]
 
+        del mod.extras[len(mod) - 1]
         mod.del_sequence(self.curr)
         self.hide()
         self.pooped = False
