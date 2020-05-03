@@ -183,7 +183,7 @@ void sequence_advance(sequence *seq, double period) {
 		while (r >= seq->length)
 			r-=seq->length;
 
-		// printf("%d %d %d %d\n", seq->trg_times[0], seq->trg_times[1], seq->trg_times[2], seq->trg_times[3]);
+		//printf("%d %d %d %d\n", seq->trg_times[0], seq->trg_times[1], seq->trg_times[2], seq->trg_times[3]);
 
 		// quantised play
 		if (seq->trg_times[2] == r) {
@@ -191,8 +191,11 @@ void sequence_advance(sequence *seq, double period) {
 			if (!seq->playing) {
 				seq->playing = 1;
 				seq->pos = 0;
-				if (seq->trg_playmode == TRIGGER_ONESHOT)
-					seq->trg_times[3] = -4;
+				if (seq->trg_playmode == TRIGGER_ONESHOT) {
+					seq->trg_times[3] = -2;
+					if (r == 0)
+						seq->trg_times[3]--;
+				}
 
 				for (int t = 0; t < seq->ntrk; t++)
 					track_reset(seq->trk[t]);
@@ -218,8 +221,7 @@ void sequence_advance(sequence *seq, double period) {
 				seq->trg_times[3]++;
 			}
 
-			if (seq->trg_times[3] == -1) {
-
+			if ((seq->trg_times[3] == -1) && (seq->trg_times[2] == -1)) {
 				seq->trg_times[3] = 0;
 				seq->playing = 0;
 				seq->lost = 1;
@@ -482,12 +484,14 @@ void sequence_trigger_play_off(sequence *seq) {
 	if (seq->trg_playmode == TRIGGER_HOLD) {
 		if (seq->playing) {
 			seq->trg_times[3] = -23;
-		} else {
+		}  else {
 			seq->playing = 0;
 			seq->lost = 1;
 			seq->trg_times[3] = 0;
+			seq->trg_times[2] = -1;
 			for (int t = 0; t < seq->ntrk; t++)
 				track_reset(seq->trk[t]);
+
 		}
 	}
 }
