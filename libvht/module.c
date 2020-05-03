@@ -49,28 +49,34 @@ int trg_equal(trigger *trg, midi_event *mev) {
 
 // the god-function
 void module_advance(module *mod, jack_nframes_t curr_frames) {
-	if (mod->nseq == 0)
+	if (mod->nseq == 0) {
 		return;
+	}
 
 	module_excl_in(mod);
 	midi_buffer_clear(mod->clt);
 
-	if (!mod->playing) {
-		// are we paused?
-		if (mod->zero_time > 0)
-			mod->zero_time += mod->clt->jack_buffer_size;
-	}
-
 	// are we muting after stop?
-	if (!mod->playing && mod->mute) {
-		for (int t = 0; t < mod->seq[mod->curr_seq]->ntrk; t++)
-			track_kill_notes(mod->seq[mod->curr_seq]->trk[t]);
+	if (!mod->playing) {
+		if (mod->mute) {
+			for (int t = 0; t < mod->seq[mod->curr_seq]->ntrk; t++)
+				track_kill_notes(mod->seq[mod->curr_seq]->trk[t]);
 
-		mod->mute = 0;
+			mod->mute = 0;
+		} else {
+		}
+
+		module_excl_out(mod);
+		return;
 	}
 
-	if (mod->zero_time == 0)
+	if (mod->zero_time == 0) {
 		mod->zero_time = curr_frames;
+	} else {
+//		mod->zero_time += mod->clt->jack_buffer_size;
+	}
+
+
 
 	double time = (curr_frames - mod->zero_time) / (double)mod->clt->jack_sample_rate;
 	double row_length = 60.0 / ((double)mod->rpb * (double)mod->bpm);
@@ -102,20 +108,37 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 				midi_buffer_add(mod->clt, mod->clt->default_midi_port, mev);
 			}
 
-			double tt = mod->song_pos + ((double)mev.time / 60.0 / ((double)mod->rpb * (double)mod->bpm));
-
 			// handle triggers
 			for (int s = 0; s < mod->nseq; s++) {
-				if ((mod->seq[s]->triggers[0].type) && trg_equal(&mod->seq[s]->triggers[0], &mev)) {
-					sequence_trigger_mute(mod->seq[s]);
+				if (mev.velocity > 0) {
+					if ((mod->seq[s]->triggers[0].type) && trg_equal(&mod->seq[s]->triggers[0], &mev)) {
+						sequence_trigger_mute(mod->seq[s]);
+					}
+
+					if ((mod->seq[s]->triggers[1].type) && trg_equal(&mod->seq[s]->triggers[1], &mev)) {
+						sequence_trigger_cue(mod->seq[s]);
+					}
+
+					if ((mod->seq[s]->triggers[2].type) && trg_equal(&mod->seq[s]->triggers[2], &mev)) {
+						sequence_trigger_play_on(mod->seq[s]);
+					}
 				}
 
-				if ((mod->seq[s]->triggers[1].type) && trg_equal(&mod->seq[s]->triggers[1], &mev)) {
-					sequence_trigger_cue(mod->seq[s]);
+				trigger trg = mod->seq[s]->triggers[2];
+
+				if ((mod->seq[s]->triggers[2].type == note_on) && \
+				        (mev.channel == trg.channel) && \
+				        (mev.type == note_off) && \
+				        (mev.note == trg.note)) {
+					sequence_trigger_play_off(mod->seq[s]);
 				}
 
-				if ((mod->seq[s]->triggers[2].type) && trg_equal(&mod->seq[s]->triggers[2], &mev)) {
-					sequence_trigger_play_on(mod->seq[s], tt);
+				if ((mod->seq[s]->triggers[2].type == control_change) && \
+				        (mev.channel == trg.channel) && \
+				        (mev.type == trg.type) && \
+				        (mev.note == trg.note) && \
+				        (mev.velocity == 0)) {
+					sequence_trigger_play_off(mod->seq[s]);
 				}
 			}
 
@@ -131,7 +154,6 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 						if (ignev.note == mev.note)
 							ignore = 1;
 			}
-
 
 			if (mod->recording && !ignore) {
 				sequence_handle_record(mod, mod->seq[mod->curr_seq], mev);
@@ -153,6 +175,11 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 				sequence *seq = mod->seq[s];
 				if (seq->lost) {
 					seq->pos = fmod(mod->song_pos, seq->length);
+
+					for (int t = 0; t < seq->ntrk; t++) {
+						seq->trk[t]->pos = seq->pos;
+					}
+
 					seq->lost = 0;
 				}
 
@@ -192,6 +219,18 @@ module *module_new() {
 
 void module_mute(module *mod) {
 	mod->mute = 1;
+}
+
+void module_reset(module *mod) {
+	mod->zero_time = 0;
+	mod->song_pos = 0;
+	mod->min = mod->sec = mod->ms = 0;
+	for (int s = 0; s < mod->nseq; s++) {
+		mod->seq[s]->pos = 0;
+		//mod->seq[s]->lost = 1;
+		for (int t = 0; t < mod->seq[s]->ntrk; t++)
+			track_reset(mod->seq[s]->trk[t]);
+	}
 }
 
 void module_seqs_reindex(module *mod) {

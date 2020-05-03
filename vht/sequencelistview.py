@@ -157,6 +157,8 @@ class SequenceListView(Gtk.DrawingArea):
                         old = self._menu_handle
                         self._menu_handle = -1
                         self.redraw(old)
+            else:
+                self._menu_handle = -1
         else:
             self._highlight = -1
             self._move_handle = -1
@@ -177,7 +179,7 @@ class SequenceListView(Gtk.DrawingArea):
         if curr >= len(mod):
             return
 
-        if event.button == cfg.select_button:  # activate track
+        if event.button == cfg.select_button:
             old = mod.curr_seq
 
             h = self.get_allocated_height()
@@ -197,8 +199,8 @@ class SequenceListView(Gtk.DrawingArea):
 
             return True
 
-        ms = mod.extras[mod.curr_seq][-1]["mouse_cfg"]
-        # trigger mute?
+        ms = mod.extras[curr][-1]["mouse_cfg"]
+
         if event.button == ms[0]:
             mod[curr].trigger_mute()
 
@@ -206,7 +208,7 @@ class SequenceListView(Gtk.DrawingArea):
             mod[curr].trigger_cue()
 
         if event.button == ms[2]:
-            mod[curr].trigger_play_on(mod.jack_pos)
+            mod[curr].trigger_play_on()
             self._lplay_triggered = curr
 
         return True
@@ -219,7 +221,7 @@ class SequenceListView(Gtk.DrawingArea):
         ms = mod.extras[mod.curr_seq][-1]["mouse_cfg"]
         if event.button == ms[2]:
             if self._lplay_triggered > -1:
-                mod[self._lplay_triggered].trigger_play_off(mod.jack_pos)
+                mod[self._lplay_triggered].trigger_play_off()
                 self._lplay_triggered = -1
                 return True
 
@@ -280,6 +282,7 @@ class SequenceListView(Gtk.DrawingArea):
             redr.append(col)
 
         for r in redr:
+            seq = mod[r]
             x = (self._txt_height * cfg.mixer_padding) * r
             x += ((self._txt_height * cfg.mixer_padding) - self._txt_height) / 2.0
 
@@ -291,14 +294,21 @@ class SequenceListView(Gtk.DrawingArea):
                 0.05, *(col * cfg.intensity_txt for col in cfg.mixer_colour)
             )
 
+            gradient.add_color_stop_rgb(
+                0.1, *(col * cfg.intensity_txt for col in cfg.mixer_colour)
+            )
+
+            bottom_intensity = cfg.intensity_txt / 1.5
             if r == self._highlight:
-                gradient.add_color_stop_rgb(
-                    1.0, *(col * cfg.intensity_txt for col in cfg.mixer_colour)
-                )
-            else:
-                gradient.add_color_stop_rgb(
-                    1.0, *(col * cfg.intensity_background for col in cfg.mixer_colour)
-                )
+                bottom_intensity = cfg.intensity_txt
+
+            if seq.playing:
+                hi = mod.extras[r][-1]["highlight"]
+                bottom_intensity *= 1.5 * (1 - ((seq.pos % hi) / hi))
+
+            gradient.add_color_stop_rgb(
+                1.0, *(col * bottom_intensity for col in cfg.mixer_colour)
+            )
 
             cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
             cr.rectangle(x - self._txt_height / 3, 0, self._txt_height * 1.23, h)
@@ -354,9 +364,43 @@ class SequenceListView(Gtk.DrawingArea):
             cr.show_text("=")
 
             cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.mixer_colour))
-            cr.set_line_width((cfg.mixer_font_size / 10.0) * cfg.seq_line_width)
+            cr.set_line_width((cfg.mixer_font_size / 5.0) * cfg.seq_line_width)
             cr.move_to(x + self._txt_height, self._txt_height / 4.0)
+
+            itop = cfg.intensity_background
+            imid = cfg.intensity_txt
+            ibot = cfg.intensity_background
+            if seq.cue:
+                ibot = imid
+
+            if seq.playing:
+                itop = cfg.intensity_txt * 1.5
+                imid = cfg.intensity_background
+                ibot = cfg.intensity_txt * 1.5
+
+                if seq.cue:
+                    ibot = imid
+
+            gradient = cairo.LinearGradient(0, 0, 0, h)
+            gradient.add_color_stop_rgb(0.0, *(col * itop for col in cfg.mixer_colour))
+
+            gradient.add_color_stop_rgb(
+                (seq.pos / seq.length) - 0.1, *(col * itop for col in cfg.mixer_colour)
+            )
+
+            gradient.add_color_stop_rgb(
+                (seq.pos / seq.length), *(col * imid for col in cfg.mixer_colour)
+            )
+
+            gradient.add_color_stop_rgb(
+                (seq.pos / seq.length) + 0.1, *(col * ibot for col in cfg.mixer_colour)
+            )
+
+            gradient.add_color_stop_rgb(1.0, *(col * ibot for col in cfg.mixer_colour))
+
+            cr.set_source(gradient)
             cr.line_to(x + self._txt_height, h)
+
             cr.stroke()
 
         self.queue_draw()
@@ -368,8 +412,5 @@ class SequenceListView(Gtk.DrawingArea):
         return False
 
     def tick(self):
-        if self._llen != len(mod):
-            self._llen = len(mod)
-            self.redraw()
-
+        self.redraw()
         return True

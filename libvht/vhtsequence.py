@@ -34,7 +34,7 @@ class VHTSequence(Iterable):
 
     def __iter__(self):
         for itm in range(self.__len__()):
-            yield VHTTrack(libcvht.sequence_get_trk(self._seq_handle, itm),)
+            yield VHTTrack(libcvht.sequence_get_trk(self._seq_handle, itm))
 
     def __getitem__(self, itm):
         if itm >= self.__len__():
@@ -45,7 +45,7 @@ class VHTSequence(Iterable):
                 raise IndexError()
 
             return VHTTrack(
-                libcvht.sequence_get_trk(self._seq_handle, self.__len__() - 1),
+                libcvht.sequence_get_trk(self._seq_handle, self.__len__() - 1)
             )
 
         return VHTTrack(libcvht.sequence_get_trk(self._seq_handle, itm))
@@ -150,11 +150,11 @@ class VHTSequence(Iterable):
     def trigger_cue(self):
         libcvht.sequence_trigger_cue(self._seq_handle)
 
-    def trigger_play_on(self, time=-1):
-        libcvht.sequence_trigger_play_on(self._seq_handle, time)
+    def trigger_play_on(self):
+        libcvht.sequence_trigger_play_on(self._seq_handle)
 
-    def trigger_play_off(self, time=-1):
-        libcvht.sequence_trigger_play_off(self._seq_handle, time)
+    def trigger_play_off(self):
+        libcvht.sequence_trigger_play_off(self._seq_handle)
 
     def __str__(self):
         ret = ""

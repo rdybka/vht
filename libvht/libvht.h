@@ -78,6 +78,7 @@ extern void queue_midi_note_on(midi_client *clt, sequence *seq, int port, int ch
 extern void queue_midi_note_off(midi_client *clt, sequence *seq, int port, int chn, int note);
 extern void queue_midi_ctrl(midi_client *clt, sequence *seq, track *trk, int val, int ctrl);
 
+
 extern void set_default_midi_port(module *mod, int port);
 extern timeline *module_get_timeline(module *mod);
 
@@ -104,14 +105,13 @@ extern int sequence_get_trg_quantise(sequence *seq);
 
 extern void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt);
 extern char *sequence_get_trig(sequence *seq, int t);
-
+extern void sequence_trigger_mute(sequence *seq);
+extern void sequence_trigger_cue(sequence *seq);
+extern void sequence_trigger_play_on(sequence *seq);
+extern void sequence_trigger_play_off(sequence *seq);
 extern int sequence_get_playing(sequence *seq);
 extern void sequence_set_playing(sequence *seq, int p);
 
-extern void sequence_trigger_mute(sequence *seq);
-extern void sequence_trigger_cue(sequence *seq);
-extern void sequence_trigger_play_on(sequence *seq, double time);
-extern void sequence_trigger_play_off(sequence *seq, double time);
 extern int sequence_get_cue(sequence *seq);
 extern sequence *sequence_clone(sequence *seq);
 

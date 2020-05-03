@@ -66,6 +66,7 @@ class VHTModule(Iterable):
         return r.__str__()
 
     def new(self):
+        self.play = 0
         for s in range(len(self)):
             self.del_sequence(0)
 
@@ -81,7 +82,7 @@ class VHTModule(Iterable):
     def __iter__(self):
         for itm in range(self.__len__()):
             yield VHTSequence(
-                libcvht.module_get_seq(self._mod_handle, itm), self.cb_new_track,
+                libcvht.module_get_seq(self._mod_handle, itm), self.cb_new_track
             )
 
     def __getitem__(self, itm):
@@ -280,7 +281,7 @@ class VHTModule(Iterable):
             s["trg_playmode"] = seq.trg_playmode
             s["trg_quantise"] = seq.trg_quantise
             s["trig"] = [seq.get_trig(0), seq.get_trig(1), seq.get_trig(2)]
-
+            s["playing"] = seq.playing
             s["trk"] = []
 
             for trk in seq:
@@ -362,6 +363,7 @@ class VHTModule(Iterable):
 
             p = self.play
             self.play = 0
+
             self.new()
             self.reset()
 
@@ -372,6 +374,9 @@ class VHTModule(Iterable):
             for seq in jm["seq"]:
                 s = self.add_sequence()
                 s.length = seq["length"]
+
+                if "playing" in seq:
+                    s.playing = seq["playing"]
 
                 if "trg_playmode" in seq:
                     s.trg_playmode = seq["trg_playmode"]

@@ -1052,7 +1052,7 @@ class ControllerEditor:
                 self.active_row = r
                 self.last_selected = r
 
-                if self.trk.ctrl[self.ctrlnum][int(r)].velocity is -1:
+                if self.trk.ctrl[self.ctrlnum][int(r)].velocity == -1:
                     self.selecting = True
                 else:
                     self.moving = True

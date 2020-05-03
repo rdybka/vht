@@ -2,7 +2,7 @@
 
 # - clears the tree so we can do "git add ." (I know, I know)
 # - regenerates the wrapper for libvht
-# - don't run without swig installed
+# - don't run without swig3 installed
 # - also uses black and astyle
 
 rm -f *.so *.o libvht/libmod.py libvht/*.so
@@ -22,4 +22,5 @@ cd libvht
 ./beautify.sh
 cd ..
 black vht/*.py libvht/*.py
-swig -python libvht/libvht.h
+swig3.0 -python libvht/libvht.h
+

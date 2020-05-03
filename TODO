@@ -1,32 +1,29 @@
 - seqlist
-    - trigging
-    - animate
-    - playmode/triggers
     - upscale/downscale
+	- rpb
 - timeline
+    - on left
 - loop
     -reset
 - tracks:
-	- let ring?
+    - kill notes when muting
 - standarise midin for media buttons
 - panic
 - console
-	- click in statusbar
+    - click in statusbar
     - documentation
     - updates from puthin
     - autofill
-? first row not playing
 - silence
     - when quitting
 - autoscroll and moving
-? ctrl antialias
 - ports
 - autoscroll and console open/close (magic row 27)
 - magic transposing
 - export:
 	- midi
 	- audio
-		- freewheeling
+	    - freewheeling
 - configuration
 ? new window
 ? new

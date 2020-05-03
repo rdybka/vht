@@ -78,15 +78,6 @@ void module_set_rpb(module *mod, int v) {
 	module_excl_out(mod);
 }
 
-void module_reset(module *mod) {
-	mod->zero_time = 0;
-	for (int s = 0; s < mod->nseq; s++) {
-		mod->seq[0]->pos = 0;
-		for (int t = 0; t < mod->seq[0]->ntrk; t++)
-			track_reset(mod->seq[0]->trk[t]);
-	}
-}
-
 int module_get_nseq(module *mod) {
 	return mod->nseq;
 }

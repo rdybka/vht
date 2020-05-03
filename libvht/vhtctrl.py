@@ -38,7 +38,7 @@ class VHTCtrl(Iterable):
     def __iter__(self):
         for i in range(self.__len__()):
             yield VHTCtrlRow(
-                libcvht.track_get_ctrlrow_ptr(self._trk_handle, self._ctrl, i),
+                libcvht.track_get_ctrlrow_ptr(self._trk_handle, self._ctrl, i)
             )
 
     def __setitem__(self, itm, val):
@@ -55,7 +55,7 @@ class VHTCtrl(Iterable):
             raise IndexError(itm)
 
         return VHTCtrlRow(
-            libcvht.track_get_ctrlrow_ptr(self._trk_handle, self._ctrl, itm),
+            libcvht.track_get_ctrlrow_ptr(self._trk_handle, self._ctrl, itm)
         )
 
     def refresh(self):

@@ -58,6 +58,7 @@ module *module_new(void);
 void module_free(module *mod);
 void module_advance(module *mod, jack_nframes_t curr_frames);
 void module_mute(module *mod);
+void module_reset(module *mod);
 void module_dump_notes(module *mod, int n);
 
 void module_excl_in(module *mod);

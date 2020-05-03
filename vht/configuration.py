@@ -39,10 +39,12 @@ class Configuration:
 
         self.console_scale = 1
         self.timeline_position = 0.75
+        self.timeline_position_y = 100
         self.console_position = 0.7
         self.console_show = False
         self.timeline_show = True
         self.console_steal_stderr = True
+        self.start_playing = True
 
         c = (0.2, 0.7, 1.0)
         self.colour = c
@@ -89,10 +91,10 @@ class Configuration:
         self.select_button = 1
         self.delete_button = 3
 
-        self.default_ctrl_name = "sxd"
+        self.default_ctrl_name = "zyn"
 
         self.dark_theme = True
-        self.notebook_mouseover = False
+        self.notebook_mouseover = True
 
         self.quick_controls_desc = "vol/pan:"
         self.quick_control_1_ctrl = 7
@@ -100,7 +102,7 @@ class Configuration:
         self.quick_control_2_ctrl = 10
         self.quick_control_2_def = 64
 
-        self.new_tracks_left = True
+        self.new_tracks_left = False
         self.new_seqs_with_tracks = True
         self.default_seq_length = 16
 
@@ -222,9 +224,7 @@ key_aliases = {
     "backslash": "\\",
 }
 
-ignore_modifiers = {
-    "Control_L",
-}
+ignore_modifiers = {"Control_L"}
 
 
 class cfgkey:

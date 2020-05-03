@@ -5484,58 +5484,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_sequence_get_playing(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  sequence *arg1 = (sequence *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  int result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:sequence_get_playing",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_get_playing" "', argument " "1"" of type '" "sequence *""'"); 
-  }
-  arg1 = (sequence *)(argp1);
-  result = (int)sequence_get_playing(arg1);
-  resultobj = SWIG_From_int((int)(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_sequence_set_playing(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  sequence *arg1 = (sequence *) 0 ;
-  int arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:sequence_set_playing",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_set_playing" "', argument " "1"" of type '" "sequence *""'"); 
-  }
-  arg1 = (sequence *)(argp1);
-  ecode2 = SWIG_AsVal_int(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_set_playing" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = (int)(val2);
-  sequence_set_playing(arg1,arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_sequence_trigger_mute(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   sequence *arg1 = (sequence *) 0 ;
@@ -5581,26 +5529,17 @@ fail:
 SWIGINTERN PyObject *_wrap_sequence_trigger_play_on(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   sequence *arg1 = (sequence *) 0 ;
-  double arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  double val2 ;
-  int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:sequence_trigger_play_on",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:sequence_trigger_play_on",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_trigger_play_on" "', argument " "1"" of type '" "sequence *""'"); 
   }
   arg1 = (sequence *)(argp1);
-  ecode2 = SWIG_AsVal_double(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_trigger_play_on" "', argument " "2"" of type '" "double""'");
-  } 
-  arg2 = (double)(val2);
-  sequence_trigger_play_on(arg1,arg2);
+  sequence_trigger_play_on(arg1);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -5611,26 +5550,69 @@ fail:
 SWIGINTERN PyObject *_wrap_sequence_trigger_play_off(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   sequence *arg1 = (sequence *) 0 ;
-  double arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  double val2 ;
-  int ecode2 = 0 ;
   PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:sequence_trigger_play_off",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:sequence_trigger_play_off",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_trigger_play_off" "', argument " "1"" of type '" "sequence *""'"); 
   }
   arg1 = (sequence *)(argp1);
-  ecode2 = SWIG_AsVal_double(obj1, &val2);
+  sequence_trigger_play_off(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_get_playing(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:sequence_get_playing",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_get_playing" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  result = (int)sequence_get_playing(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_set_playing(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:sequence_set_playing",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_set_playing" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_trigger_play_off" "', argument " "2"" of type '" "double""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_set_playing" "', argument " "2"" of type '" "int""'");
   } 
-  arg2 = (double)(val2);
-  sequence_trigger_play_off(arg1,arg2);
+  arg2 = (int)(val2);
+  sequence_set_playing(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -8003,12 +7985,12 @@ static PyMethodDef SwigMethods[] = {
 	 { "sequence_get_trg_quantise", _wrap_sequence_get_trg_quantise, METH_VARARGS, NULL},
 	 { "sequence_set_trig", _wrap_sequence_set_trig, METH_VARARGS, NULL},
 	 { "sequence_get_trig", _wrap_sequence_get_trig, METH_VARARGS, NULL},
-	 { "sequence_get_playing", _wrap_sequence_get_playing, METH_VARARGS, NULL},
-	 { "sequence_set_playing", _wrap_sequence_set_playing, METH_VARARGS, NULL},
 	 { "sequence_trigger_mute", _wrap_sequence_trigger_mute, METH_VARARGS, NULL},
 	 { "sequence_trigger_cue", _wrap_sequence_trigger_cue, METH_VARARGS, NULL},
 	 { "sequence_trigger_play_on", _wrap_sequence_trigger_play_on, METH_VARARGS, NULL},
 	 { "sequence_trigger_play_off", _wrap_sequence_trigger_play_off, METH_VARARGS, NULL},
+	 { "sequence_get_playing", _wrap_sequence_get_playing, METH_VARARGS, NULL},
+	 { "sequence_set_playing", _wrap_sequence_set_playing, METH_VARARGS, NULL},
 	 { "sequence_get_cue", _wrap_sequence_get_cue, METH_VARARGS, NULL},
 	 { "sequence_clone", _wrap_sequence_clone, METH_VARARGS, NULL},
 	 { "track_get_row_ptr", _wrap_track_get_row_ptr, METH_VARARGS, NULL},

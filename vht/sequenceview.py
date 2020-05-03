@@ -219,6 +219,21 @@ class SequenceView(Gtk.Box):
             mod.mainwin.app.on_load(None, None)
             return True
 
+        # triggers from keypad
+        if 65465 >= event.keyval >= 65456:
+            sid = event.keyval - 65456
+            if sid < len(mod):
+                ms = mod.extras[sid][-1]["mouse_cfg"]
+
+                if ms[0] == 3:
+                    mod[sid].trigger_mute()
+
+                if ms[1] == 3:
+                    mod[sid].trigger_cue()
+
+                if ms[2] == 3:
+                    mod[sid].trigger_play_on()
+
         if cfg.key["fullscreen"].matches(event):
             if mod.mainwin.fs:
                 mod.mainwin.unfullscreen()
@@ -547,6 +562,15 @@ class SequenceView(Gtk.Box):
         return False
 
     def on_key_release(self, widget, event):
+        # triggers from keypad
+        if 65465 >= event.keyval >= 65456:
+            sid = event.keyval - 65456
+            if sid < len(mod):
+                ms = mod.extras[sid][-1]["mouse_cfg"]
+
+                if ms[2] == 3:
+                    mod[sid].trigger_play_off()
+
         if mod.active_track:
             return mod.active_track.on_key_release(widget, event)
 

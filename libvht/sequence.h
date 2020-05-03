@@ -77,8 +77,8 @@ void sequence_set_playing(sequence *seq, int p);
 
 void sequence_trigger_mute(sequence *seq);
 void sequence_trigger_cue(sequence *seq);
-void sequence_trigger_play_on(sequence *seq, double time);
-void sequence_trigger_play_off(sequence *seq, double time);
+void sequence_trigger_play_on(sequence *seq);
+void sequence_trigger_play_off(sequence *seq);
 
 void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt);
 char *sequence_get_trig(sequence *seq, int t);

@@ -92,8 +92,7 @@ class VHTApp(Gtk.Application):
         self.add_window(self.main_win)
 
         self.main_win.show_all()
-
-        mod.play = True
+        mod.play = cfg.start_playing
 
     def on_quit(self, action, param):
         self.quit()

@@ -385,7 +385,7 @@ class TrackView(Gtk.DrawingArea):
             matrix.translate(0, 0)
             # because rowheight is float
             matrix.scale(
-                1.0, math.ceil(self.txt_height * empl) / (self.txt_height * empl),
+                1.0, math.ceil(self.txt_height * empl) / (self.txt_height * empl)
             )
             self.empty_pattern.set_matrix(matrix)
 
@@ -1613,7 +1613,7 @@ class TrackView(Gtk.DrawingArea):
 
         # skipping track
         curr = None
-        for i, trk, in enumerate(self.seq):
+        for i, trk in enumerate(self.seq):
             if trk.index == self.trk.index:
                 curr = i
 

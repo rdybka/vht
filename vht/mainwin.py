@@ -166,7 +166,7 @@ class MainWin(Gtk.ApplicationWindow):
 
         self.timeline_box.pack1(seqpane, False, False)
         self.timeline_box.pack2(Gtk.Label("timeliner"), True, True)
-        self.timeline_box.set_position(230)
+        self.timeline_box.set_position(cfg.timeline_position_y)
 
         self.vbox.pack_start(self.hbox, True, True, 0)
         self._status_bar = StatusBar()

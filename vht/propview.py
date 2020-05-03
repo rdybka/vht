@@ -91,7 +91,7 @@ class PropView(Gtk.ScrolledWindow):
         self.seq.swap_track(trk.index, trk.index + offs)
 
     def move_left(self, trk):
-        if trk.index is 0:
+        if trk.index == 0:
             return
 
         self.move_track(trk, -1)
