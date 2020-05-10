@@ -61,7 +61,7 @@ typedef struct midi_client_t {
 	midi_event midi_ignore_buffer[MIDI_EVT_BUFFER_LENGTH];
 } midi_client;
 
-midi_client *midi_client_new();
+midi_client *midi_client_new(void *mod);
 void midi_client_free(midi_client *clt);
 int midi_start(midi_client *clt, char *clt_name);
 void midi_stop(midi_client *clt);
