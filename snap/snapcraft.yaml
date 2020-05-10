@@ -14,6 +14,6 @@
   parts:
     vht:
       plugin: python
-      build-environment:
-      - build-packages: [libjack-jackd2-dev]
+      build-packages:
+      - libjack-jackd2-dev
   
