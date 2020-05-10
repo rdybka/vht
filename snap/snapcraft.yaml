@@ -23,6 +23,7 @@ parts:
     - libjack-dev
     - libgtk-3-0
     - libvte-2.91-0
+    - libgirepository-1.0-1
     - python3-gi
     - python3-gi-cairo
 
