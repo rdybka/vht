@@ -21,6 +21,8 @@ parts:
     plugin: python
     stage-packages:
     - libjack-dev
+    - libgtk-3-0
+    - libvte
     - python3-gi
     - python3-gi-cairo
 
