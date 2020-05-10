@@ -6,7 +6,7 @@ description: |
   Valhalla Tracker is a MIDI sequencing companion for your GNU/Linux audio setup
 
 grade: devel
-confinement: strict # use 'strict' once you have the right plugs and slots
+confinement: devmode # use 'strict' once you have the right plugs and slots
 
 apps:
   valhalla-tracker:
