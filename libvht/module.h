@@ -35,6 +35,7 @@ typedef struct module_t {
 	int recording;
 
 	jack_nframes_t zero_time;
+
 	double song_pos;
 	int min, sec, ms;
 

@@ -263,7 +263,7 @@ class VHTModule(Iterable):
             libcvht.midi_ignore_buffer_add(self._clt_handle, ig[0], ig[1], ig[2])
 
     def set_default_midi_port(self, port):
-        libcvht.set_default_midi_port(self._clt_handle, port)
+        libcvht.set_default_midi_port(self._mod_handle, port)
 
     def panic(self):
         print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFUUUUUUUUUUUUUUUUUUUUUUUU!!!!!!!")

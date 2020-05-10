@@ -1,3 +1,9 @@
+* note in in ctrl
+* recording in stopped seq
+* media butts
+? ctrl in edit mode
+* don't update time when stopped
+* midi out doubles
 - seqlist
     - upscale/downscale
 	- rpb
@@ -5,9 +11,10 @@
     - on left
 - loop
     -reset
+- ports
+- standarise midin for media buttons
 - tracks:
     - kill notes when muting
-- standarise midin for media buttons
 - panic
 - console
     - click in statusbar
@@ -17,7 +24,6 @@
 - silence
     - when quitting
 - autoscroll and moving
-- ports
 - autoscroll and console open/close (magic row 27)
 - magic transposing
 - export:

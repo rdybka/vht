@@ -517,6 +517,8 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 		evt.type = r.type;
 		evt.note = r.note;
 		evt.velocity = r.velocity;
+
+		//printf("note: %d %d \n", evt.note, evt.time);
 		midi_buffer_add(trk->clt, trk->port, evt);
 
 		// fix wandering notes
@@ -555,7 +557,7 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 	}
 }
 
-void track_advance(track *trk, double speriod) {
+void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 	if (trk->resync) {
 		return;
 	}
@@ -564,11 +566,13 @@ void track_advance(track *trk, double speriod) {
 
 	// length of period in track time
 	double tperiod = ((double)trk->nrows / (double)trk->nsrows) * speriod;
-	double tmul = (double) clt->jack_buffer_size / tperiod;
+	double tmul = (double) nframes / tperiod;
 
 	int row_start = floorf(trk->pos);
-	int row_end = floorf(trk->pos + tperiod) + 1;
+	if (row_start == trk->nrows)
+		row_start = 0;
 
+	int row_end = floorf(trk->pos + tperiod) + 1;
 	if (row_end > trk->nrows)
 		row_end = trk->nrows;
 
@@ -650,12 +654,12 @@ void track_advance(track *trk, double speriod) {
 				row r;
 				track_get_row(trk, c, nn, &r);
 
-				double trigger_time = (double)n + ((double)r.delay / 49.0);
+				double trigger_time = (double)n + ((double)r.delay / 100);  //49.0
 				double delay = trigger_time - trk->pos;
+
 				if ((delay >= 0) && (delay < tperiod)) {
 					if (trk->playing) {
-						track_play_row(trk, nn, c, delay * tmul);
-						//printf("note: %f %f %f %d %d\n", trigger_time, trk->pos, delay, row_start, row_end);
+						track_play_row(trk, nn, c, (clt->jack_buffer_size - nframes) + delay * tmul);
 					}
 				}
 			}
@@ -1104,7 +1108,7 @@ void track_handle_record(track *trk, midi_event evt) {
 		rem = -(1.0 - rem);
 	}
 
-	int t = floorf(50.0 * rem);
+	int t = floorf(100.0 * rem);
 
 	if (p > trk->nrows - 1)
 		p = p - trk->nrows;

@@ -1822,7 +1822,12 @@ class TrackView(Gtk.DrawingArea):
         m_channel = midin["channel"]
 
         if m_type == 1:  # or m_type == 2:
-            if self.edit and m_note and mod.record == 0:
+            if (
+                self.edit
+                and self.edit[0] < len(self.trk)
+                and m_note
+                and mod.record == 0
+            ):
                 self.undo_buff.add_state()
                 old = self.edit[1]
                 self.trk[self.edit[0]][self.edit[1]].type = m_type

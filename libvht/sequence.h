@@ -64,7 +64,7 @@ void sequence_swap_track(sequence *seq, int t1, int t2);
 void sequence_double(sequence *seq);
 void sequence_halve(sequence *seq);
 void sequence_free(sequence *);
-void sequence_advance(sequence *seq, double period);
+void sequence_advance(sequence *seq, double period, jack_nframes_t nframes);
 sequence *sequence_clone(sequence *seq);
 
 void sequence_set_trg_quantise(sequence *seq, int v);

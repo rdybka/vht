@@ -151,7 +151,7 @@ void sequence_free(sequence *seq) {
 	free(seq);
 }
 
-void sequence_advance(sequence *seq, double period) {
+void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 	if ((seq->trg_quantise == 0) && (seq->trg_times[2] == -2)) {
 		seq->trg_times[2] = -1;
 		if (seq->playing && seq->trg_times[3] != -2) {
@@ -174,8 +174,13 @@ void sequence_advance(sequence *seq, double period) {
 
 	double p = ceil(seq->pos) - seq->pos;
 	if (period > p) {
+		jack_nframes_t frm = nframes;
+		frm *= p / period;
+
 		period -= p;
-		sequence_advance(seq, p);
+		nframes -= frm;
+
+		sequence_advance(seq, p, frm);
 	}
 
 	if (seq->pos == floor(seq->pos)) {
@@ -269,7 +274,7 @@ void sequence_advance(sequence *seq, double period) {
 			seq->trk[t]->resync = 0;
 			seq->trk[t]->pos = 0;
 			track_wind(seq->trk[t], seq->pos);
-			track_advance(seq->trk[t], period);
+			track_advance(seq->trk[t], period, nframes);
 		}
 	}
 
@@ -281,12 +286,12 @@ void sequence_advance(sequence *seq, double period) {
 				seq->trk[t]->resync = 0;
 				seq->trk[t]->pos = 0;
 				track_wind(seq->trk[t], seq->pos);
-				track_advance(seq->trk[t], period);
+				track_advance(seq->trk[t], period, nframes);
 			}
 		}
 
 		for (int t = 0; t < seq->ntrk; t++) {
-			track_advance(seq->trk[t], period);
+			track_advance(seq->trk[t], period, nframes);
 
 			// if track past end, stop playing
 			if (seq->trk[t]->pos > seq->trk[t]->nrows)
@@ -388,6 +393,9 @@ void sequence_set_playing(sequence *seq, int p) {
 }
 
 void sequence_handle_record(module *mod, sequence *seq, midi_event evt) {
+	if (!seq->playing)
+		return;
+
 	if (mod->recording == 1)
 		if (seq->midi_focus >= 0 && seq->midi_focus < seq->ntrk) {
 			track_handle_record(seq->trk[seq->midi_focus], evt);

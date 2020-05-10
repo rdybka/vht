@@ -80,7 +80,6 @@ typedef struct track_t {
 
 	int loop;  // extend in timeline
 
-	unsigned char trigger_type;
 	pthread_mutex_t excl; // for atomic row access
 	pthread_mutex_t exclrec; // for row changes
 	pthread_mutex_t exclctrl; // for ctrls
@@ -124,7 +123,7 @@ void track_clear_rec_updates(track *trk);
 void track_handle_record(track *trk, midi_event evt);
 
 void track_reset(track *trk);
-void track_advance(track *trk, double speriod);
+void track_advance(track *trk, double speriod, jack_nframes_t nframes);
 void track_wind(track *trk, double speriod);
 void track_kill_notes(track *trk);
 

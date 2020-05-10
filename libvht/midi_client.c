@@ -163,7 +163,21 @@ void midi_buffer_add(midi_client *clt, int port, midi_event evt) {
 }
 
 int midi_buffer_compare(const void *a, const void *b) {
-	return ((midi_event *)a)->time - ((midi_event *)b)->time;
+	int res = ((midi_event *)a)->time - ((midi_event *)b)->time;
+
+	if (res == 0)
+		res = ((midi_event *)a)->channel - ((midi_event *)b)->channel;
+
+	if (res == 0)
+		res = ((midi_event *)b)->type - ((midi_event *)a)->type;
+
+	if (res == 0)
+		res = ((midi_event *)a)->note - ((midi_event *)b)->note;
+
+	if (res == 0)
+		res = ((midi_event *)b)->velocity - ((midi_event *)a)->velocity;
+
+	return res;
 }
 
 void midi_buffer_flush_port(midi_client *clt, int port) {
@@ -183,8 +197,11 @@ void midi_buffer_flush_port(midi_client *clt, int port) {
 
 	qsort(clt->midi_buffer[port], clt->curr_midi_event[port], sizeof(midi_event), midi_buffer_compare);
 
+	midi_event *last = 0;
+
 	for (int i = 0; i < clt->curr_midi_event[port]; i++) {
 		unsigned char buff[3];
+		int dbl = 0;
 		if (midi_encode_event(clt->midi_buffer[port][i], buff)) {
 			int l = 3;
 
@@ -192,12 +209,29 @@ void midi_buffer_flush_port(midi_client *clt, int port) {
 				l = 2;
 			}
 
-			jack_midi_event_write(outp, clt->midi_buffer[port][i].time, buff, l);
+			if (last) {
+				midi_event *curr = &clt->midi_buffer[port][i];
+
+				if ((last->time == curr->time) &&
+				        (last->channel == curr->channel) &&
+				        (last->type == curr->type) &&
+				        (last->note == curr->note)) {
+					dbl = 1;
+				}
+
+				if (!dbl)
+					jack_midi_event_write(outp, clt->midi_buffer[port][i].time, buff, l);
+
+				last = &clt->midi_buffer[port][i];
+			} else {
+				jack_midi_event_write(outp, clt->midi_buffer[port][i].time, buff, l);
+				last = &clt->midi_buffer[port][i];
+			}
 		}
 
 		module *mod = (module *) clt->mod_ref;
 
-		if (clt->dump_notes) {
+		if (clt->dump_notes && !dbl) {
 			char desc[256];
 			midi_describe_event(clt->midi_buffer[port][i], desc, 256);
 			printf("%02d:%02d:%03d pt: %02d, %s\n", mod->min, mod->sec, mod->ms, port, desc);
