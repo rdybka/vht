@@ -9,7 +9,7 @@ grade: devel
 confinement: strict # use 'strict' once you have the right plugs and slots
 
 apps:
-  valhalla-tracker-desktop:
+  valhalla-tracker:
     command: vht
 
 parts:
@@ -18,5 +18,7 @@ parts:
     plugin: python
     stage-packages:
     - libjack-jackd2-dev
+    - python3-gi
+    - python3-gi-cairo
 
 
