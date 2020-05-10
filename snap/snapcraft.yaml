@@ -22,7 +22,7 @@ parts:
     stage-packages:
     - libjack-dev
     - libgtk-3-0
-    - libvte
+    - libvte-2.91-0
     - python3-gi
     - python3-gi-cairo
 
