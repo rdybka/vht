@@ -17,8 +17,12 @@ parts:
     source: .
     plugin: python
     stage-packages:
-    - libjack-jackd2-dev
+    - libjack-dev
     - python3-gi
     - python3-gi-cairo
+
+    plugs:
+    - home
+    - jack1
 
 
