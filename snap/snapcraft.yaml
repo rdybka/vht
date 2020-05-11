@@ -1,6 +1,6 @@
 name: valhalla-tracker
 base: core18
-version: '0.1.8'
+version: git
 summary: A live midi sequencer for JACK
 description: |
   Valhalla Tracker is a MIDI sequencing companion for your GNU/Linux audio setup
@@ -23,7 +23,7 @@ parts:
     source: .
     plugin: python
     stage-packages:
-    - libjack-dev
+    - libjack-jackd2-dev
     - gir1.2-gtk-3.0
     - gir1.2-vte-2.91
     - python3-gi
