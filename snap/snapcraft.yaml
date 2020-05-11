@@ -8,9 +8,6 @@ description: |
 grade: devel
 confinement: strict
 
-architectures:
-  - build-on: amd64
-
 apps:
   valhalla-tracker:
     command: desktop-launch vht
