@@ -6,7 +6,7 @@ description: |
   Valhalla Tracker is a MIDI sequencing companion for your GNU/Linux audio setup
 
 grade: devel
-confinement: devmode
+confinement: strict
 
 apps:
   valhalla-tracker:
@@ -14,13 +14,14 @@ apps:
     extensions: [gnome-3-28]
     plugs:
     - home
+    - jack1
 
 parts:
   libvht:
     source: .
     plugin: python
     stage-packages:
-    - libjack-jackd2-dev
+    - libjack-dev
     - gir1.2-gtk-3.0
     - gir1.2-vte-2.91
     - python3-gi
