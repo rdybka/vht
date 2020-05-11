@@ -30,7 +30,7 @@ setup(name = "vht",
         ]},
 	
 	data_files = [
-		('share/vht', ['data/vht.svg', 'data/menu.ui', 'data/ctrl/10-gm', 'data/ctrl/20-zyn', 'data/bank/10-gm1', 'data/bank/20-gm2']),
+		('share/vht', ['data/vht.svg', 'data/vht.png', 'data/menu.ui', 'data/ctrl/10-gm', 'data/ctrl/20-zyn', 'data/bank/10-gm1', 'data/bank/20-gm2']),
 		('share/icons', ['data/vht.svg']),
 		('share/applications', ['data/com.github.rdybka.vht.desktop'])
 	],
