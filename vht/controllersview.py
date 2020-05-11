@@ -73,11 +73,7 @@ class ControllersView(Gtk.Box):
 
         self.new_ctrl_entry = Gtk.Entry()
 
-        self.new_ctrl_entry.set_text(
-            ""
-            if 1 not in mod.ctrls[cfg.default_ctrl_name]
-            else mod.ctrls[cfg.default_ctrl_name][1]
-        )
+        self.new_ctrl_entry.set_text()
 
         self.new_ctrl.pack_end(self.new_ctrl_entry)
 
