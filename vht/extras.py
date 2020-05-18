@@ -44,7 +44,6 @@ def fix_extras_new_seq(s):
     mod.extras[s] = {}
     mod.extras[s][-1] = {}
 
-    mod.extras[s][-1]["highlight"] = cfg.highlight
     mod.extras[s][-1]["mouse_cfg"] = [3, 2, 0]
     mod.extras[s][-1]["sequence_name"] = ""
 

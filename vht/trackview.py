@@ -602,7 +602,7 @@ class TrackView(Gtk.DrawingArea):
                         *(col * cfg.intensity_txt_highlight * 1.2 for col in cfg.colour)
                     )
                 else:
-                    if cfg.highlight > 1 and (r) % self.parent.highlight == 0:
+                    if r % self.seq.rpb == 0:
                         cr.set_source_rgb(
                             *(col * cfg.intensity_txt_highlight for col in cfg.colour)
                         )
@@ -741,7 +741,7 @@ class TrackView(Gtk.DrawingArea):
                         *(col * cfg.intensity_txt_highlight * 1.2 for col in cfg.colour)
                     )
                 else:
-                    if cfg.highlight > 1 and (r) % cfg.highlight == 0:
+                    if r % self.seq.rpb == 0:
                         cr.set_source_rgb(
                             *(col * cfg.intensity_txt_highlight for col in cfg.colour)
                         )

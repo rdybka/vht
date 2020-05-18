@@ -32,6 +32,8 @@ class TrackviewPointer:
         if not trk:
             self.trk = seq
 
+        self.seq = seq
+
         self.spacing = 1.0
         self.opacity = cfg.pointer_opacity
         self._parent = parent
@@ -39,13 +41,13 @@ class TrackviewPointer:
 
         self.lpos = None
 
-        self.pulse = Pulsar(mod.rpb)
+        self.pulse = Pulsar(seq.rpb)
 
         self.stopped = False
         self.gradient = None
 
     def draw(self, pos):
-        self.pulse.freq = mod.rpb
+        self.pulse.freq = mod[mod.curr_seq].rpb
 
         if isinstance(self.trk, VHTTrack):
             if mod[mod.curr_seq].playing == 0:
@@ -82,7 +84,7 @@ class TrackviewPointer:
         # sideview
         if isinstance(self.trk, VHTSequence):
             i = 0.5
-            if cfg.highlight > 1 and (r) % cfg.highlight == 0:
+            if r % self.seq.rpb == 0:
                 i *= 2
 
             x = 0
@@ -117,7 +119,7 @@ class TrackviewPointer:
         if self._parent.show_notes:
             for c in range(len(self.trk)):
                 i = 0.5
-                if cfg.highlight > 1 and (r) % cfg.highlight == 0:
+                if r % self.seq.rpb == 0:
                     i *= 1.0
 
                 rw = self.trk[c][r]

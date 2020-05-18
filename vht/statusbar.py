@@ -58,7 +58,7 @@ class StatusBar(Gtk.DrawingArea):
         self.tt_rect = Gdk.Rectangle()
         self.tt_txt = None
 
-        self.pulse = Pulsar(mod.rpb)
+        self.pulse = Pulsar(mod[mod.curr_seq].rpb)
 
     def redraw(self):
         cr = self._context
@@ -178,11 +178,7 @@ class StatusBar(Gtk.DrawingArea):
         else:
             cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
-        txt = " hig:%d" % mod.mainwin._sequence_view.highlight
-
-        if mod.mainwin._sequence_view.highlight == 1:
-            txt = " hig:0"
-
+        txt = " bpm:%6.2f" % mod.bpm
         *_, dx, _ = cr.text_extents(txt)
         cr.move_to(self.pos[-1], h)
         cr.show_text(txt)
@@ -196,7 +192,7 @@ class StatusBar(Gtk.DrawingArea):
         else:
             cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
-        txt = " bpm:%6.2f" % mod.bpm
+        txt = " rpb:%d" % mod[cs].rpb
         *_, dx, _ = cr.text_extents(txt)
         cr.move_to(self.pos[-1], h)
         cr.show_text(txt)
@@ -204,20 +200,6 @@ class StatusBar(Gtk.DrawingArea):
         self.pos.append(xx)
 
         if self.active_field == 6:
-            cr.set_source_rgb(
-                *(col * cfg.intensity_txt_highlight for col in cfg.star_colour)
-            )
-        else:
-            cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
-
-        txt = " rpb:%d" % mod.rpb
-        *_, dx, _ = cr.text_extents(txt)
-        cr.move_to(self.pos[-1], h)
-        cr.show_text(txt)
-        xx += dx
-        self.pos.append(xx)
-
-        if self.active_field == 7:
             cr.set_source_rgb(
                 *(col * cfg.intensity_txt_highlight for col in cfg.star_colour)
             )
@@ -263,7 +245,7 @@ class StatusBar(Gtk.DrawingArea):
         self.queue_draw()
 
     def tick(self, wdg, param):
-        self.pulse.freq = mod.rpb
+        self.pulse.freq = mod[mod.curr_seq].rpb
         self.redraw()
         return 1
 
@@ -349,13 +331,7 @@ class StatusBar(Gtk.DrawingArea):
                     cfg.key["skip_down"],
                 )
 
-            if self.active_field == 4:  # highlight
-                self.tt_txt = "<big>↑</big> %s\n<big>↓</big> %s" % (
-                    cfg.key["highlight_up"],
-                    cfg.key["highlight_down"],
-                )
-
-            if self.active_field == 5:  # bpm
+            if self.active_field == 4:  # bpm
                 self.tt_txt = (
                     "<big> ⇑</big> %s\n<big> ↑</big> %s\n<big>.↑</big> %s\n<big>.↓</big> %s\n<big> ↓</big> %s\n<big> ⇓</big> %s"
                     % (
@@ -368,13 +344,13 @@ class StatusBar(Gtk.DrawingArea):
                     )
                 )
 
-            if self.active_field == 6:  # rpb
+            if self.active_field == 5:  # rpb
                 self.tt_txt = "<big>↑</big> %s\n<big>↓</big> %s" % (
                     cfg.key["rpb_up"],
                     cfg.key["rpb_down"],
                 )
 
-            if self.active_field == 7:  # prt
+            if self.active_field == 6:  # prt
                 self.tt_txt = "<big>↑</big> %s\n<big>↓</big> %s" % (
                     cfg.key["def_port_up"],
                     cfg.key["def_port_down"],
@@ -408,16 +384,6 @@ class StatusBar(Gtk.DrawingArea):
                 cfg.skip = max(cfg.skip - 1, -16)
 
         if self.active_field == 4:
-            aseq = mod.mainwin._sequence_view
-            if up:
-                aseq.highlight = min(aseq.highlight + 1, 32)
-            if down:
-                aseq.highlight = max(aseq.highlight - 1, 1)
-
-            mod.mainwin._sequence_view.redraw_track()
-            mod.extras[aseq.seq.index][-1]["highlight"] = aseq.highlight
-
-        if self.active_field == 5:
             if up:
                 mod.bpm = mod.bpm + 1
                 mod.mainwin.adj.set_value(mod.bpm)
@@ -425,13 +391,21 @@ class StatusBar(Gtk.DrawingArea):
                 mod.bpm = mod.bpm - 1
                 mod.mainwin.adj.set_value(mod.bpm)
 
-        if self.active_field == 6:
+        if self.active_field == 5:
             if up:
-                mod.rpb += 1
+                org = mod[mod.curr_seq].rpb
+                mod[mod.curr_seq].rpb += 1
+                if org != mod[mod.curr_seq].rpb:
+                    mod.mainwin._sequence_view.highlight = mod[mod.curr_seq].rpb
+                    mod.mainwin._sequence_view.redraw_track()
             if down:
-                mod.rpb -= 1
+                org = mod[mod.curr_seq].rpb
+                mod[mod.curr_seq].rpb -= 1
+                if org != mod[mod.curr_seq].rpb:
+                    mod.mainwin._sequence_view.highlight = mod[mod.curr_seq].rpb
+                    mod.mainwin._sequence_view.redraw_track()
 
-        if self.active_field == 7:
+        if self.active_field == 6:
             if up:
                 cfg.default_midi_out_port = min(
                     max(cfg.default_midi_out_port + 1, 0), mod.max_ports - 1
@@ -452,13 +426,16 @@ class StatusBar(Gtk.DrawingArea):
         pass
 
     def on_button_release(self, widget, event):
-        up = down = False
+        up = down = middle = False
 
         if event.button == 1:
             down = True
 
         if event.button == 3:
             up = True
+
+        if event.button == 2:
+            middle = True
 
         if self.active_field == 1:
             if up:
@@ -479,16 +456,6 @@ class StatusBar(Gtk.DrawingArea):
                 cfg.skip = max(cfg.skip - 1, -16)
 
         if self.active_field == 4:
-            aseq = mod.mainwin._sequence_view
-            if up:
-                aseq.highlight = min(aseq.highlight + 1, 32)
-            if down:
-                aseq.highlight = max(aseq.highlight - 1, 1)
-
-            mod.mainwin._sequence_view.redraw_track()
-            mod.extras[aseq.seq.index][-1]["highlight"] = aseq.highlight
-
-        if self.active_field == 5:
             if up:
                 mod.bpm = mod.bpm + 1
                 mod.mainwin.adj.set_value(mod.bpm)
@@ -496,13 +463,24 @@ class StatusBar(Gtk.DrawingArea):
                 mod.bpm = mod.bpm - 1
                 mod.mainwin.adj.set_value(mod.bpm)
 
-        if self.active_field == 6:
+        if self.active_field == 5:
             if up:
-                mod.rpb += 1
+                org = mod[mod.curr_seq].rpb
+                mod[mod.curr_seq].rpb += 1
+                if org != mod[mod.curr_seq].rpb:
+                    mod.mainwin._sequence_view.highlight = mod[mod.curr_seq].rpb
+                    mod.mainwin._sequence_view.redraw_track()
             if down:
-                mod.rpb -= 1
+                org = mod[mod.curr_seq].rpb
+                mod[mod.curr_seq].rpb -= 1
+                if org != mod[mod.curr_seq].rpb:
+                    mod.mainwin._sequence_view.highlight = mod[mod.curr_seq].rpb
+                    mod.mainwin._sequence_view.redraw_track()
 
-        if self.active_field == 7:
+            if middle:
+                mod[mod.curr_seq].ketchup()
+
+        if self.active_field == 6:
             if up:
                 cfg.default_midi_out_port = min(
                     max(cfg.default_midi_out_port + 1, 0), mod.max_ports - 1

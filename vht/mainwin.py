@@ -110,7 +110,7 @@ class MainWin(Gtk.ApplicationWindow):
         self.seqbox = Gtk.Paned()
         self.seqbox.set_orientation(Gtk.Orientation.VERTICAL)
 
-        self._sequence_view = SequenceView(mod[0])
+        self._sequence_view = SequenceView(mod[mod.curr_seq])
         self.hbox.set_orientation(Gtk.Orientation.HORIZONTAL)
 
         self.seqbox.pack1(self._sequence_view, True, True)

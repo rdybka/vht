@@ -68,15 +68,6 @@ int module_is_recording(module *mod) {
 	return mod->recording;
 }
 
-int module_get_rpb(module *mod) {
-	return mod->rpb;
-}
-
-void module_set_rpb(module *mod, int v) {
-	module_excl_in(mod);
-	mod->rpb = v;
-	module_excl_out(mod);
-}
 
 int module_get_nseq(module *mod) {
 	return mod->nseq;
@@ -272,6 +263,20 @@ char *sequence_get_trig(sequence *seq, int t) {
 
 double sequence_get_pos(sequence *seq) {
 	return seq->pos;
+}
+
+int sequence_get_rpb(sequence *seq) {
+	return seq->rpb;
+}
+
+void sequence_set_rpb(sequence *seq, int v) {
+	seq_mod_excl_in(seq);
+	seq->rpb = v;
+	seq_mod_excl_out(seq);
+}
+
+void sequence_set_lost(sequence *seq, int p) {
+	seq->lost = p;
 }
 
 void track_set_playing(track *trk, int p) {

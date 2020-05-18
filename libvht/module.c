@@ -57,7 +57,7 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 	midi_buffer_clear(mod->clt);
 
 	double time = (curr_frames - mod->zero_time) / (double)mod->clt->jack_sample_rate;
-	double row_length = 60.0 / ((double)mod->rpb * (double)mod->bpm);
+	double row_length = 60.0 / (double)mod->bpm;
 	double period = ((double)mod->clt->jack_buffer_size / (double)mod->clt->jack_sample_rate) / row_length;
 
 	// are we muting after stop?
@@ -80,7 +80,7 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 		mod->zero_time = curr_frames;
 	}
 
-	// handle input from MIDI
+// handle input from MIDI
 	void *inp = jack_port_get_buffer(mod->clt->jack_input_port, mod->clt->jack_buffer_size);
 
 	jack_nframes_t ninp;
@@ -166,14 +166,15 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 			for (int s = 0; s < mod->nseq; s++) {
 				sequence *seq = mod->seq[s];
 				if (seq->lost) {
-					seq->pos = fmod(mod->song_pos, seq->length);
+					seq->pos = fmod(mod->song_pos * seq->rpb, seq->length);
 
 					for (int t = 0; t < seq->ntrk; t++) {
 						seq->trk[t]->pos = seq->pos;
 					}
 					seq->lost = 0;
 				}
-				sequence_advance(seq, period, mod->clt->jack_buffer_size);
+
+				sequence_advance(seq, period * seq->rpb, mod->clt->jack_buffer_size);
 			}
 			mod->song_pos += period;
 		} else {
@@ -190,7 +191,6 @@ module *module_new() {
 	module *mod = malloc(sizeof(module));
 
 	mod->bpm = 120;
-	mod->rpb = 4;
 	mod->nseq = 0;
 	mod->curr_seq = 0;
 	mod->playing = 0;
@@ -328,7 +328,7 @@ char *module_get_time(module *mod) {
 }
 
 double module_get_jack_pos(module *mod) {
-	double row_length = 60.0 / ((double)mod->rpb * (double)mod->bpm);
+	double row_length = 60.0 / ((double)mod->bpm);
 	return (mod->song_pos + (((jack_frame_time(mod->clt->jack_client) - mod->clt->jack_last_frame) / (double)mod->clt->jack_sample_rate) / row_length));
 }
 

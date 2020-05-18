@@ -28,10 +28,8 @@ class Configuration:
         self.console_font = "Monospace"
         self.mixer_font = "Monospace"
 
-        self.highlight = 4
-
         self.seq_font_size = 16
-        self.mixer_font_size = 16
+        self.mixer_font_size = 26
         self.mixer_padding = 1.5
         self.seq_line_width = 1.0
         self.seq_spacing = 1.05
@@ -141,8 +139,6 @@ class Configuration:
             "rpb_down": cfgkey("KP_Subtract", True, True, False),
             "octave_up": cfgkey("KP_Multiply", False, False, False),
             "octave_down": cfgkey("KP_Divide", False, False, False),
-            "highlight_up": cfgkey("KP_Multiply", True, False, False),
-            "highlight_down": cfgkey("KP_Divide", True, False, False),
             "def_port_up": cfgkey("KP_Multiply", True, True, False),
             "def_port_down": cfgkey("KP_Divide", True, True, False),
             "follow": cfgkey("f", False, False, False),

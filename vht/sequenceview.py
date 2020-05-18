@@ -67,8 +67,6 @@ class SequenceView(Gtk.Box):
 
         self.def_new_track_width = 0
 
-        self.fix_highlight_extras()
-
         self._track_box = Gtk.Box()
         self._track_box.set_spacing(0)
 
@@ -133,11 +131,9 @@ class SequenceView(Gtk.Box):
         self.active_tracks = {}
         self.build()
 
-        self.show_all()
+        self.highlight = seq.rpb
 
-    def fix_highlight_extras(self):
-        if self.seq.index in mod.extras:
-            self.highlight = mod.extras[self.seq.index][-1]["highlight"]
+        self.show_all()
 
     def on_button_press(self, widget, event):
         if event.button == cfg.delete_button:
@@ -295,7 +291,6 @@ class SequenceView(Gtk.Box):
         if cfg.key["sequence_clone"].matches(event):
             idx = mod.clone_sequence(mod.curr_seq).index
             mod.extras[idx][-1]["mouse_cfg"] = mod.extras[mod.curr_seq][-1]["mouse_cfg"]
-            mod.extras[idx][-1]["highlight"] = mod.extras[mod.curr_seq][-1]["highlight"]
             mod.extras[idx][-1]["sequence_name"] = extras.get_name(
                 mod.extras[mod.curr_seq][-1]["sequence_name"]
             )
@@ -486,23 +481,20 @@ class SequenceView(Gtk.Box):
             return True
 
         if cfg.key["rpb_up"].matches(event):
-            mod.rpb += 1
+            org = self.seq.rpb
+            self.seq.rpb += 1
+            if org != self.seq.rpb:
+                self.highlight = self.seq.rpb
+                self.redraw_track()
             return True
 
         if cfg.key["rpb_down"].matches(event):
-            mod.rpb -= 1
-            return True
-
-        if cfg.key["highlight_up"].matches(event):
-            self.highlight = min(self.highlight + 1, 32)
-            mod.extras[self.seq.index][-1]["highlight"] = self.highlight
-            self.redraw_track()
-            return True
-
-        if cfg.key["highlight_down"].matches(event):
-            self.highlight = max(self.highlight - 1, 1)
-            mod.extras[self.seq.index][-1]["highlight"] = self.highlight
-            self.redraw_track()
+            org = self.seq.rpb
+            self.seq.rpb -= 1
+            self.highlight = self.seq.rpb
+            if org != self.seq.rpb:
+                self.highlight = self.seq.rpb
+                self.redraw_track()
             return True
 
         # velocities fall through if not in edit mode
@@ -617,9 +609,6 @@ class SequenceView(Gtk.Box):
 
     def seq_add(self):
         s = mod.add_sequence(cfg.default_seq_length)
-        mod.extras[s.index][-1]["highlight"] = mod.extras[self.seq.index][-1][
-            "highlight"
-        ]
 
         s.length = self.seq.length
         if cfg.new_seqs_with_tracks:
@@ -777,13 +766,11 @@ class SequenceView(Gtk.Box):
         self.queue_draw()
 
     def build(self, quick=False):
-        self.fix_highlight_extras()
-
         if quick:
             self.get_window().freeze_updates()
 
         if self.seq.index in mod.extras:
-            self.highlight = mod.extras[self.seq.index][-1]["highlight"]
+            self.highlight = self.seq.rpb
         self.prop_view.seq = self.seq
         self._side_prop.seq = self.seq
         self._side_prop.popover.seq = self.seq
@@ -817,8 +804,8 @@ class SequenceView(Gtk.Box):
         self.active_tracks.clear()
 
         if mod.load(filename):
-            self.seq = mod[0]
-            self.font_size = mod.extras[self.seq.index][-1]["font_size"]
+            self.seq = mod[mod.curr_seq]
+            self.font_size = mod.extras[mod.curr_seq][-1]["font_size"]
             self.build()
             mod.seqlist.redraw()
             return True

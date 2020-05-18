@@ -227,14 +227,6 @@ def module_dump_notes(mod, n):
     return _libcvht.module_dump_notes(mod, n)
 module_dump_notes = _libcvht.module_dump_notes
 
-def module_get_rpb(mod):
-    return _libcvht.module_get_rpb(mod)
-module_get_rpb = _libcvht.module_get_rpb
-
-def module_set_rpb(mod, rpb):
-    return _libcvht.module_set_rpb(mod, rpb)
-module_set_rpb = _libcvht.module_set_rpb
-
 def module_get_ctrlpr(mod):
     return _libcvht.module_get_ctrlpr(mod)
 module_get_ctrlpr = _libcvht.module_get_ctrlpr
@@ -406,6 +398,18 @@ sequence_get_playing = _libcvht.sequence_get_playing
 def sequence_set_playing(seq, p):
     return _libcvht.sequence_set_playing(seq, p)
 sequence_set_playing = _libcvht.sequence_set_playing
+
+def sequence_set_lost(seq, p):
+    return _libcvht.sequence_set_lost(seq, p)
+sequence_set_lost = _libcvht.sequence_set_lost
+
+def sequence_get_rpb(seq):
+    return _libcvht.sequence_get_rpb(seq)
+sequence_get_rpb = _libcvht.sequence_get_rpb
+
+def sequence_set_rpb(seq, rpb):
+    return _libcvht.sequence_set_rpb(seq, rpb)
+sequence_set_rpb = _libcvht.sequence_set_rpb
 
 def sequence_get_cue(seq):
     return _libcvht.sequence_get_cue(seq)

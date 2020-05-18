@@ -4341,58 +4341,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_module_get_rpb(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  module *arg1 = (module *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject * obj0 = 0 ;
-  int result;
-  
-  if (!PyArg_ParseTuple(args,(char *)"O:module_get_rpb",&obj0)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_get_rpb" "', argument " "1"" of type '" "module *""'"); 
-  }
-  arg1 = (module *)(argp1);
-  result = (int)module_get_rpb(arg1);
-  resultobj = SWIG_From_int((int)(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_module_set_rpb(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  module *arg1 = (module *) 0 ;
-  int arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  PyObject * obj0 = 0 ;
-  PyObject * obj1 = 0 ;
-  
-  if (!PyArg_ParseTuple(args,(char *)"OO:module_set_rpb",&obj0,&obj1)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_module, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_set_rpb" "', argument " "1"" of type '" "module *""'"); 
-  }
-  arg1 = (module *)(argp1);
-  ecode2 = SWIG_AsVal_int(obj1, &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "module_set_rpb" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = (int)(val2);
-  module_set_rpb(arg1,arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_module_get_ctrlpr(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   module *arg1 = (module *) 0 ;
@@ -5613,6 +5561,88 @@ SWIGINTERN PyObject *_wrap_sequence_set_playing(PyObject *SWIGUNUSEDPARM(self), 
   } 
   arg2 = (int)(val2);
   sequence_set_playing(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_set_lost(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:sequence_set_lost",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_set_lost" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_set_lost" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  sequence_set_lost(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_get_rpb(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject * obj0 = 0 ;
+  int result;
+  
+  if (!PyArg_ParseTuple(args,(char *)"O:sequence_get_rpb",&obj0)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_get_rpb" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  result = (int)sequence_get_rpb(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_set_rpb(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject * obj0 = 0 ;
+  PyObject * obj1 = 0 ;
+  
+  if (!PyArg_ParseTuple(args,(char *)"OO:sequence_set_rpb",&obj0,&obj1)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_set_rpb" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  ecode2 = SWIG_AsVal_int(obj1, &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_set_rpb" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  sequence_set_rpb(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -7946,8 +7976,6 @@ static PyMethodDef SwigMethods[] = {
 	 { "module_get_curr_seq", _wrap_module_get_curr_seq, METH_VARARGS, NULL},
 	 { "module_set_curr_seq", _wrap_module_set_curr_seq, METH_VARARGS, NULL},
 	 { "module_dump_notes", _wrap_module_dump_notes, METH_VARARGS, NULL},
-	 { "module_get_rpb", _wrap_module_get_rpb, METH_VARARGS, NULL},
-	 { "module_set_rpb", _wrap_module_set_rpb, METH_VARARGS, NULL},
 	 { "module_get_ctrlpr", _wrap_module_get_ctrlpr, METH_VARARGS, NULL},
 	 { "module_set_ctrlpr", _wrap_module_set_ctrlpr, METH_VARARGS, NULL},
 	 { "module_set_play_mode", _wrap_module_set_play_mode, METH_VARARGS, NULL},
@@ -7991,6 +8019,9 @@ static PyMethodDef SwigMethods[] = {
 	 { "sequence_trigger_play_off", _wrap_sequence_trigger_play_off, METH_VARARGS, NULL},
 	 { "sequence_get_playing", _wrap_sequence_get_playing, METH_VARARGS, NULL},
 	 { "sequence_set_playing", _wrap_sequence_set_playing, METH_VARARGS, NULL},
+	 { "sequence_set_lost", _wrap_sequence_set_lost, METH_VARARGS, NULL},
+	 { "sequence_get_rpb", _wrap_sequence_get_rpb, METH_VARARGS, NULL},
+	 { "sequence_set_rpb", _wrap_sequence_set_rpb, METH_VARARGS, NULL},
 	 { "sequence_get_cue", _wrap_sequence_get_cue, METH_VARARGS, NULL},
 	 { "sequence_clone", _wrap_sequence_clone, METH_VARARGS, NULL},
 	 { "track_get_row_ptr", _wrap_track_get_row_ptr, METH_VARARGS, NULL},

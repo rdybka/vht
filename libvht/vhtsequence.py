@@ -92,6 +92,16 @@ class VHTSequence(Iterable):
         return libcvht.sequence_get_pos(self._seq_handle)
 
     @property
+    def rpb(self):
+        return libcvht.sequence_get_rpb(self._seq_handle)
+
+    @rpb.setter
+    def rpb(self, value):
+        if value:
+            libcvht.sequence_set_rpb(self._seq_handle, min(max(1, value), 32))
+            # self.timeline.changes[0] = [0, self.bpm, self.rpb, 0]
+
+    @property
     def cue(self):
         if libcvht.sequence_get_cue(self._seq_handle) > 0:
             return True
@@ -105,6 +115,9 @@ class VHTSequence(Iterable):
     @playing.setter
     def playing(self, value):
         libcvht.sequence_set_playing(self._seq_handle, value)
+
+    def ketchup(self):
+        libcvht.sequence_set_lost(self._seq_handle, 1)
 
     @property
     def length(self):

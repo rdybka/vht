@@ -303,7 +303,7 @@ class SequenceListView(Gtk.DrawingArea):
                 bottom_intensity = cfg.intensity_txt
 
             if seq.playing:
-                hi = mod.extras[r][-1]["highlight"]
+                hi = mod[r].rpb
                 bottom_intensity *= 1.5 * (1 - ((seq.pos % hi) / hi))
 
             gradient.add_color_stop_rgb(

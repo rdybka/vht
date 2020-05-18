@@ -59,8 +59,6 @@ extern void module_swap_sequence(module *mod, int s1, int s2);
 extern int module_get_curr_seq(module *mod);
 extern void module_set_curr_seq(module *mod, int s);
 extern void module_dump_notes(module *mod, int n);
-extern int module_get_rpb(module *mod);
-extern void module_set_rpb(module *mod, int rpb);
 extern int module_get_ctrlpr(module *mod);
 extern void module_set_ctrlpr(module *mod, int);
 extern void module_set_play_mode(module *mod, int m);
@@ -111,6 +109,9 @@ extern void sequence_trigger_play_on(sequence *seq);
 extern void sequence_trigger_play_off(sequence *seq);
 extern int sequence_get_playing(sequence *seq);
 extern void sequence_set_playing(sequence *seq, int p);
+extern void sequence_set_lost(sequence *seq, int p);
+extern int sequence_get_rpb(sequence *seq);
+extern void sequence_set_rpb(sequence *seq, int rpb);
 
 extern int sequence_get_cue(sequence *seq);
 extern sequence *sequence_clone(sequence *seq);

@@ -1,12 +1,4 @@
-* note in in ctrl
-* recording in stopped seq
-* media butts
-? ctrl in edit mode
-* don't update time when stopped
-* midi out doubles
-- seqlist
-    - upscale/downscale
-	- rpb
+- trigger buttons
 - timeline
     - on left
 - loop

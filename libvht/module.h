@@ -40,7 +40,6 @@ typedef struct module_t {
 	int min, sec, ms;
 
 	float bpm;
-	int rpb;
 
 	int ctrlpr;
 	sequence **seq;

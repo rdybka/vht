@@ -165,16 +165,6 @@ class VHTModule(Iterable):
         libcvht.module_set_curr_seq(self._mod_handle, val)
 
     @property
-    def rpb(self):
-        return libcvht.module_get_rpb(self._mod_handle)
-
-    @rpb.setter
-    def rpb(self, value):
-        if value:
-            libcvht.module_set_rpb(self._mod_handle, min(max(1, value), 32))
-            self.timeline.changes[0] = [0, self.bpm, self.rpb, 0]
-
-    @property
     def ctrlpr(self):
         return libcvht.module_get_ctrlpr(self._mod_handle)
 
@@ -213,7 +203,7 @@ class VHTModule(Iterable):
     def bpm(self, value):
         value = min(max(value, self.min_bpm), self.max_bpm)
         libcvht.module_set_bpm(self._mod_handle, value)
-        self.timeline.changes[0] = [0, self.bpm, self.rpb, 0]
+        # self.timeline.changes[0] = [0, self.bpm, self.rpb, 0]
 
     @property
     def play_mode(self):
@@ -271,13 +261,14 @@ class VHTModule(Iterable):
     def save(self, filename):
         jm = {}
         jm["bpm"] = self.bpm
-        jm["rpb"] = self.rpb
         jm["ctrlpr"] = self.ctrlpr
         jm["extras"] = self.extras
+        jm["curr_seq"] = self.curr_seq
         jm["seq"] = []
         for seq in self:
             s = {}
             s["length"] = seq.length
+            s["rpb"] = seq.rpb
             s["trg_playmode"] = seq.trg_playmode
             s["trg_quantise"] = seq.trg_quantise
             s["trig"] = [seq.get_trig(0), seq.get_trig(1), seq.get_trig(2)]
@@ -368,12 +359,12 @@ class VHTModule(Iterable):
             self.reset()
 
             self.bpm = jm["bpm"]
-            self.rpb = jm["rpb"]
             self.ctrlpr = jm["ctrlpr"]
 
             for seq in jm["seq"]:
                 s = self.add_sequence()
                 s.length = seq["length"]
+                s.rpb = seq["rpb"]
 
                 if "playing" in seq:
                     s.playing = seq["playing"]
@@ -446,6 +437,7 @@ class VHTModule(Iterable):
             for cb in self.cb_post_load:
                 cb(jm)
 
+            self.curr_seq = jm["curr_seq"]
             self.midi_synch_ports()
             self.play = p
 

@@ -39,6 +39,7 @@ typedef struct sequence_t {
 	track **trk;
 	int ntrk;
 	int length;
+	int rpb;
 	double pos;
 	double last_period;
 	int midi_focus;
@@ -83,4 +84,6 @@ void sequence_trigger_play_off(sequence *seq);
 void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt);
 char *sequence_get_trig(sequence *seq, int t);
 
+void seq_mod_excl_in(sequence *seq);
+void seq_mod_excl_out(sequence *seq);
 #endif //__SEQUENCE_H__
