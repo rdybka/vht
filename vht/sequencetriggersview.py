@@ -38,9 +38,11 @@ class SequenceTriggersView(Gtk.Grid):
         self.set_column_homogeneous(False)
         self.set_row_homogeneous(False)
 
-        self.attach(Gtk.Label("mute:"), 0, 0, 1, 1)
-        self.attach(Gtk.Label("cue:"), 0, 1, 1, 1)
-        self.attach(Gtk.Label("play:"), 0, 2, 1, 1)
+        for i, l in enumerate(["mute:", "cue:", "play:"]):
+            lbl = Gtk.Button.new_with_label(l)
+            lbl.connect("button-press-event", self.on_butt_in, i)
+            lbl.connect("button-release-event", self.on_butt_out, i)
+            self.attach(lbl, 0, i, 1, 1)
 
         entry_wc = 20
 
@@ -224,6 +226,20 @@ class SequenceTriggersView(Gtk.Grid):
 
         ms[d] = evt.button
         self.refresh()
+
+    def on_butt_in(self, wdg, sign, i):
+        if i == 0:
+            mod[self.seq].trigger_mute()
+
+        if i == 1:
+            mod[self.seq].trigger_cue()
+
+        if i == 2:
+            mod[self.seq].trigger_play_on()
+
+    def on_butt_out(self, wdg, sign, i):
+        if i == 2:
+            mod[self.seq].trigger_play_off()
 
     def on_clear_clicked(self, wdg, c):
         mod[self.seq].set_trig(c, 0, 0, 0)
