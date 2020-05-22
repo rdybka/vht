@@ -180,8 +180,7 @@ class SequenceListViewPopover(Gtk.Popover):
     def on_clone_button_clicked(self, wdg):
         idx = mod.clone_sequence(self.curr).index
 
-        mod.extras[idx][-1]["mouse_cfg"] = mod.extras[self.curr][-1]["mouse_cfg"]
-        mod.extras[idx][-1]["highlight"] = mod.extras[self.curr][-1]["highlight"]
+        mod.extras[idx][-1]["mouse_cfg"] = mod.extras[self.curr][-1]["mouse_cfg"].copy()
         mod.extras[idx][-1]["sequence_name"] = extras.get_name(
             mod.extras[self.curr][-1]["sequence_name"]
         )
