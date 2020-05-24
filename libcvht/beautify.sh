@@ -1,6 +1,6 @@
 #!/bin/sh
 
-mv libvht.h libvht.g
+mv libcvht.h libcvht.g
 astyle -A14 --indent=tab *.c *.h
-mv libvht.g libvht.h
+mv libcvht.g libcvht.h
 rm *.orig

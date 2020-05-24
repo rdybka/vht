@@ -24,7 +24,7 @@
 %include "carrays.i"
 %array_class(int, int_array);
 %{
-#include "libvht.h"
+#include "libcvht.h"
 %}
 #endif
 

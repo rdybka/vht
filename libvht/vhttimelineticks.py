@@ -17,7 +17,7 @@
 
 from collections.abc import Iterable
 
-from libvht import libcvht
+import libcvht
 
 
 class VHTTimelineTicks(Iterable):

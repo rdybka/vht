@@ -17,7 +17,7 @@
 
 from collections.abc import MutableSequence
 
-from libvht import libcvht
+import libcvht
 
 
 class VHTTimelineChanges(MutableSequence):

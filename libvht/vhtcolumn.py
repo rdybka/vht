@@ -17,7 +17,7 @@
 
 from collections.abc import Iterable
 from libvht.vhtrow import VHTRow
-from libvht import libcvht
+import libcvht
 
 
 class VHTColumn(Iterable):

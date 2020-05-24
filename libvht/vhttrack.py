@@ -19,7 +19,7 @@ from collections.abc import Iterable
 from libvht.vhtcolumn import VHTColumn
 from libvht.vhtctrllist import VHTCtrlList
 from libvht.vhtquicklist import VHTQuickList
-from libvht import libcvht
+import libcvht
 
 
 class VHTTrack(Iterable):

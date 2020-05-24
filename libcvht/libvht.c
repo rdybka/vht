@@ -22,7 +22,7 @@
 #include "jack_process.h"
 
 #include "module.h"
-#include "libvht.h"
+//#include "libcvht.h"
 
 // getters/setters and global stuff
 

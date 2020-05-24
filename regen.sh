@@ -5,8 +5,9 @@
 # - don't run without swig3 installed
 # - also uses black and astyle
 
-rm -f *.snap *.so *.o libvht/libmod.py libvht/*.so
-rm -f libvht/*.o
+rm -f *.snap *.so *.o libcvht/*.so
+rm -f libcvht/*.o
+rm -rf __pycache__
 rm -rf vht/__pycache__
 rm -rf libvht/__pycache__
 rm -rf build
@@ -16,12 +17,13 @@ rm -rf libvht/*.pyc
 rm -rf vht/*.pyc
 rm -rf dist
 rm -rf vht.egg-info
-rm -f libvht/libvht_wrap.c
+rm -f libcvht/libcvht_wrap.c
 
-cd libvht
+cd libcvht
 ./beautify.sh
 cd ..
 black vht/*.py libvht/*.py
-swig3.0 -python libvht/libvht.h
+swig -python libcvht/libcvht.h
+mv libcvht/libcvht.py .
 snapcraft clean
 
