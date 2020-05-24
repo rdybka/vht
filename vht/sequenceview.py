@@ -290,7 +290,9 @@ class SequenceView(Gtk.Box):
 
         if cfg.key["sequence_clone"].matches(event):
             idx = mod.clone_sequence(mod.curr_seq).index
-            mod.extras[idx][-1]["mouse_cfg"] = mod.extras[mod.curr_seq][-1]["mouse_cfg"]
+            mod.extras[idx][-1]["mouse_cfg"] = mod.extras[mod.curr_seq][-1][
+                "mouse_cfg"
+            ].copy()
             mod.extras[idx][-1]["sequence_name"] = extras.get_name(
                 mod.extras[mod.curr_seq][-1]["sequence_name"]
             )
