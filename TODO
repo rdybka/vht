@@ -1,4 +1,6 @@
+- fix gui line-up for slvpop
 - timeline
+    - view
     - on left
 - loop
     -reset
@@ -18,9 +20,9 @@
 - autoscroll and console open/close (magic row 27)
 - magic transposing
 - export:
-	- midi
-	- audio
-	    - freewheeling
+    - midi
+    - audio
+        - freewheeling
 - configuration
 ? new window
 ? new

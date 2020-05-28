@@ -32,6 +32,7 @@ class VHTModule(Iterable):
     def __init__(self):
         super(VHTModule, self).__init__()
         self.active_track = None
+
         self._mod_handle = libcvht.module_new()
         self._clt_handle = libcvht.module_get_midi_client(self._mod_handle)
         self.extras = {}  # will be saved - for stuff like names of tracks
