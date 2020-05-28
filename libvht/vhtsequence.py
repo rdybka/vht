@@ -17,7 +17,7 @@
 
 from collections.abc import Iterable
 from libvht.vhttrack import VHTTrack
-import libcvht
+from libvht import libcvht
 
 
 class VHTSequence(Iterable):

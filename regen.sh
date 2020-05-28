@@ -6,7 +6,7 @@
 # - also uses black and astyle
 
 rm -f *.snap *.so *.o libcvht/*.so
-rm -f libcvht/*.o
+rm -f libvht/*.o
 rm -rf __pycache__
 rm -rf vht/__pycache__
 rm -rf libvht/__pycache__
@@ -17,13 +17,12 @@ rm -rf libvht/*.pyc
 rm -rf vht/*.pyc
 rm -rf dist
 rm -rf vht.egg-info
-rm -f libcvht/libcvht_wrap.c
+rm -f libvht/libcvht_wrap.c
 
-cd libcvht
+cd libvht
 ./beautify.sh
 cd ..
 black vht/*.py libvht/*.py
-swig -python libcvht/libcvht.h
-mv libcvht/libcvht.py .
+swig -python libvht/libcvht.h
 snapcraft clean
 

@@ -16,8 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections.abc import MutableSequence
-
-import libcvht
+from libvht import libcvht
 
 
 class VHTTimelineChanges(MutableSequence):

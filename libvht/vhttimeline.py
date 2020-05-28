@@ -17,8 +17,7 @@
 
 from libvht.vhttimelinechanges import VHTTimelineChanges
 from libvht.vhttimelineticks import VHTTimelineTicks
-
-import libcvht
+from libvht import libcvht
 
 
 class VHTTimeline:

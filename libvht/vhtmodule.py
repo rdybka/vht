@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections.abc import Iterable
-import libcvht
+from libvht import libcvht
 from libvht.vhtsequence import VHTSequence
 from libvht.vhttimeline import VHTTimeline
 import pickle
