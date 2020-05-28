@@ -5,7 +5,7 @@
 # - don't run without swig3 installed
 # - also uses black and astyle
 
-rm -f *.snap *.so *.o libcvht/*.so
+rm -f *.snap *.so *.o libvht/*.so
 rm -f libvht/*.o
 rm -rf __pycache__
 rm -rf vht/__pycache__
