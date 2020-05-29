@@ -7,10 +7,10 @@ description: |
 
 grade: stable
 confinement: strict
-license: GPL-3.0
+license: GPL-3.0+
 
 architectures:
-  - build-on: amd64
+    - build-on: amd64
 
 apps:
   valhalla-tracker:
@@ -19,7 +19,11 @@ apps:
     plugs:
     - home
     - network
-    - jack2
+    slots:
+        dbus-daemon:
+            interface: dbus
+            bus: session
+            name: com.github.rdybka.vht
 
 parts:
   libvht:
