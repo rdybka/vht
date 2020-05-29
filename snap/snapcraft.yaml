@@ -1,5 +1,5 @@
 name: valhalla-tracker
-base: core18
+base: core20
 version: git
 summary: A live midi sequencer for JACK
 description: |
@@ -18,15 +18,14 @@ apps:
     extensions: [gnome-3-28]
     plugs:
     - home
-    - network
-    - jack1
+    - jack2
 
 parts:
   libvht:
     source: .
     plugin: python
     stage-packages:
-    - libjack-dev
+    - libjack-jackd2-dev
     - gir1.2-gtk-3.0
     - gir1.2-vte-2.91
     - python3-gi
