@@ -17,7 +17,7 @@ apps:
     extensions: [gnome-3-28]
     plugs:
     - home
-    - jack1
+    - network
 
 parts:
   libvht:
