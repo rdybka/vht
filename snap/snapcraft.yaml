@@ -1,5 +1,5 @@
 name: valhalla-tracker
-base: core20
+base: core18
 version: git
 summary: A live midi sequencer for JACK
 description: |
@@ -15,7 +15,7 @@ architectures:
 apps:
   valhalla-tracker:
     command: desktop-launch vht
-    extensions: [gnome-3-34]
+    extensions: [gnome-3-28]
     plugs:
     - home
     - network
