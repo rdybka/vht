@@ -5,8 +5,9 @@ summary: A live midi sequencer for JACK
 description: |
   Valhalla Tracker is a MIDI sequencing companion for your GNU/Linux audio setup
 
-grade: devel
-confinement: strict #devmode
+grade: stable
+confinement: strict
+license: GPL-3.0
 
 architectures:
   - build-on: amd64
