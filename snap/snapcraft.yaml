@@ -15,9 +15,10 @@ architectures:
 apps:
   valhalla-tracker:
     command: desktop-launch vht
-    extensions: [gnome-3-28]
+    extensions: [gnome-3-34]
     plugs:
     - home
+    - network
     - jack2
 
 parts:
