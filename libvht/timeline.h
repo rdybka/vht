@@ -19,24 +19,26 @@
 #ifndef __TIMELINE_H__
 #define __TIMELINE_H__
 
+#include "sequence.h"
+
 typedef struct timeslice_t {
 	float bpm;
-	int rpb;
 	double length;
 	double time;
 } timeslice;
 
 typedef struct timechange_t {
 	float bpm;
-	int rpb;
 	int linked;
 	long row;
 } timechange;
 
 typedef struct timestrip_t {
-	int seq_id;
+	sequence *seq;
 	int start;
 	int length;
+	int rpb_start;
+	int rpb_end;
 	int loop_length;
 } timestrip;
 
@@ -62,12 +64,17 @@ timeline *timeline_new(void);
 void timeline_free(timeline *tl);
 void timeline_update(timeline *tl);
 void timeline_advance(timeline *tl, double period);
-//py
-int timeline_change_set(timeline *tl, long row, float bpm, int rpb, int linked);
+
+int timeline_change_set(timeline *tl, long row, float bpm, int linked);
 void timeline_change_del(timeline *tl, int id);
 char *timeline_get_change(timeline *tl, int id);
 int timeline_get_nchanges(timeline *tl);
 int timeline_get_nticks(timeline *tl);
 double timeline_get_tick(timeline *tl, int n);
 
-#endif
+timestrip *timeline_get_strip(timeline *tl, int n);
+int timeline_get_nstrips(timeline *tl);
+timestrip *timeline_add_strip(timeline *tl, sequence *seq, int start, int length, int rpb_start, int rpb_end, int loop_length);
+void timeline_del_strip(timeline *tl, int id);
+
+#endif //__TIMELINE_H__

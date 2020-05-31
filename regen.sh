@@ -5,7 +5,7 @@
 # - don't run without swig3 installed
 # - also uses black and astyle
 
-rm -f *.snap *.so *.o libvht/*.so
+rm -f *.snap *.so *.o
 rm -f libvht/*.o
 rm -rf __pycache__
 rm -rf vht/__pycache__
@@ -24,5 +24,5 @@ cd libvht
 cd ..
 black vht/*.py libvht/*.py
 swig -python libvht/libcvht.h
-snapcraft clean
+#snapcraft clean
 

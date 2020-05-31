@@ -1,7 +1,11 @@
-- fix gui line-up for slvpop
 - timeline
+    - strip managent
+    - feeding
+    - scrub
+    - loop
     - view
     - on left
+- fix gui line-up for slvpop
 - loop
     -reset
 - ports

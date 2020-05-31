@@ -17,6 +17,7 @@
 
 from libvht.vhttimelinechanges import VHTTimelineChanges
 from libvht.vhttimelineticks import VHTTimelineTicks
+from libvht.vhttimelinestrips import VHTTimelineStrips
 from libvht import libcvht
 
 
@@ -27,6 +28,7 @@ class VHTTimeline:
         self._tl_handle = libcvht.module_get_timeline(self._mod_handle)
         self.changes = VHTTimelineChanges(self._tl_handle)
         self.ticks = VHTTimelineTicks(self._tl_handle)
+        self.strips = VHTTimelineStrips(self._mod_handle, self._tl_handle)
 
     def __str__(self):
         return "dupa"

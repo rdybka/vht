@@ -212,7 +212,7 @@ class VHTModule(Iterable):
 
     @play_mode.setter
     def play_mode(self, value):
-        libcvht.module_get_play_mode(self._mod_handle, value)
+        libcvht.module_set_play_mode(self._mod_handle, value)
 
     @property
     def max_ports(self):
@@ -234,7 +234,8 @@ class VHTModule(Iterable):
     def max_bpm(self):
         return 1023  # don't crash the synth
 
-    # those two work non-realtime,
+    # those two work non-"realtime",
+    # ment for gui events
     # actual recording happens in c
     def clear_midi_in(self):
         libcvht.midi_in_clear_events(self._clt_handle)

@@ -17,6 +17,7 @@
 
 from vht.console import Console
 from vht.sequencelistview import SequenceListView
+from vht.timelineview import TimelineView
 from vht.statusbar import StatusBar
 from vht.sequenceview import SequenceView
 from vht import *
@@ -146,8 +147,10 @@ class MainWin(Gtk.ApplicationWindow):
         icon = Gio.ThemedIcon(name="media-playlist-repeat")
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
         self.seq_mode_butt.add(image)
-        # self.seq_mode_butt.connect("clicked", self.on_butt_panic_clicked)
-        # self.seq_mode_butt.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["panic"]))
+        self.seq_mode_butt.connect("clicked", self.on_playmode_clicked)
+        self.seq_mode_butt.set_tooltip_markup(
+            cfg.tooltip_markup % (cfg.key["play_mode"])
+        )
 
         buttbox = Gtk.Box()
         buttbox.set_orientation(Gtk.Orientation.VERTICAL)
@@ -165,7 +168,14 @@ class MainWin(Gtk.ApplicationWindow):
         seqpane.pack2(buttbox, False, False)
 
         self.timeline_box.pack1(seqpane, False, False)
-        self.timeline_box.pack2(Gtk.Label("timeliner"), True, True)
+
+        self.timeline_view = TimelineView()
+        mod.timeline_view = self.timeline_view
+
+        self.timeline_sw = Gtk.ScrolledWindow()
+        self.timeline_sw.add_with_viewport(self.timeline_view)
+
+        self.timeline_box.pack2(self.timeline_sw, True, True)
         self.timeline_box.set_position(cfg.timeline_position_y)
 
         self.vbox.pack_start(self.hbox, True, True, 0)
@@ -219,6 +229,14 @@ class MainWin(Gtk.ApplicationWindow):
 
     def on_butt_panic_clicked(self, butt):
         mod.panic()
+
+    def on_playmode_clicked(self, butt):
+        if mod.play_mode:
+            butt.set_active(True)
+            mod.play_mode = 0
+        else:
+            butt.set_active(False)
+            mod.play_mode = 1
 
     def on_bpm_changed(self, adj):
         mod.bpm = adj.get_value()
@@ -283,6 +301,15 @@ class MainWin(Gtk.ApplicationWindow):
                 self.seqbox.set_wide_handle(False)
             else:
                 self.show_console()
+            return True
+
+        if cfg.key["panic"].matches(event):
+            mod.panic()
+            return True
+
+        if cfg.key["play_mode"].matches(event):
+            self.on_playmode_clicked(self.seq_mode_butt)
+            return True
 
         return False
 

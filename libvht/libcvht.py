@@ -506,8 +506,8 @@ def ctrlrow_set_anchor(crw, a):
 def ctrlrow_set(crw, v, l, s, a):
     return _libcvht.ctrlrow_set(crw, v, l, s, a)
 
-def timeline_change_set(tl, row, bpm, rpb, linked):
-    return _libcvht.timeline_change_set(tl, row, bpm, rpb, linked)
+def timeline_change_set(tl, row, bpm, linked):
+    return _libcvht.timeline_change_set(tl, row, bpm, linked)
 
 def timeline_change_del(tl, id):
     return _libcvht.timeline_change_del(tl, id)
@@ -523,6 +523,51 @@ def timeline_get_nticks(tl):
 
 def timeline_get_tick(tl, n):
     return _libcvht.timeline_get_tick(tl, n)
+
+def timeline_get_strip(tl, n):
+    return _libcvht.timeline_get_strip(tl, n)
+
+def timeline_get_nstrips(tl):
+    return _libcvht.timeline_get_nstrips(tl)
+
+def timeline_add_strip(tl, seq, start, length, rpb_start, rpb_end, loop_length):
+    return _libcvht.timeline_add_strip(tl, seq, start, length, rpb_start, rpb_end, loop_length)
+
+def timeline_del_strip(tl, id):
+    return _libcvht.timeline_del_strip(tl, id)
+
+def timestrip_get_seq_id(tstr):
+    return _libcvht.timestrip_get_seq_id(tstr)
+
+def timestrip_get_start(tstr):
+    return _libcvht.timestrip_get_start(tstr)
+
+def timestrip_get_length(tstr):
+    return _libcvht.timestrip_get_length(tstr)
+
+def timestrip_get_rpb_start(tstr):
+    return _libcvht.timestrip_get_rpb_start(tstr)
+
+def timestrip_get_rpb_end(tstr):
+    return _libcvht.timestrip_get_rpb_end(tstr)
+
+def timestrip_get_loop_length(tstr):
+    return _libcvht.timestrip_get_loop_length(tstr)
+
+def timestrip_set_start(tstr, start):
+    return _libcvht.timestrip_set_start(tstr, start)
+
+def timestrip_set_length(tstr, length):
+    return _libcvht.timestrip_set_length(tstr, length)
+
+def timestrip_set_rpb_start(tstr, rpb_start):
+    return _libcvht.timestrip_set_rpb_start(tstr, rpb_start)
+
+def timestrip_set_rpb_end(tstr, rpb_end):
+    return _libcvht.timestrip_set_rpb_end(tstr, rpb_end)
+
+def timestrip_set_loop_length(tstr, loop_length):
+    return _libcvht.timestrip_set_loop_length(tstr, loop_length)
 
 def parse_note(arg1):
     return _libcvht.parse_note(arg1)

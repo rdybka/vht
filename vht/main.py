@@ -213,6 +213,7 @@ def run():
     mod.ctrlpr = cfg.controller_resolution
     mod.saving = False
     # mod.dump_notes = True
+    mod.play_mode = 0
     midig = []
     for val in cfg.midi_in.values():
         midig.append(tuple(val[:-1]))

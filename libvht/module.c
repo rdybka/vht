@@ -179,7 +179,7 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 			mod->song_pos += period;
 		} else {
 			timeline_advance(mod->tline, period);
-
+			mod->song_pos = mod->tline->pos;
 		}
 	}
 

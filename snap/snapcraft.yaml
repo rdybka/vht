@@ -1,3 +1,4 @@
+# anyone feels like taking this over - be my guest
 name: valhalla-tracker
 base: core18
 version: git
@@ -18,7 +19,7 @@ apps:
     extensions: [gnome-3-28]
     plugs:
     - home
-    - network
+    - jack2 # one day, hopefully - until then fkit
     slots:
         dbus-daemon:
             interface: dbus

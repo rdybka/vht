@@ -925,7 +925,7 @@ class SequenceView(Gtk.Box):
 
     def tick(self, wdg, param):
         mod.seqlist.tick()
-
+        mod.timeline_view.tick()
         # this is for things like start/stop/record/rewind/clear track
         if not mod.gui_midi_capture:
             midin = mod.get_midi_in_event()

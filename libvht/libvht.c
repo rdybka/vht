@@ -24,7 +24,7 @@
 #include "module.h"
 //#include "libcvht.h"
 
-// getters/setters and global stuff
+// getters/setters and stuff for python
 
 midi_client *module_get_midi_client(module *mod) {
 	return mod->clt;
@@ -285,3 +285,48 @@ void track_set_playing(track *trk, int p) {
 		track_kill_notes(trk);
 	}
 }
+
+int timestrip_get_seq_id(timestrip *tstr) {
+	return tstr->seq->index;
+}
+
+int timestrip_get_start(timestrip *tstr) {
+	return tstr->start;
+}
+
+int timestrip_get_length(timestrip *tstr) {
+	return tstr->length;
+}
+
+int timestrip_get_rpb_start(timestrip *tstr) {
+	return tstr->rpb_start;
+}
+
+int timestrip_get_rpb_end(timestrip *tstr) {
+	return tstr->rpb_end;
+}
+
+int timestrip_get_loop_length(timestrip *tstr) {
+	return tstr->loop_length;
+}
+
+void timestrip_set_start(timestrip *tstr, int start) {
+	tstr->start = start;
+}
+
+void timestrip_set_length(timestrip *tstr, int length) {
+	tstr->length = length;
+}
+
+void timestrip_set_rpb_start(timestrip *tstr, int rpb_start) {
+	tstr->rpb_start = rpb_start;
+}
+
+void timestrip_set_rpb_end(timestrip *tstr, int rpb_end) {
+	tstr->rpb_end = rpb_end;
+}
+
+void timestrip_set_loop_length(timestrip *tstr, int loop_length) {
+	tstr->loop_length = loop_length;
+}
+

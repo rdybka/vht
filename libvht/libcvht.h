@@ -1,4 +1,4 @@
-/* libvht.h - Valhalla Tracker (libvht)
+/* libcvht.h - Valhalla Tracker (libvht)
  *
  * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
@@ -16,8 +16,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIBVHT_H__
-#define __LIBVHT_H__
+#ifndef __LIBCVHT_H__
+#define __LIBCVHT_H__
 
 #ifdef SWIG
 %module libcvht
@@ -202,13 +202,31 @@ extern void ctrlrow_set_anchor(ctrlrow *crw, int a);
 extern void ctrlrow_set(ctrlrow *crw, int v, int l, int s, int a);
 
 // timeline
-extern int timeline_change_set(timeline *tl, long row, float bpm, int rpb, int linked);
+extern int timeline_change_set(timeline *tl, long row, float bpm, int linked);
 extern void timeline_change_del(timeline *tl, int id);
 extern char *timeline_get_change(timeline *tl, int id);
 extern int timeline_get_nchanges(timeline *tl);
 extern int timeline_get_nticks(timeline *tl);
 extern double timeline_get_tick(timeline *tl, int n);
 
+extern timestrip *timeline_get_strip(timeline *tl, int n);
+extern int timeline_get_nstrips(timeline *tl);
+extern timestrip *timeline_add_strip(timeline *tl, sequence *seq, int start, int length, int rpb_start, int rpb_end, int loop_length);
+extern void timeline_del_strip(timeline *tl, int id);
+
+extern int timestrip_get_seq_id(timestrip *tstr);
+extern int timestrip_get_start(timestrip *tstr);
+extern int timestrip_get_length(timestrip *tstr);
+extern int timestrip_get_rpb_start(timestrip *tstr);
+extern int timestrip_get_rpb_end(timestrip *tstr);
+extern int timestrip_get_loop_length(timestrip *tstr);
+
+extern void timestrip_set_start(timestrip *tstr, int start);
+extern void timestrip_set_length(timestrip *tstr, int length);
+extern void timestrip_set_rpb_start(timestrip *tstr, int rpb_start);
+extern void timestrip_set_rpb_end(timestrip *tstr, int rpb_end);
+extern void timestrip_set_loop_length(timestrip *tstr, int loop_length);
+
 extern int parse_note(char *);
 
-#endif //__LIBVHT_H__
+#endif //__LIBCVHT_H__
