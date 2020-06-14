@@ -258,7 +258,7 @@ class VHTModule(Iterable):
         libcvht.set_default_midi_port(self._mod_handle, port)
 
     def panic(self):
-        print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFUUUUUUUUUUUUUUUUUUUUUUUU!!!!!!!")
+        libcvht.module_panic(self._mod_handle)
 
     def save(self, filename):
         jm = {}

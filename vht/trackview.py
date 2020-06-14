@@ -1225,7 +1225,7 @@ class TrackView(Gtk.DrawingArea):
                         ctrl.on_button_press(widget, event)
             return False
 
-        if event.button == cfg.delete_button:
+        if event.button == cfg.delete_button or row >= self.trk.nrows:
             trk = mod.active_track
 
             if row >= self.trk.nrows:
@@ -1288,6 +1288,9 @@ class TrackView(Gtk.DrawingArea):
             return False
 
         if event.state & Gdk.ModifierType.CONTROL_MASK:
+            return False
+
+        if row >= self.trk.nrows:
             return False
 
         self.sel_drag = False
@@ -2081,7 +2084,7 @@ class TrackView(Gtk.DrawingArea):
             old = self.edit[1]
             self.trk[self.edit[0]][self.edit[1]] = note
 
-            if self.trk[self.edit[0]][self.edit[1]].velocity == 0:
+            if self.trk[self.edit[0]][self.edit[1]].velocity == 100:
                 self.trk[self.edit[0]][self.edit[1]].velocity = cfg.velocity
 
             self.edit = self.edit[0], self.edit[1] + cfg.skip
@@ -2357,7 +2360,7 @@ class TrackView(Gtk.DrawingArea):
                 if not self.edit:
                     return True
 
-                while not self.edit[1] % cfg.highlight == 0:
+                while not self.edit[1] % self.parent.highlight == 0:
                     self.edit = self.edit[0], self.edit[1] + 1
 
                 if self.edit[1] >= self.trk.nrows:
@@ -2379,7 +2382,7 @@ class TrackView(Gtk.DrawingArea):
                     old = self.select_start[1], self.select_end[1]
                     self.select_end = self.select_end[0], self.select_end[1] + 1
 
-                    while not self.select_end[1] % cfg.highlight == 0:
+                    while not self.select_end[1] % self.parent.highlight == 0:
                         self.select_end = self.select_end[0], self.select_end[1] + 1
 
                     self.select_end = (
@@ -2408,7 +2411,7 @@ class TrackView(Gtk.DrawingArea):
                 if not self.edit:
                     return True
 
-                while not self.edit[1] % cfg.highlight == 0:
+                while not self.edit[1] % self.parent.highlight == 0:
                     self.edit = self.edit[0], self.edit[1] - 1
 
                 self.edit = self.edit[0], max(self.edit[1], 0)
@@ -2429,7 +2432,7 @@ class TrackView(Gtk.DrawingArea):
                     old = self.select_start[1], self.select_end[1]
                     self.select_end = self.select_end[0], self.select_end[1] - 1
 
-                    while not self.select_end[1] % cfg.highlight == 0:
+                    while not self.select_end[1] % self.parent.highlight == 0:
                         self.select_end = self.select_end[0], self.select_end[1] - 1
 
                     self.select_end = self.select_end[0], max(self.select_end[1], 0)

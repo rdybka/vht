@@ -1,4 +1,7 @@
-# anyone feels like taking this over - be my guest
+# this doesn't work
+# sure someone who knows/cares about snaps would fix it
+# are you that person?
+# i know i'm not
 name: valhalla-tracker
 base: core18
 version: git
@@ -19,7 +22,7 @@ apps:
     extensions: [gnome-3-28]
     plugs:
     - home
-    - jack2 # one day, hopefully - until then fkit
+    - jack2 # :)
     slots:
         dbus-daemon:
             interface: dbus

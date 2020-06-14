@@ -126,7 +126,11 @@ char *i2n(unsigned char i) {
 	int oct = i / 12;
 	int note = i%12;
 
-	sprintf(buff, "%s%x", notes[note], oct);
+	if (oct > 0) {
+		sprintf(buff, "%s%x", notes[note], oct - 1);
+	} else {
+		sprintf(buff, "%s<", notes[note]);
+	}
 	return buff;
 }
 

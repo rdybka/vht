@@ -43,10 +43,13 @@ class VHTRow:
     def update_strrep(self):
         notes = ["C-", "C#", "D-", "D#", "E-", "F-", "F#", "G-", "G#", "A-", "A#", "B-"]
         note = self._note % 12
-        octave = self._note // 12
+        octave = (self._note // 12) - 1
         if self._type == 1:  # note_on
             if octave < 10:
-                self._strrep = notes[note] + str(octave)
+                if octave == -1:
+                    self._strrep = notes[note] + "<"
+                else:
+                    self._strrep = notes[note] + str(octave)
             else:
                 self._strrep = notes[note] + "A"
             return

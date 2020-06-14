@@ -80,7 +80,6 @@ class MainWin(Gtk.ApplicationWindow):
         self.bpmbutton = Gtk.SpinButton()
         self.bpmbutton.set_adjustment(self.adj)
         self.bpmbutton.set_digits(2)
-        # self.bpmbutton.set_snap_to_ticks(True)
         self.bpmbutton.set_numeric(True)
         self.bpmbutton.set_increments(1, 10)
 
@@ -91,7 +90,7 @@ class MainWin(Gtk.ApplicationWindow):
         self.time_display = Gtk.Label()
         self.time_display.use_markup = True
 
-        self.hb.pack_end(Gtk.Separator())
+        # self.hb.pack_end(Gtk.Separator())
         self.menubutt = Gtk.MenuButton()
         icon = Gio.ThemedIcon(name="open-menu-symbolic")
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)

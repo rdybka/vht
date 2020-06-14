@@ -143,6 +143,8 @@ class TrackPropViewPopover(Gtk.Popover):
             cfg.tooltip_markup % (cfg.key["toggle_controls"])
         )
 
+        self.show_notes_button.set_vexpand(False)
+
         self.show_notes_button.connect("toggled", self.on_show_notes_toggled)
         self.show_timeshift_button.connect("toggled", self.on_show_timeshift_toggled)
         self.show_pitchwheel_button.connect("toggled", self.on_show_pitchwheel_toggled)
@@ -150,15 +152,23 @@ class TrackPropViewPopover(Gtk.Popover):
             "toggled", self.on_show_controllers_toggled
         )
 
+        pad = Gtk.Label()
+        pad.set_vexpand(True)
+        grid.attach(pad, 0, 1, 1, 1)
+
         lab = Gtk.Label("show:")
         lab.set_vexpand(True)
+
         grid.attach(lab, 0, 0, 1, 1)
         grid.attach(self.show_notes_button, 1, 0, 1, 1)
         grid.attach(self.show_timeshift_button, 2, 0, 1, 1)
         grid.attach(self.show_pitchwheel_button, 3, 0, 1, 1)
         grid.attach(self.show_controllers_button, 4, 0, 1, 1)
 
-        grid.attach(Gtk.Label(cfg.quick_controls_desc), 0, 1, 1, 1)
+        lab = Gtk.Label(cfg.quick_controls_desc)
+        lab.set_vexpand(True)
+        grid.attach(lab, 0, 2, 1, 1)
+        lab.set_vexpand(True)
 
         self.quick_control_scale_1 = Gtk.Scale.new_with_range(
             Gtk.Orientation.HORIZONTAL, 0, 127, 1
@@ -174,8 +184,8 @@ class TrackPropViewPopover(Gtk.Popover):
         self.quick_control_scale_1.set_value(v1)
         self.quick_control_scale_2.set_value(v2)
 
-        grid.attach(self.quick_control_scale_1, 1, 1, 2, 1)
-        grid.attach(self.quick_control_scale_2, 3, 1, 2, 1)
+        grid.attach(self.quick_control_scale_1, 1, 2, 2, 1)
+        grid.attach(self.quick_control_scale_2, 3, 2, 2, 1)
 
         self.quick_control_scale_1.connect("value-changed", self.on_qc1_changed)
         self.quick_control_scale_2.connect("value-changed", self.on_qc2_changed)
@@ -185,8 +195,10 @@ class TrackPropViewPopover(Gtk.Popover):
 
         self.name_entry.set_activates_default(False)
 
-        grid.attach(Gtk.Label("name:"), 0, 3, 1, 1)
-        grid.attach(self.name_entry, 1, 3, 4, 1)
+        lab = Gtk.Label("name:")
+        lab.set_vexpand(True)
+        grid.attach(lab, 0, 4, 1, 1)
+        grid.attach(self.name_entry, 1, 4, 4, 1)
 
         self.name_entry.set_text(
             mod.extras[parent.seq.index][self.trk.index]["track_name"]
@@ -206,7 +218,8 @@ class TrackPropViewPopover(Gtk.Popover):
             mod.extras[self.parent.seq.index][self.trk.index]["track_show_notes"]
         )
 
-        grid.attach(Gtk.Label("patch:"), 0, 2, 1, 1)
+        lab = Gtk.Label("patch:")
+        grid.attach(lab, 0, 3, 1, 1)
 
         box = Gtk.Box()
 
@@ -265,7 +278,7 @@ class TrackPropViewPopover(Gtk.Popover):
         box.add(self.patch_button)
         box.add(self.patch_menu_button)
 
-        grid.attach(box, 1, 2, 2, 1)
+        grid.attach(box, 1, 3, 2, 1)
 
         self.extend_track_grid = grid
 
@@ -400,9 +413,6 @@ class TrackPropViewPopover(Gtk.Popover):
 
         if itm.seq == -23:
             s = mod.add_sequence(mod[mod.curr_seq].length)
-            mod.extras[len(mod) - 1][-1]["highlight"] = mod.extras[
-                self.parent.seq.index
-            ][-1]["highlight"]
             mod.seqlist.configure()
             mod.seqlist.redraw()
 

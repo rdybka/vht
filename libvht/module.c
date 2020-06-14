@@ -224,6 +224,14 @@ void module_reset(module *mod) {
 	}
 }
 
+void module_panic(module *mod) {
+	for (int s = 0; s < mod->nseq; s++)
+		for (int t = 0; t < mod->seq[s]->ntrk; t++) {
+			mod->seq[s]->trk[t]->kill = 1;
+			queue_midi_ctrl(mod->clt, mod->seq[s], mod->seq[s]->trk[t], 0, 0x7B);
+		}
+}
+
 void module_seqs_reindex(module *mod) {
 	for (int s = 0; s < mod->nseq; s++) {
 		mod->seq[s]->index = s;

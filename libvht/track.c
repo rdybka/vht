@@ -53,6 +53,7 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	trk->loop = 1;
 	trk->ncols = 1;
 	trk->playing = 0;
+	trk->kill = 0;
 	trk->port = port;
 	trk->cur_rec_update = 0;
 	trk->resync = 0;
@@ -564,6 +565,10 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 
 	midi_client *clt = (midi_client *)trk->clt;
 
+	if (trk->kill) {
+		track_kill_notes(trk);
+	}
+
 	// length of period in track time
 	double tperiod = ((double)trk->nrows / (double)trk->nsrows) * speriod;
 	double tmul = (double) nframes / tperiod;
@@ -746,6 +751,8 @@ void track_wind(track *trk, double period) {
 }
 
 void track_kill_notes(track *trk) {
+	pthread_mutex_lock(&trk->excl);
+
 	for (int c = 0; c < trk->ncols; c++) {
 		if (trk->ring[c] != -1) {
 			midi_event evt;
@@ -755,18 +762,18 @@ void track_kill_notes(track *trk) {
 			evt.note = trk->ring[c];
 			evt.velocity = 0;
 			evt.time = 0;
-			if (trk->clt)
+			if (trk->clt) {
 				midi_buffer_add(trk->clt, trk->port, evt);
+			}
 
 			trk->ring[c] = -1;
 		}
-
-		pthread_mutex_lock(&trk->excl);
 
 		for (int t = 0; t < trk->nrows; t++) {
 			trk->rows[c][t].ringing = 0;
 		}
 
+		trk->kill = 0;
 		pthread_mutex_unlock(&trk->excl);
 	}
 }
@@ -1037,7 +1044,7 @@ void track_halve(track *trk) {
 void track_trigger(track *trk) {
 	if (trk->playing) {
 		trk->playing = 0;
-		track_kill_notes(trk);
+		trk->kill = 1;
 	} else {
 		trk->playing = 1;
 	}

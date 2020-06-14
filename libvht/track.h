@@ -40,6 +40,7 @@ typedef struct track_t {
 	int playing;
 	double pos;
 	int index;
+	volatile int kill;
 
 	// used for recording
 	double last_pos;

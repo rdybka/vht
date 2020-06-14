@@ -119,7 +119,7 @@ class PoorMansPiano:
                     self.trk.port,
                     self.trk.channel,
                     mnt,
-                    cfg.velocity,
+                    int(cfg.velocity),
                 )
                 self.note_on = mnt
                 self.ringing.append(mnt)

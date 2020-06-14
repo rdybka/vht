@@ -106,6 +106,7 @@ class VelocityEditor:
 
                 self.tv.trk[self.col][self.row].velocity = vel
                 self.tv.redraw(self.row)
+                cfg.velocity = vel
                 return True
 
         if not self.confirmed:
@@ -144,4 +145,5 @@ class VelocityEditor:
 
             self.tv.trk[self.col][new_hover_row].velocity = vel
             self.tv.redraw(new_hover_row, new_hover_row)
+            cfg.velocity = vel
         return True

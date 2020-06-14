@@ -78,10 +78,7 @@ class VHTSequence(Iterable):
     def swap_track(self, t1, t2):
         libcvht.sequence_swap_track(self._seq_handle, t1, t2)
 
-    def del_track(self, t=-1):
-        if t >= 0:
-            self[t].kill_notes()
-
+    def del_track(self, t):
         libcvht.sequence_del_track(self._seq_handle, t)
 
     def set_midi_focus(self, foc):

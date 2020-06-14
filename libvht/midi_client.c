@@ -195,13 +195,14 @@ void midi_buffer_flush_port(midi_client *clt, int port) {
 	if (clt->curr_midi_event[port] == 0)
 		return;
 
-	qsort(clt->midi_buffer[port], clt->curr_midi_event[port], sizeof(midi_event), midi_buffer_compare);
-
-	midi_event *last = 0;
+	if (clt->curr_midi_event[port] > 1)
+		qsort(clt->midi_buffer[port], clt->curr_midi_event[port], sizeof(midi_event), midi_buffer_compare);
 
 	for (int i = 0; i < clt->curr_midi_event[port]; i++) {
+		midi_event *last = 0;
 		unsigned char buff[3];
 		int dbl = 0;
+
 		if (midi_encode_event(clt->midi_buffer[port][i], buff)) {
 			int l = 3;
 

@@ -1,18 +1,16 @@
+- clean up octaves / make sure notes 1-127 work
+- nudge velocity
 - timeline
-    - strip managent
+    - strip management
     - feeding
     - scrub
     - loop
     - view
     - on left
-- fix gui line-up for slvpop
 - loop
     -reset
 - ports
 - standarise midin for media buttons
-- tracks:
-    - kill notes when muting
-- panic
 - console
     - click in statusbar
     - documentation
