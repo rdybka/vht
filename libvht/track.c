@@ -366,6 +366,7 @@ track *track_clone(track *src) {
 		dst->last_pos = src->last_pos;
 		dst->last_period = src->last_period;
 		dst->indicators = src->indicators;
+		dst->playing = src->playing;
 	}
 
 	return dst;

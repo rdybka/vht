@@ -25,4 +25,5 @@ cd ..
 black vht/*.py libvht/*.py
 swig -python libvht/libcvht.h
 #snapcraft clean
-
+git add .
+git reset libvht/*.so

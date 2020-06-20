@@ -21,6 +21,7 @@ from vht import cfg, mod
 from gi.repository import Gdk, Gtk, Gio
 from datetime import datetime
 import gi
+import copy
 
 gi.require_version("Gtk", "3.0")
 
@@ -411,18 +412,18 @@ class TrackPropViewPopover(Gtk.Popover):
             self.parent.clone_track(self.trkview)
             return
 
+        seq = itm.seq
         if itm.seq == -23:
-            s = mod.add_sequence(mod[mod.curr_seq].length)
-            mod.seqlist.configure()
-            mod.seqlist.redraw()
+            mod.add_sequence(mod[mod.curr_seq].length)
+            seq = len(mod) - 1
+            mod.extras[seq][-1]["font_size"] = mod.extras[self.parent.seq.index][-1][
+                "font_size"
+            ]
 
-        seq = itm.seq if itm.seq != -23 else len(mod) - 1
-
-        ntrk = self.parent.seq.clone_track(self.trkview.trk, mod[seq])
-        mod.extras[seq][ntrk.index] = mod.extras[self.parent.seq.index][
-            self.trk.index
-        ].copy()
-
+        trk = self.parent.seq.clone_track(self.trkview.trk, mod[seq])
+        mod.extras[seq][trk.index] = copy.deepcopy(
+            mod.extras[self.parent.seq.index][self.trk.index]
+        )
         self.build_clone_menu()
 
     def on_patch_menu_item_activate(self, itm):

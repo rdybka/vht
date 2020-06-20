@@ -371,7 +371,7 @@ class StatusBar(Gtk.DrawingArea):
 
         if self.active_field == 1:
             if up:
-                cfg.octave = min(cfg.octave + 1, 8)
+                cfg.octave = min(cfg.octave + 1, 10)
             if down:
                 cfg.octave = max(cfg.octave - 1, 0)
 
@@ -443,7 +443,7 @@ class StatusBar(Gtk.DrawingArea):
 
         if self.active_field == 1:
             if up:
-                cfg.octave = min(cfg.octave + 1, 8)
+                cfg.octave = min(cfg.octave + 1, 10)
             if down:
                 cfg.octave = max(cfg.octave - 1, 0)
 

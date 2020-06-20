@@ -2,9 +2,14 @@
 
 from setuptools import setup, Extension
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(name = "vht",
-	version = "0.1.8",
-	description = "Valhalla MIDI Tracker",
+	version = "0.1.23",
+	description = "Valhalla Tracker - a live MIDI sequencer for JACK",
+	long_description=long_description,
+    long_description_content_type="text/markdown",
 	author = "Remigiusz Dybka",
 	author_email = "remigiusz.dybka@gmail.com",
 	url = "https://github.com/rdybka/vht",
@@ -36,8 +41,8 @@ setup(name = "vht",
 	],
 	
 	classifiers=[
+        'Development Status :: 3 - Alpha',
 		'Environment :: X11 Applications :: Gnome',
-		'Development Status :: 2 - Pre-Alpha',
 		'Intended Audience :: End Users/Desktop',
 		'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
 		'Programming Language :: Python :: 3',

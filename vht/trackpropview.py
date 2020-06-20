@@ -21,6 +21,7 @@ from vht.trackpropviewpopover import TrackPropViewPopover
 from vht import *
 from datetime import datetime
 import random
+import copy
 import cairo
 from gi.repository import Gdk, Gtk, Gio
 import gi
@@ -134,12 +135,12 @@ class TrackPropView(Gtk.DrawingArea):
 
     def clone_track(self, trk):
         ntrk = self.seq.clone_track(trk.trk)
-        if trk.trk.playing:
-            ntrk.playing = 0
 
-        mod.extras[self.seq.index][ntrk.index] = mod.extras[self.seq.index][
-            trk.trk.index
-        ].copy()
+        ntrk.playing = 0
+
+        mod.extras[self.seq.index][ntrk.index] = copy.deepcopy(
+            mod.extras[self.seq.index][trk.trk.index]
+        )
 
         t = self.seqview.add_track(ntrk)
         t.show_controllers = trk.show_controllers

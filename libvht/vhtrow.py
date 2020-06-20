@@ -21,7 +21,6 @@ from libvht import libcvht
 class VHTRow:
     def __init__(self, rowptr):
         self._rowptr = rowptr
-
         self._type = libcvht.row_get_type(self._rowptr)
         self._note = libcvht.row_get_note(self._rowptr)
         self._velocity = libcvht.row_get_velocity(self._rowptr)
@@ -96,6 +95,8 @@ class VHTRow:
         if isinstance(value, int):
             self._note = value
             libcvht.row_set_note(self._rowptr, self._note)
+            self.update_strrep()
+            return
 
         if isinstance(value, str):
             self._note = libcvht.parse_note(value)

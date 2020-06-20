@@ -22,6 +22,7 @@ from vht import cfg, mod, extras
 from gi.repository import Gdk, Gtk, Gio
 from datetime import datetime
 import gi
+import copy
 
 gi.require_version("Gtk", "3.0")
 
@@ -198,10 +199,10 @@ class SequenceListViewPopover(Gtk.Popover):
     def on_clone_button_clicked(self, wdg):
         idx = mod.clone_sequence(self.curr).index
 
-        mod.extras[idx][-1]["mouse_cfg"] = mod.extras[self.curr][-1]["mouse_cfg"].copy()
+        mod.extras[idx][-1] = copy.deepcopy(mod.extras[self.curr][-1])
         mod.extras[idx][-1]["sequence_name"] = extras.get_name(
             mod.extras[self.curr][-1]["sequence_name"]
         )
 
         for t in range(len(mod[idx])):
-            mod.extras[idx][t] = mod.extras[self.curr][t].copy()
+            mod.extras[idx][t] = copy.deepcopy(mod.extras[self.curr][t])

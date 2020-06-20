@@ -969,7 +969,10 @@ class TrackView(Gtk.DrawingArea):
         new_hover_row = max(new_hover_row, 0)
         new_hover_column = max(new_hover_column, 0)
 
-        if self.velocity_editor:
+        if self.velocity_editor and not (
+            (event.state & Gdk.ModifierType.SHIFT_MASK)
+            and (event.state & Gdk.ModifierType.BUTTON1_MASK)
+        ):
             return self.velocity_editor.on_motion(widget, event)
 
         if self.timeshift_editor and not (
@@ -1020,6 +1023,7 @@ class TrackView(Gtk.DrawingArea):
             self.select_start
             and self.select_end
             and (event.state & Gdk.ModifierType.CONTROL_MASK)
+            and (not event.state & Gdk.ModifierType.SHIFT_MASK)
             and (event.state & Gdk.ModifierType.BUTTON1_MASK)
         ):  # nudge
             if self.nudge_last_y == -1:
@@ -1063,6 +1067,55 @@ class TrackView(Gtk.DrawingArea):
                 for c in range(self.select_start[0], self.select_end[0] + 1):
                     for r in range(self.select_start[1], self.select_end[1] + 1):
                         self.trk[c][r].delay = self.nudge_buff[(c, r)] + n
+                        self.redraw(r)
+
+            return True
+
+        if (
+            self.select_start
+            and self.select_end
+            and (event.state & Gdk.ModifierType.SHIFT_MASK)
+            and (event.state & Gdk.ModifierType.CONTROL_MASK)
+            and (event.state & Gdk.ModifierType.BUTTON1_MASK)
+        ):  # velocity
+            if self.nudge_last_y == -1:
+                self.nudge_last_y = event.y
+
+                self.velocity_editor = VelocityEditor(
+                    self, new_hover_column, new_hover_row, event
+                )
+                self.velocity_editor.confirmed = True
+                self.configure()
+                self.parent.redraw_track(self.trk)
+                self.nudge_buff = {}
+                self.sel_dragged = True
+                return True
+
+            n = math.floor(event.y - self.nudge_last_y) / 4
+            if n != 0:
+                maxn = 0
+                minn = 127
+
+                for c in range(self.select_start[0], self.select_end[0] + 1):
+                    for r in range(self.select_start[1], self.select_end[1] + 1):
+                        if not (c, r) in self.nudge_buff:
+                            self.nudge_buff[(c, r)] = self.trk[c][r].velocity
+
+                        if self.trk[c][r].type > 0:
+                            maxn = max(maxn, self.nudge_buff[(c, r)])
+                            minn = min(minn, self.nudge_buff[(c, r)])
+
+                maxn = 127 - maxn
+                minn = -minn
+
+                if n > 0:
+                    n = min(n, maxn)
+                else:
+                    n = max(n, minn)
+
+                for c in range(self.select_start[0], self.select_end[0] + 1):
+                    for r in range(self.select_start[1], self.select_end[1] + 1):
+                        self.trk[c][r].velocity = self.nudge_buff[(c, r)] + n
                         self.redraw(r)
 
             return True
@@ -2079,13 +2132,14 @@ class TrackView(Gtk.DrawingArea):
 
         note = self.pmp.key2note(Gdk.keyval_to_lower(event.keyval))
 
-        if self.edit and self.edit[0] < len(self.trk) and note and mod.record == 0:
+        if self.edit and self.edit[0] < len(self.trk) and note >= 0 and mod.record == 0:
             self.undo_buff.add_state()
             old = self.edit[1]
-            self.trk[self.edit[0]][self.edit[1]] = note
-
-            if self.trk[self.edit[0]][self.edit[1]].velocity == 100:
-                self.trk[self.edit[0]][self.edit[1]].velocity = cfg.velocity
+            rw = self.trk[self.edit[0]][self.edit[1]]
+            rw.note = note
+            rw.type = 1
+            if rw.velocity == 0:
+                rw.velocity = cfg.velocity
 
             self.edit = self.edit[0], self.edit[1] + cfg.skip
             if self.edit[1] >= self.trk.nrows:

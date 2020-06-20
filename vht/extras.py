@@ -41,6 +41,9 @@ def get_name(n):
 
 
 def fix_extras_new_seq(s):
+    if s in mod.extras:
+        return
+
     mod.extras[s] = {}
     mod.extras[s][-1] = {}
 

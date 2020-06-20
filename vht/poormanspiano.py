@@ -106,11 +106,10 @@ class PoorMansPiano:
             mnt = self.mnotes2.index(key) + 12
 
         if mnt == -23:
-            return None
+            return -1
 
         mnt += cfg.octave * 12
-        while mnt > 127:
-            mnt -= 12
+        mnt = min(mnt, 127)
 
         if not note_off:
             if self.note_on != mnt:
@@ -133,14 +132,4 @@ class PoorMansPiano:
             while mnt in self.ringing:
                 self.ringing.remove(mnt)
 
-        octave = cfg.octave
-        if key in self.notes:
-            return "%s%d" % (self.notes[key], octave)
-
-        octave = cfg.octave
-        octave += 1
-        if octave > 8:
-            octave = 8
-        if key in self.notes2:
-            return "%s%d" % (self.notes2[key], octave)
-        return None
+        return mnt

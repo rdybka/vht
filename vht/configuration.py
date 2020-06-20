@@ -37,7 +37,7 @@ class Configuration:
 
         self.console_scale = 1
         self.timeline_position = 0.75
-        self.timeline_position_y = 123
+        self.timeline_position_y = 232
         self.console_position = 0.7
         self.console_show = False
         self.timeline_show = True
@@ -54,7 +54,7 @@ class Configuration:
         self.console_colour = self.star_colour
         self.record_colour = (1.0, 0, 0)
 
-        self.popup_timeout = 0.7
+        self.popup_timeout = 0.2
 
         self.intensity_background = 0.2
         self.intensity_txt = 1
@@ -63,11 +63,11 @@ class Configuration:
         self.intensity_lines = 0.6
         self.even_highlight = 1.4
         self.intensity_select = 0.7
-        self.pointer_opacity = 0.9
+        self.pointer_opacity = 1.0
         self.pointer_width = 5
         self.auto_scroll_delay = 0.2
         self.tooltip_markup = """<span font_family="Monospace" size="large">%s</span>"""
-        self.window_opacity = 1
+        self.window_opacity = 1.0
 
         self.sequence_name_format = "s%02d"
         self.row_number_format = "%03d"

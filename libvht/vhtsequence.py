@@ -66,7 +66,7 @@ class VHTSequence(Iterable):
         ntrk = libcvht.sequence_clone_track(dest._seq_handle, trk._trk_handle)
         # libcvht.track_set_playing(ntrk, 0)
         for cb in self.cb_new_track:
-            cb(self.index, libcvht.track_get_index(ntrk))
+            cb(dest.index, libcvht.track_get_index(ntrk))
         return VHTTrack(ntrk)
 
     def double(self):
