@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name = "vht",
-	version = "0.1.23",
+	version = "0.1.23.0",
 	description = "Valhalla Tracker - a live MIDI sequencer for JACK",
 	long_description=long_description,
     long_description_content_type="text/markdown",
@@ -35,7 +35,9 @@ setup(name = "vht",
         ]},
 	
 	data_files = [
-		('share/vht', ['data/vht.svg', 'data/vht.png', 'data/menu.ui', 'data/ctrl/10-gm', 'data/ctrl/20-zyn', 'data/bank/10-gm1', 'data/bank/20-gm2']),
+		('share/vht', ['data/vht.svg', 'data/vht.png', 'data/menu.ui']),
+		('share/vht/ctrl', ['data/ctrl/10-gm', 'data/ctrl/20-zyn']),
+		('share/vht/bank', ['data/bank/10-gm1', 'data/bank/20-gm2']),
 		('share/icons', ['data/vht.svg']),
 		('share/applications', ['data/com.github.rdybka.vht.desktop'])
 	],

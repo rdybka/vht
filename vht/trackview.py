@@ -1025,7 +1025,7 @@ class TrackView(Gtk.DrawingArea):
             and (event.state & Gdk.ModifierType.CONTROL_MASK)
             and (not event.state & Gdk.ModifierType.SHIFT_MASK)
             and (event.state & Gdk.ModifierType.BUTTON1_MASK)
-        ):  # nudge
+        ):  # nudge time
             if self.nudge_last_y == -1:
                 self.nudge_last_y = event.y
                 if not self.show_timeshift:
@@ -1091,17 +1091,16 @@ class TrackView(Gtk.DrawingArea):
                 self.sel_dragged = True
                 return True
 
-            n = math.floor(event.y - self.nudge_last_y) / 4
+            n = -math.floor(event.y - self.nudge_last_y) / 4
             if n != 0:
                 maxn = 0
                 minn = 127
 
                 for c in range(self.select_start[0], self.select_end[0] + 1):
                     for r in range(self.select_start[1], self.select_end[1] + 1):
-                        if not (c, r) in self.nudge_buff:
-                            self.nudge_buff[(c, r)] = self.trk[c][r].velocity
-
-                        if self.trk[c][r].type > 0:
+                        if self.trk[c][r].type == 1:
+                            if not (c, r) in self.nudge_buff:
+                                self.nudge_buff[(c, r)] = self.trk[c][r].velocity
                             maxn = max(maxn, self.nudge_buff[(c, r)])
                             minn = min(minn, self.nudge_buff[(c, r)])
 
@@ -1115,8 +1114,9 @@ class TrackView(Gtk.DrawingArea):
 
                 for c in range(self.select_start[0], self.select_end[0] + 1):
                     for r in range(self.select_start[1], self.select_end[1] + 1):
-                        self.trk[c][r].velocity = self.nudge_buff[(c, r)] + n
-                        self.redraw(r)
+                        if (c, r) in self.nudge_buff:
+                            self.trk[c][r].velocity = self.nudge_buff[(c, r)] + n
+                            self.redraw(r)
 
             return True
 
