@@ -203,6 +203,11 @@ void midi_buffer_flush_port(midi_client *clt, int port) {
 		unsigned char buff[3];
 		int dbl = 0;
 
+		midi_event *curr = &clt->midi_buffer[port][i];
+		if (curr->time >= clt->jack_buffer_size) {
+			curr->time = clt->jack_buffer_size - 1;
+		}
+
 		if (midi_encode_event(clt->midi_buffer[port][i], buff)) {
 			int l = 3;
 
@@ -211,13 +216,14 @@ void midi_buffer_flush_port(midi_client *clt, int port) {
 			}
 
 			if (last) {
-				midi_event *curr = &clt->midi_buffer[port][i];
+				curr = &clt->midi_buffer[port][i];
 
 				if ((last->time == curr->time) &&
 				        (last->channel == curr->channel) &&
 				        (last->type == curr->type) &&
 				        (last->note == curr->note)) {
 					dbl = 1;
+					printf("dbl!!!\n");
 				}
 
 				if (!dbl)
