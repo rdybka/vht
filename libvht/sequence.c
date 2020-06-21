@@ -316,8 +316,8 @@ void sequence_del_track(sequence *seq, int t) {
 		return;
 
 	seq->trk[t]->kill = 1;
-	if (seq->playing && seq->trk[t]->playing && seq->trk[t]->clt)
-		while(seq->trk[t]->kill);
+	//if (seq->playing && seq->trk[t]->playing && seq->trk[t]->clt)
+	//	while(seq->trk[t]->kill);
 
 	seq_mod_excl_in(seq);
 
