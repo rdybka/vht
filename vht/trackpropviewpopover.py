@@ -32,11 +32,14 @@ class TrackPropViewPopover(Gtk.Popover):
         self.set_relative_to(parent)
 
         self.add_events(
-            Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.ENTER_NOTIFY_MASK
+            Gdk.EventMask.LEAVE_NOTIFY_MASK
+            | Gdk.EventMask.ENTER_NOTIFY_MASK
+            | Gdk.EventMask.KEY_PRESS_MASK
         )
 
         self.connect("leave-notify-event", self.on_leave)
         self.connect("enter-notify-event", self.on_enter)
+        self.connect("key-press-event", self.on_key_press)
 
         self.parent = parent
         self.trk = trk
@@ -373,6 +376,12 @@ class TrackPropViewPopover(Gtk.Popover):
 
         self.extend_notebook.set_current_page(0)
         self.set_modal(False)
+
+    def on_key_press(self, widget, event):
+        if event.keyval == Gdk.KEY_Escape:
+            self.hide()
+            self.unpop()
+            return True
 
     def build_clone_menu(self):
         m = self.clone_button.get_popup()

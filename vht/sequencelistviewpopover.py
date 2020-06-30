@@ -36,11 +36,13 @@ class SequenceListViewPopover(Gtk.Popover):
             | Gdk.EventMask.ENTER_NOTIFY_MASK
             | Gdk.EventMask.BUTTON_PRESS_MASK
             | Gdk.EventMask.SCROLL_MASK
+            | Gdk.EventMask.KEY_PRESS_MASK
         )
 
         self.connect("leave-notify-event", self.on_leave)
         self.connect("enter-notify-event", self.on_enter)
         self.connect("scroll-event", self.on_scroll)
+        self.connect("key-press-event", self.on_key_press)
 
         self._parent = parent
         self._time_want_to_leave = 0
@@ -83,6 +85,14 @@ class SequenceListViewPopover(Gtk.Popover):
         self.set_relative_to(parent)
         self.set_position(Gtk.PositionType.LEFT)
         # mod.gui_midi_capture = False
+
+    def on_key_press(self, widget, event):
+        if event.keyval == Gdk.KEY_Escape:
+            self.hide()
+            self.pooped = False
+            self._trgview.capture = -1
+            self._parent._menu_handle = -1
+            return True
 
     def on_scroll(self, wdg, prm):
         last = new = self.curr

@@ -54,7 +54,6 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 	}
 
 	module_excl_in(mod);
-	midi_buffer_clear(mod->clt);
 
 	double time = (curr_frames - mod->zero_time) / (double)mod->clt->jack_sample_rate;
 	double row_length = 60.0 / (double)mod->bpm;
@@ -63,9 +62,9 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 	// are we muting after stop?
 	if (!mod->playing) {
 		if (mod->mute) {
-			for (int t = 0; t < mod->seq[mod->curr_seq]->ntrk; t++)
-				track_kill_notes(mod->seq[mod->curr_seq]->trk[t]);
-
+			for (int s = 0; s < mod->nseq; s++)
+				for (int t = 0; t < mod->seq[s]->ntrk; t++)
+					track_kill_notes(mod->seq[s]->trk[t]);
 			mod->mute = 0;
 		}
 	} else {
@@ -227,7 +226,7 @@ void module_reset(module *mod) {
 void module_panic(module *mod) {
 	for (int s = 0; s < mod->nseq; s++)
 		for (int t = 0; t < mod->seq[s]->ntrk; t++) {
-			mod->seq[s]->trk[t]->kill = 1;
+			track_kill_notes(mod->seq[s]->trk[t]);
 			queue_midi_ctrl(mod->clt, mod->seq[s], mod->seq[s]->trk[t], 0, 0x7B);
 		}
 }

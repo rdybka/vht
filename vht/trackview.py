@@ -2138,8 +2138,7 @@ class TrackView(Gtk.DrawingArea):
             rw = self.trk[self.edit[0]][self.edit[1]]
             rw.note = note
             rw.type = 1
-            if rw.velocity == 0:
-                rw.velocity = cfg.velocity
+            rw.velocity = cfg.velocity
 
             self.edit = self.edit[0], self.edit[1] + cfg.skip
             if self.edit[1] >= self.trk.nrows:

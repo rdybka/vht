@@ -252,6 +252,8 @@ void midi_buffer_flush(midi_client *clt) {
 		if (clt->jack_output_ports[p])
 			midi_buffer_flush_port(clt, p);
 	}
+
+	midi_buffer_clear(clt);
 }
 
 

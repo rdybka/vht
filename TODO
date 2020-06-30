@@ -1,3 +1,16 @@
+* track muting on deletion
+* seq muting on deletion
+* update statusbar after fullscreen
+* esc to close popup
+* cloning tracks in seq:
+    * time
+    * rpb
+* overwriting velocities from sbar
+
+- ports
+- undo/redo
+    - undelete tracks
+    - undelete seqs
 - timeline
     - strip management
     - feeding
@@ -7,21 +20,19 @@
     - on left
 - loop
     -reset
-? ports
+- transport
 - standarise midin for media buttons
 - console
     - click in statusbar
     - documentation
     - updates from puthin
     - autofill
-- silence
-    - when quitting
+- labels on tooltips
+- track colors
 - autoscroll and moving
 - autoscroll and console open/close (magic row 27)
-- magic transposing
 - export:
     - audio
         - freewheeling
 - configuration
-? new window
-? new
+

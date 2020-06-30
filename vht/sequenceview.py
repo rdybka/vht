@@ -585,7 +585,6 @@ class SequenceView(Gtk.Box):
         self.redraw_track(None)
         self._side_prop.redraw()
         self.prop_view.redraw()
-        # self._status_bar.queue_resize()
 
     def on_scroll(self, widget, event):
         if event.state & Gdk.ModifierType.CONTROL_MASK:  # we're zooming!

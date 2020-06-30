@@ -30,11 +30,14 @@ class SequencePropViewPopover(Gtk.Popover):
         self.set_relative_to(parent)
 
         self.set_events(
-            Gdk.EventMask.LEAVE_NOTIFY_MASK | Gdk.EventMask.ENTER_NOTIFY_MASK
+            Gdk.EventMask.LEAVE_NOTIFY_MASK
+            | Gdk.EventMask.ENTER_NOTIFY_MASK
+            | Gdk.EventMask.KEY_PRESS_MASK
         )
 
         self.connect("leave-notify-event", self.on_leave)
         self.connect("enter-notify-event", self.on_enter)
+        self.connect("key-press-event", self.on_key_press)
 
         self.parent = parent
         self.seq = seq
@@ -75,6 +78,12 @@ class SequencePropViewPopover(Gtk.Popover):
         self.grid.show_all()
         self.add(self.grid)
         self.set_modal(False)
+
+    def on_key_press(self, widget, event):
+        if event.keyval == Gdk.KEY_Escape:
+            self.hide()
+            self.unpop()
+            return True
 
     def tick(self, wdg, param):
         if self.time_want_to_leave == 0:  # normal

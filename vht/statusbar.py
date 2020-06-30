@@ -61,6 +61,7 @@ class StatusBar(Gtk.DrawingArea):
         self.pulse = Pulsar(mod[mod.curr_seq].rpb)
 
     def redraw(self):
+        self.queue_resize()
         cr = self._context
         w = self.get_allocated_width()
         h = self.get_allocated_height()
@@ -258,7 +259,7 @@ class StatusBar(Gtk.DrawingArea):
             self._surface.finish()
 
         w = wdg.get_allocated_width()
-        h = wdg.get_allocated_width()
+        h = wdg.get_allocated_height()
 
         self.tt_rect.height = h
 

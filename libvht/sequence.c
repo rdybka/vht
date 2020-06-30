@@ -78,6 +78,7 @@ sequence *sequence_clone(sequence *seq) {
 	ns->mod_excl = seq->mod_excl;
 	ns->clt = seq->clt;
 	ns->pos = seq->pos;
+	ns->rpb = seq->rpb;
 
 	for (int t = 0; t < seq->ntrk; t++) {
 		track *trk = track_clone(seq->trk[t]);
@@ -143,6 +144,7 @@ void sequence_halve(sequence *seq) {
 
 void sequence_free(sequence *seq) {
 	for (int t = 0; t < seq->ntrk; t++) {
+		track_kill_notes(seq->trk[t]);
 		track_free(seq->trk[t]);
 	}
 
@@ -315,10 +317,6 @@ void sequence_del_track(sequence *seq, int t) {
 	if ((t >= seq->ntrk) || (t < 0))
 		return;
 
-	seq->trk[t]->kill = 1;
-	//if (seq->playing && seq->trk[t]->playing && seq->trk[t]->clt)
-	//	while(seq->trk[t]->kill);
-
 	seq_mod_excl_in(seq);
 
 	track_free(seq->trk[t]);
@@ -329,7 +327,7 @@ void sequence_del_track(sequence *seq, int t) {
 
 	seq->ntrk--;
 
-	if (seq->ntrk  == 0) {
+	if (seq->ntrk == 0) {
 		free(seq->trk);
 		seq->trk = 0;
 	} else {
