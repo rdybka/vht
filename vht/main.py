@@ -26,6 +26,7 @@ from gi.repository import GLib, Gtk, Gio, GdkPixbuf
 import vht.extras
 import sys
 import os
+import time
 import gi
 import pkg_resources
 
@@ -250,7 +251,11 @@ def run():
 
     app = VHTApp()
     app.run(sys.argv)
+
+    mod.play = 0
+    time.sleep(0.096)
     mod.panic()
+    time.sleep(0.042)
     mod.midi_stop()
 
 

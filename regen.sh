@@ -7,7 +7,7 @@
 
 rm -f *.snap *.so *.o
 rm -f libvht/*.o
-rm -f libvht/*.so
+#rm -f libvht/*.so
 rf -f install.txt
 rm -rf __pycache__
 rm -rf vht/__pycache__
