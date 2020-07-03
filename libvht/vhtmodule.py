@@ -20,6 +20,7 @@ from libvht import libcvht
 from libvht.vhtsequence import VHTSequence
 from libvht.vhttimeline import VHTTimeline
 import pickle
+import time
 
 
 class VHTModule(Iterable):
@@ -46,6 +47,7 @@ class VHTModule(Iterable):
 
     def __del__(self):
         libcvht.module_free(self._mod_handle)
+        libcvht.midi_stop(self._clt_handle)
 
     # this will connect and initialise an empty module
     def midi_start(self, name=None):
@@ -53,6 +55,7 @@ class VHTModule(Iterable):
 
     # disconnect from jack
     def midi_stop(self):
+        time.sleep(0.420)
         libcvht.midi_stop(self._clt_handle)
 
     def midi_synch_ports(self):
@@ -257,8 +260,8 @@ class VHTModule(Iterable):
     def set_default_midi_port(self, port):
         libcvht.set_default_midi_port(self._mod_handle, port)
 
-    def panic(self):
-        libcvht.module_panic(self._mod_handle)
+    def panic(self, brutal=False):
+        libcvht.module_panic(self._mod_handle, 1 if brutal else 0)
 
     def save(self, filename):
         jm = {}

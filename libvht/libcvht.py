@@ -98,8 +98,8 @@ def module_free(mod):
 def module_reset(mod):
     return _libcvht.module_reset(mod)
 
-def module_panic(mod):
-    return _libcvht.module_panic(mod)
+def module_panic(mod, brutal):
+    return _libcvht.module_panic(mod, brutal)
 
 def module_get_midi_client(mod):
     return _libcvht.module_get_midi_client(mod)

@@ -3429,18 +3429,25 @@ fail:
 SWIGINTERN PyObject *_wrap_module_panic(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   module *arg1 = (module *) 0 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  PyObject *swig_obj[1] ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
   
-  if (!args) SWIG_fail;
-  swig_obj[0] = args;
+  if (!SWIG_Python_UnpackTuple(args, "module_panic", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_module, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_panic" "', argument " "1"" of type '" "module *""'"); 
   }
   arg1 = (module *)(argp1);
-  module_panic(arg1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "module_panic" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  module_panic(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -7992,7 +7999,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "module_new", _wrap_module_new, METH_NOARGS, NULL},
 	 { "module_free", _wrap_module_free, METH_O, NULL},
 	 { "module_reset", _wrap_module_reset, METH_O, NULL},
-	 { "module_panic", _wrap_module_panic, METH_O, NULL},
+	 { "module_panic", _wrap_module_panic, METH_VARARGS, NULL},
 	 { "module_get_midi_client", _wrap_module_get_midi_client, METH_O, NULL},
 	 { "midi_start", _wrap_midi_start, METH_VARARGS, NULL},
 	 { "midi_stop", _wrap_midi_stop, METH_O, NULL},

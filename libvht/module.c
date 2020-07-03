@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <unistd.h>
 #include <stdio.h>
 #include <math.h>
 #include <pthread.h>
@@ -223,11 +224,12 @@ void module_reset(module *mod) {
 	}
 }
 
-void module_panic(module *mod) {
+void module_panic(module *mod, int brutal) {
 	for (int s = 0; s < mod->nseq; s++)
 		for (int t = 0; t < mod->seq[s]->ntrk; t++) {
 			track_kill_notes(mod->seq[s]->trk[t]);
-			queue_midi_ctrl(mod->clt, mod->seq[s], mod->seq[s]->trk[t], 0, 0x7B);
+			if (brutal)
+				queue_midi_ctrl(mod->clt, mod->seq[s], mod->seq[s]->trk[t], 0, 0x7B);
 		}
 }
 
@@ -238,6 +240,13 @@ void module_seqs_reindex(module *mod) {
 }
 
 void module_free(module *mod) {
+	printf("i'm free!!!!\n");
+	for (int s = 0; s < mod->nseq; s++)
+		for (int t = 0; t < mod->seq[s]->ntrk; t++)
+			track_kill_notes(mod->seq[s]->trk[t]);
+
+	sleep(.420);
+
 	midi_stop(mod->clt);
 	for (int s = 0; s < mod->nseq; s++)
 		sequence_free(mod->seq[s]);

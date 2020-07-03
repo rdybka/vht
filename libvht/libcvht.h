@@ -34,7 +34,7 @@
 extern module *module_new(void);
 extern void module_free(module *mod);
 extern void module_reset(module *mod);
-extern void module_panic(module *mod);
+extern void module_panic(module *mod, int brutal);
 extern midi_client *module_get_midi_client(module *mod);
 int midi_start(midi_client *clt, char *clt_name);
 void midi_stop(midi_client *clt);

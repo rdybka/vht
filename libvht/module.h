@@ -76,6 +76,6 @@ int module_get_play_mode(module *mod);
 
 
 void sequence_handle_record(module *mod, sequence *seq, midi_event evt);
-void module_panic(module *mod);
+void module_panic(module *mod, int brutal);
 
 #endif //__MODULE_H__

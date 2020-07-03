@@ -92,7 +92,7 @@ class Configuration:
         self.default_ctrl_name = "zyn"
 
         self.dark_theme = True
-        self.notebook_mouseover = True
+        self.notebook_mouseover = False
 
         self.quick_controls_desc = "vol/pan:"
         self.quick_control_1_ctrl = 7
@@ -109,7 +109,7 @@ class Configuration:
         self.last_load_path = ""
         self.last_save_path = ""
         self.save_indication_time = 0.23
-        self.track_indication_time = 0.05
+        self.track_indication_time = 0.02
 
         self.key = {
             # sequenceview		shift, ctrl, alt

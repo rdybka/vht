@@ -89,13 +89,7 @@ class VHTApp(Gtk.Application):
             self.main_win.set_header_from_filename(self.main_win.last_filename)
             self.main_win.adj.set_value(mod.bpm)
 
-        self.add_window(self.main_win)
-
-        self.main_win.show_all()
         mod.play = cfg.start_playing
-
-    def on_quit(self, action, param):
-        self.quit()
 
     def on_load(self, action, param):
         dialog = Gtk.FileChooserDialog(
@@ -254,13 +248,9 @@ def run():
     # fix patches
     mod.bank = bankcfg.load()
 
-    try:
-        app = VHTApp()
-        app.run(sys.argv)
-    except:
-        mod.midi_stop()
-        sys.exit()
-
+    app = VHTApp()
+    app.run(sys.argv)
+    mod.panic()
     mod.midi_stop()
 
 
