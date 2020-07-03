@@ -227,7 +227,7 @@ class MainWin(Gtk.ApplicationWindow):
         self._sequence_view.seq_add()
 
     def on_butt_panic_clicked(self, butt):
-        mod.panic()
+        mod.panic(True)
 
     def on_playmode_clicked(self, butt):
         if mod.play_mode:
@@ -303,7 +303,7 @@ class MainWin(Gtk.ApplicationWindow):
             return True
 
         if cfg.key["panic"].matches(event):
-            mod.panic()
+            mod.panic(True)
             return True
 
         if cfg.key["play_mode"].matches(event):
