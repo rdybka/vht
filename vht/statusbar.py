@@ -48,7 +48,7 @@ class StatusBar(Gtk.DrawingArea):
 
         self._surface = None
         self._context = None
-        self.min_char_width = 80
+        self.min_char_width = 70
 
         self.pos = []
         self.active_field = None
