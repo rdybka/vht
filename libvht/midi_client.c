@@ -276,11 +276,11 @@ void queue_midi_note_on(midi_client *clt, sequence *seq, int port, int chn, int 
 
 		if (seq)
 			sequence_handle_record(mod, seq, evt);
+	} else {
+		midi_buff_excl_in(clt);
+		clt->midi_queue_buffer[port][clt->curr_midi_queue_event[port]++] = evt;
+		midi_buff_excl_out(clt);
 	}
-
-	midi_buff_excl_in(clt);
-	clt->midi_queue_buffer[port][clt->curr_midi_queue_event[port]++] = evt;
-	midi_buff_excl_out(clt);
 }
 
 void queue_midi_note_off(midi_client *clt, sequence *seq, int port, int chn, int note) {
@@ -303,11 +303,11 @@ void queue_midi_note_off(midi_client *clt, sequence *seq, int port, int chn, int
 
 		if (seq)
 			sequence_handle_record(mod, seq, evt);
+	} else {
+		midi_buff_excl_in(clt);
+		clt->midi_queue_buffer[port][clt->curr_midi_queue_event[port]++] = evt;
+		midi_buff_excl_out(clt);
 	}
-
-	midi_buff_excl_in(clt);
-	clt->midi_queue_buffer[port][clt->curr_midi_queue_event[port]++] = evt;
-	midi_buff_excl_out(clt);
 }
 
 void queue_midi_ctrl(midi_client *clt, sequence *seq, track *trk, int val, int ctrl) {
@@ -334,24 +334,24 @@ void queue_midi_ctrl(midi_client *clt, sequence *seq, track *trk, int val, int c
 
 		if (seq)
 			sequence_handle_record(mod, seq, evt);
-	}
-
-	// update lctrlvals in track
-	pthread_mutex_lock(&trk->exclctrl);
-	if (ctrl == -1) {
-		trk->lctrlval[0] = val * 127;
 	} else {
-		for (int c = 0; c < trk->nctrl; c++) {
-			if (trk->ctrlnum[c] == ctrl)
-				trk->lctrlval[c] = val;
+		// update lctrlvals in track
+		pthread_mutex_lock(&trk->exclctrl);
+		if (ctrl == -1) {
+			trk->lctrlval[0] = val * 127;
+		} else {
+			for (int c = 0; c < trk->nctrl; c++) {
+				if (trk->ctrlnum[c] == ctrl)
+					trk->lctrlval[c] = val;
+			}
 		}
+
+		pthread_mutex_unlock(&trk->exclctrl);
+
+		midi_buff_excl_in(clt);
+		clt->midi_queue_buffer[trk->port][clt->curr_midi_queue_event[trk->port]++] = evt;
+		midi_buff_excl_out(clt);
 	}
-
-	pthread_mutex_unlock(&trk->exclctrl);
-
-	midi_buff_excl_in(clt);
-	clt->midi_queue_buffer[trk->port][clt->curr_midi_queue_event[trk->port]++] = evt;
-	midi_buff_excl_out(clt);
 }
 
 void midi_in_buffer_add(midi_client *clt, midi_event evt) {
