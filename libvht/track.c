@@ -581,26 +581,32 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 	// send program change?
 	if (trk->prog > -1) {
 		if ((trk->prog_sent == 0) && (trk->playing))  {
+			int resend = 0;
+
 			trk->prog_sent = 1;
 			midi_event evt;
 
-			evt.time = 0;
+			evt.time = 1;
 			evt.channel = trk->channel;
 			evt.type = control_change;
 			evt.control = 0;
 			evt.data = trk->bank_msb;
 
-			if (trk->bank_msb > -1)
+			if (trk->bank_msb > -1) {
 				midi_buffer_add(clt, trk->port, evt);
+				resend = 1;
+			}
 
-			evt.time = 0;
+			evt.time = 2;
 			evt.channel = trk->channel;
 			evt.type = control_change;
 			evt.control = 32;
 			evt.data = trk->bank_lsb;
 
-			if (trk->bank_lsb > -1)
+			if (trk->bank_lsb > -1) {
 				midi_buffer_add(clt, trk->port, evt);
+				resend = 1;
+			}
 
 			evt.time = 0;
 			evt.channel = trk->channel;
@@ -609,6 +615,16 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 			evt.data = 0;
 
 			midi_buffer_add(clt, trk->port, evt);
+
+			if (resend) {
+				evt.time = 3;
+				evt.channel = trk->channel;
+				evt.type = program_change;
+				evt.control = trk->prog;
+				evt.data = 0;
+
+				midi_buffer_add(clt, trk->port, evt);
+			}
 			trk->indicators |= 8;
 		}
 	}

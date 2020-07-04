@@ -21,6 +21,7 @@ from vht import mod, cfg
 def fix_extras_new_trk(s, t):
     mod.extras[s][t] = {}
     mod.extras[s][t]["track_name"] = ""
+    mod.extras[s][t]["track_keep_name"] = False
     mod.extras[s][t]["ctrl_names"] = {}
     mod.extras[s][t]["track_show_notes"] = True
     mod.extras[s][t]["track_show_timeshift"] = False

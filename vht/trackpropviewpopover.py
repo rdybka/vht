@@ -199,9 +199,16 @@ class TrackPropViewPopover(Gtk.Popover):
 
         self.name_entry.set_activates_default(False)
 
-        lab = Gtk.Label("name:")
-        lab.set_vexpand(True)
-        grid.attach(lab, 0, 4, 1, 1)
+        self.name_lab = Gtk.ToggleButton.new_with_label("name:")
+        self.name_lab.set_vexpand(True)
+
+        self.name_lab.set_active(
+            mod.extras[self.parent.seq.index][self.trk.index]["track_keep_name"]
+        )
+
+        self.name_lab.connect("toggled", self.on_keep_name_toggled)
+
+        grid.attach(self.name_lab, 0, 4, 1, 1)
         grid.attach(self.name_entry, 1, 4, 4, 1)
 
         self.name_entry.set_text(
@@ -222,7 +229,12 @@ class TrackPropViewPopover(Gtk.Popover):
             mod.extras[self.parent.seq.index][self.trk.index]["track_show_notes"]
         )
 
-        lab = Gtk.Label("patch:")
+        lab = Gtk.Button.new_with_label("patch:")
+        lab.connect("button-press-event", self.on_resend_patch_clicked, 0)
+        self.show_timeshift_button.set_active(
+            mod.extras[self.parent.seq.index][self.trk.index]["track_show_timeshift"]
+        )
+
         grid.attach(lab, 0, 3, 1, 1)
 
         box = Gtk.Box()
@@ -281,8 +293,30 @@ class TrackPropViewPopover(Gtk.Popover):
 
         box.add(self.patch_button)
         box.add(self.patch_menu_button)
-
         grid.attach(box, 1, 3, 2, 1)
+
+        box = Gtk.Box()
+        self.bank_msb = Gtk.Entry()
+        lab = Gtk.Label("CC#0")
+        self.bank_msb.set_text("%d" % self.trk.get_program()[0])
+        self.bank_msb.set_input_purpose(Gtk.InputPurpose.DIGITS)
+        self.bank_msb.set_width_chars(3)
+        self.bank_msb.set_max_length(3)
+        box.add(lab)
+        box.add(self.bank_msb)
+        grid.attach(box, 3, 3, 1, 1)
+
+        box = Gtk.Box()
+        self.bank_lsb = Gtk.Entry()
+        lab = Gtk.Label("CC#32")
+        self.bank_lsb.set_text("%d" % self.trk.get_program()[1])
+        self.bank_lsb.set_input_purpose(Gtk.InputPurpose.DIGITS)
+        self.bank_lsb.set_width_chars(3)
+        self.bank_lsb.set_max_length(3)
+        self.bank_lsb.set_hexpand(False)
+        box.add(lab)
+        box.add(self.bank_lsb)
+        grid.attach(box, 4, 3, 1, 1)
 
         self.extend_track_grid = grid
 
@@ -377,6 +411,20 @@ class TrackPropViewPopover(Gtk.Popover):
         self.extend_notebook.set_current_page(0)
         self.set_modal(False)
 
+    def on_resend_patch_clicked(self, wdg, evt, data):
+        msb = -1
+        lsb = -1
+        c = int(self.patch_adj.get_value())
+
+        if self.bank_msb.get_text().isnumeric():
+            msb = int(self.bank_msb.get_text())
+
+        if self.bank_lsb.get_text().isnumeric():
+            lsb = int(self.bank_lsb.get_text())
+
+        self.trk.set_bank(msb, lsb)
+        self.trk.send_program_change(c)
+
     def on_key_press(self, widget, event):
         if event.keyval == Gdk.KEY_Escape:
             self.hide()
@@ -438,8 +486,13 @@ class TrackPropViewPopover(Gtk.Popover):
     def on_patch_menu_item_activate(self, itm):
         self.name_entry.set_text(itm.patch[1])
         self.trk.set_bank(*itm.patch[0][:2])
-        self.patch_adj.set_value(itm.patch[0][2])
+
         mod.extras[self.parent.seq.index][self.trk.index]["last_patch_file"] = itm.name
+        self.patch_adj.set_value(itm.patch[0][2])
+
+        b = self.trk.get_program()
+        self.bank_msb.set_text("%d" % b[0])
+        self.bank_lsb.set_text("%d" % b[1])
 
     def refresh(self):
         if self.trkview.trk.nctrl == 1:
@@ -528,15 +581,21 @@ class TrackPropViewPopover(Gtk.Popover):
         c = int(adj.get_value())
         if c == -1:
             self.trk.set_bank(0, 0)
-        self.trk.send_program_change(c)
+        else:
+            self.trk.send_program_change(c)
 
+        if self.name_lab.get_active():
+            return
+
+        curr = self.trk.get_program()
+        self.name_entry.set_text("")
         # figure out the name
         if "last_patch_file" in mod.extras[self.parent.seq.index][self.trk.index]:
             n = mod.extras[self.parent.seq.index][self.trk.index]["last_patch_file"]
             if n in mod.bank:
                 pf = mod.bank[n]
                 for p in pf:
-                    if p[0][2] == c:
+                    if p[0][2] == c and p[0][0] == curr[0] and p[0][1] == curr[1]:
                         self.name_entry.set_text(p[2])
 
     def on_leave(self, wdg, prm):
@@ -570,6 +629,11 @@ class TrackPropViewPopover(Gtk.Popover):
         else:
             self.show_controllers_button.set_active(True)
             self.show_controllers_button.set_sensitive(False)
+
+    def on_keep_name_toggled(self, wdg):
+        mod.extras[self.parent.seq.index][self.trk.index][
+            "track_keep_name"
+        ] = wdg.get_active()
 
     def on_name_changed(self, wdg):
         mod.extras[self.parent.seq.index][self.trk.index]["track_name"] = wdg.get_text()

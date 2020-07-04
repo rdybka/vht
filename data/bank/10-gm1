@@ -1,5 +1,5 @@
 #general midi 1
-121:0:*
+0:0:*
 [Piano]
 1:Acoustic Grand Piano
 2:Bright Acoustic Piano
@@ -144,3 +144,14 @@
 126:Helicopter
 127:Applause
 128:Gunshot
+120:0:*
+[Drum Kit]
+1:Standard Kit
+9:Room Kit
+17:Power Kit
+25:Electronic Kit
+26:TR-808 Kit
+33:Jazz Kit
+41:Brush Kit
+49:Orchestra Kit
+57:Sound FX Kit
