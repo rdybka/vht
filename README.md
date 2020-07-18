@@ -2,21 +2,21 @@
 ## about
 Valhalla Tracker aims to be a MIDI sequencing companion
 for GNU/Linux audio setups. Adhering to Unix philosophy,
-it tries to do one thing well.
+it tries to do one thing well
 
 - by itself produces no sound and won't run on Windows™
 - timing/input/output relies 100% on JACK
-- probably most suitable for loop based music
 - seems to work fine with fluidsynth, ZynAddSubFX and a MIDI controller
+- probably most suitable for loop based music
 - minimalistic by design
 - minimalistic by necessity
-- can load and save files
-- tries not to interfere but inspire
-- for the same reason, sparsely documented :]
+- can save and load files
+- sparsely documented for hacking pleasure
 
 ## in zip
 - C library which talks to JACK and runs gameloop
-- GTK interface written in Python
+- it's Python counterpart, lazingly wrapped with SWIG
+- GTK human interface also written in snake language
 
 ## deps
 ```

@@ -412,16 +412,16 @@ class TimelineView(Gtk.DrawingArea):
 
     def animate(self):
         if self.qb_start_dest - self.qb_start != 0:
-            self.qb_start += (self.qb_start_dest - self.qb_start) / 10.0
+            self.qb_start += (self.qb_start_dest - self.qb_start) / 3
 
         if self.spl_dest - self.spl != 0:
-            self.spl += (self.spl_dest - self.spl) / 10
+            self.spl += (self.spl_dest - self.spl) / 3
 
         if abs(self.max_qb_start_dest - self.max_qb_start) > 0.01:
-            self.max_qb_start += (self.max_qb_start_dest - self.max_qb_start) / 10
+            self.max_qb_start += (self.max_qb_start_dest - self.max_qb_start) / 3
 
         if self.pointer_ry_dest - self.pointer_ry != 0:
-            self.pointer_ry += (self.pointer_ry_dest - self.pointer_ry) / 3
+            self.pointer_ry += (self.pointer_ry_dest - self.pointer_ry) / 2
 
         if self.pointer_xy:
             self.pointer_r = mod.timeline.t2qb(
