@@ -521,11 +521,20 @@ def timeline_get_change(tl, id):
 def timeline_get_nchanges(tl):
     return _libcvht.timeline_get_nchanges(tl)
 
+def timeline_get_qb(tl, t):
+    return _libcvht.timeline_get_qb(tl, t)
+
+def timeline_get_qb_time(tl, row):
+    return _libcvht.timeline_get_qb_time(tl, row)
+
 def timeline_get_nticks(tl):
     return _libcvht.timeline_get_nticks(tl)
 
 def timeline_get_tick(tl, n):
     return _libcvht.timeline_get_tick(tl, n)
+
+def timeline_get_length(tl):
+    return _libcvht.timeline_get_length(tl)
 
 def timeline_get_strip(tl, n):
     return _libcvht.timeline_get_strip(tl, n)

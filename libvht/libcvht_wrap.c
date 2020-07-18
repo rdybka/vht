@@ -3197,6 +3197,9 @@ SWIG_AsVal_float (PyObject * obj, float *val)
   return res;
 }
 
+
+  #define SWIG_From_long   PyInt_FromLong 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -7472,6 +7475,66 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_timeline_get_qb(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  timeline *arg1 = (timeline *) 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  long result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "timeline_get_qb", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_get_qb" "', argument " "1"" of type '" "timeline *""'"); 
+  }
+  arg1 = (timeline *)(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timeline_get_qb" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = (double)(val2);
+  result = (long)timeline_get_qb(arg1,arg2);
+  resultobj = SWIG_From_long((long)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_timeline_get_qb_time(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  timeline *arg1 = (timeline *) 0 ;
+  long arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  long val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  double result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "timeline_get_qb_time", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_get_qb_time" "', argument " "1"" of type '" "timeline *""'"); 
+  }
+  arg1 = (timeline *)(argp1);
+  ecode2 = SWIG_AsVal_long(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timeline_get_qb_time" "', argument " "2"" of type '" "long""'");
+  } 
+  arg2 = (long)(val2);
+  result = (double)timeline_get_qb_time(arg1,arg2);
+  resultobj = SWIG_From_double((double)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_timeline_get_nticks(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   timeline *arg1 = (timeline *) 0 ;
@@ -7518,6 +7581,29 @@ SWIGINTERN PyObject *_wrap_timeline_get_tick(PyObject *SWIGUNUSEDPARM(self), PyO
   } 
   arg2 = (int)(val2);
   result = (double)timeline_get_tick(arg1,arg2);
+  resultobj = SWIG_From_double((double)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_timeline_get_length(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  timeline *arg1 = (timeline *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  double result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_get_length" "', argument " "1"" of type '" "timeline *""'"); 
+  }
+  arg1 = (timeline *)(argp1);
+  result = (double)timeline_get_length(arg1);
   resultobj = SWIG_From_double((double)(result));
   return resultobj;
 fail:
@@ -8140,8 +8226,11 @@ static PyMethodDef SwigMethods[] = {
 	 { "timeline_change_del", _wrap_timeline_change_del, METH_VARARGS, NULL},
 	 { "timeline_get_change", _wrap_timeline_get_change, METH_VARARGS, NULL},
 	 { "timeline_get_nchanges", _wrap_timeline_get_nchanges, METH_O, NULL},
+	 { "timeline_get_qb", _wrap_timeline_get_qb, METH_VARARGS, NULL},
+	 { "timeline_get_qb_time", _wrap_timeline_get_qb_time, METH_VARARGS, NULL},
 	 { "timeline_get_nticks", _wrap_timeline_get_nticks, METH_O, NULL},
 	 { "timeline_get_tick", _wrap_timeline_get_tick, METH_VARARGS, NULL},
+	 { "timeline_get_length", _wrap_timeline_get_length, METH_O, NULL},
 	 { "timeline_get_strip", _wrap_timeline_get_strip, METH_VARARGS, NULL},
 	 { "timeline_get_nstrips", _wrap_timeline_get_nstrips, METH_O, NULL},
 	 { "timeline_add_strip", _wrap_timeline_add_strip, METH_VARARGS, NULL},

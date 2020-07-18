@@ -300,7 +300,7 @@ class TrackPropViewPopover(Gtk.Popover):
         lab = Gtk.Label("CC#0")
         self.bank_msb.set_text("%d" % self.trk.get_program()[0])
         self.bank_msb.set_input_purpose(Gtk.InputPurpose.DIGITS)
-        self.bank_msb.set_width_chars(3)
+        self.bank_msb.set_width_chars(4)
         self.bank_msb.set_max_length(3)
         box.add(lab)
         box.add(self.bank_msb)
@@ -311,7 +311,7 @@ class TrackPropViewPopover(Gtk.Popover):
         lab = Gtk.Label("CC#32")
         self.bank_lsb.set_text("%d" % self.trk.get_program()[1])
         self.bank_lsb.set_input_purpose(Gtk.InputPurpose.DIGITS)
-        self.bank_lsb.set_width_chars(3)
+        self.bank_lsb.set_width_chars(4)
         self.bank_lsb.set_max_length(3)
         self.bank_lsb.set_hexpand(False)
         box.add(lab)
@@ -484,7 +484,6 @@ class TrackPropViewPopover(Gtk.Popover):
         self.build_clone_menu()
 
     def on_patch_menu_item_activate(self, itm):
-        self.name_entry.set_text(itm.patch[1])
         self.trk.set_bank(*itm.patch[0][:2])
 
         mod.extras[self.parent.seq.index][self.trk.index]["last_patch_file"] = itm.name
@@ -493,6 +492,8 @@ class TrackPropViewPopover(Gtk.Popover):
         b = self.trk.get_program()
         self.bank_msb.set_text("%d" % b[0])
         self.bank_lsb.set_text("%d" % b[1])
+        if not self.name_lab.get_active():
+            self.name_entry.set_text(itm.patch[1])
 
     def refresh(self):
         if self.trkview.trk.nctrl == 1:

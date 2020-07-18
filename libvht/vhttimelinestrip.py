@@ -30,7 +30,7 @@ class VHTTimelineStrip:
         rpb_end = libcvht.timestrip_get_rpb_end(self._ptr)
         loop_length = libcvht.timestrip_get_loop_length(self._ptr)
 
-        self._strrep = " %d %d %d %d %d %d" % (
+        self._strrep = "%d %d %d %d %d %d" % (
             seq_id,
             start,
             length,

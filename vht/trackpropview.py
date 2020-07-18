@@ -348,7 +348,7 @@ class TrackPropView(Gtk.DrawingArea):
         cr.fill()
 
         if active:
-            alpha = 0.8
+            alpha = 2
             gradient = cairo.LinearGradient(0, 0, 0, self.txt_height * 2)
             gradient.add_color_stop_rgba(
                 0,
@@ -362,7 +362,7 @@ class TrackPropView(Gtk.DrawingArea):
             )
             gradient.add_color_stop_rgba(
                 0.8,
-                *(col * cfg.intensity_txt_highlight * 0.4 for col in cfg.record_colour),
+                *(col * cfg.intensity_txt_highlight for col in cfg.record_colour),
                 alpha
             )
 

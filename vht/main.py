@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# “The only Zen you’ll find on mountain tops
-# is the Zen you bring up there with you.” – Alan Watts
 
 from vht.mainwin import MainWin
 from vht import mod, cfg, ctrlcfg, autoexec, bankcfg, randomcomposer
@@ -207,7 +205,6 @@ def run():
 
     mod.ctrlpr = cfg.controller_resolution
     mod.saving = False
-    mod.dump_notes = True
     mod.play_mode = 0
     midig = []
     for val in cfg.midi_in.values():
@@ -242,12 +239,12 @@ def run():
         print("creating", mod.cfg_path)
         os.mkdir(mod.cfg_path)
 
-    autoexec.run()
-
     # fix controller configs
     mod.ctrls = ctrlcfg.load()
     # fix patches
     mod.bank = bankcfg.load()
+
+    autoexec.run()
 
     app = VHTApp()
     app.run(sys.argv)

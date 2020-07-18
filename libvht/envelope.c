@@ -80,7 +80,6 @@ int y2bz(envelope *env, float y) {
 	return (int)y * env->res + (int)((y - floorf(y)) * env->res);
 }
 
-// pozdrowienia dla mojego mentora - Konrada Wicyńskiego
 void envelope_draw_cluster(envelope *env, int nf, int nl) {
 	float lx = 0;					// past
 	float ly = 0;
@@ -134,7 +133,7 @@ void envelope_draw_cluster(envelope *env, int nf, int nl) {
 			xx+=dx / env->res;
 		}
 
-		// bezier'ish part - hold on tight
+		// bezier'ish part
 		if (z + lz > 1) {
 			z = 1 - lz;
 		}
@@ -297,7 +296,6 @@ void envelope_set_node(envelope *env, int n, float x, float y, float z, int link
 	if ((n < 0) || (n >= env->nnodes))
 		return;
 
-	//printf("node_set: %d: %f:%f:%f %d\n", n, x, y, z, linked);
 	env->nodes[n].x = x;
 	env->nodes[n].y = y;
 	env->nodes[n].z = z;

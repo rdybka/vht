@@ -22,9 +22,9 @@
 #include "jack_process.h"
 
 #include "module.h"
-//#include "libcvht.h"
 
 // getters/setters and stuff for python
+// bad idea, probably
 
 midi_client *module_get_midi_client(module *mod) {
 	return mod->clt;
@@ -284,6 +284,10 @@ void track_set_playing(track *trk, int p) {
 	if (p == 0) {
 		track_kill_notes(trk);
 	}
+}
+
+double timeline_get_length(timeline *tl) {
+	return tl->time_length;
 }
 
 int timestrip_get_seq_id(timestrip *tstr) {

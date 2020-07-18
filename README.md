@@ -2,7 +2,7 @@
 ## about
 Valhalla Tracker aims to be a MIDI sequencing companion
 for GNU/Linux audio setups. Adhering to Unix philosophy,
-it does one thing well.
+it tries to do one thing well.
 
 - by itself produces no sound and won't run on Windows™
 - timing/input/output relies 100% on JACK
@@ -30,14 +30,3 @@ and the usual GNOME stuff
 ```
 pip3 install vht
 ```
-
-## roadmap before a file release
-- [x] record/edit notes
-- [x] record/edit controllers
-- [x] console
-- [x] triggers
-- [ ] timeline
-- [ ] export midi/wav
-- [ ] configuration window
-
-deadline: soon enough

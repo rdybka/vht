@@ -27,9 +27,11 @@ class Configuration:
         self.seq_font = "Monospace"
         self.console_font = "Monospace"
         self.mixer_font = "Monospace"
+        self.timeline_font = "Monospace"
 
-        self.seq_font_size = 16
+        self.seq_font_size = 24
         self.mixer_font_size = 24
+        self.timeline_font_size = 12
         self.mixer_padding = 1.5
         self.seq_line_width = 1.0
         self.seq_spacing = 1.05
@@ -40,26 +42,28 @@ class Configuration:
         self.timeline_position_y = 232
         self.console_position = 0.7
         self.console_show = False
-        self.timeline_show = True
+        self.timeline_show = False
         self.console_steal_stderr = True
         self.start_playing = True
 
-        c = (0.2, 0.7, 1.0)
+        c = (0.6, 1.0, 1.0)
         self.colour = c
 
-        c = (0, 0.7, 0.7)
+        c = (0.3, 1.0, 0.3)
         self.mixer_colour = c
 
         self.star_colour = (1, 1, 0)
         self.console_colour = self.star_colour
+        self.timeline_colour = self.mixer_colour
+
         self.record_colour = (1.0, 0, 0)
 
         self.popup_timeout = 0.2
 
         self.intensity_background = 0.2
-        self.intensity_txt = 1
+        self.intensity_txt = 0.75
         self.intensity_indicator = 0.75
-        self.intensity_txt_highlight = 3
+        self.intensity_txt_highlight = 1.0
         self.intensity_lines = 0.6
         self.even_highlight = 1.4
         self.intensity_select = 0.7
@@ -102,6 +106,7 @@ class Configuration:
 
         self.new_tracks_left = False
         self.new_seqs_with_tracks = True
+
         self.default_seq_length = 16
 
         self.controller_resolution = 8

@@ -35,6 +35,8 @@ class MainWin(Gtk.ApplicationWindow):
     def __init__(self, app):
         super().__init__(application=app)
 
+        # here we GUI
+
         self.fs = False
         self.app = app
         mod.mainwin = self
@@ -43,7 +45,6 @@ class MainWin(Gtk.ApplicationWindow):
         self.last_filename = None
         self.last_filename_naked = None
 
-        # here we GUI
         st = self.get_settings()
         st.set_property("gtk-application-prefer-dark-theme", cfg.dark_theme)
 
@@ -110,10 +111,10 @@ class MainWin(Gtk.ApplicationWindow):
         self.seqbox = Gtk.Paned()
         self.seqbox.set_orientation(Gtk.Orientation.VERTICAL)
 
-        self._sequence_view = SequenceView(mod[mod.curr_seq])
+        self.sequence_view = SequenceView(mod[mod.curr_seq])
         self.hbox.set_orientation(Gtk.Orientation.HORIZONTAL)
 
-        self.seqbox.pack1(self._sequence_view, True, True)
+        self.seqbox.pack1(self.sequence_view, True, True)
 
         self.hbox.pack1(self.seqbox, True, True)
         self.console = Console()
@@ -152,6 +153,7 @@ class MainWin(Gtk.ApplicationWindow):
         )
 
         buttbox = Gtk.Box()
+        self.seqlist_butts = buttbox
         buttbox.set_orientation(Gtk.Orientation.VERTICAL)
         buttbox.pack_end(self.seq_mode_butt, False, True, 0)
         buttbox.pack_end(self.butt_panic, False, True, 0)
@@ -171,10 +173,7 @@ class MainWin(Gtk.ApplicationWindow):
         self.timeline_view = TimelineView()
         mod.timeline_view = self.timeline_view
 
-        self.timeline_sw = Gtk.ScrolledWindow()
-        self.timeline_sw.add_with_viewport(self.timeline_view)
-
-        self.timeline_box.pack2(self.timeline_sw, True, True)
+        self.timeline_box.pack2(self.timeline_view, True, True)
         self.timeline_box.set_position(cfg.timeline_position_y)
 
         self.vbox.pack_start(self.hbox, True, True, 0)
@@ -187,7 +186,7 @@ class MainWin(Gtk.ApplicationWindow):
         self.set_default_size(800, 600)
         self.show_all()
 
-        self._sequence_view._sv.grab_focus()
+        self.sequence_view._sv.grab_focus()
 
         if cfg.console_show:
             self.show_console()
@@ -224,7 +223,7 @@ class MainWin(Gtk.ApplicationWindow):
         mod.play = False
 
     def on_seq_add_butt_clicked(self, butt):
-        self._sequence_view.seq_add()
+        self.sequence_view.seq_add()
 
     def on_butt_panic_clicked(self, butt):
         mod.panic(True)
@@ -268,7 +267,7 @@ class MainWin(Gtk.ApplicationWindow):
 
         self.console.hide()
         mod.console_visible = False
-        self._sequence_view.auto_scroll_req = True
+        self.sequence_view.auto_scroll_req = True
 
     def show_console(self):
         if mod.console_visible:
@@ -282,7 +281,7 @@ class MainWin(Gtk.ApplicationWindow):
 
         mod.console_visible = True
         self.seqbox.set_wide_handle(True)
-        self._sequence_view.auto_scroll_req = True
+        self.sequence_view.auto_scroll_req = True
         self.seqbox.show_all()
 
     def on_key_press(self, wdg, event):
@@ -330,7 +329,7 @@ class MainWin(Gtk.ApplicationWindow):
     def load(self, filename):
         self.set_header_from_filename(None)
 
-        if not self._sequence_view.load(filename):
+        if not self.sequence_view.load(filename):
             return False
 
         self.last_filename = filename

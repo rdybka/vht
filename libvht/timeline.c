@@ -41,7 +41,7 @@ timeline *timeline_new(void) {
 	ntl->nticks = 0;
 
 	ntl->pos = 0.0;
-	ntl->length = 32;
+	ntl->length = 1280;
 	ntl->time_length = 0.0;
 	ntl->loop_start = ntl->loop_end = -1;
 
@@ -169,25 +169,69 @@ void timeline_update(timeline *tl) {
 		cchange = lchange;
 	}
 
+	tl->slices[0].time = 0.0;
+	tl->nticks = tl->nslices;
+	tl->ticks = realloc(tl->ticks, sizeof(double) * (tl->nticks + 1));
+
 	for(int s = 0; s < tl->nslices; s++) {
-		tl->slices[s].length = 60.0 / tl->slices[s].bpm;
+		tl->slices[s].length = (60.0 / tl->slices[s].bpm) / 4;
 		if (s > 0)
 			tl->slices[s].time = tl->slices[s - 1].time + tl->slices[s - 1].length;
+
+		tl->ticks[s] = tl->slices[s].time;
 	}
 
 	tl->time_length = tl->slices[tl->nslices - 1].time + tl->slices[tl->nslices - 1].length;
+}
 
-	tl->nticks = (int)floor(tl->time_length);
-	tl->ticks = realloc(tl->ticks, sizeof(double) * (tl->nticks + 1));
+int tick_cmp(const void *t1, const void *t2) {
 
-	int last_tick = 0;
-	tl->ticks[0] = 0.0;
-	for (int r = 0; r < tl->nslices; r++) {
-		if ((int)floor(tl->slices[r].time) > last_tick) {
-			last_tick++;
-			tl->ticks[last_tick] = (double)(r - 1) + (((double)last_tick - tl->slices[r - 1].time) / tl->slices[r - 1].length);
-		}
+	double tt1 = *(double* )t1;
+	double tt2 = *(double* )t2;
+
+	if ((tt2 - tt1 > 0) && (tt2 - tt1 < 5))
+		return 0;
+
+	if (tt1 < tt2)
+		return -1;
+
+	if (tt1 > tt2)
+		return 1;
+
+	return 0;
+}
+
+long timeline_get_qb(timeline *tl, double t) {
+	if (t > tl->time_length)
+		return tl->nticks;
+
+	if (t < 0)
+		return -1;
+
+	if (t == 0)
+		return 0;
+
+	long tstart = tl->nticks - 1;
+
+	void *rt = bsearch(&t, tl->ticks, sizeof(double), tl->nticks, &tick_cmp);
+	if (rt) {
+		tstart = (rt - (void *) tl->ticks) / sizeof(double);
 	}
+
+	for (int r = tstart; r > -1; r--) {
+		if (t > tl->ticks[r])
+			return r;
+	}
+
+	return -1;
+}
+
+double timeline_get_qb_time(timeline *tl, long row) {
+	long rr = row;
+	if (rr > tl->nticks -1)
+		return tl->ticks[tl->nticks -1] + tl->slices[tl->nticks -1].length;
+
+	return tl->ticks[rr];
 }
 
 void timeline_change_del(timeline *tl, int id) {
@@ -234,7 +278,7 @@ timestrip *timeline_add_strip(timeline *tl, sequence *seq, int start, int length
 
 	tl->strips = realloc(tl->strips, sizeof(timestrip) * ++tl->nstrips);
 	timestrip *s = &tl->strips[tl->nstrips - 1];
-	s->seq = seq;
+	s->seq = sequence_clone(seq);
 	s->start = start;
 	s->length = length;
 	s->rpb_start = rpb_start;

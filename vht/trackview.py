@@ -2641,7 +2641,7 @@ class TrackView(Gtk.DrawingArea):
             self.redraw(y)
             self.undo_buff.add_state()
 
-        return True
+        return False
 
     def on_key_release(self, widget, event):
         if not self.trk:
@@ -2688,10 +2688,10 @@ class TrackView(Gtk.DrawingArea):
                 self.nudge_hide_timeshift = False
 
             self.undo_buff.add_state()
-            return True
+            return False
 
         if shift or alt:
-            return True
+            return False
 
         if self.keyboard_focus is None:
             self.pmp.key2note(Gdk.keyval_to_lower(event.keyval), True)

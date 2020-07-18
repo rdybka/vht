@@ -207,8 +207,12 @@ extern int timeline_change_set(timeline *tl, long row, float bpm, int linked);
 extern void timeline_change_del(timeline *tl, int id);
 extern char *timeline_get_change(timeline *tl, int id);
 extern int timeline_get_nchanges(timeline *tl);
+extern long timeline_get_qb(timeline *tl, double t);
+extern double timeline_get_qb_time(timeline *tl, long row);
 extern int timeline_get_nticks(timeline *tl);
 extern double timeline_get_tick(timeline *tl, int n);
+
+extern double timeline_get_length(timeline *tl);
 
 extern timestrip *timeline_get_strip(timeline *tl, int n);
 extern int timeline_get_nstrips(timeline *tl);

@@ -401,14 +401,14 @@ class StatusBar(Gtk.DrawingArea):
                 org = mod[mod.curr_seq].rpb
                 mod[mod.curr_seq].rpb += 1
                 if org != mod[mod.curr_seq].rpb:
-                    mod.mainwin._sequence_view.highlight = mod[mod.curr_seq].rpb
-                    mod.mainwin._sequence_view.redraw_track()
+                    mod.mainwin.sequence_view.highlight = mod[mod.curr_seq].rpb
+                    mod.mainwin.sequence_view.redraw_track()
             if down:
                 org = mod[mod.curr_seq].rpb
                 mod[mod.curr_seq].rpb -= 1
                 if org != mod[mod.curr_seq].rpb:
-                    mod.mainwin._sequence_view.highlight = mod[mod.curr_seq].rpb
-                    mod.mainwin._sequence_view.redraw_track()
+                    mod.mainwin.sequence_view.highlight = mod[mod.curr_seq].rpb
+                    mod.mainwin.sequence_view.redraw_track()
 
         if self.active_field == 6:
             if up:
@@ -473,14 +473,14 @@ class StatusBar(Gtk.DrawingArea):
                 org = mod[mod.curr_seq].rpb
                 mod[mod.curr_seq].rpb += 1
                 if org != mod[mod.curr_seq].rpb:
-                    mod.mainwin._sequence_view.highlight = mod[mod.curr_seq].rpb
-                    mod.mainwin._sequence_view.redraw_track()
+                    mod.mainwin.sequence_view.highlight = mod[mod.curr_seq].rpb
+                    mod.mainwin.sequence_view.redraw_track()
             if down:
                 org = mod[mod.curr_seq].rpb
                 mod[mod.curr_seq].rpb -= 1
                 if org != mod[mod.curr_seq].rpb:
-                    mod.mainwin._sequence_view.highlight = mod[mod.curr_seq].rpb
-                    mod.mainwin._sequence_view.redraw_track()
+                    mod.mainwin.sequence_view.highlight = mod[mod.curr_seq].rpb
+                    mod.mainwin.sequence_view.redraw_track()
 
             if middle:
                 mod[mod.curr_seq].ketchup()

@@ -106,11 +106,11 @@ class SequenceListView(Gtk.DrawingArea):
         self._highlight = s1
         if old == mod.curr_seq:
             mod.curr_seq = self._move_handle
-            mod.mainwin._sequence_view.prop_view.redraw()
+            mod.mainwin.sequence_view.prop_view.redraw()
         else:
             if self._move_handle == mod.curr_seq:
                 mod.curr_seq = old
-                mod.mainwin._sequence_view.prop_view.redraw()
+                mod.mainwin.sequence_view.prop_view.redraw()
 
         self.redraw(old)
         self.redraw(s1)
@@ -195,7 +195,7 @@ class SequenceListView(Gtk.DrawingArea):
                 self.redraw(old)
 
             if old != mod.curr_seq:
-                mod.mainwin._sequence_view.switch(mod.curr_seq)
+                mod.mainwin.sequence_view.switch(mod.curr_seq)
 
             return True
 
@@ -275,7 +275,9 @@ class SequenceListView(Gtk.DrawingArea):
         redr = []
         if col == -1:
             redr = list(range(len(mod)))
-            cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
+            cr.set_source_rgb(
+                *(col * cfg.intensity_background for col in cfg.mixer_colour)
+            )
             cr.rectangle(0, 0, w, h)
             cr.fill()
         else:
@@ -310,7 +312,9 @@ class SequenceListView(Gtk.DrawingArea):
                 1.0, *(col * bottom_intensity for col in cfg.mixer_colour)
             )
 
-            cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
+            cr.set_source_rgb(
+                *(col * cfg.intensity_background for col in cfg.mixer_colour)
+            )
             cr.rectangle(x - self._txt_height / 3, 0, self._txt_height * 1.23, h)
             cr.fill()
 
@@ -353,11 +357,11 @@ class SequenceListView(Gtk.DrawingArea):
 
             if r == self._move_handle and r == self._highlight:
                 cr.set_source_rgb(
-                    *(col * cfg.intensity_txt_highlight for col in cfg.colour)
+                    *(col * cfg.intensity_txt_highlight for col in cfg.mixer_colour)
                 )
             else:
                 cr.set_source_rgb(
-                    *(col * cfg.intensity_background for col in cfg.colour)
+                    *(col * cfg.intensity_background for col in cfg.mixer_colour)
                 )
 
             cr.move_to(x, h - (self._txt_height * 0.7))
@@ -368,15 +372,15 @@ class SequenceListView(Gtk.DrawingArea):
             cr.move_to(x + self._txt_height, self._txt_height / 4.0)
 
             itop = cfg.intensity_background
-            imid = cfg.intensity_txt
+            imid = 1.0
             ibot = cfg.intensity_background
             if seq.cue:
                 ibot = imid
 
             if seq.playing:
-                itop = cfg.intensity_txt * 1.5
+                itop = 1.0
                 imid = cfg.intensity_background
-                ibot = cfg.intensity_txt * 1.5
+                ibot = 1.0
 
                 if seq.cue:
                     ibot = imid
