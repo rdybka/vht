@@ -15,7 +15,7 @@ it tries to do one thing well
 
 ## in zip
 - C library which talks to JACK and runs gameloop
-- it's Python counterpart, lazingly wrapped with SWIG
+- it's Python counterpart, lazily wrapped with SWIG
 - GTK human interface also written in snake language
 
 ## deps
