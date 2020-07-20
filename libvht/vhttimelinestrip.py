@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from libvht import libcvht
+from libvht.vhtsequence import VHTSequence
 
 
 class VHTTimelineStrip:
@@ -24,14 +25,16 @@ class VHTTimelineStrip:
 
     def update_strrep(self):
         seq_id = libcvht.timestrip_get_seq_id(self._ptr)
+        col = libcvht.timestrip_get_col(self._ptr)
         start = libcvht.timestrip_get_start(self._ptr)
         length = libcvht.timestrip_get_length(self._ptr)
         rpb_start = libcvht.timestrip_get_rpb_start(self._ptr)
         rpb_end = libcvht.timestrip_get_rpb_end(self._ptr)
         loop_length = libcvht.timestrip_get_loop_length(self._ptr)
 
-        self._strrep = "%d %d %d %d %d %d" % (
+        self._strrep = "%d %d %d %d %d %d %d" % (
             seq_id,
+            col,
             start,
             length,
             rpb_start,
@@ -43,9 +46,9 @@ class VHTTimelineStrip:
     def seq_id(self):
         return libcvht.timestrip_get_seq_id(self._ptr)
 
-    @seq_id.setter
-    def seq_id(self, value):
-        libcvht.timestrip_set_seq_id(self._ptr, value)
+    @property
+    def col(self):
+        return libcvht.timestrip_get_col(self._ptr)
 
     @property
     def start(self):

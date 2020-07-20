@@ -26,7 +26,7 @@ class VHTModule(Iterable):
     """
     This is your interface to the VHT magic
 
-    libvht.new_mod()
+    libvht.mod()
     """
 
     def __init__(self):

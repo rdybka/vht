@@ -542,14 +542,17 @@ def timeline_get_strip(tl, n):
 def timeline_get_nstrips(tl):
     return _libcvht.timeline_get_nstrips(tl)
 
-def timeline_add_strip(tl, seq, start, length, rpb_start, rpb_end, loop_length):
-    return _libcvht.timeline_add_strip(tl, seq, start, length, rpb_start, rpb_end, loop_length)
+def timeline_add_strip(tl, col, seq, start, length, rpb_start, rpb_end, loop_length):
+    return _libcvht.timeline_add_strip(tl, col, seq, start, length, rpb_start, rpb_end, loop_length)
 
 def timeline_del_strip(tl, id):
     return _libcvht.timeline_del_strip(tl, id)
 
 def timestrip_get_seq_id(tstr):
     return _libcvht.timestrip_get_seq_id(tstr)
+
+def timestrip_get_col(tstr):
+    return _libcvht.timestrip_get_col(tstr)
 
 def timestrip_get_start(tstr):
     return _libcvht.timestrip_get_start(tstr)

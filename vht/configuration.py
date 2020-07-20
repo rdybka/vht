@@ -30,7 +30,7 @@ class Configuration:
         self.timeline_font = "Monospace"
 
         self.seq_font_size = 24
-        self.mixer_font_size = 24
+        self.mixer_font_size = 16
         self.timeline_font_size = 12
         self.mixer_padding = 1.5
         self.seq_line_width = 1.0
@@ -39,7 +39,7 @@ class Configuration:
 
         self.console_scale = 1
         self.timeline_position = 0.75
-        self.timeline_position_y = 232
+        self.timeline_position_y = 203
         self.console_position = 0.7
         self.console_show = False
         self.timeline_show = False

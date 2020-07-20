@@ -240,7 +240,6 @@ void module_seqs_reindex(module *mod) {
 }
 
 void module_free(module *mod) {
-	printf("i'm free!!!!\n");
 	for (int s = 0; s < mod->nseq; s++)
 		for (int t = 0; t < mod->seq[s]->ntrk; t++)
 			track_kill_notes(mod->seq[s]->trk[t]);
@@ -330,6 +329,8 @@ void module_swap_sequence(module *mod, int s1, int s2) {
 	mod->seq[s2] = s3;
 
 	module_seqs_reindex(mod);
+
+	timeline_swap_sequence(mod->tline, s1, s2);
 	module_excl_out(mod);
 }
 

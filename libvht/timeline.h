@@ -35,6 +35,7 @@ typedef struct timechange_t {
 
 typedef struct timestrip_t {
 	sequence *seq;
+	int col;
 	int start;
 	int length;
 	int rpb_start;
@@ -66,7 +67,7 @@ void timeline_update(timeline *tl);
 void timeline_advance(timeline *tl, double period);
 long timeline_get_qb(timeline *tl, double t);
 double timeline_get_qb_time(timeline *tl, long row);
-
+void timeline_swap_sequence(timeline *tl, int s1, int s2);
 int timeline_change_set(timeline *tl, long row, float bpm, int linked);
 void timeline_change_del(timeline *tl, int id);
 char *timeline_get_change(timeline *tl, int id);
@@ -76,7 +77,7 @@ double timeline_get_tick(timeline *tl, int n);
 
 timestrip *timeline_get_strip(timeline *tl, int n);
 int timeline_get_nstrips(timeline *tl);
-timestrip *timeline_add_strip(timeline *tl, sequence *seq, int start, int length, int rpb_start, int rpb_end, int loop_length);
+timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end, int loop_length);
 void timeline_del_strip(timeline *tl, int id);
 
 #endif //__TIMELINE_H__

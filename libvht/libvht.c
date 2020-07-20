@@ -294,6 +294,10 @@ int timestrip_get_seq_id(timestrip *tstr) {
 	return tstr->seq->index;
 }
 
+int timestrip_get_col(timestrip *tstr) {
+	return tstr->col;
+}
+
 int timestrip_get_start(timestrip *tstr) {
 	return tstr->start;
 }

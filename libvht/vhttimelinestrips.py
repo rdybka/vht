@@ -15,12 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections.abc import MutableSequence
+from collections.abc import Iterable
 from libvht import libcvht
 from libvht.vhttimelinestrip import VHTTimelineStrip
 
 
-class VHTTimelineStrips(MutableSequence):
+class VHTTimelineStrips(Iterable):
     def __init__(self, mod, tl):
         super(VHTTimelineStrips, self).__init__()
         self._tl_handle = tl
@@ -31,7 +31,7 @@ class VHTTimelineStrips(MutableSequence):
 
     def __iter__(self):
         for itm in range(self.__len__()):
-            return VHTTimelineStrip(libcvht.timeline_get_strip(self._tl_handle, itm))
+            yield VHTTimelineStrip(libcvht.timeline_get_strip(self._tl_handle, itm))
 
     def __getitem__(self, itm):
         if 0 > itm >= self.__len__():
@@ -39,25 +39,14 @@ class VHTTimelineStrips(MutableSequence):
 
         return VHTTimelineStrip(libcvht.timeline_get_strip(self._tl_handle, itm))
 
-    def __delitem__(self, itm):
-        if 0 > itm >= self.__len__():
-            raise IndexError(itm)
-
-        libcvht.timeline_del_strip(self._tl_handle, itm)
-
-    def __setitem__(selt, itm, val):
-        i = self[itm]
-        i.start = val.start
-        i.length = val.length
-        i.rpb_start = val.rpb_start
-        i.rpb_end = val.rpb_end
-        i.loop_length = val.loop_length
-
     def insert(self, seq_id, start, length, rpb_start, rpb_end, loop_length):
         return VHTTimelineStrip(
             libcvht.timeline_add_strip(
                 self._tl_handle,
-                libcvht.module_get_seq(self._mod_handle, seq_id),
+                seq_id,
+                libcvht.sequence_clone(
+                    libcvht.module_get_seq(self._mod_handle, seq_id)
+                ),
                 start,
                 length,
                 rpb_start,

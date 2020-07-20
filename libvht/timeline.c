@@ -41,7 +41,7 @@ timeline *timeline_new(void) {
 	ntl->nticks = 0;
 
 	ntl->pos = 0.0;
-	ntl->length = 1280;
+	ntl->length = 1024;
 	ntl->time_length = 0.0;
 	ntl->loop_start = ntl->loop_end = -1;
 
@@ -54,7 +54,11 @@ void timeline_free(timeline *tl) {
 	free(tl->slices);
 	free(tl->changes);
 	free(tl->ticks);
+	for(int s = 0; s < tl->nstrips; s++) {
+		sequence_free(tl->strips[s].seq);
+	}
 	free(tl->strips);
+
 	free(tl);
 }
 
@@ -128,6 +132,15 @@ void timeline_update_chunk(timeline *tl, int from, int to) {
 }
 
 void timeline_update(timeline *tl) {
+	tl->length = 32;
+
+	for (int s = 0; s < tl->nstrips; s++) {
+		int t = tl->strips[s].start + tl->strips[s].loop_length;
+		if (t > tl->length)
+			tl->length = t;
+	}
+
+
 	if (!tl->nchanges)
 		return;
 
@@ -273,18 +286,20 @@ timestrip *timeline_get_strip(timeline *tl, int n) {
 	return &tl->strips[n];
 };
 
-timestrip *timeline_add_strip(timeline *tl, sequence *seq, int start, int length, int rpb_start, int rpb_end, int loop_length) {
+timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end, int loop_length) {
 	timeline_excl_in(tl);
 
 	tl->strips = realloc(tl->strips, sizeof(timestrip) * ++tl->nstrips);
 	timestrip *s = &tl->strips[tl->nstrips - 1];
-	s->seq = sequence_clone(seq);
+	s->seq = seq;
 	s->start = start;
 	s->length = length;
 	s->rpb_start = rpb_start;
 	s->rpb_end = rpb_end;
 	s->loop_length = loop_length;
+	s->col = col;
 
+	timeline_update(tl);
 	timeline_excl_out(tl);
 
 	return s;
@@ -300,7 +315,27 @@ void timeline_del_strip(timeline *tl, int id) {
 	tl->strips = realloc(tl->strips, sizeof(timestrip) * --tl->nstrips);
 
 	timeline_excl_out(tl);
-};
+}
+
+void timeline_swap_sequence(timeline *tl, int s1, int s2) {
+	timeline_excl_in(tl);
+
+	for (int st = 0; st < tl->nstrips; st++) {
+		if (tl->strips[st].col == s1)
+			tl->strips[st].col = -s2;
+		if (tl->strips[st].col == s2)
+			tl->strips[st].col = -s1;
+	}
+
+	for (int st = 0; st < tl->nstrips; st++) {
+		if (tl->strips[st].col == -s1)
+			tl->strips[st].col = s1;
+		if (tl->strips[st].col == -s2)
+			tl->strips[st].col = s2;
+	}
+
+	timeline_excl_out(tl);
+}
 
 void timeline_advance(timeline *tl, double period) {
 	timeline_excl_in(tl);

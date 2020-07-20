@@ -216,10 +216,11 @@ extern double timeline_get_length(timeline *tl);
 
 extern timestrip *timeline_get_strip(timeline *tl, int n);
 extern int timeline_get_nstrips(timeline *tl);
-extern timestrip *timeline_add_strip(timeline *tl, sequence *seq, int start, int length, int rpb_start, int rpb_end, int loop_length);
+extern timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end, int loop_length);
 extern void timeline_del_strip(timeline *tl, int id);
 
 extern int timestrip_get_seq_id(timestrip *tstr);
+extern int timestrip_get_col(timestrip *tstr);
 extern int timestrip_get_start(timestrip *tstr);
 extern int timestrip_get_length(timestrip *tstr);
 extern int timestrip_get_rpb_start(timestrip *tstr);

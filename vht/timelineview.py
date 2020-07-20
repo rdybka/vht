@@ -58,10 +58,10 @@ class TimelineView(Gtk.DrawingArea):
 
         self.spl = 0.5  # seconds per line (on screen)
         self.qb_start = 0
-        self.max_qb_start = 23
+        self.max_qb_start = 23.0
         self.spl_dest = 0.125
         self.qb_start_dest = self.qb_start
-        # self.max_qb_start_dest = self.max_qb_start
+        self.max_qb_start_dest = 23.0
         self.pointer_ry = 0
         self.pointer_ry_dest = 0
 
@@ -81,6 +81,8 @@ class TimelineView(Gtk.DrawingArea):
         self.snap = 8
         self.snap_hold = False
         self.zoom_hold = False
+
+        self.curr_col = -1
 
     def on_configure(self, wdg, event):
         win = self.get_window()
@@ -154,6 +156,9 @@ class TimelineView(Gtk.DrawingArea):
             mod.timeline.length - (self.time_height * 0.7)
         )
 
+        if not self.max_qb_start_dest:
+            self.max_qb_start_dest = 0.0
+
         self.scrollbar_height = h * (self.time_height / mod.timeline.length)
         self.scrollbar_pos = (h - self.scrollbar_height) * (
             self.qb_start / self.max_qb_start
@@ -167,11 +172,13 @@ class TimelineView(Gtk.DrawingArea):
             cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.timeline_colour))
 
         cr.set_line_width(1)
-        cr.rectangle(
-            w - tw, self.scrollbar_pos, -self.scrollbar_width, self.scrollbar_height
-        )
-        cr.fill()
+        if self.scrollbar_height < h:
+            cr.rectangle(
+                w - tw, self.scrollbar_pos, -self.scrollbar_width, self.scrollbar_height
+            )
+            cr.fill()
 
+        # ticks -----------------
         ltim = -1
         sl = mod.timeline.length
 
@@ -204,6 +211,9 @@ class TimelineView(Gtk.DrawingArea):
                 cr.move_to(w - tw, y)
                 cr.line_to((w - tw) + tw * 0.5, y)
                 cr.stroke()
+
+                if tstart == 0:
+                    y = max(y, txtenddx * 2)
                 self.insert_label(cr, x, y - txtenddx / 2, txtend)
                 do_draw = False
                 continue
@@ -261,6 +271,43 @@ class TimelineView(Gtk.DrawingArea):
             if r % self.snap == 0:
                 if rr - lrr > 1:
                     drw = True
+
+        # gdid
+        cw = mod.mainwin.seqlist._txt_height * cfg.mixer_padding
+        for r in range(len(mod)):
+            cr.set_source_rgb(*(col * 0.6 for col in cfg.timeline_colour))
+            cr.set_line_width(1)
+            cr.move_to((r + 1) * cw, 0)
+            cr.line_to((r + 1) * cw, h)
+            cr.stroke()
+
+        cr.set_line_width(0.5)
+
+        tstart = mod.timeline.qb2t(self.qb_start)
+        tend = tstart + h * self.spl
+        qbend = mod.timeline.t2qb(tend)
+
+        # print(self.qb_start, qbend, tend)
+        for st in mod.timeline.strips:
+            if st.start > qbend:
+                continue
+            if st.loop_length + st.start < self.qb_start:
+                continue
+
+            ystart = (mod.timeline.qb2t(st.start) - tstart) / self.spl
+            yend = mod.timeline.qb2t(st.length) / self.spl
+            lend = mod.timeline.qb2t(st.loop_length) / self.spl
+
+            if st.col == self.curr_col:
+                cr.set_source_rgb(*(col * 0.5 for col in cfg.timeline_colour))
+            else:
+                cr.set_source_rgb(*(col * 0.4 for col in cfg.timeline_colour))
+
+            cr.rectangle(st.col * cw + 1, ystart, cw - 2, yend)
+            cr.fill()
+            cr.set_source_rgb(*(col * 0.2 for col in cfg.timeline_colour))
+            cr.rectangle(st.col * cw + 1, ystart, cw - 2, yend)
+            cr.stroke()
 
         # pointer -------------------
         if self.pointer_xy:
@@ -320,6 +367,18 @@ class TimelineView(Gtk.DrawingArea):
         if self.scrollbar_highlight and self.scrollstart == -1:
             self.scrollstart = event.y
             self.scrollstart_time = mod.timeline.qb2t(self.qb_start)
+            return True
+
+        if self.curr_col > -1 and self.pointer_r > -1:
+            seq = mod[self.curr_col]
+            mod.timeline.strips.insert(
+                self.curr_col,
+                int(self.pointer_r),
+                seq.length,
+                seq.rpb,
+                seq.rpb,
+                seq.length,
+            )
 
         return True
 
@@ -332,6 +391,9 @@ class TimelineView(Gtk.DrawingArea):
         h = self.get_allocated_height()
 
         tw = w - mod.mainwin.seqlist_butts.get_allocated_width()
+        cw = mod.mainwin.seqlist._txt_height * cfg.mixer_padding
+        col = event.x // cw
+        self.curr_col = -1 if col >= len(mod) else int(col)
 
         mod.mainwin.set_focus(self)
 
@@ -365,6 +427,7 @@ class TimelineView(Gtk.DrawingArea):
 
     def on_leave(self, wdg, prm):
         self.pointer_xy = None
+        self.pointer_r = -1
         return True
 
     def on_enter(self, wdg, prm):
@@ -415,7 +478,7 @@ class TimelineView(Gtk.DrawingArea):
             self.qb_start += (self.qb_start_dest - self.qb_start) / 3
 
         if self.spl_dest - self.spl != 0:
-            self.spl += (self.spl_dest - self.spl) / 3
+            self.spl += (self.spl_dest - self.spl) / 10
 
         if abs(self.max_qb_start_dest - self.max_qb_start) > 0.01:
             self.max_qb_start += (self.max_qb_start_dest - self.max_qb_start) / 3
@@ -427,8 +490,9 @@ class TimelineView(Gtk.DrawingArea):
             self.pointer_r = mod.timeline.t2qb(
                 self.l2t(self.pointer_xy[1]) + mod.timeline.qb2t(self.qb_start)
             )
+
             if self.pointer_r < mod.timeline.nqb:
-                self.pointer_r = (self.pointer_r // self.snap) * self.snap
+                self.pointer_r = round((self.pointer_r / self.snap)) * self.snap
 
             self.pointer_ry_dest = max(
                 (mod.timeline.qb2t(self.pointer_r) - mod.timeline.qb2t(self.qb_start))

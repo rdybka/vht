@@ -74,7 +74,6 @@ void module_synch_output_ports(module *mod);
 void module_set_play_mode(module *mod, int m);
 int module_get_play_mode(module *mod);
 
-
 void sequence_handle_record(module *mod, sequence *seq, midi_event evt);
 void module_panic(module *mod, int brutal);
 
