@@ -805,6 +805,7 @@ class SequenceView(Gtk.Box):
             self.seq = mod[mod.curr_seq]
             self.font_size = mod.extras[mod.curr_seq][-1]["font_size"]
             self.build()
+
             mod.seqlist.redraw()
             return True
         else:
@@ -835,9 +836,6 @@ class SequenceView(Gtk.Box):
         self.recalculate_row_spacing()
 
     def recalculate_row_spacing(self):
-        if not self.get_realized():
-            return
-
         minspc = 1.0
 
         for wdg in self.get_tracks(True):
@@ -853,6 +851,9 @@ class SequenceView(Gtk.Box):
         if minspc < 1.0:
             for wdg in self.get_tracks(True):
                 wdg.spacing /= minspc
+
+        if not self.get_realized():
+            return
 
         self.redraw_track(None)
         self.queue_draw()
@@ -967,7 +968,7 @@ class SequenceView(Gtk.Box):
 
                 midin = mod.get_midi_in_event()
 
-        if mod.record > -1:
+        if mod.record > 0:
             for trk in self.get_tracks():
                 redr_props = False
                 redr_trk = False
@@ -1034,11 +1035,19 @@ class SequenceView(Gtk.Box):
 
                         if cfg.new_tracks_left:
                             self.prop_view.move_first(self.seq[-1])
+        else:  # not recording
+            for trk in self.get_tracks():
+                if trk.trk.dirty:
+                    trk.redraw()
 
         for wdg in self.get_tracks(True):
             wdg.tick()
             if wdg.edit and wdg.trk:
                 self.auto_scroll(wdg)
+
+        for s in mod:
+            for t in s:
+                t.dirty = 0
 
         return True
 

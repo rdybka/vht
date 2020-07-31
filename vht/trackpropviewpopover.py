@@ -699,6 +699,7 @@ class TrackPropViewPopover(Gtk.Popover):
 
     def on_nrows_changed(self, adj):
         self.trk.nrows = int(adj.get_value())
+        self.trkview.select_end, self.trkview.select_start = None, None
         self.parent.seqview.recalculate_row_spacing()
 
     def on_nsrows_changed(self, adj):
@@ -708,6 +709,7 @@ class TrackPropViewPopover(Gtk.Popover):
             self.trk.nrows = int(adj.get_value())
             self.nrows_adj.set_value(adj.get_value())
 
+        self.trkview.select_end, self.trkview.select_start = None, None
         self.parent.seqview.recalculate_row_spacing()
 
     def on_nrows_toggled(self, wdg):

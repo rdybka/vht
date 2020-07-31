@@ -18,39 +18,54 @@
 from collections.abc import Iterable
 from libvht import libcvht
 from libvht.vhttimelinestrip import VHTTimelineStrip
+from libvht.vhtsequence import VHTSequence
 
 
 class VHTTimelineStrips(Iterable):
     def __init__(self, mod, tl):
         super(VHTTimelineStrips, self).__init__()
         self._tl_handle = tl
-        self._mod_handle = mod
+        self._mod_handle = mod._mod_handle
+        self._mod = mod
 
     def __len__(self):
         return libcvht.timeline_get_nstrips(self._tl_handle)
 
     def __iter__(self):
         for itm in range(self.__len__()):
-            yield VHTTimelineStrip(libcvht.timeline_get_strip(self._tl_handle, itm))
+            yield VHTTimelineStrip(
+                libcvht.timeline_get_strip(self._tl_handle, itm), self._mod
+            )
 
     def __getitem__(self, itm):
         if 0 > itm >= self.__len__():
             raise IndexError(itm)
 
-        return VHTTimelineStrip(libcvht.timeline_get_strip(self._tl_handle, itm))
+        return VHTTimelineStrip(
+            libcvht.timeline_get_strip(self._tl_handle, itm), self._mod
+        )
+
+    def get_seq(self, col, itm):
+        sq = libcvht.timeline_get_seq(self._tl_handle, col, itm)
+        if sq:
+            return VHTSequence(sq, self._mod.cb_new_track)
+        else:
+            raise IndexError(col, itm)
 
     def insert(self, seq_id, start, length, rpb_start, rpb_end, loop_length):
+        ns = libcvht.sequence_clone(libcvht.module_get_seq(self._mod_handle, seq_id))
+        libcvht.sequence_set_parent(ns, seq_id)
+
         return VHTTimelineStrip(
             libcvht.timeline_add_strip(
                 self._tl_handle,
                 seq_id,
-                libcvht.sequence_clone(
-                    libcvht.module_get_seq(self._mod_handle, seq_id)
-                ),
+                ns,
                 start,
                 length,
                 rpb_start,
                 rpb_end,
                 loop_length,
-            )
+            ),
+            self._mod,
         )

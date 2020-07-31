@@ -100,6 +100,7 @@ class SequenceListView(Gtk.DrawingArea):
     def swap_seq(self, s0, s1):
         mod.swap_sequence(s0, s1)
         mod.extras[s0], mod.extras[s1] = mod.extras[s1], mod.extras[s0]
+        mod.thumbmanager.swap(s0, s1)
 
         old = s0
         self._move_handle = s1
@@ -280,12 +281,14 @@ class SequenceListView(Gtk.DrawingArea):
             )
             cr.rectangle(0, 0, w, h)
             cr.fill()
+
         else:
             redr.append(col)
 
         for r in redr:
             seq = mod[r]
             x = (self._txt_height * cfg.mixer_padding) * r
+            thx = x
             x += ((self._txt_height * cfg.mixer_padding) - self._txt_height) / 2.0
 
             gradient = cairo.LinearGradient(0, 0, 0, h)
@@ -306,7 +309,7 @@ class SequenceListView(Gtk.DrawingArea):
 
             if seq.playing:
                 hi = mod[r].rpb
-                bottom_intensity *= 1.5 * (1 - ((seq.pos % hi) / hi))
+                bottom_intensity -= 0.42 * (1 - ((seq.pos % hi) / hi))
 
             gradient.add_color_stop_rgb(
                 1.0, *(col * bottom_intensity for col in cfg.mixer_colour)
@@ -315,14 +318,24 @@ class SequenceListView(Gtk.DrawingArea):
             cr.set_source_rgb(
                 *(col * cfg.intensity_background for col in cfg.mixer_colour)
             )
-            cr.rectangle(x - self._txt_height / 3, 0, self._txt_height * 1.23, h)
-            cr.fill()
 
             cr.save()
             cr.set_source(gradient)
             cr.rectangle(x - self._txt_height / 3, 0, self._txt_height * 1.23, h)
             cr.fill()
             cr.restore()
+
+            thumb = mod.thumbmanager.get(r)
+            if thumb:
+                thsurf = thumb.get_surface()
+                tw, th = thsurf.get_width(), thsurf.get_height()
+                mtx = cairo.Matrix()
+                mtx.scale(tw / (self._txt_height * 1.1), th / h)
+                mtx.translate(-thx, 0)
+                thumb.set_matrix(mtx)
+                cr.set_source(thumb)
+                cr.rectangle(thx, 0, w, h)
+                cr.fill()
 
             if self._popup.pooped and self._popup.curr == r:
                 cr.set_source_rgb(

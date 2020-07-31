@@ -227,6 +227,12 @@ def sequence_get_max_length():
 def sequence_get_index(seq):
     return _libcvht.sequence_get_index(seq)
 
+def sequence_get_parent(seq):
+    return _libcvht.sequence_get_parent(seq)
+
+def sequence_set_parent(seq, s):
+    return _libcvht.sequence_set_parent(seq, s)
+
 def sequence_set_length(seq, length):
     return _libcvht.sequence_set_length(seq, length)
 
@@ -307,6 +313,18 @@ def sequence_get_cue(seq):
 
 def sequence_clone(seq):
     return _libcvht.sequence_clone(seq)
+
+def sequence_get_thumb(seq, ret, l):
+    return _libcvht.sequence_get_thumb(seq, ret, l)
+
+def sequence_get_thumb_dirty(seq):
+    return _libcvht.sequence_get_thumb_dirty(seq)
+
+def sequence_get_thumb_length(seq):
+    return _libcvht.sequence_get_thumb_length(seq)
+
+def sequence_gen_thumb(seq):
+    return _libcvht.sequence_gen_thumb(seq)
 
 def track_get_row_ptr(arg1, c, r):
     return _libcvht.track_get_row_ptr(arg1, c, r)
@@ -452,6 +470,12 @@ def track_get_indicators(trk):
 def track_set_indicators(trk, i):
     return _libcvht.track_set_indicators(trk, i)
 
+def track_set_dirty(trk, d):
+    return _libcvht.track_set_dirty(trk, d)
+
+def track_get_dirty(trk):
+    return _libcvht.track_get_dirty(trk)
+
 def track_new(port, channel, len, songlen, ctrlpr):
     return _libcvht.track_new(port, channel, len, songlen, ctrlpr)
 
@@ -548,8 +572,11 @@ def timeline_add_strip(tl, col, seq, start, length, rpb_start, rpb_end, loop_len
 def timeline_del_strip(tl, id):
     return _libcvht.timeline_del_strip(tl, id)
 
-def timestrip_get_seq_id(tstr):
-    return _libcvht.timestrip_get_seq_id(tstr)
+def timeline_get_seq(tl, col, n):
+    return _libcvht.timeline_get_seq(tl, col, n)
+
+def timestrip_get_seq(tstr):
+    return _libcvht.timestrip_get_seq(tstr)
 
 def timestrip_get_col(tstr):
     return _libcvht.timestrip_get_col(tstr)

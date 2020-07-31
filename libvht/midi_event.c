@@ -162,11 +162,21 @@ int parse_note(char *buff) {
 	if (strlen(b) == 3) { // sharpie
 		note++;
 		octave = atoi(b + 2);
+		if (b[2] == '<')
+			octave = -1;
 	}
 
 	if (strlen(b) == 2) {
 		octave = atoi(b + 1);
+		if (b[1] == '<')
+			octave = -1;
 	}
+
+
+	octave++;
+
+	while(note + octave * 12 > 127)
+		octave--;
 
 	return note + octave * 12;
 }

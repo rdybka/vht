@@ -20,8 +20,9 @@ from libvht.vhtsequence import VHTSequence
 
 
 class VHTTimelineStrip:
-    def __init__(self, ptr):
+    def __init__(self, ptr, mod):
         self._ptr = ptr
+        self._mod = mod
 
     def update_strrep(self):
         seq_id = libcvht.timestrip_get_seq_id(self._ptr)
@@ -43,8 +44,8 @@ class VHTTimelineStrip:
         )
 
     @property
-    def seq_id(self):
-        return libcvht.timestrip_get_seq_id(self._ptr)
+    def seq(self):
+        return VHTSequence(libcvht.timestrip_get_seq(self._ptr), self._mod.cb_new_track)
 
     @property
     def col(self):

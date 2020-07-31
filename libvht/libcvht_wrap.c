@@ -4620,6 +4620,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_sequence_get_parent(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_get_parent" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  result = (int)sequence_get_parent(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_set_parent(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "sequence_set_parent", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_set_parent" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_set_parent" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  sequence_set_parent(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_sequence_set_length(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   sequence *arg1 = (sequence *) 0 ;
@@ -5348,6 +5400,113 @@ SWIGINTERN PyObject *_wrap_sequence_clone(PyObject *SWIGUNUSEDPARM(self), PyObje
   arg1 = (sequence *)(argp1);
   result = (sequence *)sequence_clone(arg1);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_sequence, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_get_thumb(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  int *arg2 = (int *) 0 ;
+  int arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject *swig_obj[3] ;
+  int result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "sequence_get_thumb", 3, 3, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_get_thumb" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_int, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "sequence_get_thumb" "', argument " "2"" of type '" "int *""'"); 
+  }
+  arg2 = (int *)(argp2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "sequence_get_thumb" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  result = (int)sequence_get_thumb(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_get_thumb_dirty(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_get_thumb_dirty" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  result = (int)sequence_get_thumb_dirty(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_get_thumb_length(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_get_thumb_length" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  result = (int)sequence_get_thumb_length(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_gen_thumb(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_gen_thumb" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  result = (int)sequence_gen_thumb(arg1);
+  resultobj = SWIG_From_int((int)(result));
   return resultobj;
 fail:
   return NULL;
@@ -6771,6 +6930,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_track_set_dirty(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "track_set_dirty", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_set_dirty" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "track_set_dirty" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  track_set_dirty(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_track_get_dirty(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_get_dirty" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  result = (int)track_get_dirty(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_track_new(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int arg1 ;
@@ -7771,23 +7982,61 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_timestrip_get_seq_id(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_timeline_get_seq(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  timeline *arg1 = (timeline *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject *swig_obj[3] ;
+  sequence *result = 0 ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "timeline_get_seq", 3, 3, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_get_seq" "', argument " "1"" of type '" "timeline *""'"); 
+  }
+  arg1 = (timeline *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timeline_get_seq" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "timeline_get_seq" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  result = (sequence *)timeline_get_seq(arg1,arg2,arg3);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_sequence, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_timestrip_get_seq(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   timestrip *arg1 = (timestrip *) 0 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  int result;
+  sequence *result = 0 ;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timestrip, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timestrip_get_seq_id" "', argument " "1"" of type '" "timestrip *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timestrip_get_seq" "', argument " "1"" of type '" "timestrip *""'"); 
   }
   arg1 = (timestrip *)(argp1);
-  result = (int)timestrip_get_seq_id(arg1);
-  resultobj = SWIG_From_int((int)(result));
+  result = (sequence *)timestrip_get_seq(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_sequence, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -8159,6 +8408,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "sequence_get_length", _wrap_sequence_get_length, METH_O, NULL},
 	 { "sequence_get_max_length", _wrap_sequence_get_max_length, METH_NOARGS, NULL},
 	 { "sequence_get_index", _wrap_sequence_get_index, METH_O, NULL},
+	 { "sequence_get_parent", _wrap_sequence_get_parent, METH_O, NULL},
+	 { "sequence_set_parent", _wrap_sequence_set_parent, METH_VARARGS, NULL},
 	 { "sequence_set_length", _wrap_sequence_set_length, METH_VARARGS, NULL},
 	 { "sequence_get_trk", _wrap_sequence_get_trk, METH_VARARGS, NULL},
 	 { "sequence_add_track", _wrap_sequence_add_track, METH_VARARGS, NULL},
@@ -8186,6 +8437,10 @@ static PyMethodDef SwigMethods[] = {
 	 { "sequence_set_rpb", _wrap_sequence_set_rpb, METH_VARARGS, NULL},
 	 { "sequence_get_cue", _wrap_sequence_get_cue, METH_O, NULL},
 	 { "sequence_clone", _wrap_sequence_clone, METH_O, NULL},
+	 { "sequence_get_thumb", _wrap_sequence_get_thumb, METH_VARARGS, NULL},
+	 { "sequence_get_thumb_dirty", _wrap_sequence_get_thumb_dirty, METH_O, NULL},
+	 { "sequence_get_thumb_length", _wrap_sequence_get_thumb_length, METH_O, NULL},
+	 { "sequence_gen_thumb", _wrap_sequence_gen_thumb, METH_O, NULL},
 	 { "track_get_row_ptr", _wrap_track_get_row_ptr, METH_VARARGS, NULL},
 	 { "track_get_ctrlrow_ptr", _wrap_track_get_ctrlrow_ptr, METH_VARARGS, NULL},
 	 { "track_get_index", _wrap_track_get_index, METH_O, NULL},
@@ -8234,6 +8489,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "track_get_loop", _wrap_track_get_loop, METH_O, NULL},
 	 { "track_get_indicators", _wrap_track_get_indicators, METH_O, NULL},
 	 { "track_set_indicators", _wrap_track_set_indicators, METH_VARARGS, NULL},
+	 { "track_set_dirty", _wrap_track_set_dirty, METH_VARARGS, NULL},
+	 { "track_get_dirty", _wrap_track_get_dirty, METH_O, NULL},
 	 { "track_new", _wrap_track_new, METH_VARARGS, NULL},
 	 { "row_get_type", _wrap_row_get_type, METH_O, NULL},
 	 { "row_get_note", _wrap_row_get_note, METH_O, NULL},
@@ -8266,7 +8523,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "timeline_get_nstrips", _wrap_timeline_get_nstrips, METH_O, NULL},
 	 { "timeline_add_strip", _wrap_timeline_add_strip, METH_VARARGS, NULL},
 	 { "timeline_del_strip", _wrap_timeline_del_strip, METH_VARARGS, NULL},
-	 { "timestrip_get_seq_id", _wrap_timestrip_get_seq_id, METH_O, NULL},
+	 { "timeline_get_seq", _wrap_timeline_get_seq, METH_VARARGS, NULL},
+	 { "timestrip_get_seq", _wrap_timestrip_get_seq, METH_O, NULL},
 	 { "timestrip_get_col", _wrap_timestrip_get_col, METH_O, NULL},
 	 { "timestrip_get_start", _wrap_timestrip_get_start, METH_O, NULL},
 	 { "timestrip_get_length", _wrap_timestrip_get_length, METH_O, NULL},

@@ -130,7 +130,23 @@ class VHTSequence(Iterable):
 
     @property
     def index(self):
-        return libcvht.sequence_get_index(self._seq_handle)
+        idx = libcvht.sequence_get_index(self._seq_handle)
+        par = libcvht.sequence_get_parent(self._seq_handle)
+        if par > -1:
+            return par, idx
+        else:
+            return idx
+
+    @property
+    def thumb_dirty(self):
+        return libcvht.sequence_get_thumb_dirty(self._seq_handle)
+
+    @property
+    def thumb(self):
+        tl = libcvht.sequence_gen_thumb(self._seq_handle)
+        ret_arr = libcvht.int_array(tl)
+        libcvht.sequence_get_thumb(self._seq_handle, ret_arr, tl)
+        return ret_arr
 
     @property
     def trg_playmode(self):

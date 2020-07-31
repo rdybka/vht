@@ -46,6 +46,7 @@ sequence *sequence_new(int length) {
 	seq->midi_focus = 0;
 	seq->last_period = 0;
 	seq->index = 0;
+	seq->parent = -1;
 	seq->rpb = 4;
 
 	for (int t = 0; t < 3; t ++) {
@@ -64,6 +65,11 @@ sequence *sequence_new(int length) {
 	seq->clt = NULL;
 	seq->playing = 0;
 	seq->lost = 1;
+	seq->thumb_dirty = 1;
+	seq->thumb_repr = NULL;
+	seq->thumb_last_ring = 0;
+	seq->thumb_length = 0;
+	seq->thumb_panic = 0;
 	return seq;
 }
 
@@ -71,6 +77,8 @@ void sequence_trk_reindex(sequence *seq) {
 	for (int t = 0; t < seq->ntrk; t++) {
 		seq->trk[t]->index = t;
 	}
+
+	seq->thumb_dirty = 1;
 }
 
 sequence *sequence_clone(sequence *seq) {
@@ -100,6 +108,9 @@ sequence *sequence_clone(sequence *seq) {
 		ns->triggers[t].note = seq->triggers[t].note;
 	}
 
+	ns->thumb_repr = NULL;
+	ns->thumb_dirty = 1;
+	ns->parent = seq->parent;
 	return ns;
 }
 
@@ -112,6 +123,7 @@ void sequence_add_track(sequence *seq, track *trk) {
 	trk->clt = seq->clt;
 	sequence_trk_reindex(seq);
 	track_wind(trk, seq->pos);
+	seq->thumb_dirty = 1;
 	seq_mod_excl_out(seq);
 	return;
 }
@@ -119,6 +131,7 @@ void sequence_add_track(sequence *seq, track *trk) {
 track *sequence_clone_track(sequence *seq, track *trk) {
 	track *ntrk = track_clone(trk);
 	sequence_add_track(seq, ntrk);
+	seq->thumb_dirty = 1;
 	return ntrk;
 }
 
@@ -130,6 +143,7 @@ void sequence_double(sequence *seq) {
 		track_double(seq->trk[t]);
 
 	seq->length *= 2;
+	seq->thumb_dirty = 1;
 }
 
 void sequence_halve(sequence *seq) {
@@ -140,6 +154,7 @@ void sequence_halve(sequence *seq) {
 		track_halve(seq->trk[t]);
 
 	seq->length /= 2;
+	seq->thumb_dirty = 1;
 }
 
 void sequence_free(sequence *seq) {
@@ -150,6 +165,9 @@ void sequence_free(sequence *seq) {
 
 	if (seq->trk)
 		free(seq->trk);
+
+	if (seq->thumb_repr)
+		free(seq->thumb_repr);
 
 	free(seq);
 }
@@ -183,7 +201,7 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 		period -= p;
 		nframes -= frm;
 
-		sequence_advance(seq, p, frm);
+		sequence_advance(seq, p, frm);// :]
 	}
 
 	if (seq->pos == floor(seq->pos)) {
@@ -372,6 +390,7 @@ void sequence_set_length(sequence *seq, int length) {
 
 	seq->length = length;
 	seq->lost = 1;
+	seq->thumb_dirty = 1;
 	seq_mod_excl_out(seq);
 }
 
@@ -393,6 +412,8 @@ void sequence_set_playing(sequence *seq, int p) {
 	} else {
 		seq->playing = 1;
 	}
+
+	seq->thumb_dirty = 1;
 }
 
 void sequence_handle_record(module *mod, sequence *seq, midi_event evt) {
@@ -420,7 +441,7 @@ void sequence_handle_record(module *mod, sequence *seq, midi_event evt) {
 			track *trk;
 			trk = track_new(mod->clt->default_midi_port, evt.channel, seq->length, seq->length, mod->ctrlpr);
 
-			// sequence_add_track(seq, trk); can't call it from here because of mutex - copy code, bad design
+			// sequence_add_track(seq, trk); can't call it from here because of bad design
 			seq->trk = realloc(seq->trk, sizeof(track *) * (seq->ntrk + 1));
 			seq->trk[seq->ntrk++] = trk;
 			trk->mod_excl = seq->mod_excl;
@@ -480,7 +501,7 @@ void sequence_trigger_play_on(sequence *seq) {
 		int np = ceil(seq->pos);
 
 		while(np++ % seq->trg_quantise);
-		np--; //:)
+		np--;
 
 		while(np >= seq->length)
 			np-=seq->length;
@@ -506,3 +527,122 @@ void sequence_trigger_play_off(sequence *seq) {
 		}
 	}
 }
+
+int sequence_get_thumb_dirty(sequence *seq) {
+	if (seq->thumb_dirty)
+		return 1;
+
+	if (seq->thumb_panic)
+		return 1;
+
+	for (int t = 0; t < seq->ntrk; t++) {
+		if (seq->trk[t]->dirty) {
+			seq->thumb_dirty = 1;
+			return seq->thumb_dirty;
+		}
+	}
+
+	seq->thumb_dirty = 1;
+	int *oldie = seq->thumb_repr;
+	seq->thumb_repr = NULL;
+	sequence_gen_thumb(seq);
+
+	if (oldie[0] == seq->thumb_repr[0])
+		if (oldie[1] == seq->thumb_repr[1]) {
+			int eq = memcmp(oldie, seq->thumb_repr, seq->thumb_length * sizeof(int));
+			if (eq == 0) {
+				free(oldie);
+				return 0;
+			}
+		}
+
+	free(oldie);
+	return 1;
+};
+
+int sequence_get_thumb_length(sequence *seq) {
+	return seq->thumb_length;
+};
+
+int sequence_gen_thumb(sequence *seq) {
+	if (seq->thumb_panic) {
+		seq->thumb_panic--;
+		seq->thumb_dirty = 1;
+	}
+
+	if (seq->thumb_dirty) {
+		int ncols = 0;
+		int tlen = seq->length;
+
+		for (int t = 0; t < seq->ntrk; t++) {
+			ncols += seq->trk[t]->ncols;
+			if (tlen < seq->trk[t]->nsrows) // funky business
+				tlen = seq->trk[t]->nsrows;
+		}
+
+		seq->thumb_length = 2 + ncols * tlen;
+		seq->thumb_repr = realloc(seq->thumb_repr, seq->thumb_length * sizeof(int));
+		memset(seq->thumb_repr, 0, seq->thumb_length * sizeof(int));
+		seq->thumb_repr[0] = tlen;
+		seq->thumb_repr[1] = ncols;
+
+		int col = 0;
+		for (int t = 0; t < seq->ntrk; t++) {
+			for (int r = 0; r < seq->trk[t]->nrows; r++) {
+				int rr = (int)(((double)seq->trk[t]->nsrows / (double)seq->trk[t]->nrows) * (double)r);
+				for (int c = 0; c < seq->trk[t]->ncols; c++) {
+
+					int v = 0;
+
+					if (seq->trk[t]->rows[c][r].type == note_on) {
+						v = 1;
+
+						if (seq->trk[t]->ring[c] == seq->trk[t]->rows[c][r].note) {
+							if (seq->trk[t]->pos >= r) {
+								v = 2;
+
+								for (int yy = seq->trk[t]->pos; yy > r; yy--) {
+									if (seq->trk[t]->rows[c][yy].type == note_on)
+										v = 1;
+								}
+							} else {
+								v = 2;
+								for (int yy = 0; yy < seq->trk[t]->pos; yy++)
+									if (seq->trk[t]->rows[c][yy].type > 0)
+										v = 1;
+
+								for (int yy = seq->trk[t]->nrows; yy >= r && v == 2; yy--) {
+									if ((seq->trk[t]->rows[c][yy].type == note_on) &&
+									        (seq->trk[t]->ring[c] == seq->trk[t]->rows[c][yy].note)) {
+										if (r != yy)
+											v = 1;
+									}
+								}
+							}
+						}
+					}
+
+					int addr = 2 + (ncols * rr) + col + c;
+					if ((v > 0) && (addr < seq->thumb_length))
+						seq->thumb_repr[addr] = v;
+				}
+			}
+
+
+			col += seq->trk[t]->ncols;
+			seq->trk[t]->dirty = 0;
+		}
+
+		seq->thumb_dirty = 0;
+	}
+
+	return seq->thumb_length;
+};
+
+int sequence_get_thumb(sequence *seq, int *ret, int l) {
+	if (l != seq->thumb_length)
+		return 0;
+
+	memcpy(ret, seq->thumb_repr, l * sizeof(int));
+	return l;
+};

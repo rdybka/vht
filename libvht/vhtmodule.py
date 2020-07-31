@@ -37,7 +37,7 @@ class VHTModule(Iterable):
         self._clt_handle = libcvht.module_get_midi_client(self._mod_handle)
         self.extras = {}  # will be saved - for stuff like names of tracks
 
-        self.timeline = VHTTimeline(self._mod_handle)
+        self.timeline = VHTTimeline(self)
 
         # these are ment to fix extras
         self.cb_new_sequence = []  # will be called after new seq with seq_id as param

@@ -19,8 +19,9 @@ from libvht import libcvht
 
 
 class VHTRow:
-    def __init__(self, rowptr):
+    def __init__(self, rowptr, trkptr):
         self._rowptr = rowptr
+        self._trkptr = trkptr
         self._type = libcvht.row_get_type(self._rowptr)
         self._note = libcvht.row_get_note(self._rowptr)
         self._velocity = libcvht.row_get_velocity(self._rowptr)
@@ -67,6 +68,7 @@ class VHTRow:
         libcvht.row_set(
             self._rowptr, self._type, self._note, self._velocity, self._delay
         )
+        libcvht.track_set_dirty(self._trkptr, 1)
         self.update_strrep()
 
     def clear(self):
@@ -75,6 +77,7 @@ class VHTRow:
         self._velocity = 0
         self._delay = 0
         libcvht.row_set(self._rowptr, 0, 0, 0, 0)
+        libcvht.track_set_dirty(self._trkptr, 1)
         self.update_strrep()
 
     @property
@@ -85,6 +88,7 @@ class VHTRow:
     def type(self, value):
         self._type = value
         libcvht.row_set_type(self._rowptr, self._type)
+        libcvht.track_set_dirty(self._trkptr, 1)
 
     @property
     def note(self):
@@ -95,12 +99,14 @@ class VHTRow:
         if isinstance(value, int):
             self._note = value
             libcvht.row_set_note(self._rowptr, self._note)
+            libcvht.track_set_dirty(self._trkptr, 1)
             self.update_strrep()
             return
 
         if isinstance(value, str):
             self._note = libcvht.parse_note(value)
             libcvht.row_set_note(self._rowptr, self._note)
+            libcvht.track_set_dirty(self._trkptr, 1)
             self.type = 1
             if self.velocity == 0:
                 self.velocity = 100
@@ -115,6 +121,7 @@ class VHTRow:
     def velocity(self, value):
         self._velocity = int(value)
         libcvht.row_set_velocity(self._rowptr, self._velocity)
+        libcvht.track_set_dirty(self._trkptr, 1)
 
     @property
     def delay(self):
@@ -124,6 +131,7 @@ class VHTRow:
     def delay(self, value):
         self._delay = int(value)
         libcvht.row_set_delay(self._rowptr, self._delay)
+        libcvht.track_set_dirty(self._trkptr, 1)
 
     def __str__(self):
         return self._strrep

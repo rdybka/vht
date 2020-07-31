@@ -1,10 +1,13 @@
 - timeline
+    - seqswaps
     - strip management
+    - selecting
+    - saving/loading
     - feeding
     - scrub
     - loop
-    - view
-    - on left
+    - on left?
+    - global ring
 - configuration
     - ports
     - defaults
@@ -14,12 +17,13 @@
 - undo/redo
     - undelete tracks
     - undelete seqs
-- track colors
+? track colours
 - labels on tooltips
 - transport
 - export
 - console
     - click in statusbar
     - documentation
-    - updates from puthin
     - autofill
+- track callback
+- hexchooser

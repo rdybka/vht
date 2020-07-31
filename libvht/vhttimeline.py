@@ -23,10 +23,11 @@ from libvht import libcvht
 
 class VHTTimeline:
     def __init__(self, mod):
-        self._mod_handle = mod
+        self._mod_handle = mod._mod_handle
+        self._mod = mod
 
         self._tl_handle = libcvht.module_get_timeline(self._mod_handle)
-        self.strips = VHTTimelineStrips(self._mod_handle, self._tl_handle)
+        self.strips = VHTTimelineStrips(self._mod, self._tl_handle)
         self.ticks = VHTTimelineTicks(self._tl_handle)
         self.changes = VHTTimelineChanges(self._tl_handle)
 

@@ -225,12 +225,15 @@ void module_reset(module *mod) {
 }
 
 void module_panic(module *mod, int brutal) {
-	for (int s = 0; s < mod->nseq; s++)
+	for (int s = 0; s < mod->nseq; s++) {
 		for (int t = 0; t < mod->seq[s]->ntrk; t++) {
 			track_kill_notes(mod->seq[s]->trk[t]);
 			if (brutal)
 				queue_midi_ctrl(mod->clt, mod->seq[s], mod->seq[s]->trk[t], 0, 0x7B);
 		}
+
+		mod->seq[s]->thumb_panic = 9;
+	}
 }
 
 void module_seqs_reindex(module *mod) {

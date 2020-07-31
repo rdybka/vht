@@ -26,6 +26,7 @@
 %{
 #include "libcvht.h"
 %}
+
 #endif
 
 #include "module.h"
@@ -36,8 +37,8 @@ extern void module_free(module *mod);
 extern void module_reset(module *mod);
 extern void module_panic(module *mod, int brutal);
 extern midi_client *module_get_midi_client(module *mod);
-int midi_start(midi_client *clt, char *clt_name);
-void midi_stop(midi_client *clt);
+extern int midi_start(midi_client *clt, char *clt_name);
+extern void midi_stop(midi_client *clt);
 
 extern char *get_midi_error(module *mod);
 extern char *module_get_time(module *mod);
@@ -87,6 +88,8 @@ extern int sequence_get_ntrk(sequence *seq);
 extern int sequence_get_length(sequence *seq);
 extern int sequence_get_max_length(void);
 extern int sequence_get_index(sequence *seq);
+extern int sequence_get_parent(sequence *seq);
+extern void sequence_set_parent(sequence *seq, int s);
 extern void sequence_set_length(sequence *seq, int length);
 extern track *sequence_get_trk(sequence *seq, int n);
 extern void sequence_add_track(sequence *seq, track *trk);
@@ -116,6 +119,11 @@ extern void sequence_set_rpb(sequence *seq, int rpb);
 
 extern int sequence_get_cue(sequence *seq);
 extern sequence *sequence_clone(sequence *seq);
+
+extern int sequence_get_thumb(sequence *seq, int *ret, int l);
+extern int sequence_get_thumb_dirty(sequence *seq);
+extern int sequence_get_thumb_length(sequence *seq);
+extern int sequence_gen_thumb(sequence *seq);
 
 // track
 extern row *track_get_row_ptr(track *, int c, int r);
@@ -173,7 +181,8 @@ extern void track_set_loop(track *trk, int v);
 extern int track_get_loop(track *trk);
 extern int track_get_indicators(track *trk);
 extern void track_set_indicators(track *trk, int i);
-
+extern void track_set_dirty(track *trk, int d);
+extern int track_get_dirty(track *trk);
 extern track *track_new(int port, int channel, int len, int songlen, int ctrlpr);
 
 // row
@@ -218,8 +227,8 @@ extern timestrip *timeline_get_strip(timeline *tl, int n);
 extern int timeline_get_nstrips(timeline *tl);
 extern timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end, int loop_length);
 extern void timeline_del_strip(timeline *tl, int id);
-
-extern int timestrip_get_seq_id(timestrip *tstr);
+extern sequence *timeline_get_seq(timeline *tl, int col, int n);
+extern sequence *timestrip_get_seq(timestrip *tstr);
 extern int timestrip_get_col(timestrip *tstr);
 extern int timestrip_get_start(timestrip *tstr);
 extern int timestrip_get_length(timestrip *tstr);

@@ -35,7 +35,10 @@ class VHTColumn(Iterable):
 
     def __iter__(self):
         for i in range(self.__len__()):
-            yield VHTRow(libcvht.track_get_row_ptr(self._trk_handle, self._col, i))
+            yield VHTRow(
+                libcvht.track_get_row_ptr(self._trk_handle, self._col, i),
+                self._trk_handle,
+            )
 
     def __setitem__(self, itm, val):
         self[itm].note = val
@@ -47,7 +50,10 @@ class VHTColumn(Iterable):
         if itm < 0:
             raise IndexError()
 
-        return VHTRow(libcvht.track_get_row_ptr(self._trk_handle, self._col, itm))
+        return VHTRow(
+            libcvht.track_get_row_ptr(self._trk_handle, self._col, itm),
+            self._trk_handle,
+        )
 
     def __str__(self):
         ret = ""

@@ -97,6 +97,7 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	trk->playing = 1;
 	trk->clt = NULL;
 	trk->indicators = 0;
+	trk->dirty = 0;
 	return trk;
 };
 
@@ -124,6 +125,7 @@ void track_set_row(track *trk, int c, int n, int type, int note, int velocity, i
 
 	pthread_mutex_unlock(&trk->excl);
 	track_insert_rec_update(trk, c, n);
+	trk->dirty = 1;
 }
 
 void track_set_wanderer(track *trk, int c, int p, int v) {
@@ -803,6 +805,7 @@ void track_add_col(track *trk) {
 	trk->rows[trk->ncols -1] = malloc(sizeof(row) * trk->arows);
 	trk->ring = realloc(trk->ring, sizeof(int) * trk->ncols);
 	trk->ring[trk->ncols - 1] = -1;
+	trk->dirty = 1;
 	pthread_mutex_unlock(&trk->excl);
 
 	track_clear_rows(trk, trk->ncols - 1);
@@ -853,7 +856,7 @@ void track_del_col(track *trk, int c) {
 
 	trk->rows = realloc(trk->rows, sizeof(row*) * trk->ncols);
 	trk->ring = realloc(trk->ring, sizeof(int) * trk->ncols);
-
+	trk->dirty = 1;
 	trk_mod_excl_out(trk);
 }
 
@@ -893,6 +896,7 @@ void track_swap_col(track *trk, int c, int c2) {
 	row *c3 = trk->rows[c];
 	trk->rows[c] = trk->rows[c2];
 	trk->rows[c2] = c3;
+	trk->dirty = 1;
 	trk_mod_excl_out(trk);
 }
 
@@ -989,6 +993,7 @@ void track_resize(track *trk, int size) {
 
 	pthread_mutex_unlock(&trk->excl);
 	track_clear_updates(trk);
+	trk->dirty = 1;
 }
 
 void track_set_nrows(track *trk, int n) {
@@ -1004,6 +1009,7 @@ void track_set_nsrows(track *trk, int n) {
 	}
 
 	trk->resync = 1;
+	trk->dirty = 1;
 }
 
 void track_double(track *trk) {

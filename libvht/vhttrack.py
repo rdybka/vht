@@ -94,6 +94,14 @@ class VHTTrack(Iterable):
         libcvht.track_set_indicators(self._trk_handle, value)
 
     @property
+    def dirty(self):
+        return libcvht.track_get_dirty(self._trk_handle)
+
+    @dirty.setter
+    def dirty(self, value):
+        libcvht.track_set_dirty(self._trk_handle, value)
+
+    @property
     def channel(self):
         return libcvht.track_get_channel(self._trk_handle)
 

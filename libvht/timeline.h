@@ -76,6 +76,7 @@ int timeline_get_nticks(timeline *tl);
 double timeline_get_tick(timeline *tl, int n);
 
 timestrip *timeline_get_strip(timeline *tl, int n);
+sequence *timeline_get_seq(timeline *tl, int col, int n);
 int timeline_get_nstrips(timeline *tl);
 timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end, int loop_length);
 void timeline_del_strip(timeline *tl, int id);

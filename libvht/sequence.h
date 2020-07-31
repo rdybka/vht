@@ -43,6 +43,7 @@ typedef struct sequence_t {
 	double pos;
 	double last_period;
 	int midi_focus;
+	int parent;
 	int index;
 
 	// triggers
@@ -54,6 +55,11 @@ typedef struct sequence_t {
 	void *clt;
 	int playing;
 	int lost;
+	int thumb_dirty;
+	int *thumb_repr;
+	int thumb_last_ring;
+	int thumb_length;
+	int thumb_panic;
 } sequence;
 
 sequence *sequence_new(int length);
@@ -67,6 +73,11 @@ void sequence_halve(sequence *seq);
 void sequence_free(sequence *);
 void sequence_advance(sequence *seq, double period, jack_nframes_t nframes);
 sequence *sequence_clone(sequence *seq);
+
+int sequence_get_thumb_dirty(sequence *seq);
+int sequence_get_thumb_length(sequence *seq);
+int sequence_gen_thumb(sequence *seq);
+int sequence_get_thumb(sequence *seq, int *ret, int l);
 
 void sequence_set_trg_quantise(sequence *seq, int v);
 void sequence_set_trg_playmode(sequence *seq, int v);

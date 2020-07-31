@@ -87,6 +87,7 @@ typedef struct track_t {
 
 	void *clt;
 	int indicators;
+	int dirty; // for thumbnail
 } track;
 
 track *track_new(int port, int channel, int len, int songlen, int ctrlpr);

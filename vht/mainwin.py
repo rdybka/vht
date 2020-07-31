@@ -20,6 +20,7 @@ from vht.sequencelistview import SequenceListView
 from vht.timelineview import TimelineView
 from vht.statusbar import StatusBar
 from vht.sequenceview import SequenceView
+from vht.thumbmanager import ThumbManager
 from vht import *
 import vht.extras
 
@@ -40,6 +41,7 @@ class MainWin(Gtk.ApplicationWindow):
         self.fs = False
         self.app = app
         mod.mainwin = self
+        mod.thumbmanager = ThumbManager(mod)
         self.timeline_visible = False
         mod.console_visible = False
         self.last_filename = None
@@ -205,6 +207,7 @@ class MainWin(Gtk.ApplicationWindow):
         self.add_tick_callback(self.tick)
 
     def tick(self, wdg, param):
+        mod.thumbmanager.tick()
         self.time_display.set_markup(
             """<span font_desc="Roboto bold" font_family="monospace" size="x-large">%s</span>"""
             % mod.time

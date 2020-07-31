@@ -59,7 +59,7 @@ class TimelineView(Gtk.DrawingArea):
         self.spl = 0.5  # seconds per line (on screen)
         self.qb_start = 0
         self.max_qb_start = 23.0
-        self.spl_dest = 0.125
+        self.spl_dest = 0.015625
         self.qb_start_dest = self.qb_start
         self.max_qb_start_dest = 23.0
         self.pointer_ry = 0
@@ -252,13 +252,13 @@ class TimelineView(Gtk.DrawingArea):
         # snapticks -----------------
         r = int(math.floor(self.qb_start))
         rr = (mod.timeline.qb2t(r) - mod.timeline.qb2t(self.qb_start)) / self.spl
+        cr.set_source_rgb(
+            *(col * cfg.intensity_txt * 0.7 for col in cfg.timeline_colour)
+        )
         lrr = -420
         drw = True
         while rr < h and r < mod.timeline.nqb + 1:
             if drw:
-                cr.set_source_rgb(
-                    *(col * cfg.intensity_txt * 0.4 for col in cfg.timeline_colour)
-                )
                 cr.set_line_width(1)
                 cr.move_to(w - tw, rr)
                 cr.line_to((w - tw) - self.scrollbar_width, rr)
@@ -272,7 +272,7 @@ class TimelineView(Gtk.DrawingArea):
                 if rr - lrr > 1:
                     drw = True
 
-        # gdid
+        # grid
         cw = mod.mainwin.seqlist._txt_height * cfg.mixer_padding
         for r in range(len(mod)):
             cr.set_source_rgb(*(col * 0.6 for col in cfg.timeline_colour))
@@ -305,6 +305,23 @@ class TimelineView(Gtk.DrawingArea):
 
             cr.rectangle(st.col * cw + 1, ystart, cw - 2, yend)
             cr.fill()
+
+            cr.save()
+            thumb = mod.thumbmanager.get(st.seq.index)
+            if thumb:
+                thsurf = thumb.get_surface()
+                thx = st.col * cw + 1
+
+                tw, th = thsurf.get_width(), thsurf.get_height()
+                mtx = cairo.Matrix()
+                mtx.scale(tw / (cw - 2), th / yend)
+                mtx.translate(-thx, -ystart)
+                thumb.set_matrix(mtx)
+                cr.set_source(thumb)
+                cr.rectangle(thx, ystart, cw - 2, yend)
+                cr.fill()
+            cr.restore()
+
             cr.set_source_rgb(*(col * 0.2 for col in cfg.timeline_colour))
             cr.rectangle(st.col * cw + 1, ystart, cw - 2, yend)
             cr.stroke()
@@ -330,30 +347,31 @@ class TimelineView(Gtk.DrawingArea):
             elif self.zoom_hold:
                 lblextra = lblextra + "zoom: %.3f" % (self.spl * h)
 
-            margx = 15
+            margx = 20
             margy = 7
             *_, txtdy, txtdx, _ = cr.text_extents(lbl)
 
-            ty = ry - margy
+            ty = ry + margy
+            tx = w - (tw + margx)
 
-            if ry < margy * 2 + txtdy:
-                ty = ry + margy + txtdy
-
-            tx = w - (tw + txtdx + margx)
-
+            cr.save()
             cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.timeline_colour))
             cr.move_to(tx, ty)
+            cr.rotate(math.pi / 2.0)
             cr.show_text(lbl)
+            cr.restore()
 
-            if len(lblextra) and ry >= margy * 2 + txtdy:
-                *_, txtdx, _ = cr.text_extents(lblextra)
-                ty = ry + margy + txtdy
-                tx = w - (tw + txtdx + margx)
+            if len(lblextra):
+                ty = ry + margy
+                tx = w - (tw + txtdy + margx + margy)
+                cr.save()
                 cr.set_source_rgb(
                     *(col * cfg.intensity_txt_highlight for col in cfg.timeline_colour)
                 )
                 cr.move_to(tx, ty)
+                cr.rotate(math.pi / 2.0)
                 cr.show_text(lblextra)
+                cr.restore()
 
         wnd = self.get_window()
         wnd.invalidate_rect(None, False)

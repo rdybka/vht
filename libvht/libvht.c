@@ -105,6 +105,14 @@ int sequence_get_index(sequence *seq) {
 	return seq->index;
 }
 
+int sequence_get_parent(sequence *seq) {
+	return seq->parent;
+};
+
+void sequence_set_parent(sequence *seq, int s) {
+	seq->parent = s;
+};
+
 int sequence_get_max_length(void) {
 	return SEQUENCE_MAX_LENGTH;
 }
@@ -209,6 +217,14 @@ void track_set_loop(track *trk, int v) {
 	trk->loop = v;
 }
 
+void track_set_dirty(track *trk, int d) {
+	trk->dirty = d;
+}
+
+int track_get_dirty(track *trk) {
+	return trk->dirty;
+}
+
 int track_get_loop(track *trk) {
 	return trk->loop;
 }
@@ -290,8 +306,8 @@ double timeline_get_length(timeline *tl) {
 	return tl->time_length;
 }
 
-int timestrip_get_seq_id(timestrip *tstr) {
-	return tstr->seq->index;
+sequence *timestrip_get_seq(timestrip *tstr) {
+	return tstr->seq;
 }
 
 int timestrip_get_col(timestrip *tstr) {
