@@ -136,7 +136,7 @@ void timeline_update(timeline *tl) {
 	tl->length = 32;
 
 	for (int s = 0; s < tl->nstrips; s++) {
-		int t = tl->strips[s].start + tl->strips[s].loop_length;
+		int t = tl->strips[s].start + tl->strips[s].length;
 		if (t > tl->length)
 			tl->length = t;
 	}
@@ -295,7 +295,7 @@ sequence *timeline_get_seq(timeline *tl, int col, int n) {
 	return NULL;
 }
 
-timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end, int loop_length) {
+timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end) {
 	timeline_excl_in(tl);
 
 	int maxid = -1;
@@ -312,7 +312,6 @@ timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, i
 	s->length = length;
 	s->rpb_start = rpb_start;
 	s->rpb_end = rpb_end;
-	s->loop_length = loop_length;
 	s->col = col;
 	s->seq->index = maxid + 1;
 
@@ -331,6 +330,33 @@ void timeline_del_strip(timeline *tl, int id) {
 	tl->strips = realloc(tl->strips, sizeof(timestrip) * --tl->nstrips);
 
 	timeline_excl_out(tl);
+}
+
+void timeline_clear(timeline *tl) {
+	timeline_excl_in(tl);
+
+	for (int s = 0; s < tl->nstrips; s++) {
+		sequence_free(tl->strips[s].seq);
+	}
+
+	if (tl->strips)
+		free(tl->strips);
+	tl->nstrips = 0;
+	tl->strips = NULL;
+
+	if (tl->changes)
+		free(tl->changes);
+	tl->nchanges = 0;
+	tl->changes = NULL;
+
+	if (tl->ticks)
+		free(tl->ticks);
+	tl->nticks = 0;
+	tl->ticks = NULL;
+
+	timeline_update(tl);
+	timeline_excl_out(tl);
+
 }
 
 void timeline_swap_sequence(timeline *tl, int s1, int s2) {

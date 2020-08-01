@@ -222,10 +222,11 @@ extern int timeline_get_nticks(timeline *tl);
 extern double timeline_get_tick(timeline *tl, int n);
 
 extern double timeline_get_length(timeline *tl);
+extern void timeline_clear(timeline *tl);
 
 extern timestrip *timeline_get_strip(timeline *tl, int n);
 extern int timeline_get_nstrips(timeline *tl);
-extern timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end, int loop_length);
+extern timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end);
 extern void timeline_del_strip(timeline *tl, int id);
 extern sequence *timeline_get_seq(timeline *tl, int col, int n);
 extern sequence *timestrip_get_seq(timestrip *tstr);
@@ -234,13 +235,11 @@ extern int timestrip_get_start(timestrip *tstr);
 extern int timestrip_get_length(timestrip *tstr);
 extern int timestrip_get_rpb_start(timestrip *tstr);
 extern int timestrip_get_rpb_end(timestrip *tstr);
-extern int timestrip_get_loop_length(timestrip *tstr);
 
 extern void timestrip_set_start(timestrip *tstr, int start);
 extern void timestrip_set_length(timestrip *tstr, int length);
 extern void timestrip_set_rpb_start(timestrip *tstr, int rpb_start);
 extern void timestrip_set_rpb_end(timestrip *tstr, int rpb_end);
-extern void timestrip_set_loop_length(timestrip *tstr, int loop_length);
 
 extern int parse_note(char *);
 

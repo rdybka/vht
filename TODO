@@ -1,8 +1,6 @@
 - timeline
-    - save/load
+    ~ save/load
     * pointer
-    - clip
-    - scrolling_x
     - selecting
     - strip management
     - feeding
@@ -25,7 +23,7 @@
 - transport
 - export
 - console
+    - autofill
     - click in statusbar
     - documentation
-    - autofill
 - track callback

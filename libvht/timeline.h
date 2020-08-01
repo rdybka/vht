@@ -40,7 +40,6 @@ typedef struct timestrip_t {
 	int length;
 	int rpb_start;
 	int rpb_end;
-	int loop_length;
 } timestrip;
 
 typedef struct timeline_t {
@@ -63,6 +62,7 @@ typedef struct timeline_t {
 
 timeline *timeline_new(void);
 void timeline_free(timeline *tl);
+void timeline_clear(timeline *tl);
 void timeline_update(timeline *tl);
 void timeline_advance(timeline *tl, double period);
 long timeline_get_qb(timeline *tl, double t);
@@ -78,7 +78,7 @@ double timeline_get_tick(timeline *tl, int n);
 timestrip *timeline_get_strip(timeline *tl, int n);
 sequence *timeline_get_seq(timeline *tl, int col, int n);
 int timeline_get_nstrips(timeline *tl);
-timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end, int loop_length);
+timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end);
 void timeline_del_strip(timeline *tl, int id);
 
 #endif //__TIMELINE_H__

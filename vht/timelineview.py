@@ -60,7 +60,19 @@ class TimelineView(Gtk.DrawingArea):
         self.qb_start = 0
         self.max_qb_start = 23.0
         self.spl_dest = 0.015625
+
+        if "timeline_zoom" in mod.extras:
+            self.spl_dest = mod.extras["timeline_zoom"]
+        else:
+            mod.extras["timeline_zoom"] = self.spl_dest
+
         self.qb_start_dest = self.qb_start
+
+        if "timeline_pos" in mod.extras:
+            self.qb_start_dest = mod.extras["timeline_pos"]
+        else:
+            mod.extras["timeline_pos"] = self.qb_start_dest
+
         self.max_qb_start_dest = 23.0
         self.pointer_ry = 0
         self.pointer_ry_dest = 0
@@ -79,6 +91,12 @@ class TimelineView(Gtk.DrawingArea):
         self.pointer_r = -1
 
         self.snap = 8
+
+        if "timeline_snap" in mod.extras:
+            self.snap = mod.extras["timeline_snap"]
+        else:
+            mod.extras["timeline_snap"] = self.snap
+
         self.snap_hold = False
         self.zoom_hold = False
 
@@ -133,6 +151,8 @@ class TimelineView(Gtk.DrawingArea):
         h = self.get_allocated_height()
         *_, dx, _ = cr.text_extents("dupa")
         tw = mod.mainwin.seqlist_butts.get_allocated_width()
+
+        hjust = mod.mainwin.seqlist_sw.get_hadjustment()
 
         # timeline -------------------
 
@@ -274,12 +294,18 @@ class TimelineView(Gtk.DrawingArea):
 
         # grid
         cr.save()
+        cr.rectangle(0, 0, w - (tw + self.scrollbar_width * 1.5), h)
+        cr.clip()
+
+        mtx = cairo.Matrix()
+        mtx.translate(-hjust.props.value, 0)
+        cr.set_matrix(mtx)
         cw = mod.mainwin.seqlist._txt_height * cfg.mixer_padding
         for r in range(len(mod)):
             cr.set_source_rgb(*(col * 0.6 for col in cfg.timeline_colour))
             cr.set_line_width(1)
-            cr.move_to((r + 1) * cw, 0)
-            cr.line_to((r + 1) * cw, h)
+            cr.move_to(((r + 1) * cw) - (cw * 0.1), 0)
+            cr.line_to(((r + 1) * cw) - (cw * 0.1), h)
             cr.stroke()
 
         cr.set_line_width(0.5)
@@ -292,39 +318,42 @@ class TimelineView(Gtk.DrawingArea):
         for st in mod.timeline.strips:
             if st.start > qbend:
                 continue
-            if st.loop_length + st.start < self.qb_start:
+            if st.length + st.start < self.qb_start:
                 continue
 
             ystart = (mod.timeline.qb2t(st.start) - tstart) / self.spl
             yend = mod.timeline.qb2t(st.length) / self.spl
-            lend = mod.timeline.qb2t(st.loop_length) / self.spl
+            lend = mod.timeline.qb2t(st.length) / self.spl
+
+            thx = st.col * cw
+            thxx = cw * 0.8
 
             if st.col == self.curr_col:
                 cr.set_source_rgb(*(col * 0.5 for col in cfg.timeline_colour))
             else:
                 cr.set_source_rgb(*(col * 0.4 for col in cfg.timeline_colour))
 
-            cr.rectangle(st.col * cw + 1, ystart, cw - 2, yend)
+            cr.rectangle(thx, ystart, thxx, yend)
             cr.fill()
 
             thumb = mod.thumbmanager.get(st.seq.index)
             if thumb:
                 thsurf = thumb.get_surface()
-                thx = st.col * cw + 1
 
                 thw, thh = thsurf.get_width(), thsurf.get_height()
                 mtx = cairo.Matrix()
-                mtx.scale(thw / (cw - 2), thh / yend)
+                mtx.scale(thw / thxx, thh / yend)
                 mtx.translate(-thx, -ystart)
                 thumb.set_matrix(mtx)
                 cr.set_source(thumb)
-                cr.rectangle(thx, ystart, cw - 2, yend)
+                cr.rectangle(thx, ystart, thxx, yend)
                 cr.fill()
 
-            cr.set_source_rgb(*(col * 0.2 for col in cfg.timeline_colour))
-            cr.rectangle(st.col * cw + 1, ystart, cw - 2, yend)
-            cr.stroke()
+            # cr.set_source_rgb(*(col * 0.2 for col in cfg.timeline_colour))
+            # cr.rectangle(thx, ystart, thxx, yend)
+            # cr.stroke()
 
+        cr.restore()
         # pointer -------------------
         if self.pointer_xy:
             ry = self.pointer_ry
@@ -354,7 +383,16 @@ class TimelineView(Gtk.DrawingArea):
             tx = w - (tw + margx)
 
             cr.save()
-            cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.timeline_colour))
+            cr.set_source_rgb(0, 0, 0)
+            cr.move_to(tx + 2, ty + 2)
+            cr.rotate(math.pi / 2.0)
+            cr.show_text(lbl)
+            cr.restore()
+
+            cr.save()
+            cr.set_source_rgb(
+                *(col * cfg.intensity_txt_highlight for col in cfg.timeline_colour)
+            )
             cr.move_to(tx, ty)
             cr.rotate(math.pi / 2.0)
             cr.show_text(lbl)
@@ -388,13 +426,8 @@ class TimelineView(Gtk.DrawingArea):
 
         if self.curr_col > -1 and self.pointer_r > -1:
             seq = mod[self.curr_col]
-            mod.timeline.strips.insert(
-                self.curr_col,
-                int(self.pointer_r),
-                seq.length,
-                seq.rpb,
-                seq.rpb,
-                seq.length,
+            mod.timeline.strips.insert_clone(
+                self.curr_col, int(self.pointer_r), seq.length, seq.rpb, seq.rpb,
             )
 
         return True
@@ -452,28 +485,51 @@ class TimelineView(Gtk.DrawingArea):
 
     def on_scroll(self, widget, event):
         if event.state & Gdk.ModifierType.SHIFT_MASK:
+            hjust = mod.mainwin.seqlist_sw.get_hadjustment()
+            cw = mod.mainwin.seqlist._txt_height * cfg.mixer_padding
             if event.direction == Gdk.ScrollDirection.UP:
-                self.snap = min(self.snap * 2, 32)
+                hjust.props.value -= cw
+                return True
             if event.direction == Gdk.ScrollDirection.DOWN:
-                self.snap = max(self.snap / 2, 1)
+                hjust.props.value += cw
+                return True
+
+        if self.snap_hold:
+            if event.direction == Gdk.ScrollDirection.UP:
+                if self.zoom_hold:
+                    self.snap = min(self.snap + 1, 64)
+                else:
+                    self.snap = min(self.snap * 2, 64)
+
+            if event.direction == Gdk.ScrollDirection.DOWN:
+                if self.zoom_hold:
+                    self.snap = max(self.snap - 1, 1)
+                else:
+                    self.snap = max(self.snap / 2, 1)
+
+            mod.extras["timeline_snap"] = self.snap
             return True
 
-        if event.state & Gdk.ModifierType.CONTROL_MASK:
+        if self.zoom_hold:
             if event.direction == Gdk.ScrollDirection.UP:
                 self.spl_dest = max(self.spl * 0.8, math.pow(0.5, 10))
             if event.direction == Gdk.ScrollDirection.DOWN:
                 self.spl_dest = min(self.spl / 0.8, 0.25)
+
+            mod.extras["timeline_zoom"] = self.spl_dest
             return True
 
         if event.direction == Gdk.ScrollDirection.UP:
             self.qb_start_dest = max(self.qb_start - self.row_scroll, 0)
         if event.direction == Gdk.ScrollDirection.DOWN:
             self.qb_start_dest = min(self.qb_start + self.row_scroll, self.max_qb_start)
+
+        mod.extras["timeline_pos"] = self.qb_start_dest
         return True
 
     def on_key_press(self, widget, event):
         # print(Gdk.keyval_name(Gdk.keyval_to_lower(event.keyval)), event.keyval)
-        if 65505 <= event.keyval <= 65506:  # shift
+        if event.keyval == 65513:  # alt
             self.snap_hold = True
 
         if 65507 <= event.keyval <= 65508:  # ctrl
@@ -482,7 +538,7 @@ class TimelineView(Gtk.DrawingArea):
         return mod.mainwin.sequence_view.on_key_press(widget, event)
 
     def on_key_release(self, widget, event):
-        if 65505 <= event.keyval <= 65506:  # shift
+        if event.keyval == 65513:  # alt
             self.snap_hold = False
 
         if 65507 <= event.keyval <= 65508:  # ctrl

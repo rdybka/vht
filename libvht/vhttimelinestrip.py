@@ -31,7 +31,6 @@ class VHTTimelineStrip:
         length = libcvht.timestrip_get_length(self._ptr)
         rpb_start = libcvht.timestrip_get_rpb_start(self._ptr)
         rpb_end = libcvht.timestrip_get_rpb_end(self._ptr)
-        loop_length = libcvht.timestrip_get_loop_length(self._ptr)
 
         self._strrep = "%d %d %d %d %d %d %d" % (
             seq_id,
@@ -40,7 +39,6 @@ class VHTTimelineStrip:
             length,
             rpb_start,
             rpb_end,
-            loop_length,
         )
 
     @property
@@ -82,14 +80,6 @@ class VHTTimelineStrip:
     @rpb_start.setter
     def rpb_end(self, value):
         libcvht.timestrip_set_rpb_end(self._ptr, value)
-
-    @property
-    def loop_length(self):
-        return libcvht.timestrip_get_loop_length(self._ptr)
-
-    @loop_length.setter
-    def loop_length(self, value):
-        libcvht.timestrip_set_loop_length(self._ptr, value)
 
     def __str__(self):
         self.update_strrep()

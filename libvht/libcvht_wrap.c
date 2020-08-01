@@ -7822,6 +7822,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_timeline_clear(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  timeline *arg1 = (timeline *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_clear" "', argument " "1"" of type '" "timeline *""'"); 
+  }
+  arg1 = (timeline *)(argp1);
+  timeline_clear(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_timeline_get_strip(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   timeline *arg1 = (timeline *) 0 ;
@@ -7884,7 +7906,6 @@ SWIGINTERN PyObject *_wrap_timeline_add_strip(PyObject *SWIGUNUSEDPARM(self), Py
   int arg5 ;
   int arg6 ;
   int arg7 ;
-  int arg8 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int val2 ;
@@ -7899,12 +7920,10 @@ SWIGINTERN PyObject *_wrap_timeline_add_strip(PyObject *SWIGUNUSEDPARM(self), Py
   int ecode6 = 0 ;
   int val7 ;
   int ecode7 = 0 ;
-  int val8 ;
-  int ecode8 = 0 ;
-  PyObject *swig_obj[8] ;
+  PyObject *swig_obj[7] ;
   timestrip *result = 0 ;
   
-  if (!SWIG_Python_UnpackTuple(args, "timeline_add_strip", 8, 8, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "timeline_add_strip", 7, 7, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_add_strip" "', argument " "1"" of type '" "timeline *""'"); 
@@ -7940,12 +7959,7 @@ SWIGINTERN PyObject *_wrap_timeline_add_strip(PyObject *SWIGUNUSEDPARM(self), Py
     SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "timeline_add_strip" "', argument " "7"" of type '" "int""'");
   } 
   arg7 = (int)(val7);
-  ecode8 = SWIG_AsVal_int(swig_obj[7], &val8);
-  if (!SWIG_IsOK(ecode8)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "timeline_add_strip" "', argument " "8"" of type '" "int""'");
-  } 
-  arg8 = (int)(val8);
-  result = (timestrip *)timeline_add_strip(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);
+  result = (timestrip *)timeline_add_strip(arg1,arg2,arg3,arg4,arg5,arg6,arg7);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_timestrip, 0 |  0 );
   return resultobj;
 fail:
@@ -8158,29 +8172,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_timestrip_get_loop_length(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  timestrip *arg1 = (timestrip *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject *swig_obj[1] ;
-  int result;
-  
-  if (!args) SWIG_fail;
-  swig_obj[0] = args;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timestrip, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timestrip_get_loop_length" "', argument " "1"" of type '" "timestrip *""'"); 
-  }
-  arg1 = (timestrip *)(argp1);
-  result = (int)timestrip_get_loop_length(arg1);
-  resultobj = SWIG_From_int((int)(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_timestrip_set_start(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   timestrip *arg1 = (timestrip *) 0 ;
@@ -8290,35 +8281,6 @@ SWIGINTERN PyObject *_wrap_timestrip_set_rpb_end(PyObject *SWIGUNUSEDPARM(self),
   } 
   arg2 = (int)(val2);
   timestrip_set_rpb_end(arg1,arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_timestrip_set_loop_length(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  timestrip *arg1 = (timestrip *) 0 ;
-  int arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  PyObject *swig_obj[2] ;
-  
-  if (!SWIG_Python_UnpackTuple(args, "timestrip_set_loop_length", 2, 2, swig_obj)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timestrip, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timestrip_set_loop_length" "', argument " "1"" of type '" "timestrip *""'"); 
-  }
-  arg1 = (timestrip *)(argp1);
-  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timestrip_set_loop_length" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = (int)(val2);
-  timestrip_set_loop_length(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -8519,6 +8481,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "timeline_get_nticks", _wrap_timeline_get_nticks, METH_O, NULL},
 	 { "timeline_get_tick", _wrap_timeline_get_tick, METH_VARARGS, NULL},
 	 { "timeline_get_length", _wrap_timeline_get_length, METH_O, NULL},
+	 { "timeline_clear", _wrap_timeline_clear, METH_O, NULL},
 	 { "timeline_get_strip", _wrap_timeline_get_strip, METH_VARARGS, NULL},
 	 { "timeline_get_nstrips", _wrap_timeline_get_nstrips, METH_O, NULL},
 	 { "timeline_add_strip", _wrap_timeline_add_strip, METH_VARARGS, NULL},
@@ -8530,12 +8493,10 @@ static PyMethodDef SwigMethods[] = {
 	 { "timestrip_get_length", _wrap_timestrip_get_length, METH_O, NULL},
 	 { "timestrip_get_rpb_start", _wrap_timestrip_get_rpb_start, METH_O, NULL},
 	 { "timestrip_get_rpb_end", _wrap_timestrip_get_rpb_end, METH_O, NULL},
-	 { "timestrip_get_loop_length", _wrap_timestrip_get_loop_length, METH_O, NULL},
 	 { "timestrip_set_start", _wrap_timestrip_set_start, METH_VARARGS, NULL},
 	 { "timestrip_set_length", _wrap_timestrip_set_length, METH_VARARGS, NULL},
 	 { "timestrip_set_rpb_start", _wrap_timestrip_set_rpb_start, METH_VARARGS, NULL},
 	 { "timestrip_set_rpb_end", _wrap_timestrip_set_rpb_end, METH_VARARGS, NULL},
-	 { "timestrip_set_loop_length", _wrap_timestrip_set_loop_length, METH_VARARGS, NULL},
 	 { "parse_note", _wrap_parse_note, METH_O, NULL},
 	 { NULL, NULL, 0, NULL }
 };

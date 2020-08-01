@@ -331,10 +331,6 @@ int timestrip_get_rpb_end(timestrip *tstr) {
 	return tstr->rpb_end;
 }
 
-int timestrip_get_loop_length(timestrip *tstr) {
-	return tstr->loop_length;
-}
-
 void timestrip_set_start(timestrip *tstr, int start) {
 	tstr->start = start;
 }
@@ -351,7 +347,4 @@ void timestrip_set_rpb_end(timestrip *tstr, int rpb_end) {
 	tstr->rpb_end = rpb_end;
 }
 
-void timestrip_set_loop_length(timestrip *tstr, int loop_length) {
-	tstr->loop_length = loop_length;
-}
 

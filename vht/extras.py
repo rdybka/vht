@@ -35,6 +35,9 @@ def get_name(n):
     while not valid:
         valid = True
         for rr in mod.extras.values():
+            if type(rr) is not dict:
+                continue
+
             if rr[-1]["sequence_name"] == nm:
                 nm = nm + "_"
                 valid = False
@@ -65,7 +68,7 @@ def fix_extras_post_load(m):
                 if t in mod.extras[s]:
                     mod.extras[s][t] = {**mod.extras[s][t], **x[s][t]}
         else:
-            print(s, "not in extras")
+            mod.extras[s] = x[s]
 
 
 def register(mod):

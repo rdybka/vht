@@ -52,20 +52,21 @@ class VHTTimelineStrips(Iterable):
         else:
             raise IndexError(col, itm)
 
-    def insert(self, seq_id, start, length, rpb_start, rpb_end, loop_length):
+    def insert(self, col, seq, start, length, rpb_start, rpb_end):
+        return VHTTimelineStrip(
+            libcvht.timeline_add_strip(
+                self._tl_handle, col, seq, start, length, rpb_start, rpb_end,
+            ),
+            self._mod,
+        )
+
+    def insert_clone(self, seq_id, start, length, rpb_start, rpb_end):
         ns = libcvht.sequence_clone(libcvht.module_get_seq(self._mod_handle, seq_id))
         libcvht.sequence_set_parent(ns, seq_id)
 
         return VHTTimelineStrip(
             libcvht.timeline_add_strip(
-                self._tl_handle,
-                seq_id,
-                ns,
-                start,
-                length,
-                rpb_start,
-                rpb_end,
-                loop_length,
+                self._tl_handle, seq_id, ns, start, length, rpb_start, rpb_end,
             ),
             self._mod,
         )

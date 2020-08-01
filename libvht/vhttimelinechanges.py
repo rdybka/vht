@@ -43,11 +43,11 @@ class VHTTimelineChanges(MutableSequence):
     def __delitem__(self, itm):
         libcvht.timeline_change_del(self._tl_handle, itm)
 
-    def __setitem__(self, itm, bpm, linked):
-        libcvht.timeline_change_set(self._tl_handle, itm, bpm, linked)
+    def __setitem__(self, row, bpm, linked):
+        libcvht.timeline_change_set(self._tl_handle, row, bpm, linked)
 
-    def insert(self, itm, bpm, linked):
-        libcvht.timeline_change_set(self._tl_handle, itm, bpm, linked)
+    def insert(self, row, bpm, linked):
+        libcvht.timeline_change_set(self._tl_handle, row, bpm, linked)
 
     def __str__(self):
         ret = ""

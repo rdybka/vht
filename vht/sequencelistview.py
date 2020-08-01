@@ -341,11 +341,16 @@ class SequenceListView(Gtk.DrawingArea):
             if (self._menu_handle == r and not self._popup.pooped) or (
                 self._popup.pooped and self._popup.curr == r
             ):
-                cr.move_to(x + 2, (h - self._txt_height * 1.5) + 2)
+                cr.move_to(x + 1, (h - self._txt_height * 1.5) + 1)
                 cr.show_text("*")
                 cr.set_source_rgb(
                     *(col * cfg.intensity_txt_highlight for col in cfg.star_colour)
                 )
+            else:
+                cr.set_source_rgb(*(col * cfg.intensity_txt for col in (1, 1, 1)))
+                cr.move_to(x + 1, (h - self._txt_height * 1.5) + 1)
+                cr.show_text("*")
+                cr.set_source_rgb(0, 0, 0)
 
             cr.move_to(x, h - self._txt_height * 1.5)
             cr.show_text("*")
@@ -392,9 +397,10 @@ class SequenceListView(Gtk.DrawingArea):
                     *(col * cfg.intensity_txt_highlight for col in cfg.mixer_colour)
                 )
             else:
-                cr.set_source_rgb(
-                    *(col * cfg.intensity_background for col in cfg.mixer_colour)
-                )
+                cr.set_source_rgb(*(col * cfg.intensity_txt for col in (1, 1, 1)))
+                cr.move_to(x + 1, (h - (self._txt_height * 0.7)) + 1)
+                cr.show_text("=")
+                cr.set_source_rgb(0, 0, 0)
 
             cr.move_to(x, h - (self._txt_height * 0.7))
             cr.show_text("=")
@@ -440,6 +446,27 @@ class SequenceListView(Gtk.DrawingArea):
             cr.stroke()
 
         self.queue_draw()
+
+    @property
+    def visible_cols(self):
+        cls = []
+        cr = self._context
+
+        if not cr:
+            return cls
+
+        x = mod.mainwin.seqlist_sw.get_hadjustment().props.value
+        w = (
+            mod.mainwin.timeline_view.get_allocated_width()
+            - mod.mainwin.seqlist_butts.get_allocated_width()
+        )
+        cw = self._txt_height * cfg.mixer_padding
+        for s in range(len(mod)):
+            xx = ((s * cw) + (cw / 2)) - x
+            if 0 <= xx < w:
+                cls.append(s)
+
+        return cls
 
     def on_draw(self, widget, cr):
         cr.set_source_surface(self._surface, 0, 0)

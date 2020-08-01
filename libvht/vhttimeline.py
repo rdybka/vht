@@ -31,6 +31,9 @@ class VHTTimeline:
         self.ticks = VHTTimelineTicks(self._tl_handle)
         self.changes = VHTTimelineChanges(self._tl_handle)
 
+    def clear(self):
+        libcvht.timeline_clear(self._tl_handle)
+
     @property
     def length(self):  # in seconds
         return libcvht.timeline_get_length(self._tl_handle)

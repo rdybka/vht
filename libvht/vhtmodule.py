@@ -268,77 +268,28 @@ class VHTModule(Iterable):
         jm["curr_seq"] = self.curr_seq
         jm["seq"] = []
         for seq in self:
-            s = {}
-            s["length"] = seq.length
-            s["rpb"] = seq.rpb
-            s["trg_playmode"] = seq.trg_playmode
-            s["trg_quantise"] = seq.trg_quantise
-            s["trig"] = [seq.get_trig(0), seq.get_trig(1), seq.get_trig(2)]
-            s["playing"] = seq.playing
-            s["trk"] = []
+            jm["seq"].append(self.pack_seq(seq))
 
-            for trk in seq:
-                t = {}
-                t["port"] = trk.port
-                t["channel"] = trk.channel
-                t["nrows"] = trk.nrows
-                t["nsrows"] = trk.nsrows
-                t["playing"] = trk.playing
-                t["ctrlpr"] = trk.ctrlpr
-                t["program"] = trk.get_program()
-                t["qc"] = trk.get_qc()
-                t["loop"] = trk.loop
+        tl = {}
+        tl["changes"] = []
+        for ch in self.timeline.changes:
+            chng = {}
+            chng["row"] = ch[0]
+            chng["bpm"] = ch[1]
+            chng["lnk"] = ch[2]
+            tl["changes"].append(chng)
+        tl["strips"] = []
+        for strip in self.timeline.strips:
+            strp = {}
+            strp["col"] = strip.col
+            strp["start"] = strip.start
+            strp["length"] = strip.length
+            strp["rpb_start"] = strip.rpb_start
+            strp["rpb_end"] = strip.rpb_end
+            strp["seq"] = self.pack_seq(strip.seq)
+            tl["strips"].append(strp)
 
-                t["ctrl"] = []
-                for cn, ctrl in enumerate(trk.ctrl):
-                    c = {}
-                    c["ctrlnum"] = ctrl.ctrlnum
-                    c["rows"] = []
-                    c["doodles"] = []
-                    rn = 0
-                    for r in ctrl:
-                        if r.velocity > -1:
-                            rw = {}
-                            rw["n"] = rn
-                            rw["velocity"] = r.velocity
-                            rw["linked"] = r.linked
-                            rw["smooth"] = r.smooth
-                            rw["anchor"] = r.anchor
-                            c["rows"].append(rw)
-
-                        rn += 1
-
-                    for r in range(trk.nrows):
-                        dood = trk.get_ctrl_rec(cn, r).as_list()
-                        empty = True
-                        for d in dood:
-                            if d > -1:
-                                empty = False
-
-                        if not empty:
-                            c["doodles"].append([r, dood])
-
-                    t["ctrl"].append(c)
-
-                t["col"] = []
-                for col in trk:
-                    c = []
-                    rn = 0
-                    for row in col:
-                        if row.type > 0:
-                            r = {}
-                            r["n"] = rn
-                            r["type"] = row.type
-                            r["note"] = row.note
-                            r["velocity"] = row.velocity
-                            r["delay"] = row.delay
-                            c.append(r)
-
-                        rn += 1
-                    t["col"].append(c)
-
-                s["trk"].append(t)
-            jm["seq"].append(s)
+        jm["tl"] = tl
 
         with open(filename, "wb") as f:
             pickle.dump(jm, f)
@@ -364,77 +315,22 @@ class VHTModule(Iterable):
             self.ctrlpr = jm["ctrlpr"]
 
             for seq in jm["seq"]:
-                s = self.add_sequence()
-                s.length = seq["length"]
-                s.rpb = seq["rpb"]
+                sq = self.unpack_seq(seq, True)
 
-                if "playing" in seq:
-                    s.playing = seq["playing"]
+            self.timeline.clear()
 
-                if "trg_playmode" in seq:
-                    s.trg_playmode = seq["trg_playmode"]
-                    s.trg_quantise = seq["trg_quantise"]
-
-                    s.set_trig(
-                        0, seq["trig"][0][0], seq["trig"][0][1], seq["trig"][0][2]
-                    )
-                    s.set_trig(
-                        1, seq["trig"][1][0], seq["trig"][1][1], seq["trig"][1][2]
-                    )
-                    s.set_trig(
-                        2, seq["trig"][2][0], seq["trig"][2][1], seq["trig"][2][2]
-                    )
-
-                for trk in seq["trk"]:
-                    t = s.add_track(
-                        trk["port"],
-                        trk["channel"],
-                        trk["nrows"],
-                        trk["nsrows"],
-                        trk["ctrlpr"],
-                    )
-                    t.playing = trk["playing"]
-                    t.set_bank(trk["program"][0], trk["program"][1])
-                    t.send_program_change(trk["program"][2])
-                    t.set_qc1(trk["qc"][0], trk["qc"][1])
-                    t.set_qc2(trk["qc"][2], trk["qc"][3])
-
-                    t.loop = trk["loop"]
-
-                    nctrl = 0
-                    for ctrl in trk["ctrl"]:
-                        if ctrl["ctrlnum"] > -1:
-                            t.ctrl.add(ctrl["ctrlnum"])
-
-                        for rw in ctrl["rows"]:
-                            r = t.ctrl[nctrl][rw["n"]]
-                            r.velocity = rw["velocity"]
-                            r.linked = rw["linked"]
-                            r.smooth = rw["smooth"]
-                            r.anchor = rw["anchor"]
-
-                            t.ctrl[nctrl].refresh()
-
-                        for dood in ctrl["doodles"]:
-                            rn = dood[0] * t.ctrlpr
-                            for d in dood[1]:
-                                t.set_ctrl(nctrl, rn, d)
-                                rn += 1
-
-                        nctrl += 1
-
-                    for cc, col in enumerate(trk["col"]):
-                        if cc == 0:
-                            c = t[0]
-                        else:
-                            c = t.add_column()
-
-                        for row in col:
-                            rr = c[row["n"]]
-                            rr.type = row["type"]
-                            rr.note = row["note"]
-                            rr.velocity = row["velocity"]
-                            rr.delay = row["delay"]
+            tl = jm["tl"]
+            for chng in tl["changes"]:
+                self.timeline.changes.insert(chng["row"], chng["bpm"], chng["lnk"])
+            for strp in tl["strips"]:
+                self.timeline.strips.insert(
+                    strp["col"],
+                    self.unpack_seq(strp["seq"]),
+                    strp["start"],
+                    strp["length"],
+                    strp["rpb_start"],
+                    strp["rpb_end"],
+                )
 
             for cb in self.cb_post_load:
                 cb(jm)
@@ -444,3 +340,150 @@ class VHTModule(Iterable):
             self.play = p
 
         return True
+
+    def unpack_seq(self, seq, matrix=False):
+        s = None
+        sq = None
+
+        if matrix:
+            s = self.add_sequence()
+        else:
+            sq = libcvht.sequence_new(23)
+            s = VHTSequence(sq)
+
+        s.length = seq["length"]
+        s.rpb = seq["rpb"]
+
+        if "playing" in seq:
+            s.playing = seq["playing"]
+
+        if "trg_playmode" in seq:
+            s.trg_playmode = seq["trg_playmode"]
+            s.trg_quantise = seq["trg_quantise"]
+
+            s.set_trig(0, seq["trig"][0][0], seq["trig"][0][1], seq["trig"][0][2])
+            s.set_trig(1, seq["trig"][1][0], seq["trig"][1][1], seq["trig"][1][2])
+            s.set_trig(2, seq["trig"][2][0], seq["trig"][2][1], seq["trig"][2][2])
+
+        for trk in seq["trk"]:
+            t = s.add_track(
+                trk["port"], trk["channel"], trk["nrows"], trk["nsrows"], trk["ctrlpr"],
+            )
+            t.playing = trk["playing"]
+            t.set_bank(trk["program"][0], trk["program"][1])
+            t.send_program_change(trk["program"][2])
+            t.set_qc1(trk["qc"][0], trk["qc"][1])
+            t.set_qc2(trk["qc"][2], trk["qc"][3])
+
+            t.loop = trk["loop"]
+
+            nctrl = 0
+            for ctrl in trk["ctrl"]:
+                if ctrl["ctrlnum"] > -1:
+                    t.ctrl.add(ctrl["ctrlnum"])
+
+                for rw in ctrl["rows"]:
+                    r = t.ctrl[nctrl][rw["n"]]
+                    r.velocity = rw["velocity"]
+                    r.linked = rw["linked"]
+                    r.smooth = rw["smooth"]
+                    r.anchor = rw["anchor"]
+
+                    t.ctrl[nctrl].refresh()
+
+                for dood in ctrl["doodles"]:
+                    rn = dood[0] * t.ctrlpr
+                    for d in dood[1]:
+                        t.set_ctrl(nctrl, rn, d)
+                        rn += 1
+
+                nctrl += 1
+
+            for cc, col in enumerate(trk["col"]):
+                if cc == 0:
+                    c = t[0]
+                else:
+                    c = t.add_column()
+
+                for row in col:
+                    rr = c[row["n"]]
+                    rr.type = row["type"]
+                    rr.note = row["note"]
+                    rr.velocity = row["velocity"]
+                    rr.delay = row["delay"]
+
+        return sq
+
+    def pack_seq(self, seq):
+        s = {}
+        s["length"] = seq.length
+        s["rpb"] = seq.rpb
+        s["trg_playmode"] = seq.trg_playmode
+        s["trg_quantise"] = seq.trg_quantise
+        s["trig"] = [seq.get_trig(0), seq.get_trig(1), seq.get_trig(2)]
+        s["playing"] = seq.playing
+        s["trk"] = []
+
+        for trk in seq:
+            t = {}
+            t["port"] = trk.port
+            t["channel"] = trk.channel
+            t["nrows"] = trk.nrows
+            t["nsrows"] = trk.nsrows
+            t["playing"] = trk.playing
+            t["ctrlpr"] = trk.ctrlpr
+            t["program"] = trk.get_program()
+            t["qc"] = trk.get_qc()
+            t["loop"] = trk.loop
+
+            t["ctrl"] = []
+            for cn, ctrl in enumerate(trk.ctrl):
+                c = {}
+                c["ctrlnum"] = ctrl.ctrlnum
+                c["rows"] = []
+                c["doodles"] = []
+                rn = 0
+                for r in ctrl:
+                    if r.velocity > -1:
+                        rw = {}
+                        rw["n"] = rn
+                        rw["velocity"] = r.velocity
+                        rw["linked"] = r.linked
+                        rw["smooth"] = r.smooth
+                        rw["anchor"] = r.anchor
+                        c["rows"].append(rw)
+
+                    rn += 1
+
+                for r in range(trk.nrows):
+                    dood = trk.get_ctrl_rec(cn, r).as_list()
+                    empty = True
+                    for d in dood:
+                        if d > -1:
+                            empty = False
+
+                    if not empty:
+                        c["doodles"].append([r, dood])
+
+                t["ctrl"].append(c)
+
+            t["col"] = []
+            for col in trk:
+                c = []
+                rn = 0
+                for row in col:
+                    if row.type > 0:
+                        r = {}
+                        r["n"] = rn
+                        r["type"] = row.type
+                        r["note"] = row.note
+                        r["velocity"] = row.velocity
+                        r["delay"] = row.delay
+                        c.append(r)
+
+                    rn += 1
+                t["col"].append(c)
+
+            s["trk"].append(t)
+
+        return s
