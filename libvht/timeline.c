@@ -45,6 +45,7 @@ timeline *timeline_new(void) {
 	ntl->time_length = 0.0;
 	ntl->loop_start = ntl->loop_end = -1;
 
+	timeline_update(ntl);
 	pthread_mutex_init(&ntl->excl, NULL);
 	return(ntl);
 }
@@ -139,7 +140,6 @@ void timeline_update(timeline *tl) {
 		if (t > tl->length)
 			tl->length = t;
 	}
-
 
 	if (!tl->nchanges)
 		return;
@@ -335,12 +335,20 @@ void timeline_del_strip(timeline *tl, int id) {
 
 void timeline_swap_sequence(timeline *tl, int s1, int s2) {
 	timeline_excl_in(tl);
+	s1++;
+	s2++;
+
+	for (int st = 0; st < tl->nstrips; st++) {
+		tl->strips[st].col++;
+		tl->strips[st].seq->parent++;
+	}
 
 	for (int st = 0; st < tl->nstrips; st++) {
 		if (tl->strips[st].col == s1)
 			tl->strips[st].col = -s2;
 		if (tl->strips[st].col == s2)
 			tl->strips[st].col = -s1;
+
 		if (tl->strips[st].seq->parent == s1)
 			tl->strips[st].seq->parent = -s2;
 		if (tl->strips[st].seq->parent == s2)
@@ -357,6 +365,12 @@ void timeline_swap_sequence(timeline *tl, int s1, int s2) {
 		if (tl->strips[st].seq->parent == -s2)
 			tl->strips[st].seq->parent = s2;
 	}
+
+	for (int st = 0; st < tl->nstrips; st++) {
+		tl->strips[st].col--;
+		tl->strips[st].seq->parent--;
+	}
+
 
 	timeline_excl_out(tl);
 }

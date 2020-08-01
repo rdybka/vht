@@ -25,10 +25,10 @@ def track_fill(trk, note="c3", skip=2, velocity=100):
             trk[0][r].velocity = velocity
 
 
+# default module
 def muzakize():
-    mod.bpm = 123
+    # mod.bpm = 120
 
     seq = mod.add_sequence(cfg.default_seq_length)
     trk = seq.add_track()
     seq.playing = 1
-    # trk.ctrl.add(1)

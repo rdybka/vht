@@ -201,6 +201,7 @@ module *module_new() {
 	mod->ctrlpr = DEFAULT_CTRLPR;
 	mod->cur_rec_update = 0;
 	mod->tline = timeline_new();
+	timeline_change_set(mod->tline, 0, mod->bpm, 0);
 	mod->seq = malloc(sizeof(sequence *));
 	pthread_mutex_init(&mod->excl, NULL);
 	mod->clt = midi_client_new(mod);

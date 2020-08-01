@@ -337,29 +337,45 @@ class SequenceListView(Gtk.DrawingArea):
                 cr.rectangle(thx, 0, w, h)
                 cr.fill()
 
-            if self._popup.pooped and self._popup.curr == r:
+            cr.set_source_rgb(0, 0, 0)
+            if (self._menu_handle == r and not self._popup.pooped) or (
+                self._popup.pooped and self._popup.curr == r
+            ):
+                cr.move_to(x + 2, (h - self._txt_height * 1.5) + 2)
+                cr.show_text("*")
                 cr.set_source_rgb(
                     *(col * cfg.intensity_txt_highlight for col in cfg.star_colour)
                 )
-            elif self._menu_handle == r and not self._popup.pooped:
+
+            cr.move_to(x, h - self._txt_height * 1.5)
+            cr.show_text("*")
+
+            cr.set_source_rgb(0, 0, 0)
+            cr.save()
+            cr.rectangle(0, 0, w, h - self._txt_height * 2.7)
+            cr.clip()
+
+            if r == mod.curr_seq:
+                cr.set_source_rgb(0, 0, 0)
+            else:
+                cr.set_source_rgb(*(col * cfg.intensity_txt for col in (1, 1, 1)))
+
+            cr.save()
+            cr.move_to(x + 2, (self._txt_height * 0.3) + 2)
+            cr.rotate(math.pi / 2.0)
+
+            if r in mod.extras:
+                cr.show_text(mod.extras[r][-1]["sequence_name"])
+
+            cr.restore()
+
+            if r == mod.curr_seq:
                 cr.set_source_rgb(
                     *(col * cfg.intensity_txt_highlight for col in cfg.star_colour)
                 )
             else:
                 cr.set_source_rgb(0, 0, 0)
 
-            cr.move_to(x, h - self._txt_height * 1.5)
-            cr.show_text("*")
-
-            cr.set_source_rgb(0, 0, 0)
-            if r == mod.curr_seq:
-                cr.set_source_rgb(
-                    *(col * cfg.intensity_txt_highlight for col in cfg.mixer_colour)
-                )
-
-            cr.save()
-            cr.rectangle(0, 0, w, h - self._txt_height * 2.7)
-            cr.clip()
             cr.move_to(x, self._txt_height * 0.3)
             cr.rotate(math.pi / 2.0)
 
@@ -369,6 +385,9 @@ class SequenceListView(Gtk.DrawingArea):
             cr.restore()
 
             if r == self._move_handle and r == self._highlight:
+                cr.set_source_rgb(0, 0, 0)
+                cr.move_to(x + 2, (h - (self._txt_height * 0.7)) + 2)
+                cr.show_text("=")
                 cr.set_source_rgb(
                     *(col * cfg.intensity_txt_highlight for col in cfg.mixer_colour)
                 )

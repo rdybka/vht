@@ -205,7 +205,6 @@ class VHTModule(Iterable):
     def bpm(self, value):
         value = min(max(value, self.min_bpm), self.max_bpm)
         libcvht.module_set_bpm(self._mod_handle, value)
-        # self.timeline.changes[0] = [0, self.bpm, self.rpb, 0]
 
     @property
     def play_mode(self):

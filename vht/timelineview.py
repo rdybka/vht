@@ -273,6 +273,7 @@ class TimelineView(Gtk.DrawingArea):
                     drw = True
 
         # grid
+        cr.save()
         cw = mod.mainwin.seqlist._txt_height * cfg.mixer_padding
         for r in range(len(mod)):
             cr.set_source_rgb(*(col * 0.6 for col in cfg.timeline_colour))
@@ -306,21 +307,19 @@ class TimelineView(Gtk.DrawingArea):
             cr.rectangle(st.col * cw + 1, ystart, cw - 2, yend)
             cr.fill()
 
-            cr.save()
             thumb = mod.thumbmanager.get(st.seq.index)
             if thumb:
                 thsurf = thumb.get_surface()
                 thx = st.col * cw + 1
 
-                tw, th = thsurf.get_width(), thsurf.get_height()
+                thw, thh = thsurf.get_width(), thsurf.get_height()
                 mtx = cairo.Matrix()
-                mtx.scale(tw / (cw - 2), th / yend)
+                mtx.scale(thw / (cw - 2), thh / yend)
                 mtx.translate(-thx, -ystart)
                 thumb.set_matrix(mtx)
                 cr.set_source(thumb)
                 cr.rectangle(thx, ystart, cw - 2, yend)
                 cr.fill()
-            cr.restore()
 
             cr.set_source_rgb(*(col * 0.2 for col in cfg.timeline_colour))
             cr.rectangle(st.col * cw + 1, ystart, cw - 2, yend)

@@ -79,6 +79,15 @@ class ThumbManager:
 
     def swap(self, s1, s2):
         self.thumbs[s1], self.thumbs[s2] = self.thumbs[s2], self.thumbs[s1]
+        nthumbs = {}
 
-    def tick(self):
-        pass
+        for thid in self.thumbs.keys():
+            if type(thid) is tuple:
+                if thid[0] == s1:
+                    nthumbs[(s2, thid[1])] = self.thumbs[thid]
+                if thid[0] == s2:
+                    nthumbs[(s1, thid[1])] = self.thumbs[thid]
+            else:
+                nthumbs[thid] = self.thumbs[thid]
+
+        self.thumbs = nthumbs

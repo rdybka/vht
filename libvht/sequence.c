@@ -623,8 +623,13 @@ int sequence_gen_thumb(sequence *seq) {
 					}
 
 					int addr = 2 + (ncols * rr) + col + c;
-					if ((v > 0) && (addr < seq->thumb_length))
-						seq->thumb_repr[addr] = v;
+					if (seq->thumb_panic) {
+						if ((v > 0) && (addr < seq->thumb_length))
+							seq->thumb_repr[addr] = 3;
+					} else {
+						if ((v > 0) && (addr < seq->thumb_length))
+							seq->thumb_repr[addr] = v;
+					}
 				}
 			}
 
@@ -633,7 +638,8 @@ int sequence_gen_thumb(sequence *seq) {
 			seq->trk[t]->dirty = 0;
 		}
 
-		seq->thumb_dirty = 0;
+		if (!seq->thumb_panic)
+			seq->thumb_dirty = 0;
 	}
 
 	return seq->thumb_length;

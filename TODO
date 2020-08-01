@@ -1,13 +1,16 @@
 - timeline
-    - seqswaps
-    - strip management
+    - save/load
+    * pointer
+    - clip
+    - scrolling_x
     - selecting
-    - saving/loading
+    - strip management
     - feeding
     - scrub
     - loop
     - on left?
     - global ring
+- hexchooser
 - configuration
     - ports
     - defaults
@@ -26,4 +29,3 @@
     - documentation
     - autofill
 - track callback
-- hexchooser

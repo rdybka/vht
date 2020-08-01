@@ -207,7 +207,6 @@ class MainWin(Gtk.ApplicationWindow):
         self.add_tick_callback(self.tick)
 
     def tick(self, wdg, param):
-        mod.thumbmanager.tick()
         self.time_display.set_markup(
             """<span font_desc="Roboto bold" font_family="monospace" size="x-large">%s</span>"""
             % mod.time

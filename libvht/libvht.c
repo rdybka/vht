@@ -48,6 +48,7 @@ int get_max_ports(module *mod) {
 
 void module_set_bpm(module *mod, float bpm) {
 	mod->bpm = bpm;
+	timeline_change_set(mod->tline, 0, mod->bpm, 0);
 }
 
 void module_play(module *mod, int play) {
