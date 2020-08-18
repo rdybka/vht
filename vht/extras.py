@@ -19,6 +19,9 @@ from vht import mod, cfg
 
 
 def fix_extras_new_trk(s, t):
+    if t in mod.extras[s]:
+        return
+
     mod.extras[s][t] = {}
     mod.extras[s][t]["track_name"] = ""
     mod.extras[s][t]["track_keep_name"] = False

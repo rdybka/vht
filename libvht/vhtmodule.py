@@ -88,15 +88,18 @@ class VHTModule(Iterable):
             )
 
     def __getitem__(self, itm):
-        if itm >= self.__len__():
-            raise IndexError()
+        if type(itm) is tuple:
+            return self.timeline.strips.get_seq(itm[1])
+        else:
+            if itm >= self.__len__():
+                raise IndexError()
 
-        if itm < 0:
-            raise IndexError()
+            if itm < 0:
+                raise IndexError()
 
-        return VHTSequence(
-            libcvht.module_get_seq(self._mod_handle, itm), self.cb_new_track
-        )
+            return VHTSequence(
+                libcvht.module_get_seq(self._mod_handle, itm), self.cb_new_track
+            )
 
     def add_sequence(self, length=-1):
         seq = libcvht.sequence_new(length)
@@ -160,11 +163,18 @@ class VHTModule(Iterable):
 
     @property
     def curr_seq(self):
-        return libcvht.module_get_curr_seq(self._mod_handle)
+        cs = libcvht.module_get_curr_seq(self._mod_handle)
+        if cs:
+            return VHTSequence(libcvht.module_get_curr_seq(self._mod_handle)).index
+        else:
+            return 0
 
     @curr_seq.setter
     def curr_seq(self, val):
-        libcvht.module_set_curr_seq(self._mod_handle, val)
+        if type(val) is tuple:
+            libcvht.module_set_curr_seq(self._mod_handle, 0, val[1])
+        else:
+            libcvht.module_set_curr_seq(self._mod_handle, -1, val)
 
     @property
     def ctrlpr(self):

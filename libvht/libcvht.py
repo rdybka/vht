@@ -158,8 +158,8 @@ def module_swap_sequence(mod, s1, s2):
 def module_get_curr_seq(mod):
     return _libcvht.module_get_curr_seq(mod)
 
-def module_set_curr_seq(mod, s):
-    return _libcvht.module_set_curr_seq(mod, s)
+def module_set_curr_seq(mod, t, s):
+    return _libcvht.module_set_curr_seq(mod, t, s)
 
 def module_dump_notes(mod, n):
     return _libcvht.module_dump_notes(mod, n)
@@ -572,11 +572,26 @@ def timeline_get_nstrips(tl):
 def timeline_add_strip(tl, col, seq, start, length, rpb_start, rpb_end):
     return _libcvht.timeline_add_strip(tl, col, seq, start, length, rpb_start, rpb_end)
 
+def timeline_get_strip_for_qb(tl, col, qb):
+    return _libcvht.timeline_get_strip_for_qb(tl, col, qb)
+
 def timeline_del_strip(tl, id):
     return _libcvht.timeline_del_strip(tl, id)
 
-def timeline_get_seq(tl, col, n):
-    return _libcvht.timeline_get_seq(tl, col, n)
+def timeline_get_seq(tl, n):
+    return _libcvht.timeline_get_seq(tl, n)
+
+def timeline_get_room(tl, col, qb, ig):
+    return _libcvht.timeline_get_room(tl, col, qb, ig)
+
+def timeline_get_snap_top(tl, col, qb):
+    return _libcvht.timeline_get_snap_top(tl, col, qb)
+
+def timeline_get_snap_bottom(tl, col, qb):
+    return _libcvht.timeline_get_snap_bottom(tl, col, qb)
+
+def timeline_update(tl):
+    return _libcvht.timeline_update(tl)
 
 def timestrip_get_seq(tstr):
     return _libcvht.timestrip_get_seq(tstr)

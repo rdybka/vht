@@ -45,12 +45,12 @@ class VHTTimelineStrips(Iterable):
             libcvht.timeline_get_strip(self._tl_handle, itm), self._mod
         )
 
-    def get_seq(self, col, itm):
-        sq = libcvht.timeline_get_seq(self._tl_handle, col, itm)
+    def get_seq(self, itm):
+        sq = libcvht.timeline_get_seq(self._tl_handle, itm)
         if sq:
             return VHTSequence(sq, self._mod.cb_new_track)
         else:
-            raise IndexError(col, itm)
+            return None
 
     def insert(self, col, seq, start, length, rpb_start, rpb_end):
         return VHTTimelineStrip(
@@ -62,7 +62,6 @@ class VHTTimelineStrips(Iterable):
 
     def insert_clone(self, seq_id, start, length, rpb_start, rpb_end):
         ns = libcvht.sequence_clone(libcvht.module_get_seq(self._mod_handle, seq_id))
-        libcvht.sequence_set_parent(ns, seq_id)
 
         return VHTTimelineStrip(
             libcvht.timeline_add_strip(
@@ -70,3 +69,7 @@ class VHTTimelineStrips(Iterable):
             ),
             self._mod,
         )
+
+    def delete(self, itm):
+        libcvht.timeline_del_strip(self._tl_handle, itm)
+        libcvht.timeline_update(self._tl_handle)

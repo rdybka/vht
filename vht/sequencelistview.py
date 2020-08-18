@@ -192,7 +192,7 @@ class SequenceListView(Gtk.DrawingArea):
                 mod.curr_seq = curr
                 self.redraw(curr)
 
-            if old > -1:
+            if old != -1:
                 self.redraw(old)
 
             if old != mod.curr_seq:
@@ -286,6 +286,9 @@ class SequenceListView(Gtk.DrawingArea):
             redr.append(col)
 
         for r in redr:
+            if type(r) is tuple:
+                continue
+
             seq = mod[r]
             x = (self._txt_height * cfg.mixer_padding) * r
             thx = x

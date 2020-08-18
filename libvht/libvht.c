@@ -78,14 +78,6 @@ sequence *module_get_seq(module *mod, int n) {
 	return mod->seq[n];
 }
 
-int module_get_curr_seq(module *mod) {
-	return mod->curr_seq;
-}
-
-void module_set_curr_seq(module *mod, int s) {
-	mod->curr_seq = s;
-}
-
 int module_get_ctrlpr(module *mod) {
 	return mod->ctrlpr;
 }

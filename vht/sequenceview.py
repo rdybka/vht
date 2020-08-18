@@ -775,6 +775,7 @@ class SequenceView(Gtk.Box):
 
         self.add_track(None)
         for trk in self.seq:
+            extras.fix_extras_new_trk(self.seq.index, trk.index)
             self.add_track(trk, quick)
 
         if quick:
@@ -822,12 +823,20 @@ class SequenceView(Gtk.Box):
                 self.active_tracks[self.seq.index] = mod.active_track
 
         mod.active_track = None
-        ns = mod[new_seq]
-        if self.seq != ns:
+
+        ns = None
+        if type(new_seq) is tuple:
+            ns = mod.timeline.strips[new_seq[1]].seq
+            extras.fix_extras_new_seq(ns.index)
+        else:
+            ns = mod[new_seq]
+
+        if self.seq.index != ns.index:
             self.clear()
             self.seq = ns
             self.font_size = mod.extras[ns.index][-1]["font_size"]
-            self.build(quick=True)
+            self.build(quick=False)
+            mod.curr_seq = self.seq.index
 
         if self.seq.index in self.active_tracks:
             mod.active_track = self.active_tracks[self.seq.index]

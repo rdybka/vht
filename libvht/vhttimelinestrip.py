@@ -25,14 +25,14 @@ class VHTTimelineStrip:
         self._mod = mod
 
     def update_strrep(self):
-        seq_id = libcvht.timestrip_get_seq_id(self._ptr)
+        seq_id = VHTSequence(libcvht.timestrip_get_seq(self._ptr)).index[1]
         col = libcvht.timestrip_get_col(self._ptr)
         start = libcvht.timestrip_get_start(self._ptr)
         length = libcvht.timestrip_get_length(self._ptr)
         rpb_start = libcvht.timestrip_get_rpb_start(self._ptr)
         rpb_end = libcvht.timestrip_get_rpb_end(self._ptr)
 
-        self._strrep = "%d %d %d %d %d %d %d" % (
+        self._strrep = "%d %d %d %d %d %d" % (
             seq_id,
             col,
             start,
@@ -55,7 +55,10 @@ class VHTTimelineStrip:
 
     @start.setter
     def start(self, value):
-        libcvht.timestrip_set_start(self._ptr, value)
+        old = libcvht.timestrip_get_start(self._ptr)
+        if old != value:
+            libcvht.timestrip_set_start(self._ptr, int(value))
+            self._mod.timeline.update()
 
     @property
     def length(self):

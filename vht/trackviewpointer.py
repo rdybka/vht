@@ -107,8 +107,11 @@ class TrackviewPointer:
             gradient.add_color_stop_rgba(1.0, *(col * i for col in cl), 0)
             cr.set_source(gradient)
 
-            cr.rectangle(x, y, xx, self.height)
-            cr.fill()
+            if type(mod.curr_seq) is int:
+                cr.rectangle(x, y, xx, self.height)
+                cr.fill()
+            else:
+                pass  # pointer for strip
 
             return
 

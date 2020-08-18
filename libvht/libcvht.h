@@ -58,8 +58,8 @@ extern sequence *module_get_seq(module *mod, int);
 extern void module_add_sequence(module *mod, sequence *seq);
 extern void module_del_sequence(module *mod, int s);
 extern void module_swap_sequence(module *mod, int s1, int s2);
-extern int module_get_curr_seq(module *mod);
-extern void module_set_curr_seq(module *mod, int s);
+extern sequence *module_get_curr_seq(module *mod);
+extern void module_set_curr_seq(module *mod, int t, int s);
 extern void module_dump_notes(module *mod, int n);
 extern int module_get_ctrlpr(module *mod);
 extern void module_set_ctrlpr(module *mod, int);
@@ -227,8 +227,15 @@ extern void timeline_clear(timeline *tl);
 extern timestrip *timeline_get_strip(timeline *tl, int n);
 extern int timeline_get_nstrips(timeline *tl);
 extern timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end);
+extern int timeline_get_strip_for_qb(timeline *tl, int col, int qb);
 extern void timeline_del_strip(timeline *tl, int id);
-extern sequence *timeline_get_seq(timeline *tl, int col, int n);
+extern sequence *timeline_get_seq(timeline *tl, int n);
+extern int timeline_get_room(timeline *tl, int col, int qb, int ig);
+extern int timeline_get_snap_top(timeline *tl, int col, int qb);
+extern int timeline_get_snap_bottom(timeline *tl, int col, int qb);
+
+extern void timeline_update(timeline *tl);
+
 extern sequence *timestrip_get_seq(timestrip *tstr);
 extern int timestrip_get_col(timestrip *tstr);
 extern int timestrip_get_start(timestrip *tstr);

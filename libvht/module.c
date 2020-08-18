@@ -148,15 +148,16 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 			}
 
 			if (mod->recording && !ignore) {
-				sequence_handle_record(mod, mod->seq[mod->curr_seq], mev);
+				sequence_handle_record(mod, mod->curr_seq, mev);
 			}
 
-			for (int t = 0; t < mod->seq[mod->curr_seq]->ntrk; t++) {
-				if (mod->seq[mod->curr_seq]->trk[t]->channel == mev.channel) {
-					mod->seq[mod->curr_seq]->trk[t]->indicators |= 1;
+			if (mod->curr_seq) {
+				for (int t = 0; t < mod->curr_seq->ntrk; t++) {
+					if (mod->curr_seq->trk[t]->channel == mev.channel) {
+						mod->curr_seq->trk[t]->indicators |= 1;
+					}
 				}
 			}
-
 			midi_ignore_buff_excl_out(mod->clt);
 		}
 	}
@@ -346,6 +347,19 @@ char *module_get_time(module *mod) {
 	static char buff[256];
 	sprintf(buff, "%02d:%02d:%03d", mod->min, mod->sec, mod->ms);
 	return buff;
+}
+
+
+sequence *module_get_curr_seq(module *mod) {
+	return mod->curr_seq;
+}
+
+void module_set_curr_seq(module *mod, int t, int s) {
+	if (t > -1) {
+		mod->curr_seq = mod->tline->strips[s].seq;
+	} else {
+		mod->curr_seq = mod->seq[s];
+	}
 }
 
 double module_get_jack_pos(module *mod) {

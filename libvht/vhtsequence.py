@@ -133,7 +133,7 @@ class VHTSequence(Iterable):
         idx = libcvht.sequence_get_index(self._seq_handle)
         par = libcvht.sequence_get_parent(self._seq_handle)
         if par > -1:
-            return par, idx
+            return 0, idx
         else:
             return idx
 

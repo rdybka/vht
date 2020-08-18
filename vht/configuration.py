@@ -97,6 +97,7 @@ class Configuration:
 
         self.dark_theme = True
         self.notebook_mouseover = False
+        self.track_prop_mouseover = False
 
         self.quick_controls_desc = "vol/pan:"
         self.quick_control_1_ctrl = 7
@@ -115,6 +116,8 @@ class Configuration:
         self.last_save_path = ""
         self.save_indication_time = 0.23
         self.track_indication_time = 0.02
+
+        self.timeline_delete_time = 2.5
 
         self.key = {
             # sequenceview		shift, ctrl, alt

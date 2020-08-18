@@ -1299,7 +1299,7 @@ class ControllerEditor:
                     0,
                 )
                 if self.ctrlnum == 0:
-                    self.trk.set_ctrl(self.ctrlnum, rr + sr, round(v * 129))
+                    self.trk.set_ctrl(self.ctrlnum, rr + sr, round(v * 128))
                 else:
                     self.trk.set_ctrl(self.ctrlnum, rr + sr, round(v))
 

@@ -15,8 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from vht import cfg, mod
+from vht import cfg, mod, extras
+from datetime import datetime
 
+import copy
 import math
 import cairo
 import gi
@@ -100,7 +102,16 @@ class TimelineView(Gtk.DrawingArea):
         self.snap_hold = False
         self.zoom_hold = False
 
+        self.moving = None
+        self.gest_start_r = 0
+        self.move_start_r = 0
+
         self.curr_col = -1
+        self.curr_strip_id = -1
+
+        self.del_id = -1
+        self.del_time_start = 0
+        self.del_progress = 0.0
 
     def on_configure(self, wdg, event):
         win = self.get_window()
@@ -314,8 +325,10 @@ class TimelineView(Gtk.DrawingArea):
         tend = tstart + h * self.spl
         qbend = mod.timeline.t2qb(tend)
 
+        mod_curr = mod.curr_seq
+
         # print(self.qb_start, qbend, tend)
-        for st in mod.timeline.strips:
+        for stid, st in enumerate(mod.timeline.strips):
             if st.start > qbend:
                 continue
             if st.length + st.start < self.qb_start:
@@ -328,15 +341,33 @@ class TimelineView(Gtk.DrawingArea):
             thx = st.col * cw
             thxx = cw * 0.8
 
-            if st.col == self.curr_col:
-                cr.set_source_rgb(*(col * 0.5 for col in cfg.timeline_colour))
+            if st.col == 0:
+                thx += cw * 0.05
+                thxx = cw * 0.75
+
+            ind = st.seq.index
+            colour = cfg.timeline_colour
+            if type(mod_curr) is tuple:
+                if mod_curr[1] == stid:
+                    colour = cfg.star_colour
+
+            if stid == self.curr_strip_id:
+                if self.del_id == stid:
+                    cr.set_source_rgb(
+                        *(
+                            col * 0.7 * (1.0 - self.del_progress)
+                            for col in cfg.timeline_colour
+                        )
+                    )
+                else:
+                    cr.set_source_rgb(*(col * 0.7 for col in colour))
             else:
-                cr.set_source_rgb(*(col * 0.4 for col in cfg.timeline_colour))
+                cr.set_source_rgb(*(col * 0.4 for col in colour))
 
             cr.rectangle(thx, ystart, thxx, yend)
             cr.fill()
 
-            thumb = mod.thumbmanager.get(st.seq.index)
+            thumb = mod.thumbmanager.get(ind)
             if thumb:
                 thsurf = thumb.get_surface()
 
@@ -349,13 +380,20 @@ class TimelineView(Gtk.DrawingArea):
                 cr.rectangle(thx, ystart, thxx, yend)
                 cr.fill()
 
-            # cr.set_source_rgb(*(col * 0.2 for col in cfg.timeline_colour))
-            # cr.rectangle(thx, ystart, thxx, yend)
-            # cr.stroke()
+                cr.set_line_width(1.5)
+                cr.set_source_rgb(*(col * 0.9 for col in colour))
+
+                if stid == self.del_id:
+                    cr.rectangle(thx, ystart, thxx, yend - (yend * self.del_progress))
+                else:
+                    cr.rectangle(thx, ystart, thxx, yend)
+
+                cr.stroke()
 
         cr.restore()
+
         # pointer -------------------
-        if self.pointer_xy:
+        if self.pointer_xy and self.pointer_r > -1:
             ry = self.pointer_ry
 
             cr.set_source_rgb(
@@ -419,21 +457,53 @@ class TimelineView(Gtk.DrawingArea):
         return True
 
     def on_button_press(self, widget, event):
+        currs = mod.curr_seq[1] if type(mod.curr_seq) is tuple else -1
+        if event.button == cfg.delete_button:
+            if self.curr_strip_id > -1:
+                if currs != self.curr_strip_id:
+                    self.del_id = self.curr_strip_id
+                    self.del_time_start = datetime.now()
+                    self.del_progress = 0.0
+
+        if event.button != cfg.select_button:
+            return False
+
         if self.scrollbar_highlight and self.scrollstart == -1:
             self.scrollstart = event.y
             self.scrollstart_time = mod.timeline.qb2t(self.qb_start)
             return True
 
+        if event.button == cfg.select_button and self.curr_strip_id > -1:
+            mod.mainwin.sequence_view.switch(
+                mod.timeline.strips[self.curr_strip_id].seq.index
+            )
+            self.moving = True
+            self.gest_start_r = self.pointer_r
+            self.move_start_r = mod.timeline.strips[self.curr_strip_id].start
+            return True
+
         if self.curr_col > -1 and self.pointer_r > -1:
             seq = mod[self.curr_col]
-            mod.timeline.strips.insert_clone(
+            idx = mod.timeline.strips.insert_clone(
                 self.curr_col, int(self.pointer_r), seq.length, seq.rpb, seq.rpb,
-            )
+            ).seq.index
+
+            extras.fix_extras_new_seq(idx)
+            mod.extras[idx][-1] = copy.deepcopy(mod.extras[self.curr_col][-1])
+
+            for t in range(len(mod[seq.index])):
+                extras.fix_extras_new_trk(idx, t)
+                mod.extras[idx][t] = copy.deepcopy(mod.extras[seq.index][t])
 
         return True
 
     def on_button_release(self, widget, event):
+        self.del_id = -1
+        self.del_time_start = 0
+        self.del_progress = 0.0
+
         self.scrollstart = -1
+        self.moving = False
         return True
 
     def on_motion(self, widget, event):
@@ -443,9 +513,32 @@ class TimelineView(Gtk.DrawingArea):
         tw = w - mod.mainwin.seqlist_butts.get_allocated_width()
         cw = mod.mainwin.seqlist._txt_height * cfg.mixer_padding
         col = event.x // cw
-        self.curr_col = -1 if col >= len(mod) else int(col)
+        if not self.moving:
+            self.curr_col = -1 if col >= len(mod) else int(col)
 
         mod.mainwin.set_focus(self)
+
+        if self.moving and self.pointer_r:
+            delta = self.pointer_r - self.gest_start_r
+            np = self.move_start_r + delta
+            rm = mod.timeline.room_at(self.curr_col, np, self.curr_strip_id)
+            print(rm, np)
+            if rm < 0 or rm >= mod.timeline.strips[self.curr_strip_id].length:
+                mod.timeline.strips[self.curr_strip_id].start = np
+
+            if rm < mod.timeline.strips[self.curr_strip_id].length:
+                if delta > 0:
+                    mod.timeline.strips[self.curr_strip_id].start = (
+                        mod.timeline.snap_top(self.curr_col, np)
+                        - mod.timeline.strips[self.curr_strip_id].length
+                    )
+                else:
+                    sb = mod.timeline.strips[
+                        self.curr_strip_id
+                    ].start = mod.timeline.snap_bottom(self.curr_col, np)
+
+                    if sb < np:
+                        mod.timeline.strips[self.curr_strip_id].start = sb
 
         if self.scrollstart > -1:
             desttime = (
@@ -473,11 +566,30 @@ class TimelineView(Gtk.DrawingArea):
 
         self.pointer_xy = (event.x, event.y)
 
+        r = mod.timeline.t2qb(
+            self.l2t(self.pointer_xy[1]) + mod.timeline.qb2t(self.qb_start)
+        )
+
+        if not self.moving:
+            self.curr_strip_id = -1
+            r = r if r else 0
+
+            if r >= mod.timeline.nqb:
+                return True
+
+            if self.curr_col > -1:
+                i = mod.timeline.qb2s(self.curr_col, r)
+                if i > -1:
+                    self.curr_strip_id = i
+
         return True
 
     def on_leave(self, wdg, prm):
-        self.pointer_xy = None
-        self.pointer_r = -1
+        if not self.moving:
+            self.pointer_xy = None
+            self.pointer_r = -1
+            self.curr_col = -1
+            self.curr_strip_id = -1
         return True
 
     def on_enter(self, wdg, prm):
@@ -564,14 +676,37 @@ class TimelineView(Gtk.DrawingArea):
                 self.l2t(self.pointer_xy[1]) + mod.timeline.qb2t(self.qb_start)
             )
 
-            if self.pointer_r < mod.timeline.nqb:
-                self.pointer_r = round((self.pointer_r / self.snap)) * self.snap
+            if self.pointer_r > -1:
+                if self.pointer_r < mod.timeline.nqb:
+                    self.pointer_r = round((self.pointer_r / self.snap)) * self.snap
 
-            self.pointer_ry_dest = max(
-                (mod.timeline.qb2t(self.pointer_r) - mod.timeline.qb2t(self.qb_start))
-                / self.spl,
-                0,
-            )
+                self.pointer_ry_dest = max(
+                    (
+                        mod.timeline.qb2t(self.pointer_r)
+                        - mod.timeline.qb2t(self.qb_start)
+                    )
+                    / self.spl,
+                    0,
+                )
+
+        if self.del_id > -1:
+            t = datetime.now() - self.del_time_start
+            t = float(t.seconds) + t.microseconds / 100000
+
+            self.del_progress = t / cfg.timeline_delete_time
+            if self.del_progress > 1.0:
+                # fix extras!!!
+                for x in range(self.del_id, len(mod.timeline.strips) - 1):
+                    src = (0, x + 1)
+                    if src in mod.extras:
+                        mod.extras[(0, x)] = mod.extras[src]
+
+                mod.thumbmanager.clear()
+                mod.timeline.strips.delete(self.del_id)
+                self.curr_strip_id = -1
+                self.del_id = -1
+                self.del_time_start = 0
+                self.del_progress = 0
 
     def tick(self):
         self.animate()

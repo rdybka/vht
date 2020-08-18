@@ -43,11 +43,25 @@ class VHTTimeline:
         return libcvht.timeline_get_nticks(self._tl_handle)
 
     def t2qb(self, t):  # qb for time in seconds or None
-        qb = libcvht.timeline_get_qb(self._tl_handle, t)
-        return None if qb == -1 else qb
+        return libcvht.timeline_get_qb(self._tl_handle, t)
 
     def qb2t(self, qb):  # time is seconds for given qb
         return libcvht.timeline_get_qb_time(self._tl_handle, int(qb))
+
+    def qb2s(self, col, qb):  # strip_id (if any) for given col and qb
+        return libcvht.timeline_get_strip_for_qb(self._tl_handle, col, int(qb))
+
+    def room_at(self, col, qb, ig=-1):  # nqb free after qb (-1 last)
+        return libcvht.timeline_get_room(self._tl_handle, col, int(qb), int(ig))
+
+    def snap_top(self, col, qb):
+        return libcvht.timeline_get_snap_top(self._tl_handle, col, int(qb))
+
+    def snap_bottom(self, col, qb):
+        return libcvht.timeline_get_snap_bottom(self._tl_handle, col, int(qb))
+
+    def update(self):
+        libcvht.timeline_update(self._tl_handle)
 
     def __str__(self):
         return "dupa"

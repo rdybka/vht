@@ -31,7 +31,7 @@ class ThumbManager:
         if type(seq_id) is int:
             seq = self.mod[seq_id]
         if type(seq_id) is tuple:
-            seq = self.mod.timeline.strips.get_seq(seq_id[0], seq_id[1])
+            seq = self.mod.timeline.strips.get_seq(seq_id[1])
 
         if not seq:
             return None

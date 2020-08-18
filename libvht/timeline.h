@@ -74,9 +74,11 @@ char *timeline_get_change(timeline *tl, int id);
 int timeline_get_nchanges(timeline *tl);
 int timeline_get_nticks(timeline *tl);
 double timeline_get_tick(timeline *tl, int n);
+int timeline_get_room(timeline *tl, int col, int qb, int ig);
 
 timestrip *timeline_get_strip(timeline *tl, int n);
-sequence *timeline_get_seq(timeline *tl, int col, int n);
+sequence *timeline_get_seq(timeline *tl, int n);
+int timeline_get_strip_for_qb(timeline *tl, int col, int qb);
 int timeline_get_nstrips(timeline *tl);
 timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end);
 void timeline_del_strip(timeline *tl, int id);

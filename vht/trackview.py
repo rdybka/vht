@@ -963,6 +963,14 @@ class TrackView(Gtk.DrawingArea):
         if not event.window.get_toplevel().get_state() & Gdk.WindowState.FOCUSED:
             return False
 
+        for wdg in self.parent.prop_view._track_box.get_children() + [
+            self.parent._side_prop
+        ]:
+            if wdg.get_realized():
+                if self != wdg.popover:
+                    if wdg.popped:
+                        return
+
         new_hover_row = min(int(event.y / self.txt_height), self.trk.nrows - 1)
         new_hover_column = min(int(event.x / self.txt_width), len(self.trk) - 1)
 

@@ -45,7 +45,7 @@ typedef struct module_t {
 	sequence **seq;
 	timeline *tline;
 	int nseq;
-	int curr_seq;
+	sequence *curr_seq;
 	int mute;
 
 	int cur_rec_update;

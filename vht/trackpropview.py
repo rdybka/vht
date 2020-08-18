@@ -45,7 +45,7 @@ class TrackPropView(Gtk.DrawingArea):
         )
 
         self.connect("button-press-event", self.on_click)
-        self.connect("motion-notify-event", self.on_mouse_move)
+        self.connect("motion-notify-event", self.on_motion)
         self.connect("leave-notify-event", self.on_leave)
         self.connect("enter-notify-event", self.on_enter)
         self.connect("draw", self.on_draw)
@@ -172,7 +172,7 @@ class TrackPropView(Gtk.DrawingArea):
     def move_last(self):
         self.propview.move_last(self.trk)
 
-    def on_mouse_move(self, widget, data):
+    def on_motion(self, widget, data):
         if not data.window.get_toplevel().get_state() & Gdk.WindowState.FOCUSED:
             return False
 
@@ -182,9 +182,15 @@ class TrackPropView(Gtk.DrawingArea):
                     if data.y >= self.button_rect.y:
                         if data.y <= self.button_rect.y + self.button_rect.height:
                             if not self.popped:
-                                self.popover.pop()
-                                self.popped = True
                                 self.button_highlight = True
+                                if cfg.track_prop_mouseover:
+                                    self.popover.pop()
+                                    self.popped = True
+
+                                    if self.trk:
+                                        self.seqview.change_active_track(
+                                            self.seqview.get_track_view(self.trk)
+                                        )
                                 self.redraw()
                             return
 
@@ -498,6 +504,7 @@ class TrackPropView(Gtk.DrawingArea):
         cr.move_to(x, self.txt_height * 0.99 * cfg.seq_spacing)
 
         trkname = mod.extras[self.seq.index][self.trk.index]["track_name"]
+        # print(trkname, self.seq.index, self.trk.index)
 
         if trkname:
             # cr.move_to(x, self.txt_height * 0.8 * cfg.seq_spacing)
@@ -553,6 +560,15 @@ class TrackPropView(Gtk.DrawingArea):
             return False
 
         if self.trk:
+            for wdg in self.propview._track_box.get_children() + [
+                self.propview.seqview._side_prop
+            ]:
+                if wdg.get_realized():
+                    if self != wdg.popover:
+                        if wdg.popped:
+                            return
+
+        if self.trk:
             if mod.active_track:
                 if not mod.active_track.edit:
                     self.seqview.change_active_track(
@@ -560,6 +576,9 @@ class TrackPropView(Gtk.DrawingArea):
                     )
 
     def on_leave(self, wdg, prm):
+        if prm.detail == Gdk.NotifyType.ANCESTOR:
+            mod.clear_popups()
+
         self.button_highlight = False
         self.redraw()
 

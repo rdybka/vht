@@ -114,7 +114,11 @@ class StatusBar(Gtk.DrawingArea):
                 c = trk.edit[0]
                 r = trk.edit[1]
 
-        txt = "%02d:%02d:%02d:%03d" % (cs, t, c, r)
+        if type(cs) is tuple:
+            txt = "T%02d:%02d:%02d:%03d" % (cs[1], t, c, r)
+        else:
+            txt = "S%02d:%02d:%02d:%03d" % (cs, t, c, r)
+
         h = ((height * 1.5 * cfg.seq_spacing) / 2.0) + (height / 2.0)
 
         intensity = 1.0 - intensity
@@ -223,11 +227,16 @@ class StatusBar(Gtk.DrawingArea):
         else:
             cr.set_source_rgb(*(col * intensity for col in cfg.colour))
 
+        cid = cs
+        if type(cs) is tuple:
+            cid = cs[1]
+
         txt = "%02d:%03d.%03d ***" % (
-            cs,
+            cid,
             int(mod[cs].pos),
             (mod[cs].pos - int(mod[cs].pos)) * 1000,
         )
+
         *_, dx, _ = cr.text_extents(txt)
         cr.move_to(w - dx, h)
         cr.show_text(txt)

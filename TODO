@@ -1,24 +1,28 @@
 - timeline
-    ~ save/load
-    * pointer
-    - selecting
     - strip management
+        - moving
+            - snapping
+        - length
     - feeding
     - scrub
     - loop
     - on left?
     - global ring
-- hexchooser
+- click on selected note should sound it
+- seq gui callback
+- program change
+    - clear in menu
+    - doubles
+    - while paused
 - configuration
+    - metronome
     - ports
     - defaults
     - look
     - midi buttons
 - autoscroll and moving
 - undo/redo
-    - undelete tracks
-    - undelete seqs
-? track colours
+- track colours
 - labels on tooltips
 - transport
 - export
@@ -26,4 +30,3 @@
     - autofill
     - click in statusbar
     - documentation
-- track callback
