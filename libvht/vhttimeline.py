@@ -42,7 +42,7 @@ class VHTTimeline:
     def nqb(self):  # length in qbeats
         return libcvht.timeline_get_nticks(self._tl_handle)
 
-    def t2qb(self, t):  # qb for time in seconds or None
+    def t2qb(self, t):  # qb for time in seconds
         return libcvht.timeline_get_qb(self._tl_handle, t)
 
     def qb2t(self, qb):  # time is seconds for given qb
@@ -51,14 +51,11 @@ class VHTTimeline:
     def qb2s(self, col, qb):  # strip_id (if any) for given col and qb
         return libcvht.timeline_get_strip_for_qb(self._tl_handle, col, int(qb))
 
-    def room_at(self, col, qb, ig=-1):  # nqb free after qb (-1 last)
+    def room_at(self, col, qb, ig=-1):  # nqb free after qb (-1 - unl)
         return libcvht.timeline_get_room(self._tl_handle, col, int(qb), int(ig))
 
-    def snap_top(self, col, qb):
-        return libcvht.timeline_get_snap_top(self._tl_handle, col, int(qb))
-
-    def snap_bottom(self, col, qb):
-        return libcvht.timeline_get_snap_bottom(self._tl_handle, col, int(qb))
+    def snap(self, strip_id, delta):  # new position snapped against others
+        return libcvht.timeline_get_snap(self._tl_handle, strip_id, int(delta))
 
     def update(self):
         libcvht.timeline_update(self._tl_handle)

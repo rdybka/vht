@@ -1,14 +1,19 @@
 - timeline
     - strip management
-        - moving
-            - snapping
+        * moving
+            * snapping
+        - adding
         - length
     - feeding
     - scrub
     - loop
     - on left?
     - global ring
-- click on selected note should sound it
+- double, halve - out of sync
+- ctrlview
+    - pitch repr
+    - deleting doodles up
+? sound clicked note
 - seq gui callback
 - program change
     - clear in menu

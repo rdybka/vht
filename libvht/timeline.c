@@ -215,14 +215,18 @@ int tick_cmp(const void *t1, const void *t2) {
 }
 
 long timeline_get_qb(timeline *tl, double t) {
-	if (t > tl->time_length)
-		return tl->nticks;
+	if (t > tl->time_length) { // past end
+		double extra_time = t - tl->time_length;
+		double tlen = tl->ticks[tl->nticks - 1] - tl->ticks[tl->nticks - 2];
+		return tl->nticks + (long)floor(extra_time / tlen);
+	}
 
-	if (t < 0)
-		return -1;
-
-	if (t == 0)
+	if (t == 0.0)
 		return 0;
+
+	if (t < 0) {
+		return (long)floor(t / tl->ticks[1]);
+	}
 
 	long tstart = tl->nticks - 1;
 
@@ -261,10 +265,13 @@ void timeline_change_del(timeline *tl, int id) {
 }
 
 int timeline_get_room(timeline *tl, int col, int qb, int ig) {
-	if (col < 0 || qb < 0 || qb > tl->length)
+	if (col < 0)
 		return 0;
 
 	int ret = -1;
+
+	if (qb < 0)
+		qb = 0;
 
 	for (int s = 0; s < tl->nstrips; s++) {
 		if (s == ig)
@@ -281,26 +288,55 @@ int timeline_get_room(timeline *tl, int col, int qb, int ig) {
 		}
 	}
 
-
-	return ret;
-}
-
-int timeline_get_snap_top(timeline *tl, int col, int qb) {
-	int ret = -1;
-
-	return ret;
-}
-
-int timeline_get_snap_bottom(timeline *tl, int col, int qb) {
-	int ret = -1;
-	// first case r < 0
-	if (qb < 0) {
-		return 0;
+	if (qb >= tl->length) {
+		ret = -1;
 	}
 
 	return ret;
 }
 
+int timeline_get_snap(timeline *tl, int tstr_id, int qb_delta) {
+	timestrip *tstr = &tl->strips[tstr_id];
+	int ret = tstr->start;
+
+	if (tstr->start + qb_delta >= tl->length) { // past end
+		ret += qb_delta;
+		return ret;
+	}
+
+	// is pos valid?
+	int rm = timeline_get_room(tl, tstr->col, tstr->start + qb_delta, tstr_id);
+	if (rm == -1) { // last
+		ret += qb_delta;
+	}
+
+	if (rm >= tstr->length) { // there's room
+		ret += qb_delta;
+	} else {
+		int np = tstr->start + qb_delta;
+		if (qb_delta > 0) {// snap from top
+			np -= tstr->length - rm;
+			rm = timeline_get_room(tl, tstr->col, np, tstr_id);
+			if (rm >= tstr->length)
+				ret = np;
+		} else { // snap from bottom
+			int strp = timeline_get_strip_for_qb(tl, tstr->col, np);
+
+			if (strp > -1 && strp != tstr_id) {
+				np = tl->strips[strp].start + tl->strips[strp].length;
+				rm = timeline_get_room(tl, tstr->col, np, tstr_id);
+				if (rm >= tstr->length || rm == -1)
+					ret = np;
+			}
+		}
+	}
+
+	if (ret < 0)
+		ret = 0;
+
+	//printf("snap: %d %d -> %d\n", tstr_id, qb_delta, ret);
+	return ret;
+}
 
 int timeline_change_set(timeline *tl, long row, float bpm, int linked) {
 	timeline_excl_in(tl);

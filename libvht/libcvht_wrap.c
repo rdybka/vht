@@ -8118,7 +8118,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_timeline_get_snap_top(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_timeline_get_snap(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   timeline *arg1 = (timeline *) 0 ;
   int arg2 ;
@@ -8132,61 +8132,23 @@ SWIGINTERN PyObject *_wrap_timeline_get_snap_top(PyObject *SWIGUNUSEDPARM(self),
   PyObject *swig_obj[3] ;
   int result;
   
-  if (!SWIG_Python_UnpackTuple(args, "timeline_get_snap_top", 3, 3, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "timeline_get_snap", 3, 3, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_get_snap_top" "', argument " "1"" of type '" "timeline *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_get_snap" "', argument " "1"" of type '" "timeline *""'"); 
   }
   arg1 = (timeline *)(argp1);
   ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timeline_get_snap_top" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timeline_get_snap" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = (int)(val2);
   ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "timeline_get_snap_top" "', argument " "3"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "timeline_get_snap" "', argument " "3"" of type '" "int""'");
   } 
   arg3 = (int)(val3);
-  result = (int)timeline_get_snap_top(arg1,arg2,arg3);
-  resultobj = SWIG_From_int((int)(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_timeline_get_snap_bottom(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  timeline *arg1 = (timeline *) 0 ;
-  int arg2 ;
-  int arg3 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  int val3 ;
-  int ecode3 = 0 ;
-  PyObject *swig_obj[3] ;
-  int result;
-  
-  if (!SWIG_Python_UnpackTuple(args, "timeline_get_snap_bottom", 3, 3, swig_obj)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_get_snap_bottom" "', argument " "1"" of type '" "timeline *""'"); 
-  }
-  arg1 = (timeline *)(argp1);
-  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timeline_get_snap_bottom" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = (int)(val2);
-  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
-  if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "timeline_get_snap_bottom" "', argument " "3"" of type '" "int""'");
-  } 
-  arg3 = (int)(val3);
-  result = (int)timeline_get_snap_bottom(arg1,arg2,arg3);
+  result = (int)timeline_get_snap(arg1,arg2,arg3);
   resultobj = SWIG_From_int((int)(result));
   return resultobj;
 fail:
@@ -8671,8 +8633,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "timeline_del_strip", _wrap_timeline_del_strip, METH_VARARGS, NULL},
 	 { "timeline_get_seq", _wrap_timeline_get_seq, METH_VARARGS, NULL},
 	 { "timeline_get_room", _wrap_timeline_get_room, METH_VARARGS, NULL},
-	 { "timeline_get_snap_top", _wrap_timeline_get_snap_top, METH_VARARGS, NULL},
-	 { "timeline_get_snap_bottom", _wrap_timeline_get_snap_bottom, METH_VARARGS, NULL},
+	 { "timeline_get_snap", _wrap_timeline_get_snap, METH_VARARGS, NULL},
 	 { "timeline_update", _wrap_timeline_update, METH_O, NULL},
 	 { "timestrip_get_seq", _wrap_timestrip_get_seq, METH_O, NULL},
 	 { "timestrip_get_col", _wrap_timestrip_get_col, METH_O, NULL},

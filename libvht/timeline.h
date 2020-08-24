@@ -75,6 +75,7 @@ int timeline_get_nchanges(timeline *tl);
 int timeline_get_nticks(timeline *tl);
 double timeline_get_tick(timeline *tl, int n);
 int timeline_get_room(timeline *tl, int col, int qb, int ig);
+int timeline_get_snap(timeline *tl, int tstr_id, int qb_delta);
 
 timestrip *timeline_get_strip(timeline *tl, int n);
 sequence *timeline_get_seq(timeline *tl, int n);

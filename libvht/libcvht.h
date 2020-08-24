@@ -231,8 +231,7 @@ extern int timeline_get_strip_for_qb(timeline *tl, int col, int qb);
 extern void timeline_del_strip(timeline *tl, int id);
 extern sequence *timeline_get_seq(timeline *tl, int n);
 extern int timeline_get_room(timeline *tl, int col, int qb, int ig);
-extern int timeline_get_snap_top(timeline *tl, int col, int qb);
-extern int timeline_get_snap_bottom(timeline *tl, int col, int qb);
+extern int timeline_get_snap(timeline *tl, int tstr_id, int qb_delta);
 
 extern void timeline_update(timeline *tl);
 

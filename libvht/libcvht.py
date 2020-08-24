@@ -584,11 +584,8 @@ def timeline_get_seq(tl, n):
 def timeline_get_room(tl, col, qb, ig):
     return _libcvht.timeline_get_room(tl, col, qb, ig)
 
-def timeline_get_snap_top(tl, col, qb):
-    return _libcvht.timeline_get_snap_top(tl, col, qb)
-
-def timeline_get_snap_bottom(tl, col, qb):
-    return _libcvht.timeline_get_snap_bottom(tl, col, qb)
+def timeline_get_snap(tl, tstr_id, qb_delta):
+    return _libcvht.timeline_get_snap(tl, tstr_id, qb_delta)
 
 def timeline_update(tl):
     return _libcvht.timeline_update(tl)

@@ -105,6 +105,7 @@ class TimelineView(Gtk.DrawingArea):
         self.moving = None
         self.gest_start_r = 0
         self.move_start_r = 0
+        self.move_last_delta = 0
 
         self.curr_col = -1
         self.curr_strip_id = -1
@@ -393,7 +394,7 @@ class TimelineView(Gtk.DrawingArea):
         cr.restore()
 
         # pointer -------------------
-        if self.pointer_xy and self.pointer_r > -1:
+        if self.pointer_xy:  # and self.pointer_r > -1:
             ry = self.pointer_ry
 
             cr.set_source_rgb(
@@ -405,7 +406,14 @@ class TimelineView(Gtk.DrawingArea):
             cr.stroke()
 
             t = mod.timeline.qb2t(self.pointer_r)
-            lbl = "%d %d:%02d:%02d" % (self.pointer_r, t // 60, t % 60, (t * 100) % 100)
+            pr = self.pointer_r
+
+            if self.moving:
+                pr = mod.timeline.strips[self.curr_strip_id].start
+                t = mod.timeline.qb2t(pr)
+
+            lbl = "%d %d:%02d:%02d" % (pr, t // 60, t % 60, (t * 100) % 100)
+
             lblextra = ""
 
             if self.snap_hold:
@@ -480,12 +488,14 @@ class TimelineView(Gtk.DrawingArea):
             self.moving = True
             self.gest_start_r = self.pointer_r
             self.move_start_r = mod.timeline.strips[self.curr_strip_id].start
+            self.move_last_delta = 0
             return True
 
         if self.curr_col > -1 and self.pointer_r > -1:
+            rr = int(min(self.pointer_r, mod.timeline.nqb))
             seq = mod[self.curr_col]
             idx = mod.timeline.strips.insert_clone(
-                self.curr_col, int(self.pointer_r), seq.length, seq.rpb, seq.rpb,
+                self.curr_col, rr, seq.length, seq.rpb, seq.rpb,
             ).seq.index
 
             extras.fix_extras_new_seq(idx)
@@ -518,27 +528,15 @@ class TimelineView(Gtk.DrawingArea):
 
         mod.mainwin.set_focus(self)
 
-        if self.moving and self.pointer_r:
+        if self.moving:
             delta = self.pointer_r - self.gest_start_r
-            np = self.move_start_r + delta
-            rm = mod.timeline.room_at(self.curr_col, np, self.curr_strip_id)
-            print(rm, np)
-            if rm < 0 or rm >= mod.timeline.strips[self.curr_strip_id].length:
-                mod.timeline.strips[self.curr_strip_id].start = np
-
-            if rm < mod.timeline.strips[self.curr_strip_id].length:
-                if delta > 0:
-                    mod.timeline.strips[self.curr_strip_id].start = (
-                        mod.timeline.snap_top(self.curr_col, np)
-                        - mod.timeline.strips[self.curr_strip_id].length
-                    )
-                else:
-                    sb = mod.timeline.strips[
-                        self.curr_strip_id
-                    ].start = mod.timeline.snap_bottom(self.curr_col, np)
-
-                    if sb < np:
-                        mod.timeline.strips[self.curr_strip_id].start = sb
+            if self.move_last_delta != delta:
+                snappos = mod.timeline.snap(self.curr_strip_id, delta)
+                self.gest_start_r += (
+                    snappos - mod.timeline.strips[self.curr_strip_id].start
+                )
+                mod.timeline.strips[self.curr_strip_id].start = snappos
+                self.move_last_delta = delta
 
         if self.scrollstart > -1:
             desttime = (
@@ -676,18 +674,24 @@ class TimelineView(Gtk.DrawingArea):
                 self.l2t(self.pointer_xy[1]) + mod.timeline.qb2t(self.qb_start)
             )
 
-            if self.pointer_r > -1:
-                if self.pointer_r < mod.timeline.nqb:
-                    self.pointer_r = round((self.pointer_r / self.snap)) * self.snap
+            self.pointer_r = round((self.pointer_r / self.snap)) * self.snap
+            # print(self.pointer_r)
 
-                self.pointer_ry_dest = max(
-                    (
-                        mod.timeline.qb2t(self.pointer_r)
-                        - mod.timeline.qb2t(self.qb_start)
-                    )
-                    / self.spl,
-                    0,
+        if self.moving and self.curr_strip_id > -1:
+            self.pointer_ry_dest = max(
+                (
+                    mod.timeline.qb2t(mod.timeline.strips[self.curr_strip_id].start)
+                    - mod.timeline.qb2t(self.qb_start)
                 )
+                / self.spl,
+                0,
+            )
+        else:
+            self.pointer_ry_dest = max(
+                (mod.timeline.qb2t(self.pointer_r) - mod.timeline.qb2t(self.qb_start))
+                / self.spl,
+                0,
+            )
 
         if self.del_id > -1:
             t = datetime.now() - self.del_time_start
