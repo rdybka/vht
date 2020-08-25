@@ -1,18 +1,14 @@
 - timeline
     - strip management
-        * moving
-            * snapping
         - adding
         - length
-    - feeding
-    - scrub
+    - midi in broken
+    - extend
     - loop
+    - scrub
+    - feeding
     - on left?
     - global ring
-- double, halve - out of sync
-- ctrlview
-    - pitch repr
-    - deleting doodles up
 ? sound clicked note
 - seq gui callback
 - program change
@@ -20,6 +16,7 @@
     - doubles
     - while paused
 - configuration
+    - dialogs
     - metronome
     - ports
     - defaults

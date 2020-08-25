@@ -236,6 +236,8 @@ class SequenceView(Gtk.Box):
             else:
                 mod.mainwin.fullscreen()
                 mod.mainwin.fs = True
+
+            mod.mainwin.timeline_view.snap_hold = False
             return True
 
         if cfg.key["exit_edit"].matches(event):
@@ -806,7 +808,7 @@ class SequenceView(Gtk.Box):
             self.seq = mod[mod.curr_seq]
             self.font_size = mod.extras[mod.curr_seq][-1]["font_size"]
             self.build()
-
+            mod.timeline_view.fix_extras()
             mod.seqlist.redraw()
             return True
         else:
@@ -814,6 +816,7 @@ class SequenceView(Gtk.Box):
             randomcomposer.muzakize()
             self.seq = mod[0]
             self.build()
+            mod.timeline_view.fix_extras()
             mod.seqlist.redraw()
             return False
 
