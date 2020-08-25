@@ -533,6 +533,8 @@ class TimelineView(Gtk.DrawingArea):
                     extras.fix_extras_new_trk(idx, t)
                     mod.extras[idx][t] = copy.deepcopy(mod.extras[seq.index][t])
 
+                self.curr_strip_id = idx[1]
+
         return True
 
     def on_button_release(self, widget, event):
