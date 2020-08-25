@@ -117,7 +117,8 @@ class Configuration:
         self.save_indication_time = 0.23
         self.track_indication_time = 0.02
 
-        self.timeline_delete_time = 2.5
+        self.timeline_delete_time = 0.5
+        self.timeline_hint_time = 0.25
 
         self.key = {
             # sequenceview		shift, ctrl, alt
