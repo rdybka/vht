@@ -91,6 +91,7 @@ class TimelineView(Gtk.DrawingArea):
 
         self.snap_hold = False
         self.zoom_hold = False
+        self.clone_hold = False
 
         self.moving = None
         self.gest_start_r = 0
@@ -508,21 +509,39 @@ class TimelineView(Gtk.DrawingArea):
             return True
 
         if event.button == cfg.select_button and self.curr_strip_id > -1:
-            mod.mainwin.sequence_view.switch(
-                mod.timeline.strips[self.curr_strip_id].seq.index
-            )
-            self.moving = True
-            self.gest_start_r = self.pointer_r
-            self.move_start_r = mod.timeline.strips[self.curr_strip_id].start
-            self.move_last_delta = 0
+            if self.clone_hold:
+                src = mod.timeline.strips[self.curr_strip_id].seq
+                seq = mod.timeline.strips.insert_clone(self.curr_strip_id).seq
+                idx = seq.index
+
+                extras.fix_extras_new_seq(idx)
+                mod.extras[idx][-1] = copy.deepcopy(mod.extras[src.index][-1])
+
+                for t in range(len(seq)):
+                    extras.fix_extras_new_trk(idx, t)
+                    mod.extras[idx][t] = copy.deepcopy(mod.extras[src.index][t])
+
+                self.curr_strip_id = idx[1]
+                mod.mainwin.sequence_view.switch(
+                    mod.timeline.strips[self.curr_strip_id].seq.index
+                )
+            else:
+                mod.mainwin.sequence_view.switch(
+                    mod.timeline.strips[self.curr_strip_id].seq.index
+                )
+                self.moving = True
+                self.gest_start_r = self.pointer_r
+                self.move_start_r = mod.timeline.strips[self.curr_strip_id].start
+                self.move_last_delta = 0
+
             return True
 
-        if self.curr_col > -1 and self.pointer_r > -1:
+        if self.curr_strip_id == -1 and self.curr_col > -1 and self.pointer_r > -1:
             rm = mod.timeline.room_at(self.curr_col, self.pointer_r)
             if rm >= mod[self.curr_col].length or rm == -1:
                 rr = int(min(self.pointer_r, mod.timeline.nqb))
                 seq = mod[self.curr_col]
-                idx = mod.timeline.strips.insert_clone(
+                idx = mod.timeline.strips.insert_parent(
                     self.curr_col, rr, seq.length, seq.rpb, seq.rpb,
                 ).seq.index
 
@@ -667,6 +686,9 @@ class TimelineView(Gtk.DrawingArea):
         if 65507 <= event.keyval <= 65508:  # ctrl
             self.zoom_hold = True
 
+        if 65505 <= event.keyval <= 65506:  # shift
+            self.clone_hold = True
+
         return mod.mainwin.sequence_view.on_key_press(widget, event)
 
     def on_key_release(self, widget, event):
@@ -675,6 +697,9 @@ class TimelineView(Gtk.DrawingArea):
 
         if 65507 <= event.keyval <= 65508:  # ctrl
             self.zoom_hold = False
+
+        if 65505 <= event.keyval <= 65506:  # shift
+            self.clone_hold = False
 
         return mod.mainwin.sequence_view.on_key_release(widget, event)
 
@@ -719,13 +744,18 @@ class TimelineView(Gtk.DrawingArea):
 
         hint = None
 
-        if self.curr_strip_id == -1 and self.curr_col > -1:
-            rm = mod.timeline.room_at(self.curr_col, self.pointer_r)
-            if rm >= mod[self.curr_col].length or rm == -1:
-                hint = (
-                    min(self.pointer_r, mod.timeline.nqb),
-                    mod[self.curr_col].length,
-                )
+        if self.clone_hold and self.curr_strip_id > -1:
+            strp = mod.timeline.strips[self.curr_strip_id]
+            rm = mod.timeline.place_clone(self.curr_strip_id)
+            hint = (rm, strp.length)
+        else:
+            if self.curr_strip_id == -1 and self.curr_col > -1:
+                rm = mod.timeline.room_at(self.curr_col, self.pointer_r)
+                if rm >= mod[self.curr_col].length or rm == -1:
+                    hint = (
+                        min(self.pointer_r, mod.timeline.nqb),
+                        mod[self.curr_col].length,
+                    )
 
         if hint != self.hint:
             self.hint = hint

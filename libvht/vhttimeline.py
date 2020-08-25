@@ -54,6 +54,9 @@ class VHTTimeline:
     def room_at(self, col, qb, ig=-1):  # nqb free after qb (-1 - unl)
         return libcvht.timeline_get_room(self._tl_handle, col, int(qb), int(ig))
 
+    def place_clone(self, strip_id):  # first free qb for a clone of strip_id
+        return libcvht.timeline_place_clone(self._tl_handle, int(strip_id))
+
     def snap(self, strip_id, delta):  # new position snapped against others
         return libcvht.timeline_get_snap(self._tl_handle, strip_id, int(delta))
 

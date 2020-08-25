@@ -8156,6 +8156,36 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_timeline_place_clone(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  timeline *arg1 = (timeline *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  int result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "timeline_place_clone", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_place_clone" "', argument " "1"" of type '" "timeline *""'"); 
+  }
+  arg1 = (timeline *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timeline_place_clone" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  result = (int)timeline_place_clone(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_timeline_update(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   timeline *arg1 = (timeline *) 0 ;
@@ -8634,6 +8664,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "timeline_get_seq", _wrap_timeline_get_seq, METH_VARARGS, NULL},
 	 { "timeline_get_room", _wrap_timeline_get_room, METH_VARARGS, NULL},
 	 { "timeline_get_snap", _wrap_timeline_get_snap, METH_VARARGS, NULL},
+	 { "timeline_place_clone", _wrap_timeline_place_clone, METH_VARARGS, NULL},
 	 { "timeline_update", _wrap_timeline_update, METH_O, NULL},
 	 { "timestrip_get_seq", _wrap_timestrip_get_seq, METH_O, NULL},
 	 { "timestrip_get_col", _wrap_timestrip_get_col, METH_O, NULL},

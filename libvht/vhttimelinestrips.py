@@ -60,12 +60,32 @@ class VHTTimelineStrips(Iterable):
             self._mod,
         )
 
-    def insert_clone(self, seq_id, start, length, rpb_start, rpb_end):
+    def insert_parent(self, seq_id, start, length, rpb_start, rpb_end):
         ns = libcvht.sequence_clone(libcvht.module_get_seq(self._mod_handle, seq_id))
 
         return VHTTimelineStrip(
             libcvht.timeline_add_strip(
                 self._tl_handle, seq_id, ns, start, length, rpb_start, rpb_end,
+            ),
+            self._mod,
+        )
+
+    def insert_clone(self, strp_id):
+        srcstr = self[strp_id]
+        ns = libcvht.sequence_clone(
+            libcvht.timeline_get_seq(self._tl_handle, int(strp_id))
+        )
+        pos = libcvht.timeline_place_clone(self._tl_handle, int(strp_id))
+
+        return VHTTimelineStrip(
+            libcvht.timeline_add_strip(
+                self._tl_handle,
+                srcstr.col,
+                ns,
+                pos,
+                srcstr.length,
+                srcstr.rpb_start,
+                srcstr.rpb_end,
             ),
             self._mod,
         )

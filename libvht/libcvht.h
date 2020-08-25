@@ -232,7 +232,7 @@ extern void timeline_del_strip(timeline *tl, int id);
 extern sequence *timeline_get_seq(timeline *tl, int n);
 extern int timeline_get_room(timeline *tl, int col, int qb, int ig);
 extern int timeline_get_snap(timeline *tl, int tstr_id, int qb_delta);
-
+extern int timeline_place_clone(timeline *tl, int tstr_id);
 extern void timeline_update(timeline *tl);
 
 extern sequence *timestrip_get_seq(timestrip *tstr);

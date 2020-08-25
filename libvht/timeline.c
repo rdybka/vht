@@ -338,6 +338,32 @@ int timeline_get_snap(timeline *tl, int tstr_id, int qb_delta) {
 	return ret;
 }
 
+int timeline_place_clone(timeline *tl, int tstr_id) {
+	timestrip *tstr = &tl->strips[tstr_id];
+	int ret = tstr->start + tstr->length;
+
+	int oldret = -1;
+
+	while(oldret != ret) {
+		oldret = ret;
+		int rm = timeline_get_room(tl, tstr->col, ret, -1);
+		if (rm >= tstr->length || rm == -1) {
+			break;
+		} else {
+			ret += rm;
+
+			int next = timeline_get_strip_for_qb(tl, tstr->col, ret);
+			if (next == -1)
+				break;
+
+			timestrip *nstr = &tl->strips[next];
+			ret = nstr->start + nstr->length;
+		}
+	}
+
+	return ret;
+}
+
 int timeline_change_set(timeline *tl, long row, float bpm, int linked) {
 	timeline_excl_in(tl);
 
@@ -375,7 +401,7 @@ int timeline_get_strip_for_qb(timeline *tl, int col, int qb) {
 	for (int s = 0; s < tl->nstrips; s++)
 		if (tl->strips[s].seq->parent == col &&
 		        tl->strips[s].start <= qb &&
-		        tl->strips[s].start + tl->strips[s].length >= qb)
+		        tl->strips[s].start + tl->strips[s].length > qb)
 			return s;
 
 	return -1;

@@ -587,6 +587,9 @@ def timeline_get_room(tl, col, qb, ig):
 def timeline_get_snap(tl, tstr_id, qb_delta):
     return _libcvht.timeline_get_snap(tl, tstr_id, qb_delta)
 
+def timeline_place_clone(tl, tstr_id):
+    return _libcvht.timeline_place_clone(tl, tstr_id)
+
 def timeline_update(tl):
     return _libcvht.timeline_update(tl)
 
