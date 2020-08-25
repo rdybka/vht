@@ -135,6 +135,11 @@ class VHTApp(Gtk.Application):
         ab.close()
 
     def save_with_dialog(self):
+        mod.extras["timeline_win_pos"] = (
+            mod.mainwin.get_window().get_width() - mod.mainwin.hbox.get_position()
+        )
+        mod.extras["timeline_win_pos_y"] = mod.mainwin.timeline_box.get_position()
+
         if not self.main_win.last_filename:
             dialog = Gtk.FileChooserDialog(
                 "Please choose a file",
@@ -161,6 +166,7 @@ class VHTApp(Gtk.Application):
             if response == Gtk.ResponseType.OK:
                 cfg.last_save_path = dialog.get_current_folder_uri()
                 self.main_win.last_filename = dialog.get_filename()
+
                 mod.save(self.main_win.last_filename)
                 mod.saving = True
                 self.main_win.set_header_from_filename(self.main_win.last_filename)

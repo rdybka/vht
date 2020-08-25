@@ -53,6 +53,12 @@ class MainWin(Gtk.ApplicationWindow):
         self.set_events(Gdk.EventMask.KEY_PRESS_MASK)
         self.connect("key-press-event", self.on_key_press)
 
+        if "timeline_win_pos_y" in mod.extras:
+            cfg.timeline_position_y = mod.extras["timeline_win_pos_y"]
+
+        if "timeline_win_pos" in mod.extras:
+            cfg.timeline_position = mod.extras["timeline_win_pos"]
+
         self.hb = Gtk.HeaderBar()
         self.hb.set_show_close_button(True)
         # self.hb.set_has_subtitle(False)
@@ -256,7 +262,7 @@ class MainWin(Gtk.ApplicationWindow):
         if 1 == len(self.hbox.get_children()):
             self.hbox.pack2(self.timeline_box, False, True)
             self.hbox.set_position(
-                self.get_window().get_width() * cfg.timeline_position
+                self.get_window().get_width() - cfg.timeline_position
             )
 
         self.hbox.set_wide_handle(True)

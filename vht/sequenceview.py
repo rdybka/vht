@@ -807,8 +807,18 @@ class SequenceView(Gtk.Box):
         if mod.load(filename):
             self.seq = mod[mod.curr_seq]
             self.font_size = mod.extras[mod.curr_seq][-1]["font_size"]
+
+            if "timeline_win_pos" in mod.extras:
+                mod.mainwin.hbox.set_position(
+                    mod.mainwin.get_window().get_width()
+                    - mod.extras["timeline_win_pos"]
+                )
+            if "timeline_win_pos_y" in mod.extras:
+                mod.mainwin.timeline_box.set_position(mod.extras["timeline_win_pos_y"])
+
             self.build()
             mod.timeline_view.fix_extras()
+            mod.seqlist.configure()
             mod.seqlist.redraw()
             return True
         else:
@@ -817,6 +827,7 @@ class SequenceView(Gtk.Box):
             self.seq = mod[0]
             self.build()
             mod.timeline_view.fix_extras()
+            mod.seqlist.configure()
             mod.seqlist.redraw()
             return False
 

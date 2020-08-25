@@ -249,6 +249,7 @@ class SequenceListView(Gtk.DrawingArea):
     def zoom(self, i):
         cfg.mixer_font_size += i
         cfg.mixer_font_size = min(max(1, cfg.mixer_font_size), 230)
+        mod.extras["sequencelist_zoom"] = cfg.mixer_font_size
         self.configure()
         self.redraw()
 
@@ -272,6 +273,9 @@ class SequenceListView(Gtk.DrawingArea):
 
         w = self.get_allocated_width()
         h = self.get_allocated_height()
+
+        if "sequencelist_zoom" in mod.extras:
+            cfg.mixer_font_size = mod.extras["sequencelist_zoom"]
 
         redr = []
         if col == -1:
