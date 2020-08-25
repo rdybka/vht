@@ -408,12 +408,12 @@ class TimelineView(Gtk.DrawingArea):
             thx = self.curr_col * cw
             thxx = cw * 0.8
 
-            if st.col == 0:
+            if self.curr_col == 0:
                 thx += cw * 0.05
                 thxx = cw * 0.75
 
-            cr.set_line_width(0.5)
-            cr.set_source_rgba(*(cfg.timeline_colour), self.hint_alpha * 0.7)
+            cr.set_line_width(1.0)
+            cr.set_source_rgba(*(cfg.timeline_colour), self.hint_alpha * 0.8)
             cr.rectangle(thx, ystart, thxx, yend)
             cr.stroke()
 
@@ -568,7 +568,7 @@ class TimelineView(Gtk.DrawingArea):
 
         if self.scrollstart > -1:
             delta = (event.y - self.scrollstart) / ((h - self.scrollbar_height))
-            delta *= self.max_qb_start
+            delta *= self.max_qb_start_dest
             self.qb_start_dest = min(
                 self.max_qb_start, max(0, self.scrollstart_qb + delta)
             )
@@ -591,29 +591,14 @@ class TimelineView(Gtk.DrawingArea):
             self.l2t(self.pointer_xy[1]) + mod.timeline.qb2t(self.qb_start)
         )
 
-        hint = None
-
         if not self.moving:
             self.curr_strip_id = -1
             r = r if r else 0
-
-            # if r >= mod.timeline.nqb:
-            #    return True
 
             if self.curr_col > -1:
                 i = mod.timeline.qb2s(self.curr_col, r)
                 if i > -1:
                     self.curr_strip_id = i
-
-                if self.curr_strip_id == -1:
-                    rm = mod.timeline.room_at(self.curr_col, self.pointer_r)
-                    if rm >= mod[self.curr_col].length or rm == -1:
-                        hint = (self.pointer_r, mod[self.curr_col].length)
-
-        if hint != self.hint:
-            self.hint = hint
-            self.hint_alpha = 0
-            self.hint_time_start = datetime.now()
 
         return True
 
@@ -692,11 +677,11 @@ class TimelineView(Gtk.DrawingArea):
         return mod.mainwin.sequence_view.on_key_release(widget, event)
 
     def animate(self):
-        self.qb_start = max(0, min(self.qb_start_dest, self.max_qb_start))
+        self.qb_start = max(0, min(self.qb_start, self.max_qb_start))
         self.qb_start_dest = max(0, min(self.qb_start_dest, self.max_qb_start))
 
         if self.qb_start_dest - self.qb_start != 0:
-            self.qb_start += (self.qb_start_dest - self.qb_start) / 5.0
+            self.qb_start += (self.qb_start_dest - self.qb_start) / 5
 
         if self.spl_dest - self.spl != 0:
             self.spl += (self.spl_dest - self.spl) / 5
@@ -729,6 +714,21 @@ class TimelineView(Gtk.DrawingArea):
                 / self.spl,
                 0,
             )
+
+        hint = None
+
+        if self.curr_strip_id == -1 and self.curr_col > -1:
+            rm = mod.timeline.room_at(self.curr_col, self.pointer_r)
+            if rm >= mod[self.curr_col].length or rm == -1:
+                hint = (
+                    min(self.pointer_r, mod.timeline.nqb),
+                    mod[self.curr_col].length,
+                )
+
+        if hint != self.hint:
+            self.hint = hint
+            self.hint_alpha = 0
+            self.hint_time_start = datetime.now()
 
         if self.hint:
             t = datetime.now() - self.hint_time_start

@@ -1,6 +1,8 @@
+- seqlist zoom level saving
 - timeline
     - strip management
         - adding
+            - clones
         - length
     - midi in broken
     - extend
@@ -10,6 +12,7 @@
     - on left?
     - global ring
 ? sound clicked note
+- pitch repr
 - seq gui callback
 - program change
     - clear in menu
