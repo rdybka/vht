@@ -495,10 +495,9 @@ class TimelineView(Gtk.DrawingArea):
         currs = mod.curr_seq[1] if type(mod.curr_seq) is tuple else -1
         if event.button == cfg.delete_button:
             if self.curr_strip_id > -1:
-                if currs != self.curr_strip_id:
-                    self.del_id = self.curr_strip_id
-                    self.del_time_start = datetime.now()
-                    self.del_progress = 0.0
+                self.del_id = self.curr_strip_id
+                self.del_time_start = datetime.now()
+                self.del_progress = 0.0
 
         if event.button != cfg.select_button:
             return False
@@ -779,7 +778,17 @@ class TimelineView(Gtk.DrawingArea):
                     if src in mod.extras:
                         mod.extras[(0, x)] = mod.extras[src]
 
+                del mod.extras[(0, len(mod.timeline.strips) - 1)]
+
                 mod.thumbmanager.clear()
+
+                curr = mod.curr_seq
+                if type(curr) is tuple:
+                    if curr[1] == self.del_id:
+                        mod.mainwin.sequence_view.switch(
+                            mod.timeline.strips[self.curr_strip_id].col
+                        )
+
                 mod.timeline.strips.delete(self.del_id)
                 self.curr_strip_id = -1
                 self.del_id = -1

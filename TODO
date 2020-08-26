@@ -1,12 +1,11 @@
 - timeline
     - strip management
-        - deleting breaks extras
         - length
     - extend
     - loop
     - scrub
     - feeding
-    - on left?
+    ? on left
     - global ring
 ? sound clicked note
 - pitch repr
