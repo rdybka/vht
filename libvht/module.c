@@ -355,6 +355,7 @@ sequence *module_get_curr_seq(module *mod) {
 }
 
 void module_set_curr_seq(module *mod, int t, int s) {
+	//printf("curr seq: %d:%d\n", t, s);
 	if (t > -1) {
 		mod->curr_seq = mod->tline->strips[s].seq;
 	} else {

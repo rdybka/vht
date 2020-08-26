@@ -57,7 +57,7 @@ class SequenceView(Gtk.Box):
         self.add_tick_callback(self.tick)
 
         self.seq = seq
-
+        mod.curr_seq = seq.index
         self.font_size = cfg.seq_font_size
         if seq.index in mod.extras:
             self.font_size = mod.extras[seq.index][-1]["font_size"]
@@ -848,6 +848,7 @@ class SequenceView(Gtk.Box):
         if self.seq.index != ns.index:
             self.clear()
             self.seq = ns
+            mod.curr_seq = ns.index
             self.font_size = mod.extras[ns.index][-1]["font_size"]
             self.build(quick=False)
             mod.curr_seq = self.seq.index

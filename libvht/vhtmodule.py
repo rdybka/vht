@@ -165,7 +165,7 @@ class VHTModule(Iterable):
     def curr_seq(self):
         cs = libcvht.module_get_curr_seq(self._mod_handle)
         if cs:
-            return VHTSequence(libcvht.module_get_curr_seq(self._mod_handle)).index
+            return VHTSequence(cs).index
         else:
             return 0
 

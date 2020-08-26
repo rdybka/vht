@@ -245,8 +245,12 @@ long timeline_get_qb(timeline *tl, double t) {
 
 double timeline_get_qb_time(timeline *tl, long row) {
 	long rr = row;
-	if (rr > tl->nticks -1)
+
+	if (rr >= tl->nticks -1)
 		return tl->ticks[tl->nticks -1] + tl->slices[tl->nticks -1].length;
+
+	if (rr < 0)
+		return 0;
 
 	return tl->ticks[rr];
 }
