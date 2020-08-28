@@ -48,7 +48,7 @@ class VHTTimelineStrips(Iterable):
     def get_seq(self, itm):
         sq = libcvht.timeline_get_seq(self._tl_handle, itm)
         if sq:
-            return VHTSequence(sq, self._mod.cb_new_track)
+            return VHTSequence(sq, self._mod, self._mod.cb_new_track)
         else:
             return None
 

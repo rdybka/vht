@@ -221,6 +221,9 @@ def sequence_get_ntrk(seq):
 def sequence_get_length(seq):
     return _libcvht.sequence_get_length(seq)
 
+def sequence_get_relative_length(seq):
+    return _libcvht.sequence_get_relative_length(seq)
+
 def sequence_get_max_length():
     return _libcvht.sequence_get_max_length()
 
@@ -610,6 +613,18 @@ def timestrip_get_rpb_start(tstr):
 
 def timestrip_get_rpb_end(tstr):
     return _libcvht.timestrip_get_rpb_end(tstr)
+
+def timestrip_can_resize_seq(tl, tstr, len):
+    return _libcvht.timestrip_can_resize_seq(tl, tstr, len)
+
+def timestrip_can_rpb_seq(tl, tstr, rpb):
+    return _libcvht.timestrip_can_rpb_seq(tl, tstr, rpb)
+
+def timeline_get_prev_seq(tl, tstr):
+    return _libcvht.timeline_get_prev_seq(tl, tstr)
+
+def timeline_get_next_seq(tl, tstr):
+    return _libcvht.timeline_get_next_seq(tl, tstr)
 
 def timestrip_set_start(tstr, start):
     return _libcvht.timestrip_set_start(tstr, start)

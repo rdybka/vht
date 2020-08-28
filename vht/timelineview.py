@@ -343,8 +343,8 @@ class TimelineView(Gtk.DrawingArea):
                 continue
 
             ystart = (mod.timeline.qb2t(st.start) - tstart) / self.spl
-            yend = mod.timeline.qb2t(st.length) / self.spl
-            lend = mod.timeline.qb2t(st.length) / self.spl
+            yend = (mod.timeline.qb2t(st.start + st.length) - tstart) / self.spl
+            yend -= ystart
 
             thx = st.col * cw
             thxx = cw * 0.8
@@ -403,8 +403,8 @@ class TimelineView(Gtk.DrawingArea):
         # hint
         if self.curr_col > -1 and self.hint:
             ystart = (mod.timeline.qb2t(self.hint[0]) - tstart) / self.spl
-            yend = mod.timeline.qb2t(self.hint[1]) / self.spl
-            lend = mod.timeline.qb2t(self.hint[1]) / self.spl
+            yend = (mod.timeline.qb2t(self.hint[0] + self.hint[1]) - tstart) / self.spl
+            yend -= ystart
 
             thx = self.curr_col * cw
             thxx = cw * 0.8
@@ -541,7 +541,7 @@ class TimelineView(Gtk.DrawingArea):
                 rr = int(min(self.pointer_r, mod.timeline.nqb))
                 seq = mod[self.curr_col]
                 idx = mod.timeline.strips.insert_parent(
-                    self.curr_col, rr, seq.length, seq.rpb, seq.rpb,
+                    self.curr_col, rr, seq.relative_length, seq.rpb, seq.rpb,
                 ).seq.index
 
                 extras.fix_extras_new_seq(idx)
@@ -753,7 +753,7 @@ class TimelineView(Gtk.DrawingArea):
                 if rm >= mod[self.curr_col].length or rm == -1:
                     hint = (
                         min(self.pointer_r, mod.timeline.nqb),
-                        mod[self.curr_col].length,
+                        mod[self.curr_col].relative_length,
                     )
 
         if hint != self.hint:
@@ -772,26 +772,12 @@ class TimelineView(Gtk.DrawingArea):
 
             self.del_progress = t / cfg.timeline_delete_time
             if self.del_progress > 1.0:
-                # fix extras!!!
-                for x in range(self.del_id, len(mod.timeline.strips) - 1):
-                    src = (0, x + 1)
-                    if src in mod.extras:
-                        mod.extras[(0, x)] = mod.extras[src]
-
-                del mod.extras[(0, len(mod.timeline.strips) - 1)]
-
-                mod.thumbmanager.clear()
-
-                curr = mod.curr_seq
-                if type(curr) is tuple:
-                    if curr[1] == self.del_id:
-                        mod.mainwin.sequence_view.switch(
-                            mod.timeline.strips[self.curr_strip_id].col
-                        )
-
-                mod.timeline.strips.delete(self.del_id)
-                self.curr_strip_id = -1
+                did = self.del_id
                 self.del_id = -1
+                self.curr_strip_id = -1
+
+                mod.mainwin.gui_del_seq(mod.timeline.strips[did].seq.index)
+
                 self.del_time_start = 0
                 self.del_progress = 0
 

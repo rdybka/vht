@@ -84,7 +84,7 @@ class VHTModule(Iterable):
     def __iter__(self):
         for itm in range(self.__len__()):
             yield VHTSequence(
-                libcvht.module_get_seq(self._mod_handle, itm), self.cb_new_track
+                libcvht.module_get_seq(self._mod_handle, itm), self, self.cb_new_track
             )
 
     def __getitem__(self, itm):
@@ -98,7 +98,7 @@ class VHTModule(Iterable):
                 raise IndexError()
 
             return VHTSequence(
-                libcvht.module_get_seq(self._mod_handle, itm), self.cb_new_track
+                libcvht.module_get_seq(self._mod_handle, itm), self, self.cb_new_track
             )
 
     def add_sequence(self, length=-1):
@@ -106,13 +106,14 @@ class VHTModule(Iterable):
         libcvht.module_add_sequence(self._mod_handle, seq)
         for cb in self.cb_new_sequence:
             cb(libcvht.sequence_get_index(seq))
-        return VHTSequence(seq, self.cb_new_track)
+        return VHTSequence(seq, self, self.cb_new_track)
 
     def swap_sequence(self, s1, s2):
         libcvht.module_swap_sequence(self._mod_handle, s1, s2)
 
     def del_sequence(self, s):
         libcvht.module_del_sequence(self._mod_handle, s)
+        libcvht.timeline_update(self.timeline._tl_handle)
 
     def clone_sequence(self, s):
         seq = libcvht.sequence_clone(self[s]._seq_handle)
@@ -124,7 +125,7 @@ class VHTModule(Iterable):
             for cb in self.cb_new_track:
                 cb(libcvht.sequence_get_index(seq), t.index)
 
-        return VHTSequence(seq, self.cb_new_track)
+        return VHTSequence(seq, self, self.cb_new_track)
 
     def __str__(self):
         ret = "seq: %d\n" % self.__len__()
@@ -165,7 +166,7 @@ class VHTModule(Iterable):
     def curr_seq(self):
         cs = libcvht.module_get_curr_seq(self._mod_handle)
         if cs:
-            return VHTSequence(cs).index
+            return VHTSequence(cs, self).index
         else:
             return 0
 
@@ -359,7 +360,7 @@ class VHTModule(Iterable):
             s = self.add_sequence()
         else:
             sq = libcvht.sequence_new(23)
-            s = VHTSequence(sq)
+            s = VHTSequence(sq, self)
 
         s.length = seq["length"]
         s.rpb = seq["rpb"]

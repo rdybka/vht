@@ -398,6 +398,13 @@ int sequence_get_playing(sequence *seq) {
 	return seq->playing;
 }
 
+int sequence_get_relative_length(sequence *seq) {
+	double l = seq->length;
+	double rpb = seq->rpb;
+
+	return (int)ceil((4.0 / rpb) * l);
+}
+
 int sequence_get_cue(sequence *seq) {
 	if (seq->trg_times[1] == -1) {
 		return 0;

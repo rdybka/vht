@@ -86,6 +86,7 @@ extern timeline *module_get_timeline(module *mod);
 extern sequence *sequence_new(int length);
 extern int sequence_get_ntrk(sequence *seq);
 extern int sequence_get_length(sequence *seq);
+extern int sequence_get_relative_length(sequence *seq);
 extern int sequence_get_max_length(void);
 extern int sequence_get_index(sequence *seq);
 extern int sequence_get_parent(sequence *seq);
@@ -241,6 +242,12 @@ extern int timestrip_get_start(timestrip *tstr);
 extern int timestrip_get_length(timestrip *tstr);
 extern int timestrip_get_rpb_start(timestrip *tstr);
 extern int timestrip_get_rpb_end(timestrip *tstr);
+
+extern int timestrip_can_resize_seq(timeline *tl, timestrip *tstr, int len);
+extern int timestrip_can_rpb_seq(timeline *tl, timestrip *tstr, int rpb);
+
+extern sequence *timeline_get_prev_seq(timeline *tl, timestrip *tstr);
+extern sequence *timeline_get_next_seq(timeline *tl, timestrip *tstr);
 
 extern void timestrip_set_start(timestrip *tstr, int start);
 extern void timestrip_set_length(timestrip *tstr, int length);

@@ -344,3 +344,63 @@ class MainWin(Gtk.ApplicationWindow):
         self.set_header_from_filename(filename)
         self.adj.set_value(mod.bpm)
         return True
+
+    def gui_del_seq(self, seq_id):
+        print("del_seq", seq_id)
+        # open from matrix
+        if type(seq_id) is int:
+            if len(mod) > 1:
+                curr = mod.curr_seq
+                if seq_id < curr:
+                    curr -= 1
+
+                if seq_id == curr:
+                    self.sequence_view.switch(curr + 1)
+                    mod.curr_seq = curr + 1
+
+                # else:
+                #    self.sequence_view.switch(curr + 1)
+                #    curr -= 1
+
+                for r in range(seq_id, len(mod) - 1):
+                    mod.extras[r] = mod.extras[r + 1]
+
+                del mod.extras[len(mod) - 1]
+
+                for strp in mod.timeline.strips:
+                    if strp.col == seq_id:
+                        k = strp.seq.index
+                        print(k)
+                        if k in mod.extras:
+                            del mod.extras[k]
+
+                # self.sequence_view.switch(curr)
+                # mod.curr_seq = curr
+                # mod.del_sequence(seq_id)
+                mod.timeline.update()
+                mod.thumbmanager.clear()
+                return True
+        elif type(seq_id) is tuple:
+            # fix extras!!!
+            for x in range(seq_id[1], len(mod.timeline.strips) - 1):
+                src = (0, x + 1)
+                if src in mod.extras:
+                    mod.extras[(0, x)] = mod.extras[src]
+
+            del mod.extras[(0, len(mod.timeline.strips) - 1)]
+
+            curr = mod.curr_seq
+            if type(curr) is tuple:
+                if curr[1] == seq_id[1]:
+                    mod.mainwin.sequence_view.switch(
+                        mod.timeline.strips[curr[1]].prev_id
+                    )
+
+            self.timeline_view.curr_col = -1
+            self.timeline_view.curr_strip_id = -1
+
+            mod.timeline.strips.delete(seq_id[1])
+            mod.thumbmanager.clear()
+
+    def gui_del_trk(seq_id, trk_id):
+        print("del_trk", seq_id, trk_id)

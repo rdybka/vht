@@ -1,6 +1,7 @@
 - timeline
     - strip management
         - length
+        - delete full seq's
     - extend
     - loop
     - scrub

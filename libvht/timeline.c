@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "midi_client.h"
 #include "module.h"
 
 void timeline_excl_in(timeline *tl) {
@@ -246,11 +247,16 @@ long timeline_get_qb(timeline *tl, double t) {
 double timeline_get_qb_time(timeline *tl, long row) {
 	long rr = row;
 
-	if (rr >= tl->nticks -1)
-		return tl->ticks[tl->nticks -1] + tl->slices[tl->nticks -1].length;
-
 	if (rr < 0)
 		return 0;
+
+	if (rr >= tl->nticks -1) {
+		double t = tl->ticks[tl->nticks -1];
+		double rl = tl->slices[tl->nticks -1].length;
+		rr -= tl->nticks;
+
+		return t + rl + (rl * rr);
+	}
 
 	return tl->ticks[rr];
 }
@@ -368,6 +374,70 @@ int timeline_place_clone(timeline *tl, int tstr_id) {
 	return ret;
 }
 
+int timestrip_can_resize_seq(timeline *tl, timestrip *tstr, int len) {
+	int ret = 0;
+	int index = tstr->seq->index;
+	sequence *seq = tstr->seq;
+
+	int rlen = (int)ceil((4.0 / (double)seq->rpb) * len);
+
+	int rm = timeline_get_room(tl, tstr->col, tstr->start, index);
+	if (rm >= rlen || rm == -1) {
+		ret = 1;
+	}
+
+	return ret;
+}
+
+
+int timestrip_can_rpb_seq(timeline *tl, timestrip *tstr, int rpb) {
+	int ret = 0;
+
+	int index = tstr->seq->index;
+	sequence *seq = tstr->seq;
+
+	int rlen = (int)ceil((4.0 / (double)rpb) * seq->length);
+
+	int rm = timeline_get_room(tl, tstr->col, tstr->start, index);
+	if (rm >= rlen || rm == -1) {
+		ret = 1;
+	}
+
+	return ret;
+}
+
+sequence *timeline_get_prev_seq(timeline *tl, timestrip *tstr) {
+	sequence *ret = NULL;
+
+	if (tstr->seq->parent == -1) {
+		return ret;
+	}
+
+	int maxr = -1;
+
+	for (int s = 0; s < tl->nstrips; s++) {
+		if (tl->strips[s].col == tstr->col) {
+			timestrip *st = &tl->strips[s];
+
+			if (st->start > maxr) {
+				if (st->start < tstr->start) {
+					ret = tl->strips[s].seq;
+					maxr = st->start;
+				}
+			}
+		}
+	}
+
+	if (ret == tstr->seq)
+		return NULL;
+
+	return ret;
+}
+
+sequence *timeline_get_next_seq(timeline *tl, timestrip *tstr) {
+	return NULL;
+}
+
 int timeline_change_set(timeline *tl, long row, float bpm, int linked) {
 	timeline_excl_in(tl);
 
@@ -441,6 +511,7 @@ timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, i
 void timeline_del_strip(timeline *tl, int id) {
 	timeline_excl_in(tl);
 
+	sequence_free(tl->strips[id].seq);
 	for (int s = id; s < tl->nstrips - 1; s++) {
 		tl->strips[s] = tl->strips[s+1];
 		tl->strips[s].seq->index = s;
@@ -449,6 +520,29 @@ void timeline_del_strip(timeline *tl, int id) {
 	tl->strips = realloc(tl->strips, sizeof(timestrip) * --tl->nstrips);
 
 	timeline_excl_out(tl);
+}
+
+void timeline_delete_all_strips(timeline *tl, int col) {
+	for (int s = 0; s < tl->nstrips; s++) {
+		if (tl->strips[s].col == col) {
+			sequence_free(tl->strips[s].seq);
+			for (int ss = s; ss < tl->nstrips - 1; ss++) {
+				tl->strips[ss] = tl->strips[ss+1];
+				tl->strips[ss].seq->index = ss;
+			}
+
+			tl->strips = realloc(tl->strips, sizeof(timestrip) * --tl->nstrips);
+			s--;
+		}
+	}
+
+	for (int s = 0; s < tl->nstrips; s++) {
+		if (tl->strips[s].col > col) {
+			tl->strips[s].col--;
+			tl->strips[s].seq->parent = tl->strips[s].col;
+		}
+	}
+
 }
 
 void timeline_clear(timeline *tl) {

@@ -189,20 +189,7 @@ class SequenceListViewPopover(Gtk.Popover):
         if self.curr == -1:
             return
 
-        if self.curr == mod.curr_seq:
-            if self.curr < len(mod) - 1:
-                mod.mainwin.sequence_view.switch(mod.curr_seq + 1)
-            else:
-                mod.curr_seq -= 1
-                mod.mainwin.sequence_view.switch(mod.curr_seq)
-                self._parent.redraw()
-
-        # move names in extras
-        for r in range(self.curr, len(mod) - 1):
-            mod.extras[r] = mod.extras[r + 1]
-
-        del mod.extras[len(mod) - 1]
-        mod.del_sequence(self.curr)
+        mod.mainwin.gui_del_seq(self.curr)
         self.hide()
         self.pooped = False
         self._parent.redraw()

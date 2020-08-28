@@ -277,17 +277,8 @@ class SequenceView(Gtk.Box):
             return True
 
         if cfg.key["sequence_delete"].matches(event):
-            if len(mod) > 1:
-                for r in range(mod.curr_seq, len(mod) - 1):
-                    mod.extras[r] = mod.extras[r + 1]
-
-                del mod.extras[len(mod) - 1]
-                mod.del_sequence(mod.curr_seq)
-
-                mod.curr_seq = max(0, mod.curr_seq - 1)
-                self.switch(mod.curr_seq)
-                mod.seqlist.redraw()
-            return True
+            ind = self.seq.index
+            mod.mainwin.gui_del_seq(ind)
 
         if cfg.key["sequence_clone"].matches(event):
             idx = mod.clone_sequence(mod.curr_seq).index
@@ -650,6 +641,7 @@ class SequenceView(Gtk.Box):
 
     def double(self):
         self.seq.double()
+
         self._side_prop.popover.length_adj.set_value(self.seq.length)
         self.recalculate_row_spacing()
 
@@ -659,8 +651,18 @@ class SequenceView(Gtk.Box):
         self.redraw_track()
 
     def halve(self):
+        ind = self.seq.index
+        tstr = None
+
+        if type(ind) is tuple:
+            tstr = mod.timeline.strips[ind[1]]
+
         TrackView.leave_all()
         self.seq.halve()
+
+        if tstr:
+            tstr.length = tstr.seq.relative_length
+
         self._side_prop.popover.length_adj.set_value(self.seq.length)
         self.recalculate_row_spacing()
 

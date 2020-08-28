@@ -65,6 +65,8 @@ typedef struct sequence_t {
 sequence *sequence_new(int length);
 void sequence_add_track(sequence *seq, track *trk);
 track *sequence_clone_track(sequence *seq, track *trk);
+int sequence_get_length(sequence *seq);
+int sequence_get_relative_length(sequence *seq);
 void sequence_set_length(sequence *seq, int length);
 void sequence_del_track(sequence *seq, int t);
 void sequence_swap_track(sequence *seq, int t1, int t2);

@@ -118,6 +118,8 @@ class SequencePropViewPopover(Gtk.Popover):
             if trk.nsrows > self.seq.length:
                 trk.nsrows = self.seq.length
 
+        adj.set_value(self.seq.length)
+
         self.parent.seqview.recalculate_row_spacing()
         self.parent.seqview.redraw_track()
         self.parent.seqview.queue_draw()

@@ -79,9 +79,18 @@ int timeline_get_snap(timeline *tl, int tstr_id, int qb_delta);
 int timeline_place_clone(timeline *tl, int tstr_id);
 timestrip *timeline_get_strip(timeline *tl, int n);
 sequence *timeline_get_seq(timeline *tl, int n);
+sequence *timeline_get_prev_seq(timeline *tl, timestrip *tstr);
+sequence *timeline_get_next_seq(timeline *tl, timestrip *tstr);
+
 int timeline_get_strip_for_qb(timeline *tl, int col, int qb);
 int timeline_get_nstrips(timeline *tl);
 timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end);
 void timeline_del_strip(timeline *tl, int id);
+void timeline_delete_all_strips(timeline *tl, int col);
+
+// relativity
+int timestrip_can_resize_seq(timeline *tl, timestrip *tstr, int len);
+int timestrip_can_rpb_seq(timeline *tl, timestrip *tstr, int rpb);
+
 
 #endif //__TIMELINE_H__

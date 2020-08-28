@@ -25,7 +25,7 @@ class VHTTimelineStrip:
         self._mod = mod
 
     def update_strrep(self):
-        seq_id = VHTSequence(libcvht.timestrip_get_seq(self._ptr)).index[1]
+        seq_id = VHTSequence(libcvht.timestrip_get_seq(self._ptr), self._mod).index[1]
         col = libcvht.timestrip_get_col(self._ptr)
         start = libcvht.timestrip_get_start(self._ptr)
         length = libcvht.timestrip_get_length(self._ptr)
@@ -41,9 +41,44 @@ class VHTTimelineStrip:
             rpb_end,
         )
 
+    def can_resize(self, l):  # can seq be resized to l?
+        return libcvht.timestrip_can_resize_seq(
+            self._mod.timeline._tl_handle, self._ptr, l
+        )
+
+    def can_rpb(self, rpb):  # can seq's rpb be changed?
+        return libcvht.timestrip_can_rpb_seq(
+            self._mod.timeline._tl_handle, self._ptr, rpb
+        )
+
+    @property
+    def prev_id(self):
+        seq_ptr = libcvht.timeline_get_prev_seq(
+            self._mod.timeline._tl_handle, self._ptr
+        )
+
+        if seq_ptr:
+            idx = libcvht.sequence_get_index(seq_ptr)
+            return 0, idx
+        else:
+            return self.col
+
+    @property
+    def next_id(self):
+        seq_ptr = libcvht.timeline_get_next_seq(
+            self._mod.timeline._tl_handle, self._ptr
+        )
+        if seq_ptr:
+            idx = libcvht.sequence_get_index(seq_ptr)
+            return 0, idx
+        else:
+            return self.col
+
     @property
     def seq(self):
-        return VHTSequence(libcvht.timestrip_get_seq(self._ptr), self._mod.cb_new_track)
+        return VHTSequence(
+            libcvht.timestrip_get_seq(self._ptr), self._mod, self._mod.cb_new_track
+        )
 
     @property
     def col(self):

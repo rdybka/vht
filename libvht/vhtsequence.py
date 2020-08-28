@@ -21,8 +21,9 @@ from libvht import libcvht
 
 
 class VHTSequence(Iterable):
-    def __init__(self, seq, cb_new_track=[]):
+    def __init__(self, seq, mod, cb_new_track=[]):
         super(VHTSequence, self).__init__()
+        self._mod = mod
         self._seq_handle = seq
         self.cb_new_track = cb_new_track
 
@@ -70,10 +71,30 @@ class VHTSequence(Iterable):
         return VHTTrack(ntrk)
 
     def double(self):
+        tstr = None
+        ind = self.index
+        if type(ind) is tuple:
+            tstr = self._mod.timeline.strips[ind[1]]
+            if not tstr.can_resize(self.length * 2):
+                return
+
         libcvht.sequence_double(self._seq_handle)
 
+        if tstr:
+            tstr.length = self.relative_length
+            libcvht.timeline_update(self._mod.timeline._tl_handle)
+
     def halve(self):
+        tstr = None
+        ind = self.index
+        if type(ind) is tuple:
+            tstr = self._mod.timeline.strips[ind[1]]
+
         libcvht.sequence_halve(self._seq_handle)
+
+        if tstr:
+            tstr.length = self.relative_length
+            libcvht.timeline_update(self._mod.timeline._tl_handle)
 
     def swap_track(self, t1, t2):
         libcvht.sequence_swap_track(self._seq_handle, t1, t2)
@@ -94,9 +115,19 @@ class VHTSequence(Iterable):
 
     @rpb.setter
     def rpb(self, value):
-        if value:
-            libcvht.sequence_set_rpb(self._seq_handle, min(max(1, value), 32))
-            # self.timeline.changes[0] = [0, self.bpm, self.rpb, 0]
+        if 0 < value <= 32:
+            tstr = None
+            ind = self.index
+            if type(ind) is tuple:
+                tstr = self._mod.timeline.strips[ind[1]]
+                if not tstr.can_rpb(value):
+                    return
+
+            libcvht.sequence_set_rpb(self._seq_handle, value)
+
+            if tstr:
+                tstr.length = tstr.seq.relative_length
+                libcvht.timeline_update(self._mod.timeline._tl_handle)
 
     @property
     def cue(self):
@@ -122,7 +153,23 @@ class VHTSequence(Iterable):
 
     @length.setter
     def length(self, value):
+
+        tstr = None
+        ind = self.index
+        if type(ind) is tuple:
+            tstr = self._mod.timeline.strips[ind[1]]
+            if not tstr.can_resize(value):
+                return
+
         libcvht.sequence_set_length(self._seq_handle, value)
+
+        if tstr:
+            tstr.length = tstr.seq.relative_length
+            libcvht.timeline_update(self._mod.timeline._tl_handle)
+
+    @property
+    def relative_length(self):
+        return libcvht.sequence_get_relative_length(self._seq_handle)
 
     @property
     def max_length(self):
