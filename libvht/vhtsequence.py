@@ -37,6 +37,14 @@ class VHTSequence(Iterable):
         for itm in range(self.__len__()):
             yield VHTTrack(libcvht.sequence_get_trk(self._seq_handle, itm))
 
+    def __eq__(self, other):
+        h1 = int(self._seq_handle)
+        h2 = int(other._seq_handle)
+        if h1 == h2:
+            return True
+
+        return False
+
     def __getitem__(self, itm):
         if itm >= self.__len__():
             raise IndexError()

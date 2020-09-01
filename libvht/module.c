@@ -298,7 +298,7 @@ void module_del_sequence(module *mod, int s) {
 
 	module_excl_in(mod);
 
-	//timeline_delete_all_strips(mod->tline, s);
+	timeline_delete_all_strips(mod->tline, s);
 
 	sequence_free(mod->seq[s]);
 

@@ -94,6 +94,8 @@ class TimelineView(Gtk.DrawingArea):
         self.clone_hold = False
 
         self.moving = None
+        self.resizing = None
+        self.resize_start = None
         self.gest_start_r = 0
         self.move_start_r = 0
         self.move_last_delta = 0
@@ -108,6 +110,9 @@ class TimelineView(Gtk.DrawingArea):
         self.hint = None
         self.hint_alpha = 0
         self.hint_time_start = 0
+        self.resize_curs = Gdk.Cursor.new_from_name(
+            mod.mainwin.get_display(), "row-resize"
+        )
 
     def fix_extras(self):
         if "timeline_zoom" in mod.extras:
@@ -344,7 +349,12 @@ class TimelineView(Gtk.DrawingArea):
 
             ystart = (mod.timeline.qb2t(st.start) - tstart) / self.spl
             yend = (mod.timeline.qb2t(st.start + st.length) - tstart) / self.spl
+            lend = (
+                mod.timeline.qb2t(st.start + st.seq.relative_length) - tstart
+            ) / self.spl
+
             yend -= ystart
+            lend -= ystart
 
             thx = st.col * cw
             thxx = cw * 0.8
@@ -372,7 +382,7 @@ class TimelineView(Gtk.DrawingArea):
             else:
                 cr.set_source_rgb(*(col * 0.4 for col in colour))
 
-            cr.rectangle(thx, ystart, thxx, yend)
+            cr.rectangle(thx, ystart, thxx, lend)
             cr.fill()
 
             thumb = mod.thumbmanager.get(ind)
@@ -381,11 +391,12 @@ class TimelineView(Gtk.DrawingArea):
 
                 thw, thh = thsurf.get_width(), thsurf.get_height()
                 mtx = cairo.Matrix()
-                mtx.scale(thw / thxx, thh / yend)
+                # mtx.scale(thw / thxx, thh / yend)
+                mtx.scale(thw / thxx, thh / lend)
                 mtx.translate(-thx, -ystart)
                 thumb.set_matrix(mtx)
                 cr.set_source(thumb)
-                cr.rectangle(thx, ystart, thxx, yend)
+                cr.rectangle(thx, ystart, thxx, lend)
                 cr.fill()
 
                 cr.set_line_width(1.5)
@@ -394,9 +405,39 @@ class TimelineView(Gtk.DrawingArea):
                 if stid == self.del_id:
                     cr.rectangle(thx, ystart, thxx, yend - (yend * self.del_progress))
                 else:
-                    cr.rectangle(thx, ystart, thxx, yend)
+                    cr.rectangle(thx, ystart, thxx, lend)
+                    cr.stroke()
 
-                cr.stroke()
+                    if st.length > st.seq.relative_length:
+                        cr.move_to(thx + thxx / 2, ystart + lend)
+                        cr.line_to(thx + thxx / 2, ystart + yend)
+                        cr.stroke()
+                        cr.move_to(thx, ystart + yend - 1)
+                        cr.line_to(thx + thxx, ystart + yend - 1)
+                        cr.set_line_width(3.0)
+                        cr.stroke()
+                        if yend - lend > 14:
+                            cr.move_to(thx, ystart + yend - 5)
+                            cr.line_to(thx + thxx, ystart + yend - 5)
+                            cr.set_line_width(1.0)
+                            cr.stroke()
+
+                            cr.arc(
+                                thx + (thxx * 0.3),
+                                ystart + yend - 10,
+                                2,
+                                0,
+                                2 * math.pi,
+                            )
+                            cr.fill()
+                            cr.arc(
+                                thx + (thxx * 0.7),
+                                ystart + yend - 10,
+                                2,
+                                0,
+                                2 * math.pi,
+                            )
+                            cr.fill()
 
         cr.restore()
 
@@ -442,7 +483,10 @@ class TimelineView(Gtk.DrawingArea):
             lblextra = ""
             # lblextra = " %d %d" % (ry, nomorelaby)
 
-            if self.snap_hold:
+            if self.resizing:
+                strp = mod.timeline.strips[self.curr_strip_id]
+                lblextra = lblextra + "length: %d" % (strp.length)
+            elif self.snap_hold:
                 lblextra = lblextra + "snap: %d" % self.snap
             elif self.zoom_hold:
                 lblextra = lblextra + "zoom: %.3f" % (self.spl * h)
@@ -492,8 +536,11 @@ class TimelineView(Gtk.DrawingArea):
     def on_button_press(self, widget, event):
         self.hint = None
 
+        if self.resizing or self.moving:
+            return
+
         currs = mod.curr_seq[1] if type(mod.curr_seq) is tuple else -1
-        if event.button == cfg.delete_button:
+        if event.button == cfg.delete_button and not self.resizing and not self.moving:
             if self.curr_strip_id > -1:
                 self.del_id = self.curr_strip_id
                 self.del_time_start = datetime.now()
@@ -508,6 +555,12 @@ class TimelineView(Gtk.DrawingArea):
             return True
 
         if event.button == cfg.select_button and self.curr_strip_id > -1:
+            if self.show_resize_handle:
+                self.resizing = True
+                self.resize_start = mod.timeline.strips[self.curr_strip_id].length
+                self.gest_start_r = self.pointer_r
+                return True
+
             if self.clone_hold:
                 src = mod.timeline.strips[self.curr_strip_id].seq
                 seq = mod.timeline.strips.insert_clone(self.curr_strip_id).seq
@@ -556,12 +609,17 @@ class TimelineView(Gtk.DrawingArea):
         return True
 
     def on_button_release(self, widget, event):
-        self.del_id = -1
-        self.del_time_start = 0
-        self.del_progress = 0.0
+        if event.button == cfg.delete_button:
+            self.del_id = -1
+            self.del_time_start = 0
+            self.del_progress = 0.0
+            return
 
         self.scrollstart = -1
         self.moving = False
+        self.resizing = False
+
+        self.get_window().set_cursor(None)
         return True
 
     def on_motion(self, widget, event):
@@ -585,6 +643,18 @@ class TimelineView(Gtk.DrawingArea):
                 )
                 mod.timeline.strips[self.curr_strip_id].start = snappos
                 self.move_last_delta = delta
+
+        if self.resizing and self.curr_strip_id > -1:
+            strp = mod.timeline.strips[self.curr_strip_id]
+            delta = self.pointer_r - self.gest_start_r
+            rm = mod.timeline.room_at(strp.col, strp.start, strp.seq.index[1])
+            if rm == -1:
+                rm = int(self.resize_start + delta)
+
+            nl = min(
+                rm, max(strp.seq.relative_length, int((self.resize_start + delta)))
+            )
+            strp.length = nl
 
         if self.scrollstart > -1:
             delta = (event.y - self.scrollstart) / ((h - self.scrollbar_height))
@@ -611,7 +681,8 @@ class TimelineView(Gtk.DrawingArea):
             self.l2t(self.pointer_xy[1]) + mod.timeline.qb2t(self.qb_start)
         )
 
-        if not self.moving:
+        self.show_resize_handle = False
+        if not self.moving and not self.resizing:
             self.curr_strip_id = -1
             r = r if r else 0
 
@@ -619,15 +690,32 @@ class TimelineView(Gtk.DrawingArea):
                 i = mod.timeline.qb2s(self.curr_col, r)
                 if i > -1:
                     self.curr_strip_id = i
+                    strp = mod.timeline.strips[i]
+                    tstart = mod.timeline.qb2t(self.qb_start)
+                    yend = (
+                        mod.timeline.qb2t(strp.start + strp.length) - tstart
+                    ) / self.spl
+                    offs_from_back = event.y - yend
+                    if -5 <= offs_from_back:
+                        self.show_resize_handle = True
+                    else:
+                        self.show_resize_handle = False
+
+        if self.show_resize_handle or self.resizing:
+            self.get_window().set_cursor(self.resize_curs)
+        else:
+            self.get_window().set_cursor(None)
 
         return True
 
     def on_leave(self, wdg, prm):
-        if not self.moving:
+        if not self.moving and not self.resizing:
             self.pointer_xy = None
             self.pointer_r = -1
             self.curr_col = -1
             self.curr_strip_id = -1
+
+        self.clone_hold = False
         return True
 
     def on_enter(self, wdg, prm):

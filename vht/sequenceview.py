@@ -847,7 +847,7 @@ class SequenceView(Gtk.Box):
         else:
             ns = mod[new_seq]
 
-        if self.seq.index != ns.index:
+        if self.seq != ns:
             self.clear()
             self.seq = ns
             mod.curr_seq = ns.index

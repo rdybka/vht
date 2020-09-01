@@ -39,7 +39,7 @@ class Configuration:
 
         self.console_scale = 1
         self.timeline_position = 200
-        self.timeline_position_y = 203
+        self.timeline_position_y = 150
         self.console_position = 0.7
         self.console_show = False
         self.timeline_show = False

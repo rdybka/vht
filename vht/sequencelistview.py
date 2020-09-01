@@ -105,13 +105,6 @@ class SequenceListView(Gtk.DrawingArea):
         old = s0
         self._move_handle = s1
         self._highlight = s1
-        if old == mod.curr_seq:
-            mod.curr_seq = self._move_handle
-            mod.mainwin.sequence_view.prop_view.redraw()
-        else:
-            if self._move_handle == mod.curr_seq:
-                mod.curr_seq = old
-                mod.mainwin.sequence_view.prop_view.redraw()
 
         self.redraw(old)
         self.redraw(s1)

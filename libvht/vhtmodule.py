@@ -22,6 +22,81 @@ from libvht.vhttimeline import VHTTimeline
 import pickle
 
 
+def pack_seq(seq):
+    s = {}
+    s["length"] = seq.length
+    s["rpb"] = seq.rpb
+    s["trg_playmode"] = seq.trg_playmode
+    s["trg_quantise"] = seq.trg_quantise
+    s["trig"] = [seq.get_trig(0), seq.get_trig(1), seq.get_trig(2)]
+    s["playing"] = seq.playing
+    s["trk"] = []
+
+    for trk in seq:
+        t = {}
+        t["port"] = trk.port
+        t["channel"] = trk.channel
+        t["nrows"] = trk.nrows
+        t["nsrows"] = trk.nsrows
+        t["playing"] = trk.playing
+        t["ctrlpr"] = trk.ctrlpr
+        t["program"] = trk.get_program()
+        t["qc"] = trk.get_qc()
+        t["loop"] = trk.loop
+
+        t["ctrl"] = []
+        for cn, ctrl in enumerate(trk.ctrl):
+            c = {}
+            c["ctrlnum"] = ctrl.ctrlnum
+            c["rows"] = []
+            c["doodles"] = []
+            rn = 0
+            for r in ctrl:
+                if r.velocity > -1:
+                    rw = {}
+                    rw["n"] = rn
+                    rw["velocity"] = r.velocity
+                    rw["linked"] = r.linked
+                    rw["smooth"] = r.smooth
+                    rw["anchor"] = r.anchor
+                    c["rows"].append(rw)
+
+                rn += 1
+
+            for r in range(trk.nrows):
+                dood = trk.get_ctrl_rec(cn, r).as_list()
+                empty = True
+                for d in dood:
+                    if d > -1:
+                        empty = False
+
+                if not empty:
+                    c["doodles"].append([r, dood])
+
+            t["ctrl"].append(c)
+
+        t["col"] = []
+        for col in trk:
+            c = []
+            rn = 0
+            for row in col:
+                if row.type > 0:
+                    r = {}
+                    r["n"] = rn
+                    r["type"] = row.type
+                    r["note"] = row.note
+                    r["velocity"] = row.velocity
+                    r["delay"] = row.delay
+                    c.append(r)
+
+                rn += 1
+            t["col"].append(c)
+
+        s["trk"].append(t)
+
+    return s
+
+
 class VHTModule(Iterable):
     """
     This is your interface to the VHT magic
@@ -58,14 +133,6 @@ class VHTModule(Iterable):
 
     def midi_synch_ports(self):
         libcvht.module_synch_output_ports(self._mod_handle)
-
-    def __str__(self):
-        r = {}
-        r["bpm"] = self.bpm
-        r["playing"] = self.playing
-        r["nseq"] = len(self.seq)
-
-        return r.__str__()
 
     def new(self):
         self.play = 0
@@ -226,10 +293,6 @@ class VHTModule(Iterable):
         libcvht.module_set_play_mode(self._mod_handle, value)
 
     @property
-    def max_ports(self):
-        return libcvht.module_get_max_ports(self._mod_handle)
-
-    @property
     def time(self):
         return libcvht.module_get_time(self._mod_handle)
 
@@ -279,7 +342,7 @@ class VHTModule(Iterable):
         jm["curr_seq"] = self.curr_seq
         jm["seq"] = []
         for seq in self:
-            jm["seq"].append(self.pack_seq(seq))
+            jm["seq"].append(pack_seq(seq))
 
         tl = {}
         tl["changes"] = []
@@ -297,7 +360,7 @@ class VHTModule(Iterable):
             strp["length"] = strip.length
             strp["rpb_start"] = strip.rpb_start
             strp["rpb_end"] = strip.rpb_end
-            strp["seq"] = self.pack_seq(strip.seq)
+            strp["seq"] = pack_seq(strip.seq)
             tl["strips"].append(strp)
 
         jm["tl"] = tl
@@ -326,7 +389,7 @@ class VHTModule(Iterable):
             self.ctrlpr = jm["ctrlpr"]
 
             for seq in jm["seq"]:
-                sq = self.unpack_seq(seq, True)
+                self.unpack_seq(seq, True)
 
             self.timeline.clear()
 
@@ -353,7 +416,6 @@ class VHTModule(Iterable):
         return True
 
     def unpack_seq(self, seq, matrix=False):
-        s = None
         sq = None
 
         if matrix:
@@ -424,77 +486,3 @@ class VHTModule(Iterable):
                     rr.delay = row["delay"]
 
         return sq
-
-    def pack_seq(self, seq):
-        s = {}
-        s["length"] = seq.length
-        s["rpb"] = seq.rpb
-        s["trg_playmode"] = seq.trg_playmode
-        s["trg_quantise"] = seq.trg_quantise
-        s["trig"] = [seq.get_trig(0), seq.get_trig(1), seq.get_trig(2)]
-        s["playing"] = seq.playing
-        s["trk"] = []
-
-        for trk in seq:
-            t = {}
-            t["port"] = trk.port
-            t["channel"] = trk.channel
-            t["nrows"] = trk.nrows
-            t["nsrows"] = trk.nsrows
-            t["playing"] = trk.playing
-            t["ctrlpr"] = trk.ctrlpr
-            t["program"] = trk.get_program()
-            t["qc"] = trk.get_qc()
-            t["loop"] = trk.loop
-
-            t["ctrl"] = []
-            for cn, ctrl in enumerate(trk.ctrl):
-                c = {}
-                c["ctrlnum"] = ctrl.ctrlnum
-                c["rows"] = []
-                c["doodles"] = []
-                rn = 0
-                for r in ctrl:
-                    if r.velocity > -1:
-                        rw = {}
-                        rw["n"] = rn
-                        rw["velocity"] = r.velocity
-                        rw["linked"] = r.linked
-                        rw["smooth"] = r.smooth
-                        rw["anchor"] = r.anchor
-                        c["rows"].append(rw)
-
-                    rn += 1
-
-                for r in range(trk.nrows):
-                    dood = trk.get_ctrl_rec(cn, r).as_list()
-                    empty = True
-                    for d in dood:
-                        if d > -1:
-                            empty = False
-
-                    if not empty:
-                        c["doodles"].append([r, dood])
-
-                t["ctrl"].append(c)
-
-            t["col"] = []
-            for col in trk:
-                c = []
-                rn = 0
-                for row in col:
-                    if row.type > 0:
-                        r = {}
-                        r["n"] = rn
-                        r["type"] = row.type
-                        r["note"] = row.note
-                        r["velocity"] = row.velocity
-                        r["delay"] = row.delay
-                        c.append(r)
-
-                    rn += 1
-                t["col"].append(c)
-
-            s["trk"].append(t)
-
-        return s

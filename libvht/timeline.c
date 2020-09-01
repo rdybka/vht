@@ -533,6 +533,7 @@ void timeline_delete_all_strips(timeline *tl, int col) {
 
 			tl->strips = realloc(tl->strips, sizeof(timestrip) * --tl->nstrips);
 			s--;
+
 		}
 	}
 
@@ -542,7 +543,6 @@ void timeline_delete_all_strips(timeline *tl, int col) {
 			tl->strips[s].seq->parent = tl->strips[s].col;
 		}
 	}
-
 }
 
 void timeline_clear(timeline *tl) {

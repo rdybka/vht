@@ -47,6 +47,7 @@ class MainWin(Gtk.ApplicationWindow):
         self.last_filename = None
         self.last_filename_naked = None
 
+        # self.set_interactive_debugging(True)
         st = self.get_settings()
         st.set_property("gtk-application-prefer-dark-theme", cfg.dark_theme)
 
@@ -346,40 +347,32 @@ class MainWin(Gtk.ApplicationWindow):
         return True
 
     def gui_del_seq(self, seq_id):
-        print("del_seq", seq_id)
         # open from matrix
         if type(seq_id) is int:
-            if len(mod) > 1:
-                curr = mod.curr_seq
-                if seq_id < curr:
-                    curr -= 1
+            if len(mod) < 2:
+                return
 
-                if seq_id == curr:
-                    self.sequence_view.switch(curr + 1)
-                    mod.curr_seq = curr + 1
+            curr = mod.curr_seq
+            nxt = curr
+            if seq_id <= curr:
+                nxt = max(0, curr - 1)
 
-                # else:
-                #    self.sequence_view.switch(curr + 1)
-                #    curr -= 1
+            for r in range(seq_id, len(mod) - 1):
+                mod.extras[r] = mod.extras[r + 1]
 
-                for r in range(seq_id, len(mod) - 1):
-                    mod.extras[r] = mod.extras[r + 1]
+            del mod.extras[len(mod) - 1]
 
-                del mod.extras[len(mod) - 1]
+            for strp in mod.timeline.strips:
+                if strp.col == seq_id:
+                    k = strp.seq.index
+                    if k in mod.extras:
+                        del mod.extras[k]
 
-                for strp in mod.timeline.strips:
-                    if strp.col == seq_id:
-                        k = strp.seq.index
-                        print(k)
-                        if k in mod.extras:
-                            del mod.extras[k]
-
-                # self.sequence_view.switch(curr)
-                # mod.curr_seq = curr
-                # mod.del_sequence(seq_id)
-                mod.timeline.update()
-                mod.thumbmanager.clear()
-                return True
+            mod.del_sequence(seq_id)
+            mod.timeline.update()
+            mod.thumbmanager.clear()
+            self.sequence_view.switch(nxt)
+            return True
         elif type(seq_id) is tuple:
             # fix extras!!!
             for x in range(seq_id[1], len(mod.timeline.strips) - 1):
