@@ -1,18 +1,18 @@
 - timeline
-    - strip management
-        - length
-        - delete full seq's
     - extend
     - loop
     - scrub
     - feeding
     ? on left
     - global ring
+- transport
+- gui api refactor
+- names into module
 ? sound clicked note
 - pitch repr
 - seq gui callback
 - program change
-    - clear in menu
+    - clear in menu../
     - doubles
     - while paused
 - configuration
@@ -26,7 +26,6 @@
 - undo/redo
 - track colours
 - labels on tooltips
-- transport
 - export
 - console
     - autofill

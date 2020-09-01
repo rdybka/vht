@@ -83,6 +83,7 @@ sequence *timeline_get_prev_seq(timeline *tl, timestrip *tstr);
 sequence *timeline_get_next_seq(timeline *tl, timestrip *tstr);
 
 int timeline_get_strip_for_qb(timeline *tl, int col, int qb);
+int timeline_get_last_strip(timeline *tl, int col, int qb);
 int timeline_get_nstrips(timeline *tl);
 timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end);
 void timeline_del_strip(timeline *tl, int id);

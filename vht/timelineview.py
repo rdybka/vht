@@ -478,18 +478,24 @@ class TimelineView(Gtk.DrawingArea):
                 pr = mod.timeline.strips[self.curr_strip_id].start
                 t = mod.timeline.qb2t(pr)
 
+            if self.resizing:
+                strp = mod.timeline.strips[self.curr_strip_id]
+                pr = strp.start + strp.length
+                t = mod.timeline.qb2t(pr)
+
             lbl = "%d %d:%02d:%02d" % (pr, t // 60, t % 60, (t * 100) % 100)
 
             lblextra = ""
             # lblextra = " %d %d" % (ry, nomorelaby)
 
+            if self.snap_hold:
+                lblextra = lblextra + "snap: %d " % self.snap
+            elif self.zoom_hold:
+                lblextra = lblextra + "zoom: %.3f " % (self.spl * h)
+
             if self.resizing:
                 strp = mod.timeline.strips[self.curr_strip_id]
                 lblextra = lblextra + "length: %d" % (strp.length)
-            elif self.snap_hold:
-                lblextra = lblextra + "snap: %d" % self.snap
-            elif self.zoom_hold:
-                lblextra = lblextra + "zoom: %.3f" % (self.spl * h)
 
             margx = 20
             margy = 7
@@ -574,9 +580,15 @@ class TimelineView(Gtk.DrawingArea):
                     mod.extras[idx][t] = copy.deepcopy(mod.extras[src.index][t])
 
                 self.curr_strip_id = idx[1]
+
                 mod.mainwin.sequence_view.switch(
                     mod.timeline.strips[self.curr_strip_id].seq.index
                 )
+
+                self.moving = True
+                self.move_start_r = mod.timeline.strips[self.curr_strip_id].start
+                self.gest_start_r = self.move_start_r
+                self.move_last_delta = 0
             else:
                 mod.mainwin.sequence_view.switch(
                     mod.timeline.strips[self.curr_strip_id].seq.index
@@ -605,6 +617,9 @@ class TimelineView(Gtk.DrawingArea):
                     mod.extras[idx][t] = copy.deepcopy(mod.extras[seq.index][t])
 
                 self.curr_strip_id = idx[1]
+                self.moving = True
+                self.move_start_r = mod.timeline.strips[self.curr_strip_id].start
+                self.gest_start_r = self.move_start_r
 
         return True
 
@@ -649,11 +664,12 @@ class TimelineView(Gtk.DrawingArea):
             delta = self.pointer_r - self.gest_start_r
             rm = mod.timeline.room_at(strp.col, strp.start, strp.seq.index[1])
             if rm == -1:
-                rm = int(self.resize_start + delta)
+                rm = max(strp.seq.relative_length, int(self.resize_start + delta))
 
             nl = min(
                 rm, max(strp.seq.relative_length, int((self.resize_start + delta)))
             )
+
             strp.length = nl
 
         if self.scrollstart > -1:
@@ -813,15 +829,23 @@ class TimelineView(Gtk.DrawingArea):
 
             self.pointer_r = round((self.pointer_r / self.snap)) * self.snap
 
-        if self.moving and self.curr_strip_id > -1:
-            self.pointer_ry_dest = max(
-                (
-                    mod.timeline.qb2t(mod.timeline.strips[self.curr_strip_id].start)
-                    - mod.timeline.qb2t(self.qb_start)
+        if self.curr_strip_id > -1:
+            strp = mod.timeline.strips[self.curr_strip_id]
+            if self.moving:
+                self.pointer_ry_dest = max(
+                    (mod.timeline.qb2t(strp.start) - mod.timeline.qb2t(self.qb_start))
+                    / self.spl,
+                    0,
                 )
-                / self.spl,
-                0,
-            )
+            elif self.resizing:
+                self.pointer_ry_dest = max(
+                    (
+                        mod.timeline.qb2t(strp.start + strp.length)
+                        - mod.timeline.qb2t(self.qb_start)
+                    )
+                    / self.spl,
+                    0,
+                )
         else:
             self.pointer_ry_dest = max(
                 (mod.timeline.qb2t(self.pointer_r) - mod.timeline.qb2t(self.qb_start))
@@ -830,6 +854,9 @@ class TimelineView(Gtk.DrawingArea):
             )
 
         hint = None
+
+        if self.moving or self.resizing:
+            return
 
         if self.clone_hold and self.curr_strip_id > -1:
             strp = mod.timeline.strips[self.curr_strip_id]

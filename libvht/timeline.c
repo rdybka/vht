@@ -481,6 +481,22 @@ int timeline_get_strip_for_qb(timeline *tl, int col, int qb) {
 	return -1;
 }
 
+int timeline_get_last_strip(timeline *tl, int col, int qb) {
+	int ret = -1;
+	int max_r = -1;
+
+	for (int s = 0; s < tl->nstrips; s++) {
+		if (tl->strips[s].col == col) {
+			if (tl->strips[s].start > max_r && tl->strips[s].start < qb) {
+				max_r = tl->strips[s].start;
+				ret = s;
+			}
+		}
+	}
+
+	return ret;
+}
+
 timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end) {
 	timeline_excl_in(tl);
 

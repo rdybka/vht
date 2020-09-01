@@ -51,6 +51,12 @@ class VHTTimeline:
     def qb2s(self, col, qb):  # strip_id (if any) for given col and qb
         return libcvht.timeline_get_strip_for_qb(self._tl_handle, col, int(qb))
 
+    def last_strip(self, col, qb):  # last strip (if any) for given col and qb
+        if (ls := libcvht.timeline_get_last_strip(self._tl_handle, col, int(qb))) > -1:
+            return self.strips[ls]
+        else:
+            return None
+
     def room_at(self, col, qb, ig=-1):  # nqb free after qb (-1 - unl)
         return libcvht.timeline_get_room(self._tl_handle, col, int(qb), int(ig))
 

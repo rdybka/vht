@@ -652,16 +652,9 @@ class SequenceView(Gtk.Box):
 
     def halve(self):
         ind = self.seq.index
-        tstr = None
-
-        if type(ind) is tuple:
-            tstr = mod.timeline.strips[ind[1]]
 
         TrackView.leave_all()
         self.seq.halve()
-
-        if tstr:
-            tstr.length = tstr.seq.relative_length
 
         self._side_prop.popover.length_adj.set_value(self.seq.length)
         self.recalculate_row_spacing()

@@ -89,20 +89,26 @@ class VHTSequence(Iterable):
         libcvht.sequence_double(self._seq_handle)
 
         if tstr:
-            tstr.length = self.relative_length
-            libcvht.timeline_update(self._mod.timeline._tl_handle)
+            if self.relative_length > tstr.length:
+                tstr.length = self.relative_length
+
+        libcvht.timeline_update(self._mod.timeline._tl_handle)
 
     def halve(self):
-        tstr = None
         ind = self.index
+
+        tstr = None
         if type(ind) is tuple:
             tstr = self._mod.timeline.strips[ind[1]]
+            if tstr.length != tstr.seq.relative_length:
+                tstr = None
 
         libcvht.sequence_halve(self._seq_handle)
 
         if tstr:
             tstr.length = self.relative_length
-            libcvht.timeline_update(self._mod.timeline._tl_handle)
+
+        libcvht.timeline_update(self._mod.timeline._tl_handle)
 
     def swap_track(self, t1, t2):
         libcvht.sequence_swap_track(self._seq_handle, t1, t2)

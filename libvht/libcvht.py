@@ -578,6 +578,9 @@ def timeline_add_strip(tl, col, seq, start, length, rpb_start, rpb_end):
 def timeline_get_strip_for_qb(tl, col, qb):
     return _libcvht.timeline_get_strip_for_qb(tl, col, qb)
 
+def timeline_get_last_strip(tl, col, qb):
+    return _libcvht.timeline_get_last_strip(tl, col, qb)
+
 def timeline_del_strip(tl, id):
     return _libcvht.timeline_del_strip(tl, id)
 

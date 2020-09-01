@@ -8036,6 +8036,44 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_timeline_get_last_strip(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  timeline *arg1 = (timeline *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject *swig_obj[3] ;
+  int result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "timeline_get_last_strip", 3, 3, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_get_last_strip" "', argument " "1"" of type '" "timeline *""'"); 
+  }
+  arg1 = (timeline *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timeline_get_last_strip" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "timeline_get_last_strip" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  result = (int)timeline_get_last_strip(arg1,arg2,arg3);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_timeline_del_strip(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   timeline *arg1 = (timeline *) 0 ;
@@ -8820,6 +8858,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "timeline_get_nstrips", _wrap_timeline_get_nstrips, METH_O, NULL},
 	 { "timeline_add_strip", _wrap_timeline_add_strip, METH_VARARGS, NULL},
 	 { "timeline_get_strip_for_qb", _wrap_timeline_get_strip_for_qb, METH_VARARGS, NULL},
+	 { "timeline_get_last_strip", _wrap_timeline_get_last_strip, METH_VARARGS, NULL},
 	 { "timeline_del_strip", _wrap_timeline_del_strip, METH_VARARGS, NULL},
 	 { "timeline_get_seq", _wrap_timeline_get_seq, METH_VARARGS, NULL},
 	 { "timeline_get_room", _wrap_timeline_get_room, METH_VARARGS, NULL},

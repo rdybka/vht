@@ -229,6 +229,7 @@ extern timestrip *timeline_get_strip(timeline *tl, int n);
 extern int timeline_get_nstrips(timeline *tl);
 extern timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end);
 extern int timeline_get_strip_for_qb(timeline *tl, int col, int qb);
+extern int timeline_get_last_strip(timeline *tl, int col, int qb);
 extern void timeline_del_strip(timeline *tl, int id);
 extern sequence *timeline_get_seq(timeline *tl, int n);
 extern int timeline_get_room(timeline *tl, int col, int qb, int ig);
@@ -248,6 +249,7 @@ extern int timestrip_can_rpb_seq(timeline *tl, timestrip *tstr, int rpb);
 
 extern sequence *timeline_get_prev_seq(timeline *tl, timestrip *tstr);
 extern sequence *timeline_get_next_seq(timeline *tl, timestrip *tstr);
+
 
 extern void timestrip_set_start(timestrip *tstr, int start);
 extern void timestrip_set_length(timestrip *tstr, int length);
