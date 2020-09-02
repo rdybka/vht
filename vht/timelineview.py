@@ -887,9 +887,19 @@ class TimelineView(Gtk.DrawingArea):
                 0,
             )
 
+        if self.expanding:
+            self.pointer_ry_dest = max(
+                (
+                    mod.timeline.qb2t(self.exp_start + self.exp_last_delta)
+                    - mod.timeline.qb2t(self.qb_start)
+                )
+                / self.spl,
+                0,
+            )
+
         hint = None
 
-        if self.moving or self.resizing:
+        if self.moving or self.resizing or self.expanding:
             return
 
         if self.clone_hold and self.curr_strip_id > -1:
