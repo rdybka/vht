@@ -46,7 +46,7 @@ timeline *timeline_new(void) {
 	ntl->time_length = 0.0;
 	ntl->loop_start = ntl->loop_end = -1;
 
-	timeline_update(ntl);
+	timeline_update_inner(ntl);
 	pthread_mutex_init(&ntl->excl, NULL);
 	return(ntl);
 }
@@ -134,12 +134,22 @@ void timeline_update_chunk(timeline *tl, int from, int to) {
 }
 
 void timeline_update(timeline *tl) {
+	timeline_excl_in(tl);
+	timeline_update_inner(tl);
+	timeline_excl_out(tl);
+}
+
+void timeline_update_inner(timeline *tl) {
 	tl->length = 32;
+	tl->ncols = 0;
 
 	for (int s = 0; s < tl->nstrips; s++) {
 		int t = tl->strips[s].start + tl->strips[s].length;
 		if (t > tl->length)
 			tl->length = t;
+
+		if (tl->strips[s].col + 1 > tl->ncols)
+			tl->ncols = tl->strips[s].col + 1;
 	}
 
 	if (!tl->nchanges)
@@ -270,7 +280,7 @@ void timeline_change_del(timeline *tl, int id) {
 
 	tl->changes = realloc(tl->changes, sizeof(timechange) * --tl->nchanges);
 
-	timeline_update(tl);
+	timeline_update_inner(tl);
 	timeline_excl_out(tl);
 }
 
@@ -451,7 +461,7 @@ int timeline_change_set(timeline *tl, long row, float bpm, int linked) {
 
 	tl->changes[r].bpm = bpm;
 	tl->changes[r].linked = linked;
-	timeline_update(tl);
+	timeline_update_inner(tl);
 	timeline_excl_out(tl);
 	return r;
 }
@@ -497,6 +507,38 @@ int timeline_get_last_strip(timeline *tl, int col, int qb) {
 	return ret;
 }
 
+int timeline_get_max_contract(timeline *tl, int qb) {
+	int ret = qb;
+
+	for (int s = 0; s < tl->nstrips; s++) {
+		timestrip *strp = &tl->strips[s];
+
+		if (strp->start < qb && strp->start + strp->length >= qb) // inside a strip!
+			return 0;
+
+		if (strp->start < qb) {
+			if (qb - (strp->start + strp->length) < ret)
+				ret = qb - (strp->start + strp->length);
+		}
+	}
+
+	return ret;
+}
+
+int timeline_expand(timeline *tl, int qb_start, int qb_n) {
+	timeline_excl_in(tl);
+
+	for (int s = 0; s < tl->nstrips; s++) {
+		if (tl->strips[s].start >= qb_start)
+			tl->strips[s].start += qb_n;
+	}
+
+	timeline_update_inner(tl);
+	timeline_excl_out(tl);
+	return 0;
+}
+
+
 timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end) {
 	timeline_excl_in(tl);
 
@@ -519,7 +561,7 @@ timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, i
 	s->seq->playing = 0;
 	s->seq->pos = 0;
 
-	timeline_update(tl);
+	timeline_update_inner(tl);
 	timeline_excl_out(tl);
 	return s;
 }
@@ -583,7 +625,7 @@ void timeline_clear(timeline *tl) {
 	tl->nticks = 0;
 	tl->ticks = NULL;
 
-	timeline_update(tl);
+	timeline_update_inner(tl);
 	timeline_excl_out(tl);
 
 }

@@ -57,6 +57,12 @@ class VHTTimeline:
         else:
             return None
 
+    def max_contract(self, qb):
+        return libcvht.timeline_get_max_contract(self._tl_handle, int(qb))
+
+    def expand(self, qb_start, qb_n):
+        return libcvht.timeline_expand(self._tl_handle, int(qb_start), int(qb_n))
+
     def room_at(self, col, qb, ig=-1):  # nqb free after qb (-1 - unl)
         return libcvht.timeline_get_room(self._tl_handle, col, int(qb), int(ig))
 

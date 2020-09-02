@@ -51,6 +51,7 @@ typedef struct timeline_t {
 	int nchanges;
 	int nstrips;
 	int nticks;
+	int ncols;
 	int length;  // in qbeats
 	double time_length;
 	double pos;  // qb
@@ -64,6 +65,7 @@ timeline *timeline_new(void);
 void timeline_free(timeline *tl);
 void timeline_clear(timeline *tl);
 void timeline_update(timeline *tl);
+void timeline_update_inner(timeline *tl);
 void timeline_advance(timeline *tl, double period);
 long timeline_get_qb(timeline *tl, double t);
 double timeline_get_qb_time(timeline *tl, long row);
@@ -81,6 +83,8 @@ timestrip *timeline_get_strip(timeline *tl, int n);
 sequence *timeline_get_seq(timeline *tl, int n);
 sequence *timeline_get_prev_seq(timeline *tl, timestrip *tstr);
 sequence *timeline_get_next_seq(timeline *tl, timestrip *tstr);
+int timeline_get_max_contract(timeline *tl, int qb);
+int timeline_expand(timeline *tl, int qb_start, int qb_n);
 
 int timeline_get_strip_for_qb(timeline *tl, int col, int qb);
 int timeline_get_last_strip(timeline *tl, int col, int qb);

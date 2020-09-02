@@ -1,6 +1,6 @@
 - timeline
-    - extend
     - loop
+    - bpm
     - scrub
     - feeding
     ? on left
@@ -12,7 +12,7 @@
 - pitch repr
 - seq gui callback
 - program change
-    - clear in menu../
+    - clear in menu
     - doubles
     - while paused
 - configuration
