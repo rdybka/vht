@@ -491,7 +491,7 @@ class TimelineView(Gtk.DrawingArea):
                 pr = strp.start + strp.length
                 t = mod.timeline.qb2t(pr)
 
-            lbl = "%d %d:%02d:%02d" % (pr, t // 60, t % 60, (t * 100) % 100)
+            lbl = "%d %d:%02d:%02d " % (pr, t // 60, t % 60, (t * 100) % 100)
 
             lblextra = ""
             # lblextra = " %d %d" % (ry, nomorelaby)
@@ -503,14 +503,20 @@ class TimelineView(Gtk.DrawingArea):
 
             if self.resizing:
                 strp = mod.timeline.strips[self.curr_strip_id]
-                lblextra = lblextra + "length: %d" % (strp.length)
+                lblextra = lblextra + "length: %d " % (strp.length)
 
             if self.expanding:
-                lblextra = lblextra + "expand: %d" % (self.exp_last_delta)
+                lblextra = lblextra + "expand: %d " % (self.exp_last_delta)
 
             margx = 20
             margy = 7
             *_, txtdy, txtdx, _ = cr.text_extents(lbl)
+            txtw = txtdx
+            *_, txtdx, _ = cr.text_extents(lblextra)
+            txtw = max(txtw, txtdx)
+
+            if h - ry < txtw:
+                margy -= txtw + margy
 
             ty = ry + margy
             tx = w - (tw + margx)
@@ -533,7 +539,7 @@ class TimelineView(Gtk.DrawingArea):
 
             if len(lblextra):
                 ty = ry + margy
-                tx = w - (tw + txtdy + margx + margy)
+                tx = w - (tw + txtdy + (margx * 1.3))
                 cr.save()
                 cr.set_source_rgb(
                     *(col * cfg.intensity_txt_highlight for col in cfg.timeline_colour)
@@ -553,12 +559,16 @@ class TimelineView(Gtk.DrawingArea):
     def on_button_press(self, widget, event):
         self.hint = None
 
-        if self.mouse_in_timeline and event.button == cfg.select_button:
+        if (
+            self.mouse_in_timeline
+            and event.button == cfg.select_button
+            and self.zoom_hold
+        ):
             self.expanding = True
             self.gest_start_r = self.pointer_r
             self.exp_start = self.pointer_r
             self.exp_last_delta = 0
-            self.exp_min = -mod.timeline.max_contract(self.exp_start)
+            self.exp_min = -mod.timeline.expand_start(self.exp_start)
 
         if self.resizing or self.moving:
             return
@@ -676,10 +686,8 @@ class TimelineView(Gtk.DrawingArea):
             xp = max(self.exp_min, self.pointer_r - self.gest_start_r)
             if xp != self.exp_last_delta:
                 mod.timeline.expand(
-                    self.exp_start + self.exp_last_delta, -self.exp_last_delta
+                    self.exp_start + self.exp_last_delta, xp - self.exp_last_delta
                 )
-
-                mod.timeline.expand(self.exp_start, xp)
 
                 self.exp_last_delta = xp
 
@@ -723,6 +731,9 @@ class TimelineView(Gtk.DrawingArea):
         ):
             self.scrollbar_highlight = True
         else:
+            self.scrollbar_highlight = False
+
+        if self.expanding:
             self.scrollbar_highlight = False
 
         self.pointer_xy = (event.x, event.y)
@@ -863,6 +874,12 @@ class TimelineView(Gtk.DrawingArea):
 
             self.pointer_r = round((self.pointer_r / self.snap)) * self.snap
 
+        self.pointer_ry_dest = max(
+            (mod.timeline.qb2t(self.pointer_r) - mod.timeline.qb2t(self.qb_start))
+            / self.spl,
+            0,
+        )
+
         if self.curr_strip_id > -1:
             strp = mod.timeline.strips[self.curr_strip_id]
             if self.moving:
@@ -880,12 +897,6 @@ class TimelineView(Gtk.DrawingArea):
                     / self.spl,
                     0,
                 )
-        else:
-            self.pointer_ry_dest = max(
-                (mod.timeline.qb2t(self.pointer_r) - mod.timeline.qb2t(self.qb_start))
-                / self.spl,
-                0,
-            )
 
         if self.expanding:
             self.pointer_ry_dest = max(

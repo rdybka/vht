@@ -230,7 +230,7 @@ extern int timeline_get_nstrips(timeline *tl);
 extern timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end);
 extern int timeline_get_strip_for_qb(timeline *tl, int col, int qb);
 extern int timeline_get_last_strip(timeline *tl, int col, int qb);
-extern int timeline_get_max_contract(timeline *tl, int qb);
+extern int timeline_expand_start(timeline *tl, int qb_start);
 extern int timeline_expand(timeline *tl, int qb_start, int qb_n);
 
 extern void timeline_del_strip(timeline *tl, int id);

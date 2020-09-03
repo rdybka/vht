@@ -1,14 +1,14 @@
+- extras rethink
 - timeline
-    - justify labels to left id neede
-    - loop
     - bpm
+    - loop(s)
     - scrub
     - feeding
+    - transport
     ? on left
     - global ring
-- transport
-- gui api refactor
-- names into module
+- undo/redo
+- track colours
 ? sound clicked note
 - pitch repr
 - seq gui callback
@@ -23,11 +23,9 @@
     - defaults
     - look
     - midi buttons
-- autoscroll and moving
-- undo/redo
-- track colours
 - labels on tooltips
 - export
+- gui api refactor
 - console
     - autofill
     - click in statusbar

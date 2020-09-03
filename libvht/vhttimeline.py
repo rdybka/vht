@@ -57,8 +57,10 @@ class VHTTimeline:
         else:
             return None
 
-    def max_contract(self, qb):
-        return libcvht.timeline_get_max_contract(self._tl_handle, int(qb))
+    def expand_start(
+        self, qb_start
+    ):  # prepare strips for expanding, returns max retract value
+        return libcvht.timeline_expand_start(self._tl_handle, int(qb_start))
 
     def expand(self, qb_start, qb_n):
         return libcvht.timeline_expand(self._tl_handle, int(qb_start), int(qb_n))

@@ -40,6 +40,7 @@ typedef struct timestrip_t {
 	int length;
 	int rpb_start;
 	int rpb_end;
+	int tag;
 } timestrip;
 
 typedef struct timeline_t {
@@ -83,7 +84,7 @@ timestrip *timeline_get_strip(timeline *tl, int n);
 sequence *timeline_get_seq(timeline *tl, int n);
 sequence *timeline_get_prev_seq(timeline *tl, timestrip *tstr);
 sequence *timeline_get_next_seq(timeline *tl, timestrip *tstr);
-int timeline_get_max_contract(timeline *tl, int qb);
+int timeline_expand_start(timeline *tl, int qb_start);
 int timeline_expand(timeline *tl, int qb_start, int qb_n);
 
 int timeline_get_strip_for_qb(timeline *tl, int col, int qb);

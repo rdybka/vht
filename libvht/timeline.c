@@ -507,29 +507,11 @@ int timeline_get_last_strip(timeline *tl, int col, int qb) {
 	return ret;
 }
 
-int timeline_get_max_contract(timeline *tl, int qb) {
-	int ret = qb;
-
-	for (int s = 0; s < tl->nstrips; s++) {
-		timestrip *strp = &tl->strips[s];
-
-		if (strp->start < qb && strp->start + strp->length >= qb) // inside a strip!
-			return 0;
-
-		if (strp->start < qb) {
-			if (qb - (strp->start + strp->length) < ret)
-				ret = qb - (strp->start + strp->length);
-		}
-	}
-
-	return ret;
-}
-
 int timeline_expand(timeline *tl, int qb_start, int qb_n) {
 	timeline_excl_in(tl);
 
 	for (int s = 0; s < tl->nstrips; s++) {
-		if (tl->strips[s].start >= qb_start)
+		if (tl->strips[s].tag)
 			tl->strips[s].start += qb_n;
 	}
 
@@ -538,6 +520,65 @@ int timeline_expand(timeline *tl, int qb_start, int qb_n) {
 	return 0;
 }
 
+int timeline_expand_start(timeline *tl, int qb) {
+	// retag_all
+	for (int s = 0; s < tl->nstrips; s++) {
+		timestrip *strp = &tl->strips[s];
+		int rlen = sequence_get_relative_length(strp->seq);
+
+		if (strp->start >= qb || \
+		        (strp->start < qb && strp->start + rlen > qb)) {
+			strp->tag = 1;
+		} else {
+			strp->tag = 0;
+		}
+	}
+
+	// figure out max retract value
+	int ret = -1;
+
+	for (int s = 0; s < tl->nstrips; s++) {
+		timestrip *strp = &tl->strips[s];
+
+		if (!strp->tag)
+			continue;
+
+		if (strp->start < qb)
+			qb = strp->start;
+	}
+
+	for (int c = 0; c < tl->ncols; c++) {
+		int top = qb;
+		int bottom = tl->length;
+
+		for (int s = 0; s < tl->nstrips; s++) {
+			timestrip *strp = &tl->strips[s];
+
+			if (c != strp->col)
+				continue;
+
+			if (strp->start < qb) {
+				if (qb - (strp->start + strp->length) < top)
+					top = qb - (strp->start + strp->length);
+			}
+
+			if (strp->start >= qb)
+				if (strp->start - qb < bottom)
+					bottom = strp->start - qb;
+		}
+
+		if (bottom < tl->length) {
+			int gap = top + bottom;
+			if (gap < ret || ret == -1)
+				ret = gap;
+		}
+	}
+
+	if (ret == -1)
+		return 0;
+
+	return ret;
+}
 
 timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end) {
 	timeline_excl_in(tl);
@@ -557,6 +598,7 @@ timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, i
 	s->rpb_start = rpb_start;
 	s->rpb_end = rpb_end;
 	s->col = col;
+	s->tag = 0;
 	s->seq->index = tl->nstrips - 1;
 	s->seq->playing = 0;
 	s->seq->pos = 0;

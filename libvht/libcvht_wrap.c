@@ -8074,7 +8074,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_timeline_get_max_contract(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_timeline_expand_start(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   timeline *arg1 = (timeline *) 0 ;
   int arg2 ;
@@ -8085,18 +8085,18 @@ SWIGINTERN PyObject *_wrap_timeline_get_max_contract(PyObject *SWIGUNUSEDPARM(se
   PyObject *swig_obj[2] ;
   int result;
   
-  if (!SWIG_Python_UnpackTuple(args, "timeline_get_max_contract", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "timeline_expand_start", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_get_max_contract" "', argument " "1"" of type '" "timeline *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_expand_start" "', argument " "1"" of type '" "timeline *""'"); 
   }
   arg1 = (timeline *)(argp1);
   ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timeline_get_max_contract" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timeline_expand_start" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = (int)(val2);
-  result = (int)timeline_get_max_contract(arg1,arg2);
+  result = (int)timeline_expand_start(arg1,arg2);
   resultobj = SWIG_From_int((int)(result));
   return resultobj;
 fail:
@@ -8927,7 +8927,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "timeline_add_strip", _wrap_timeline_add_strip, METH_VARARGS, NULL},
 	 { "timeline_get_strip_for_qb", _wrap_timeline_get_strip_for_qb, METH_VARARGS, NULL},
 	 { "timeline_get_last_strip", _wrap_timeline_get_last_strip, METH_VARARGS, NULL},
-	 { "timeline_get_max_contract", _wrap_timeline_get_max_contract, METH_VARARGS, NULL},
+	 { "timeline_expand_start", _wrap_timeline_expand_start, METH_VARARGS, NULL},
 	 { "timeline_expand", _wrap_timeline_expand, METH_VARARGS, NULL},
 	 { "timeline_del_strip", _wrap_timeline_del_strip, METH_VARARGS, NULL},
 	 { "timeline_get_seq", _wrap_timeline_get_seq, METH_VARARGS, NULL},

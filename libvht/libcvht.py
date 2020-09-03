@@ -581,8 +581,8 @@ def timeline_get_strip_for_qb(tl, col, qb):
 def timeline_get_last_strip(tl, col, qb):
     return _libcvht.timeline_get_last_strip(tl, col, qb)
 
-def timeline_get_max_contract(tl, qb):
-    return _libcvht.timeline_get_max_contract(tl, qb)
+def timeline_expand_start(tl, qb_start):
+    return _libcvht.timeline_expand_start(tl, qb_start)
 
 def timeline_expand(tl, qb_start, qb_n):
     return _libcvht.timeline_expand(tl, qb_start, qb_n)
