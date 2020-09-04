@@ -31,6 +31,7 @@ def pack_seq(seq):
     s["trig"] = [seq.get_trig(0), seq.get_trig(1), seq.get_trig(2)]
     s["playing"] = seq.playing
     s["trk"] = []
+    s["extras"] = seq.extras.jsn
 
     for trk in seq:
         t = {}
@@ -43,6 +44,7 @@ def pack_seq(seq):
         t["program"] = trk.get_program()
         t["qc"] = trk.get_qc()
         t["loop"] = trk.loop
+        t["extras"] = trk.extras.jsn
 
         t["ctrl"] = []
         for cn, ctrl in enumerate(trk.ctrl):
@@ -114,10 +116,9 @@ class VHTModule(Iterable):
 
         self.timeline = VHTTimeline(self)
 
-        # these are ment to fix extras
+        # default values for extras
         self.cb_new_sequence = []  # will be called after new seq with seq_id as param
         self.cb_new_track = []  # will be called after new track with trk_id as param
-        self.cb_post_load = []  # will be called after loading with module_dict
 
     def __del__(self):
         libcvht.module_free(self._mod_handle)
@@ -406,9 +407,6 @@ class VHTModule(Iterable):
                     strp["rpb_end"],
                 )
 
-            for cb in self.cb_post_load:
-                cb(jm)
-
             self.curr_seq = jm["curr_seq"]
             self.midi_synch_ports()
             self.play = p
@@ -426,6 +424,7 @@ class VHTModule(Iterable):
 
         s.length = seq["length"]
         s.rpb = seq["rpb"]
+        s.extras.jsn = seq["extras"]
 
         if "playing" in seq:
             s.playing = seq["playing"]
@@ -449,6 +448,7 @@ class VHTModule(Iterable):
             t.set_qc2(trk["qc"][2], trk["qc"][3])
 
             t.loop = trk["loop"]
+            t.extras.jsn = trk["extras"]
 
             nctrl = 0
             for ctrl in trk["ctrl"]:

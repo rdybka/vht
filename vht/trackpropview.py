@@ -107,7 +107,7 @@ class TrackPropView(Gtk.DrawingArea):
         self._context = cairo.Context(self._surface)
         self._context.set_antialias(cairo.ANTIALIAS_NONE)
         self._context.set_line_width(
-            (mod.extras[self.seq.index][-1]["font_size"] / 6.0) * cfg.seq_line_width
+            (self.seq.extras["font_size"] / 6.0) * cfg.seq_line_width
         )
         self._context.select_font_face(
             cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD
@@ -137,10 +137,6 @@ class TrackPropView(Gtk.DrawingArea):
         ntrk = self.seq.clone_track(trk.trk)
 
         ntrk.playing = 0
-
-        mod.extras[self.seq.index][ntrk.index] = copy.deepcopy(
-            mod.extras[self.seq.index][trk.trk.index]
-        )
 
         t = self.seqview.add_track(ntrk)
         t.show_controllers = trk.show_controllers
@@ -229,7 +225,7 @@ class TrackPropView(Gtk.DrawingArea):
         if self.trk:
             w = self.trkview.width
 
-        self._context.set_font_size(mod.extras[self.seq.index][-1]["font_size"])
+        self._context.set_font_size(self.seq.extras["font_size"])
         cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
         cr.rectangle(0, 0, w, h)
         cr.fill()
@@ -295,9 +291,7 @@ class TrackPropView(Gtk.DrawingArea):
             self.button_rect.y = 0
             self.button_rect.height = height * cfg.seq_spacing * 2
 
-            cr.set_line_width(
-                (mod.extras[self.seq.index][-1]["font_size"] / 6.0) * cfg.seq_line_width
-            )
+            cr.set_line_width((self.seq.extras["font_size"] / 6.0) * cfg.seq_line_width)
             (x, y, width, height, dx, dy) = cr.text_extents("|")
             cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
             cr.set_antialias(cairo.ANTIALIAS_NONE)
@@ -503,7 +497,7 @@ class TrackPropView(Gtk.DrawingArea):
 
         cr.move_to(x, self.txt_height * 0.99 * cfg.seq_spacing)
 
-        trkname = mod.extras[self.seq.index][self.trk.index]["track_name"]
+        trkname = self.trk.extras["track_name"]
         # print(trkname, self.seq.index, self.trk.index)
 
         if trkname:
@@ -543,10 +537,9 @@ class TrackPropView(Gtk.DrawingArea):
                 cr.move_to(c.x_from, self.txt_height * yadj * cfg.seq_spacing)
 
                 ctrllabel = " ctrl %d" % self.trkview.trk.ctrls[c.ctrlnum]
-                if i + 1 in mod.extras[self.seq.index][self.trk.index]["ctrl_names"]:
-                    lbl = mod.extras[self.seq.index][self.trk.index]["ctrl_names"][
-                        i + 1
-                    ]
+
+                if str(i + 1) in self.trk.extras["ctrl_names"]:
+                    lbl = self.trk.extras["ctrl_names"][str(i + 1)]
                     if len(lbl[1].strip()):
                         ctrllabel = "%s" % lbl[1][:12]
 

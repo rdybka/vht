@@ -53,6 +53,7 @@ typedef struct sequence_t {
 	int trg_quantise;
 	pthread_mutex_t *mod_excl;
 	void *clt;
+	char *extras;
 	int playing;
 	int lost;
 	int thumb_dirty;
@@ -96,6 +97,9 @@ void sequence_trigger_play_off(sequence *seq);
 
 void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt);
 char *sequence_get_trig(sequence *seq, int t);
+
+char *sequence_get_extras(sequence *seq);
+void sequence_set_extras(sequence *seq, char *extr);
 
 void seq_mod_excl_in(sequence *seq);
 void seq_mod_excl_out(sequence *seq);

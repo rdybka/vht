@@ -66,6 +66,7 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	trk->qc2_ctrl = -1;
 	trk->qc2_val = -1;
 	trk->qc2_last = -1;
+	trk->extras = NULL;
 
 	pthread_mutex_init(&trk->excl, NULL);
 	pthread_mutex_init(&trk->exclrec, NULL);
@@ -268,6 +269,24 @@ void track_get_ctrl_env(track *trk, int *ret, int l, int c, int n) {
 	pthread_mutex_unlock(&trk->exclctrl);
 }
 
+char *track_get_extras(track *trk) {
+	return trk->extras;
+}
+
+void track_set_extras(track *trk, char *extr) {
+	if (extr == NULL) {
+		free(trk->extras);
+		trk->extras = NULL;
+		return;
+	}
+
+	free(trk->extras);
+	int l = strlen(extr);
+	trk->extras = malloc(l + 1);
+	strcpy(trk->extras, extr);
+}
+
+
 void track_free(track *trk) {
 	track_kill_notes(trk);
 
@@ -285,6 +304,7 @@ void track_free(track *trk) {
 		free(trk->crows[c]);
 	}
 
+	free(trk->extras);
 	free(trk->crows);
 	free(trk->ring);
 	free(trk->rows);
@@ -369,6 +389,8 @@ track *track_clone(track *src) {
 		dst->indicators = src->indicators;
 		dst->playing = src->playing;
 		dst->resync = 1;
+
+		track_set_extras(dst, src->extras);
 	}
 
 	return dst;

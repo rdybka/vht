@@ -70,6 +70,7 @@ sequence *sequence_new(int length) {
 	seq->thumb_last_ring = 0;
 	seq->thumb_length = 0;
 	seq->thumb_panic = 0;
+	seq->extras = NULL;
 	return seq;
 }
 
@@ -111,6 +112,7 @@ sequence *sequence_clone(sequence *seq) {
 	ns->thumb_repr = NULL;
 	ns->thumb_dirty = 1;
 	ns->parent = seq->parent;
+	sequence_set_extras(ns, seq->extras);
 	return ns;
 }
 
@@ -168,6 +170,9 @@ void sequence_free(sequence *seq) {
 
 	if (seq->thumb_repr)
 		free(seq->thumb_repr);
+
+	if (seq->extras)
+		free(seq->extras);
 
 	free(seq);
 }
@@ -659,3 +664,21 @@ int sequence_get_thumb(sequence *seq, int *ret, int l) {
 	memcpy(ret, seq->thumb_repr, l * sizeof(int));
 	return l;
 };
+
+
+char *sequence_get_extras(sequence *seq) {
+	return seq->extras;
+}
+
+void sequence_set_extras(sequence *seq, char *extr) {
+	if (extr == NULL) {
+		free(seq->extras);
+		seq->extras = NULL;
+		return;
+	}
+
+	free(seq->extras);
+	int l = strlen(extr);
+	seq->extras = malloc(l + 1);
+	strcpy(seq->extras, extr);
+}

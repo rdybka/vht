@@ -329,6 +329,12 @@ def sequence_get_thumb_length(seq):
 def sequence_gen_thumb(seq):
     return _libcvht.sequence_gen_thumb(seq)
 
+def sequence_get_extras(seq):
+    return _libcvht.sequence_get_extras(seq)
+
+def sequence_set_extras(seq, extr):
+    return _libcvht.sequence_set_extras(seq, extr)
+
 def track_get_row_ptr(arg1, c, r):
     return _libcvht.track_get_row_ptr(arg1, c, r)
 
@@ -481,6 +487,12 @@ def track_get_dirty(trk):
 
 def track_new(port, channel, len, songlen, ctrlpr):
     return _libcvht.track_new(port, channel, len, songlen, ctrlpr)
+
+def track_get_extras(trk):
+    return _libcvht.track_get_extras(trk)
+
+def track_set_extras(trk, extr):
+    return _libcvht.track_set_extras(trk, extr)
 
 def row_get_type(rw):
     return _libcvht.row_get_type(rw)

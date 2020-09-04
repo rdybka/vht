@@ -357,31 +357,12 @@ class MainWin(Gtk.ApplicationWindow):
             if seq_id <= curr:
                 nxt = max(0, curr - 1)
 
-            for r in range(seq_id, len(mod) - 1):
-                mod.extras[r] = mod.extras[r + 1]
-
-            del mod.extras[len(mod) - 1]
-
-            for strp in mod.timeline.strips:
-                if strp.col == seq_id:
-                    k = strp.seq.index
-                    if k in mod.extras:
-                        del mod.extras[k]
-
             mod.del_sequence(seq_id)
             mod.timeline.update()
             mod.thumbmanager.clear()
             self.sequence_view.switch(nxt)
             return True
         elif type(seq_id) is tuple:
-            # fix extras!!!
-            for x in range(seq_id[1], len(mod.timeline.strips) - 1):
-                src = (0, x + 1)
-                if src in mod.extras:
-                    mod.extras[(0, x)] = mod.extras[src]
-
-            del mod.extras[(0, len(mod.timeline.strips) - 1)]
-
             curr = mod.curr_seq
             if type(curr) is tuple:
                 if curr[1] == seq_id[1]:

@@ -31,7 +31,6 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gdk, Gtk
 
-#  --- not in production
 # import inspect
 
 
@@ -137,21 +136,16 @@ class TrackView(Gtk.DrawingArea):
         self.show_pitchwheel = False
         self.show_controllers = False
 
+        self.extras = None
+
         if trk:
+            self.extras = trk.extras
             self.undo_buff = TrackUndoBuffer(trk)
 
-            self.show_timeshift = mod.extras[self.parent.seq.index][self.trk.index][
-                "track_show_timeshift"
-            ]
-            self.show_pitchwheel = mod.extras[self.parent.seq.index][self.trk.index][
-                "track_show_pitchwheel"
-            ]
-            self.show_controllers = mod.extras[self.parent.seq.index][self.trk.index][
-                "track_show_controllers"
-            ]
-            self.show_notes = mod.extras[self.parent.seq.index][self.trk.index][
-                "track_show_notes"
-            ]
+            self.show_timeshift = self.extras["track_show_timeshift"]
+            self.show_pitchwheel = self.extras["track_show_pitchwheel"]
+            self.show_controllers = self.extras["track_show_controllers"]
+            self.show_notes = self.extras["track_show_notes"]
 
         self._surface = None
         self._context = None
@@ -204,17 +198,13 @@ class TrackView(Gtk.DrawingArea):
                         self.controller_editors.append(ControllerEditor(self, cn))
                         # we could be called on the fly while recording so let's
                         # check the extras for new ctrls
-                        if (
-                            cn
-                            not in mod.extras[self.parent.seq.index][self.trk.index][
-                                "ctrl_names"
-                            ]
-                        ):
+                        if cn not in self.extras["ctrl_names"]:
                             n = mod.ctrls[cfg.default_ctrl_name]
                             if ctrl in n:
-                                mod.extras[self.parent.seq.index][self.trk.index][
-                                    "ctrl_names"
-                                ][cn] = (cfg.default_ctrl_name, n[ctrl])
+                                self.extras["ctrl_names"][cn] = (
+                                    cfg.default_ctrl_name,
+                                    n[ctrl],
+                                )
 
         self._back_context.select_font_face(
             cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD

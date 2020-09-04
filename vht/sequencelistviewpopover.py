@@ -156,7 +156,7 @@ class SequenceListViewPopover(Gtk.Popover):
     def refresh(self):
         self.get_window().freeze_updates()
 
-        self._entry.set_text(mod.extras[self.curr][-1]["sequence_name"])
+        self._entry.set_text(mod[self.curr].extras["sequence_name"])
 
         if len(mod) == 1:
             self._del_button.set_sensitive(False)
@@ -182,7 +182,7 @@ class SequenceListViewPopover(Gtk.Popover):
         if self.curr == -1:
             return
 
-        mod.extras[self.curr][-1]["sequence_name"] = wdg.get_text()
+        mod[self.curr].extras["sequence_name"] = wdg.get_text()
         self._parent.redraw()
 
     def on_remove_button_clicked(self, wdg):
@@ -197,10 +197,6 @@ class SequenceListViewPopover(Gtk.Popover):
     def on_clone_button_clicked(self, wdg):
         idx = mod.clone_sequence(self.curr).index
 
-        mod.extras[idx][-1] = copy.deepcopy(mod.extras[self.curr][-1])
-        mod.extras[idx][-1]["sequence_name"] = extras.get_name(
-            mod.extras[self.curr][-1]["sequence_name"]
+        mod[idx].extras["sequence_name"] = extras.get_name(
+            mod[self.curr].extras["sequence_name"]
         )
-
-        for t in range(len(mod[idx])):
-            mod.extras[idx][t] = copy.deepcopy(mod.extras[self.curr][t])

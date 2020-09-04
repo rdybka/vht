@@ -207,7 +207,7 @@ class SequenceTriggersView(Gtk.Grid):
                 mod[self.seq].get_trig(2)
             )
 
-            ms = mod.extras[self.seq][-1]["mouse_cfg"]
+            ms = mod[self.seq].extras["mouse_cfg"]
             l = ["   ", " l ", " m ", " r "]
             self._mmute.set_text(l[ms[0]])
             self._mcue.set_text(l[ms[1]])
@@ -217,14 +217,15 @@ class SequenceTriggersView(Gtk.Grid):
     def on_mouse_cfg_clicked(self, wdg, evt, d):
         if evt.button < 2:
             return
-
-        ms = mod.extras[self.seq][-1]["mouse_cfg"]
+        x = mod[self.seq].extras
+        ms = x["mouse_cfg"]
 
         for b in range(len(ms)):
             if ms[b] == evt.button:
                 ms[b] = 0
 
         ms[d] = evt.button
+        x["mouse_cfg"] = ms
         self.refresh()
 
     def on_butt_in(self, wdg, sign, i):

@@ -86,6 +86,7 @@ typedef struct track_t {
 	pthread_mutex_t *mod_excl;
 
 	void *clt;
+	char *extras; // for gui settings
 	int indicators;
 	int dirty; // for thumbnail
 } track;
@@ -137,4 +138,8 @@ int track_get_loop(track *trk);
 
 void track_set_qc1(track *trk, int ctrl, int val);
 void track_set_qc2(track *trk, int ctrl, int val);
+
+char *track_get_extras(track *trk);
+void track_set_extras(track *trk, char *extr);
+
 #endif //__TRACK_H__

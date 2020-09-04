@@ -17,6 +17,7 @@
 
 from collections.abc import Iterable
 from libvht.vhttrack import VHTTrack
+from libvht.vhtextras import VHTExtras
 from libvht import libcvht
 
 
@@ -26,6 +27,7 @@ class VHTSequence(Iterable):
         self._mod = mod
         self._seq_handle = seq
         self.cb_new_track = cb_new_track
+        self._extras = None
 
     def __len__(self):
         return libcvht.sequence_get_ntrk(self._seq_handle)
@@ -38,6 +40,9 @@ class VHTSequence(Iterable):
             yield VHTTrack(libcvht.sequence_get_trk(self._seq_handle, itm))
 
     def __eq__(self, other):
+        if type(other) is not VHTSequence:
+            return False
+
         h1 = int(self._seq_handle)
         h2 = int(other._seq_handle)
         if h1 == h2:
@@ -69,8 +74,8 @@ class VHTSequence(Iterable):
             cb(self.index, libcvht.track_get_index(trk))
         return self[self.__len__() - 1]
 
-    def clone_track(self, trk, dest=-1):
-        if dest == -1:
+    def clone_track(self, trk, dest=None):
+        if dest == None:
             dest = self
         ntrk = libcvht.sequence_clone_track(dest._seq_handle, trk._trk_handle)
         # libcvht.track_set_playing(ntrk, 0)
@@ -224,6 +229,18 @@ class VHTSequence(Iterable):
     @trg_quantise.setter
     def trg_quantise(self, value):
         libcvht.sequence_set_trg_quantise(self._seq_handle, value)
+
+    @property
+    def extras(self):
+        if not self._extras:
+            self._extras = VHTExtras(self._get_extras, self._set_extras)
+        return self._extras
+
+    def _set_extras(self, value):
+        libcvht.sequence_set_extras(self._seq_handle, value)
+
+    def _get_extras(self):
+        return libcvht.sequence_get_extras(self._seq_handle)
 
     def get_trig(self, t):
         return eval(libcvht.sequence_get_trig(self._seq_handle, t))

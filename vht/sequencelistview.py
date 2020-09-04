@@ -99,7 +99,6 @@ class SequenceListView(Gtk.DrawingArea):
 
     def swap_seq(self, s0, s1):
         mod.swap_sequence(s0, s1)
-        mod.extras[s0], mod.extras[s1] = mod.extras[s1], mod.extras[s0]
         mod.thumbmanager.swap(s0, s1)
 
         old = s0
@@ -193,7 +192,7 @@ class SequenceListView(Gtk.DrawingArea):
 
             return True
 
-        ms = mod.extras[curr][-1]["mouse_cfg"]
+        ms = mod[curr].extras["mouse_cfg"]
 
         if event.button == ms[0]:
             mod[curr].trigger_mute()
@@ -212,7 +211,8 @@ class SequenceListView(Gtk.DrawingArea):
             self._drag = False
             return True
 
-        ms = mod.extras[mod.curr_seq][-1]["mouse_cfg"]
+        ms = mod[mod.curr_seq].extras["mouse_cfg"]
+
         if event.button == ms[2]:
             if self._lplay_triggered > -1:
                 mod[self._lplay_triggered].trigger_play_off()
@@ -369,8 +369,7 @@ class SequenceListView(Gtk.DrawingArea):
             cr.move_to(x + 2, (self._txt_height * 0.3) + 2)
             cr.rotate(math.pi / 2.0)
 
-            if r in mod.extras:
-                cr.show_text(mod.extras[r][-1]["sequence_name"])
+            cr.show_text(mod[r].extras["sequence_name"])
 
             cr.restore()
 
@@ -384,8 +383,7 @@ class SequenceListView(Gtk.DrawingArea):
             cr.move_to(x, self._txt_height * 0.3)
             cr.rotate(math.pi / 2.0)
 
-            if r in mod.extras:
-                cr.show_text(mod.extras[r][-1]["sequence_name"])
+            cr.show_text(mod[r].extras["sequence_name"])
 
             cr.restore()
 

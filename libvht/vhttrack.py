@@ -19,6 +19,7 @@ from collections.abc import Iterable
 from libvht.vhtcolumn import VHTColumn
 from libvht.vhtctrllist import VHTCtrlList
 from libvht.vhtquicklist import VHTQuickList
+from libvht.vhtextras import VHTExtras
 from libvht import libcvht
 
 
@@ -26,6 +27,7 @@ class VHTTrack(Iterable):
     def __init__(self, trk):
         super(VHTTrack, self).__init__()
         self._trk_handle = trk
+        self._extras = None
 
     def __len__(self):
         return libcvht.track_get_ncols(self._trk_handle)
@@ -164,6 +166,18 @@ class VHTTrack(Iterable):
     @loop.setter
     def loop(self, value):
         libcvht.track_set_loop(self._trk_handle, value)
+
+    @property
+    def extras(self):
+        if not self._extras:
+            self._extras = VHTExtras(self._get_extras, self._set_extras)
+        return self._extras
+
+    def _set_extras(self, value):
+        libcvht.track_set_extras(self._trk_handle, value)
+
+    def _get_extras(self):
+        return libcvht.track_get_extras(self._trk_handle)
 
     def send_program_change(self, prog):
         libcvht.track_set_program(self._trk_handle, prog)

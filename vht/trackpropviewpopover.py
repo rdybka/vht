@@ -43,6 +43,7 @@ class TrackPropViewPopover(Gtk.Popover):
 
         self.parent = parent
         self.trk = trk
+        self.extras = trk.extras
         self.trkview = parent.trkview
         self.grid = Gtk.Grid()
         self.grid.set_column_spacing(3)
@@ -202,38 +203,24 @@ class TrackPropViewPopover(Gtk.Popover):
         self.name_lab = Gtk.ToggleButton.new_with_label("name:")
         self.name_lab.set_vexpand(True)
 
-        self.name_lab.set_active(
-            mod.extras[self.parent.seq.index][self.trk.index]["track_keep_name"]
-        )
+        self.name_lab.set_active(self.extras["track_keep_name"])
 
         self.name_lab.connect("toggled", self.on_keep_name_toggled)
 
         grid.attach(self.name_lab, 0, 4, 1, 1)
         grid.attach(self.name_entry, 1, 4, 4, 1)
 
-        self.name_entry.set_text(
-            mod.extras[parent.seq.index][self.trk.index]["track_name"]
-        )
+        self.name_entry.set_text(self.extras["track_name"])
 
-        self.show_timeshift_button.set_active(
-            mod.extras[self.parent.seq.index][self.trk.index]["track_show_timeshift"]
-        )
+        self.show_timeshift_button.set_active(self.extras["track_show_timeshift"])
 
-        self.show_pitchwheel_button.set_active(
-            mod.extras[self.parent.seq.index][self.trk.index]["track_show_pitchwheel"]
-        )
-        self.show_controllers_button.set_active(
-            mod.extras[self.parent.seq.index][self.trk.index]["track_show_controllers"]
-        )
-        self.show_notes_button.set_active(
-            mod.extras[self.parent.seq.index][self.trk.index]["track_show_notes"]
-        )
+        self.show_pitchwheel_button.set_active(self.extras["track_show_pitchwheel"])
+        self.show_controllers_button.set_active(self.extras["track_show_controllers"])
+        self.show_notes_button.set_active(self.extras["track_show_notes"])
 
         lab = Gtk.Button.new_with_label("patch:")
         lab.connect("button-press-event", self.on_resend_patch_clicked, 0)
-        self.show_timeshift_button.set_active(
-            mod.extras[self.parent.seq.index][self.trk.index]["track_show_timeshift"]
-        )
+        self.show_timeshift_button.set_active(self.extras["track_show_timeshift"])
 
         grid.attach(lab, 0, 3, 1, 1)
 
@@ -448,7 +435,7 @@ class TrackPropViewPopover(Gtk.Popover):
 
         for s in range(len(mod)):
             if s != mod.curr_seq:
-                mitm = Gtk.MenuItem(mod.extras[s][-1]["sequence_name"])
+                mitm = Gtk.MenuItem(mod[s].extras["sequence_name"])
                 mitm.seq = int(s)
                 mitm.connect("activate", self.on_clone_menu_item_activate)
                 mitm.show()
@@ -473,20 +460,18 @@ class TrackPropViewPopover(Gtk.Popover):
         if itm.seq == -23:
             mod.add_sequence(mod[mod.curr_seq].length)
             seq = len(mod) - 1
-            mod.extras[seq][-1]["font_size"] = mod.extras[self.parent.seq.index][-1][
+            mod[seq].extras["font_size"] = mod[self.parent.seq.index].extras[
                 "font_size"
             ]
 
         trk = self.parent.seq.clone_track(self.trkview.trk, mod[seq])
-        mod.extras[seq][trk.index] = copy.deepcopy(
-            mod.extras[self.parent.seq.index][self.trk.index]
-        )
+
         self.build_clone_menu()
 
     def on_patch_menu_item_activate(self, itm):
         self.trk.set_bank(*itm.patch[0][:2])
 
-        mod.extras[self.parent.seq.index][self.trk.index]["last_patch_file"] = itm.name
+        self.extras["last_patch_file"] = itm.name
         self.patch_adj.set_value(itm.patch[0][2])
 
         b = self.trk.get_program()
@@ -591,8 +576,8 @@ class TrackPropViewPopover(Gtk.Popover):
         curr = self.trk.get_program()
         self.name_entry.set_text("")
         # figure out the name
-        if "last_patch_file" in mod.extras[self.parent.seq.index][self.trk.index]:
-            n = mod.extras[self.parent.seq.index][self.trk.index]["last_patch_file"]
+        if "last_patch_file" in self.extras:
+            n = self.extras["last_patch_file"]
             if n in mod.bank:
                 pf = mod.bank[n]
                 for p in pf:
@@ -619,9 +604,7 @@ class TrackPropViewPopover(Gtk.Popover):
         self.parent.redraw()
 
     def on_show_notes_toggled(self, wdg):
-        mod.extras[self.parent.seq.index][self.trk.index][
-            "track_show_notes"
-        ] = wdg.get_active()
+        self.extras["track_show_notes"] = wdg.get_active()
         if self.trkview.show_notes != wdg.get_active():
             self.trkview.toggle_notes()
 
@@ -632,28 +615,22 @@ class TrackPropViewPopover(Gtk.Popover):
             self.show_controllers_button.set_sensitive(False)
 
     def on_keep_name_toggled(self, wdg):
-        mod.extras[self.parent.seq.index][self.trk.index][
-            "track_keep_name"
-        ] = wdg.get_active()
+        self.extras["track_keep_name"] = wdg.get_active()
 
     def on_name_changed(self, wdg):
-        mod.extras[self.parent.seq.index][self.trk.index]["track_name"] = wdg.get_text()
+        self.extras["track_name"] = wdg.get_text()
         if self.parent.get_realized():
             self.parent.redraw()
 
     def on_show_timeshift_toggled(self, wdg):
-        mod.extras[self.parent.seq.index][self.trk.index][
-            "track_show_timeshift"
-        ] = wdg.get_active()
+        self.extras["track_show_timeshift"] = wdg.get_active()
         self.trkview.show_timeshift = wdg.get_active()
         if self.parent.popped:
             self.trkview.redraw_full()
             self.parent.redraw()
 
     def on_show_pitchwheel_toggled(self, wdg):
-        mod.extras[self.parent.seq.index][self.trk.index][
-            "track_show_pitchwheel"
-        ] = wdg.get_active()
+        self.extras["track_show_pitchwheel"] = wdg.get_active()
         if self.trkview.show_pitchwheel != wdg.get_active():
             self.trkview.toggle_pitch()
 
@@ -662,9 +639,7 @@ class TrackPropViewPopover(Gtk.Popover):
             self.parent.redraw()
 
     def on_show_controllers_toggled(self, wdg):
-        mod.extras[self.parent.seq.index][self.trk.index][
-            "track_show_controllers"
-        ] = wdg.get_active()
+        self.extras["track_show_controllers"] = wdg.get_active()
         if wdg.get_active():
             if self.trk.nctrl > 1:
                 self.show_notes_button.set_sensitive(True)

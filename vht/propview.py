@@ -80,14 +80,6 @@ class PropView(Gtk.ScrolledWindow):
         wdg = self.seqview._track_box.get_children()[trk.index]
         self.seqview._track_box.reorder_child(wdg, (trk.index) + offs)
 
-        (
-            mod.extras[self.seq.index][trk.index],
-            mod.extras[self.seq.index][trk.index + offs],
-        ) = (
-            mod.extras[self.seq.index][trk.index + offs],
-            mod.extras[self.seq.index][trk.index],
-        )
-
         self.seq.swap_track(trk.index, trk.index + offs)
 
     def move_left(self, trk):

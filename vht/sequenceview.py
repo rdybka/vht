@@ -57,10 +57,10 @@ class SequenceView(Gtk.Box):
         self.add_tick_callback(self.tick)
 
         self.seq = seq
+
         mod.curr_seq = seq.index
         self.font_size = cfg.seq_font_size
-        if seq.index in mod.extras:
-            self.font_size = mod.extras[seq.index][-1]["font_size"]
+        self.font_size = self.seq.extras["font_size"]
 
         self.last_count = len(seq)
 
@@ -218,7 +218,7 @@ class SequenceView(Gtk.Box):
         if 65465 >= event.keyval >= 65456:
             sid = event.keyval - 65456
             if sid < len(mod):
-                ms = mod.extras[sid][-1]["mouse_cfg"]
+                ms = mod[sid].extras["mouse_cfg"]
 
                 if ms[0] == 3:
                     mod[sid].trigger_mute()
@@ -282,12 +282,9 @@ class SequenceView(Gtk.Box):
 
         if cfg.key["sequence_clone"].matches(event):
             idx = mod.clone_sequence(mod.curr_seq).index
-            mod.extras[idx][-1] = copy.deepcopy(mod.extras[mod.curr_seq][-1])
-            mod.extras[idx][-1]["sequence_name"] = extras.get_name(
-                mod.extras[mod.curr_seq][-1]["sequence_name"]
+            self.seq.extras["sequence_name"] = extras.get_name(
+                self.seq.extras["sequence_name"]
             )
-            for t in range(len(mod[idx])):
-                mod.extras[idx][t] = copy.deepcopy(mod.extras[mod.curr_seq][t])
 
             self.switch(idx)
             mod.curr_seq = idx
@@ -550,7 +547,7 @@ class SequenceView(Gtk.Box):
         if 65465 >= event.keyval >= 65456:
             sid = event.keyval - 65456
             if sid < len(mod):
-                ms = mod.extras[sid][-1]["mouse_cfg"]
+                ms = mod[sid].extras["mouse_cfg"]
 
                 if ms[2] == 3:
                     mod[sid].trigger_play_off()
@@ -569,7 +566,7 @@ class SequenceView(Gtk.Box):
     def zoom(self, i):
         self.font_size += i
 
-        mod.extras[self.seq.index][-1]["font_size"] = self.font_size
+        self.seq.extras["font_size"] = self.font_size
         if self.font_size < 1:
             self.font_size = 1
 
@@ -683,12 +680,6 @@ class SequenceView(Gtk.Box):
             if mod.active_track.edit:
                 restore_edit = mod.active_track.edit
 
-        del mod.extras[self.seq.index][trk.index]
-        for i in sorted(mod.extras[self.seq.index]):
-            if i > trk.index:
-                mod.extras[self.seq.index][i - 1] = mod.extras[self.seq.index][i]
-                del mod.extras[self.seq.index][i]
-
         TrackView.leave_all()
         mod.active_track = None
         self.prop_view.del_track(trk, dest=True)
@@ -764,8 +755,7 @@ class SequenceView(Gtk.Box):
         if quick:
             self.get_window().freeze_updates()
 
-        if self.seq.index in mod.extras:
-            self.highlight = self.seq.rpb
+        self.highlight = self.seq.rpb
         self.prop_view.seq = self.seq
         self._side_prop.seq = self.seq
         self._side_prop.popover.seq = self.seq
@@ -801,7 +791,7 @@ class SequenceView(Gtk.Box):
 
         if mod.load(filename):
             self.seq = mod[mod.curr_seq]
-            self.font_size = mod.extras[mod.curr_seq][-1]["font_size"]
+            self.font_size = self.seq.extras["font_size"]
 
             if "timeline_win_pos" in mod.extras:
                 mod.mainwin.hbox.set_position(
@@ -844,7 +834,7 @@ class SequenceView(Gtk.Box):
             self.clear()
             self.seq = ns
             mod.curr_seq = ns.index
-            self.font_size = mod.extras[ns.index][-1]["font_size"]
+            self.font_size = self.seq.extras["font_size"]
             self.build(quick=False)
             mod.curr_seq = self.seq.index
 

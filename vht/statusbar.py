@@ -102,6 +102,7 @@ class StatusBar(Gtk.DrawingArea):
         r = 0
         c = 0
         cs = mod.curr_seq
+        seq = mod[cs]
 
         self.pos = []
 
@@ -201,7 +202,7 @@ class StatusBar(Gtk.DrawingArea):
         else:
             cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
-        txt = " rpb:%d" % mod[cs].rpb
+        txt = " rpb:%d" % seq.rpb
         *_, dx, _ = cr.text_extents(txt)
         cr.move_to(self.pos[-1], h)
         cr.show_text(txt)
@@ -233,8 +234,8 @@ class StatusBar(Gtk.DrawingArea):
 
         txt = "%02d:%03d.%03d ***" % (
             cid,
-            int(mod[cs].pos),
-            (mod[cs].pos - int(mod[cs].pos)) * 1000,
+            int(seq.pos),
+            (seq.pos - int(seq.pos)) * 1000,
         )
 
         *_, dx, _ = cr.text_extents(txt)

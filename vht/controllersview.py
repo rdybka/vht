@@ -34,6 +34,7 @@ class ControllersView(Gtk.Box):
 
         self.parent = parent
         self.trk = trk
+        self.extras = trk.extras
         self.trkview = trkview
         self.capturing = False
 
@@ -79,9 +80,7 @@ class ControllersView(Gtk.Box):
 
         self.last_ctrl = cfg.default_ctrl_name
 
-        self.ctrl_names = mod.extras[parent.parent.seq.index][self.trk.index][
-            "ctrl_names"
-        ]
+        self.ctrl_names = self.extras["ctrl_names"]
 
         self.new_ctrl_menu = Gtk.Menu()
         i = 0
@@ -152,9 +151,6 @@ class ControllersView(Gtk.Box):
     def rebuild(self, just_gui=False):
         reuse = False
 
-        if self.ctrl_names == None:
-            self.ctrl_names = {}
-
         if len(self.box.get_children()) == self.trk.nctrl - 1:
             reuse = True
 
@@ -165,10 +161,10 @@ class ControllersView(Gtk.Box):
         for i, c in enumerate(self.trk.ctrls):
             if c != -1:
                 parn = ("", "")
-                if i in self.ctrl_names:
-                    parn = self.ctrl_names[i]
+                if str(i) in self.ctrl_names:
+                    parn = self.ctrl_names[str(i)]
                 else:
-                    self.ctrl_names[i] = parn
+                    self.ctrl_names[str(i)] = parn
 
                 if not reuse:
                     rw = ControllersViewRow(self, self.trk, c, i, parn[0], parn[1])
@@ -176,8 +172,8 @@ class ControllersView(Gtk.Box):
                 else:
                     rw = self.box.get_children()[i - 1]
                     rw.ctrlnum = c
-                    rw.parn = self.ctrl_names[i][0]
-                    name = self.ctrl_names[i][1]
+                    rw.parn = self.ctrl_names[str(i)][0]
+                    name = self.ctrl_names[str(i)][1]
                     rw.ctrl_adj.set_value(self.trk.ctrl[i].ctrlnum)
                     rw.entry.set_text(name)
 
@@ -201,13 +197,16 @@ class ControllersView(Gtk.Box):
 
     def on_add_clicked(self, wdg):
         self.trk.ctrl.add(int(self.new_ctrl_adj.get_value()))
+        self.ctrl_names[str(self.trk.nctrl - 1)] = (
+            self.last_ctrl,
+            self.new_ctrl_entry.get_text(),
+        )
+
+        self.trk.extras["ctrl_names"] = self.ctrl_names
+
         self.trkview.controller_editors.append(
             ControllerEditor(self.trkview, len(self.trk.ctrl) - 1)
         )
 
-        self.ctrl_names[self.trk.nctrl - 1] = (
-            self.last_ctrl,
-            self.new_ctrl_entry.get_text(),
-        )
         self.trkview.show_controllers = True
         self.rebuild()

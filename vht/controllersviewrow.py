@@ -78,7 +78,8 @@ class ControllersViewRow(Gtk.ActionBar):
             cc.undo_buff._ctrlnum = c + 1
 
     def on_name_changed(self, wdg):
-        self.parent.ctrl_names[self.index] = self.parn, self.entry.get_text()
+        self.parent.ctrl_names[str(self.index)] = self.parn, self.entry.get_text()
+        self.parent.trk.extras["ctrl_names"] = self.parent.ctrl_names
         self.parent.parent.parent.redraw()
 
     def on_del_clicked(self, wdg):
@@ -105,11 +106,11 @@ class ControllersViewRow(Gtk.ActionBar):
             )
 
             (
-                self.parent.ctrl_names[self.index],
-                self.parent.ctrl_names[self.index - 1],
+                self.parent.ctrl_names[str(self.index)],
+                self.parent.ctrl_names[str(self.index - 1)],
             ) = (
-                self.parent.ctrl_names[self.index - 1],
-                self.parent.ctrl_names[self.index],
+                self.parent.ctrl_names[str(self.index - 1)],
+                self.parent.ctrl_names[str(self.index)],
             )
 
             self.trk.ctrl.swap(self.index, self.index - 1)
@@ -128,11 +129,11 @@ class ControllersViewRow(Gtk.ActionBar):
             )
 
             (
-                self.parent.ctrl_names[self.index],
-                self.parent.ctrl_names[self.index + 1],
+                self.parent.ctrl_names[str(self.index)],
+                self.parent.ctrl_names[str(self.index + 1)],
             ) = (
-                self.parent.ctrl_names[self.index + 1],
-                self.parent.ctrl_names[self.index],
+                self.parent.ctrl_names[str(self.index + 1)],
+                self.parent.ctrl_names[str(self.index)],
             )
 
             self.trk.ctrl.swap(self.index, self.index + 1)
@@ -150,7 +151,8 @@ class ControllersViewRow(Gtk.ActionBar):
         else:
             self.entry.set_text("")
 
-        self.parent.ctrl_names[self.index] = (self.parn, self.entry.get_text())
+        self.parent.ctrl_names[str(self.index)] = (self.parn, self.entry.get_text())
+        self.parent.trk.extras["ctrl_names"] = self.parent.ctrl_names
         self.trk.ctrl[self.index].ctrlnum = self.ctrlnum
         self.parent.trkview.controller_editors[
             self.index - 1

@@ -17,10 +17,10 @@
 
 from collections.abc import Iterable
 
-# a quick and dirty wrapper for the c int_array
-
 
 class VHTQuickList(Iterable):
+    """a quick and dirty wrapper for the c int_array"""
+
     def __init__(self, i, l):
         super(VHTQuickList, self).__init__()
         self._i = i

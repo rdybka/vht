@@ -126,6 +126,9 @@ extern int sequence_get_thumb_dirty(sequence *seq);
 extern int sequence_get_thumb_length(sequence *seq);
 extern int sequence_gen_thumb(sequence *seq);
 
+extern char *sequence_get_extras(sequence *seq);
+extern void sequence_set_extras(sequence *seq, char *extr);
+
 // track
 extern row *track_get_row_ptr(track *, int c, int r);
 extern ctrlrow *track_get_ctrlrow_ptr(track *, int c, int r);
@@ -186,6 +189,8 @@ extern void track_set_dirty(track *trk, int d);
 extern int track_get_dirty(track *trk);
 extern track *track_new(int port, int channel, int len, int songlen, int ctrlpr);
 
+extern char *track_get_extras(track *trk);
+extern void track_set_extras(track *trk, char *extr);
 // row
 extern int row_get_type(row *rw);
 extern int row_get_note(row *rw);

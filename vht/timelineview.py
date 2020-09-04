@@ -601,11 +601,6 @@ class TimelineView(Gtk.DrawingArea):
                 idx = seq.index
 
                 extras.fix_extras_new_seq(idx)
-                mod.extras[idx][-1] = copy.deepcopy(mod.extras[src.index][-1])
-
-                for t in range(len(seq)):
-                    extras.fix_extras_new_trk(idx, t)
-                    mod.extras[idx][t] = copy.deepcopy(mod.extras[src.index][t])
 
                 self.curr_strip_id = idx[1]
 
@@ -638,11 +633,6 @@ class TimelineView(Gtk.DrawingArea):
                 ).seq.index
 
                 extras.fix_extras_new_seq(idx)
-                mod.extras[idx][-1] = copy.deepcopy(mod.extras[self.curr_col][-1])
-
-                for t in range(len(mod[seq.index])):
-                    extras.fix_extras_new_trk(idx, t)
-                    mod.extras[idx][t] = copy.deepcopy(mod.extras[seq.index][t])
 
                 self.curr_strip_id = idx[1]
                 self.moving = True

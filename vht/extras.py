@@ -19,17 +19,17 @@ from vht import mod, cfg
 
 
 def fix_extras_new_trk(s, t):
-    if t in mod.extras[s]:
+    x = mod[s][t].extras
+    if len(x):
         return
 
-    mod.extras[s][t] = {}
-    mod.extras[s][t]["track_name"] = ""
-    mod.extras[s][t]["track_keep_name"] = False
-    mod.extras[s][t]["ctrl_names"] = {}
-    mod.extras[s][t]["track_show_notes"] = True
-    mod.extras[s][t]["track_show_timeshift"] = False
-    mod.extras[s][t]["track_show_pitchwheel"] = False
-    mod.extras[s][t]["track_show_controllers"] = False
+    x["track_name"] = ""
+    x["track_keep_name"] = False
+    x["ctrl_names"] = {}
+    x["track_show_notes"] = True
+    x["track_show_timeshift"] = False
+    x["track_show_pitchwheel"] = False
+    x["track_show_controllers"] = False
 
 
 def get_name(n):
@@ -37,44 +37,27 @@ def get_name(n):
     valid = False
     while not valid:
         valid = True
-        for rr in mod.extras.values():
-            if type(rr) is not dict:
-                continue
-
-            if rr[-1]["sequence_name"] == nm:
+        for s in mod:
+            if s.extras["sequence_name"] == nm:
                 nm = nm + "_"
                 valid = False
     return nm
 
 
 def fix_extras_new_seq(s):
-    if s in mod.extras:
+    x = mod[s].extras
+    if len(x):
         return
 
-    mod.extras[s] = {}
-    mod.extras[s][-1] = {}
-
-    mod.extras[s][-1]["mouse_cfg"] = [3, 2, 0]
-    mod.extras[s][-1]["sequence_name"] = ""
+    x["mouse_cfg"] = [3, 2, 0]
+    x["sequence_name"] = ""
 
     txt = get_name(cfg.sequence_name_format % (len(mod) - 1))
 
-    mod.extras[s][-1]["sequence_name"] = txt
-    mod.extras[s][-1]["font_size"] = cfg.seq_font_size
-
-
-def fix_extras_post_load(m):
-    x = m["extras"]
-    for s in x:
-        if s in mod.extras:
-            for t in x[s]:
-                if t in mod.extras[s]:
-                    mod.extras[s][t] = {**mod.extras[s][t], **x[s][t]}
-        else:
-            mod.extras[s] = x[s]
+    x["sequence_name"] = txt
+    x["font_size"] = cfg.seq_font_size
 
 
 def register(mod):
     mod.cb_new_sequence = [fix_extras_new_seq]
     mod.cb_new_track = [fix_extras_new_trk]
-    mod.cb_post_load = [fix_extras_post_load]
