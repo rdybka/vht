@@ -54,13 +54,13 @@ class VHTSequence(Iterable):
         if itm >= self.__len__():
             raise IndexError()
 
-        # ~ if itm == -1:
-        # ~ if not len(self):
-        # ~ raise IndexError()
+        if itm < 0:
+            if not len(self) >= -itm:
+                raise IndexError()
 
-        # ~ return VHTTrack(
-        # ~ libcvht.sequence_get_trk(self._seq_handle, self.__len__() - 1)
-        # ~ )
+            return VHTTrack(
+                libcvht.sequence_get_trk(self._seq_handle, self.__len__() + itm)
+            )
 
         return VHTTrack(libcvht.sequence_get_trk(self._seq_handle, itm))
 
