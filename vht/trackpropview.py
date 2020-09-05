@@ -225,7 +225,7 @@ class TrackPropView(Gtk.DrawingArea):
         if self.trk:
             w = self.trkview.width
 
-        self._context.set_font_size(self.seq.extras["font_size"])
+        self._context.set_font_size(self.seqview.font_size)
         cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
         cr.rectangle(0, 0, w, h)
         cr.fill()

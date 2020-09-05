@@ -134,4 +134,4 @@ class PropView(Gtk.ScrolledWindow):
                 wdg.redraw()
 
         self.last_font_size = self.seqview.font_size
-        super()
+        # super()

@@ -388,7 +388,7 @@ class VHTModule(Iterable):
 
             self.bpm = jm["bpm"]
             self.ctrlpr = jm["ctrlpr"]
-
+            self.extras = jm["extras"]
             for seq in jm["seq"]:
                 self.unpack_seq(seq, True)
 

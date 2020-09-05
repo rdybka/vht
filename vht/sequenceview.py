@@ -606,6 +606,7 @@ class SequenceView(Gtk.Box):
 
     def add_track(self, trk, quick=False):
         t = None
+
         if trk:
             if int(trk) in self.trk_cache:
                 t = self.trk_cache[int(trk)]

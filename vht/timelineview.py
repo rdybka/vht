@@ -67,8 +67,6 @@ class TimelineView(Gtk.DrawingArea):
         self.pointer_ry = 0
         self.pointer_ry_dest = 0
 
-        self.fix_extras()
-
         self.scrollbar_height = 23
         self.scrollbar_width = 8
         self.scrollbar_pos = 0
@@ -84,10 +82,7 @@ class TimelineView(Gtk.DrawingArea):
 
         self.snap = 8
 
-        if "timeline_snap" in mod.extras:
-            self.snap = mod.extras["timeline_snap"]
-        else:
-            mod.extras["timeline_snap"] = self.snap
+        self.fix_extras()
 
         self.snap_hold = False
         self.zoom_hold = False
@@ -132,6 +127,11 @@ class TimelineView(Gtk.DrawingArea):
             self.qb_start_dest = mod.extras["timeline_pos"]
         else:
             mod.extras["timeline_pos"] = self.qb_start_dest
+
+        if "timeline_snap" in mod.extras:
+            self.snap = mod.extras["timeline_snap"]
+        else:
+            mod.extras["timeline_snap"] = self.snap
 
     def on_configure(self, wdg, event):
         win = self.get_window()
@@ -633,6 +633,7 @@ class TimelineView(Gtk.DrawingArea):
                 ).seq.index
 
                 extras.fix_extras_new_seq(idx)
+                mod.mainwin.sequence_view.switch(idx)
 
                 self.curr_strip_id = idx[1]
                 self.moving = True
@@ -652,7 +653,7 @@ class TimelineView(Gtk.DrawingArea):
         self.moving = False
         self.resizing = False
         self.expanding = False
-
+        self.curr_strip_id = -1
         self.get_window().set_cursor(None)
         return True
 

@@ -357,10 +357,14 @@ class MainWin(Gtk.ApplicationWindow):
             if seq_id <= curr:
                 nxt = max(0, curr - 1)
 
+            self.sequence_view.switch(nxt)
+            for trk in mod[seq_id]:
+                del self.sequence_view.trk_cache[int(trk)]
+                del self.sequence_view.prop_view.trk_prop_cache[int(trk)]
+
             mod.del_sequence(seq_id)
             mod.timeline.update()
             mod.thumbmanager.clear()
-            self.sequence_view.switch(nxt)
             return True
         elif type(seq_id) is tuple:
             curr = mod.curr_seq
@@ -373,8 +377,12 @@ class MainWin(Gtk.ApplicationWindow):
             self.timeline_view.curr_col = -1
             self.timeline_view.curr_strip_id = -1
 
+            for trk in mod[seq_id]:
+                del self.sequence_view.trk_cache[int(trk)]
+                del self.sequence_view.prop_view.trk_prop_cache[int(trk)]
+
             mod.timeline.strips.delete(seq_id[1])
             mod.thumbmanager.clear()
 
     def gui_del_trk(seq_id, trk_id):
-        print("del_trk", seq_id, trk_id)
+        print("gui_del_trk", seq_id, trk_id)

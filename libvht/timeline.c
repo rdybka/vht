@@ -602,6 +602,7 @@ timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, i
 	s->seq->index = tl->nstrips - 1;
 	s->seq->playing = 0;
 	s->seq->pos = 0;
+	s->seq->extras = NULL;
 
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
@@ -618,7 +619,6 @@ void timeline_del_strip(timeline *tl, int id) {
 	}
 
 	tl->strips = realloc(tl->strips, sizeof(timestrip) * --tl->nstrips);
-
 	timeline_excl_out(tl);
 }
 
@@ -633,7 +633,6 @@ void timeline_delete_all_strips(timeline *tl, int col) {
 
 			tl->strips = realloc(tl->strips, sizeof(timestrip) * --tl->nstrips);
 			s--;
-
 		}
 	}
 
