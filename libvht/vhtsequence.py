@@ -195,6 +195,17 @@ class VHTSequence(Iterable):
         return libcvht.sequence_get_max_length()
 
     @property
+    def parent(self):
+        return libcvht.sequence_get_parent(self._seq_handle)
+
+    @parent.setter
+    def parent(self, value):
+        if value is None:
+            libcvht.sequence_set_parent(self._seq_handle, -1)
+        else:
+            libcvht.sequence_set_parent(self._seq_handle, int(value))
+
+    @property
     def index(self):
         idx = libcvht.sequence_get_index(self._seq_handle)
         par = libcvht.sequence_get_parent(self._seq_handle)

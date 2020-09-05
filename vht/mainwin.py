@@ -352,17 +352,28 @@ class MainWin(Gtk.ApplicationWindow):
             if len(mod) < 2:
                 return
 
-            curr = mod.curr_seq
-            nxt = curr
-            if seq_id <= curr:
-                nxt = max(0, curr - 1)
+            curr = (
+                mod.curr_seq
+                if type(mod.curr_seq) is int
+                else mod.timeline.strips[mod.curr_seq[1]].col
+            )
 
-            self.sequence_view.switch(nxt)
+            nxt = curr
+            if seq_id < curr:
+                nxt = max(nxt - 1, 0)
+
+            if nxt == len(mod) - 1:
+                nxt = max(nxt - 1, 0)
+
             for trk in mod[seq_id]:
-                del self.sequence_view.trk_cache[int(trk)]
-                del self.sequence_view.prop_view.trk_prop_cache[int(trk)]
+                if int(trk) in self.sequence_view.trk_cache:
+                    del self.sequence_view.trk_cache[int(trk)]
+
+                if int(trk) in self.sequence_view.prop_view.trk_prop_cache:
+                    del self.sequence_view.prop_view.trk_prop_cache[int(trk)]
 
             mod.del_sequence(seq_id)
+            self.sequence_view.switch(nxt)
             mod.timeline.update()
             mod.thumbmanager.clear()
             return True
@@ -378,8 +389,11 @@ class MainWin(Gtk.ApplicationWindow):
             self.timeline_view.curr_strip_id = -1
 
             for trk in mod[seq_id]:
-                del self.sequence_view.trk_cache[int(trk)]
-                del self.sequence_view.prop_view.trk_prop_cache[int(trk)]
+                if int(trk) in self.sequence_view.trk_cache:
+                    del self.sequence_view.trk_cache[int(trk)]
+
+                if int(trk) in self.sequence_view.prop_view.trk_prop_cache:
+                    del self.sequence_view.prop_view.trk_prop_cache[int(trk)]
 
             mod.timeline.strips.delete(seq_id[1])
             mod.thumbmanager.clear()

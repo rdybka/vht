@@ -667,10 +667,12 @@ int sequence_get_thumb(sequence *seq, int *ret, int l) {
 
 
 char *sequence_get_extras(sequence *seq) {
+	//printf("xtra: %d %d -> %s\n", seq->parent, seq->index, seq->extras);
 	return seq->extras;
 }
 
 void sequence_set_extras(sequence *seq, char *extr) {
+	//printf("xtra: %p %d %d %s <- %s\n", (void *)seq, seq->parent, seq->index, seq->extras, extr);
 	if (extr == NULL) {
 		free(seq->extras);
 		seq->extras = NULL;

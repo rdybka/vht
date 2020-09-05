@@ -602,7 +602,6 @@ timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, i
 	s->seq->index = tl->nstrips - 1;
 	s->seq->playing = 0;
 	s->seq->pos = 0;
-	s->seq->extras = NULL;
 
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);

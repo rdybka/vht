@@ -20,16 +20,18 @@ from vht import mod, cfg
 
 def fix_extras_new_trk(s, t):
     x = mod[s][t].extras
-    if len(x):
-        return
+    xx = {}
+    xx["track_name"] = ""
+    xx["track_keep_name"] = False
+    xx["ctrl_names"] = {}
+    xx["track_show_notes"] = True
+    xx["track_show_timeshift"] = False
+    xx["track_show_pitchwheel"] = False
+    xx["track_show_controllers"] = False
 
-    x["track_name"] = ""
-    x["track_keep_name"] = False
-    x["ctrl_names"] = {}
-    x["track_show_notes"] = True
-    x["track_show_timeshift"] = False
-    x["track_show_pitchwheel"] = False
-    x["track_show_controllers"] = False
+    for k, v in xx.items():
+        if k not in x:
+            x[k] = v
 
 
 def get_name(n):
@@ -37,7 +39,7 @@ def get_name(n):
     valid = False
     while not valid:
         valid = True
-        for s in mod:
+        for s in [s for s in mod if "sequence_name" in s.extras]:
             if s.extras["sequence_name"] == nm:
                 nm = nm + "_"
                 valid = False
@@ -46,16 +48,20 @@ def get_name(n):
 
 def fix_extras_new_seq(s):
     x = mod[s].extras
-    if len(x):
-        return
+    xx = {}
 
-    x["mouse_cfg"] = [3, 2, 0]
-    x["sequence_name"] = ""
+    if type(s) is int:
+        xx["mouse_cfg"] = [3, 2, 0]
+        xx["sequence_name"] = ""
+        txt = get_name(cfg.sequence_name_format % s)
+        xx["sequence_name"] = txt
+        xx["font_size"] = cfg.seq_font_size
+    else:
+        xx["font_size"] = cfg.seq_font_size
 
-    txt = get_name(cfg.sequence_name_format % (len(mod) - 1))
-
-    x["sequence_name"] = txt
-    x["font_size"] = cfg.seq_font_size
+    for k, v in xx.items():
+        if k not in x:
+            x[k] = v
 
 
 def register(mod):

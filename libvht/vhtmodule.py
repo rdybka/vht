@@ -26,6 +26,7 @@ def pack_seq(seq):
     s = {}
     s["length"] = seq.length
     s["rpb"] = seq.rpb
+    s["parent"] = seq.parent
     s["trg_playmode"] = seq.trg_playmode
     s["trg_quantise"] = seq.trg_quantise
     s["trig"] = [seq.get_trig(0), seq.get_trig(1), seq.get_trig(2)]
@@ -409,21 +410,42 @@ class VHTModule(Iterable):
 
             self.curr_seq = jm["curr_seq"]
             self.midi_synch_ports()
+
+            # fix extras
+            for s in self:
+                for cb in self.cb_new_sequence:
+                    cb(s.index)
+                for t in s:
+                    for cb in self.cb_new_track:
+                        cb(s.index, t.index)
+
+            for s in self.timeline.strips:
+                for cb in self.cb_new_sequence:
+                    cb(s.seq.index)
+
+                for t in s.seq:
+                    for cb in self.cb_new_track:
+                        cb(s.seq.index, t.index)
+
             self.play = p
 
         return True
 
     def unpack_seq(self, seq, matrix=False):
         sq = None
+        par = -1
 
         if matrix:
             s = self.add_sequence()
+            s.parent = par
         else:
             sq = libcvht.sequence_new(23)
             s = VHTSequence(sq, self)
+            par = seq["parent"]
 
         s.length = seq["length"]
         s.rpb = seq["rpb"]
+        s.parent = par
         s.extras.jsn = seq["extras"]
 
         if "playing" in seq:
@@ -448,6 +470,7 @@ class VHTModule(Iterable):
             t.set_qc2(trk["qc"][2], trk["qc"][3])
 
             t.loop = trk["loop"]
+
             t.extras.jsn = trk["extras"]
 
             nctrl = 0

@@ -100,11 +100,11 @@ int sequence_get_index(sequence *seq) {
 
 int sequence_get_parent(sequence *seq) {
 	return seq->parent;
-};
+}
 
 void sequence_set_parent(sequence *seq, int s) {
 	seq->parent = s;
-};
+}
 
 int sequence_get_max_length(void) {
 	return SEQUENCE_MAX_LENGTH;
