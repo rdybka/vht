@@ -491,6 +491,10 @@ class TimelineView(Gtk.DrawingArea):
                 pr = strp.start + strp.length
                 t = mod.timeline.qb2t(pr)
 
+            if self.expanding:
+                pr = self.exp_start + self.exp_last_delta
+                t = mod.timeline.qb2t(pr)
+
             lbl = "%d %d:%02d:%02d " % (pr, t // 60, t % 60, (t * 100) % 100)
 
             lblextra = ""
@@ -562,7 +566,7 @@ class TimelineView(Gtk.DrawingArea):
         if (
             self.mouse_in_timeline
             and event.button == cfg.select_button
-            and self.zoom_hold
+            and self.clone_hold
         ):
             self.expanding = True
             self.gest_start_r = self.pointer_r

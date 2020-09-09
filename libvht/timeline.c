@@ -524,7 +524,7 @@ int timeline_expand_start(timeline *tl, int qb) {
 	// retag_all
 	for (int s = 0; s < tl->nstrips; s++) {
 		timestrip *strp = &tl->strips[s];
-		int rlen = sequence_get_relative_length(strp->seq);
+		int rlen = strp->length;
 
 		if (strp->start >= qb || \
 		        (strp->start < qb && strp->start + rlen > qb)) {
