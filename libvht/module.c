@@ -211,7 +211,7 @@ module *module_new() {
 	tc->row = 0;
 	tc->linked = 0;
 
-	//timeline_update(mod->tline);
+	timeline_update(mod->tline);
 
 	return mod;
 }
