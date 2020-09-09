@@ -35,6 +35,7 @@ class ControllersView(Gtk.Box):
         self.parent = parent
         self.trk = trk
         self.extras = trk.extras
+        self.ctrl_names = trk.extras["ctrl_names"]
         self.trkview = trkview
         self.capturing = False
 
@@ -80,7 +81,7 @@ class ControllersView(Gtk.Box):
 
         self.last_ctrl = cfg.default_ctrl_name
 
-        self.ctrl_names = self.extras["ctrl_names"]
+        # self.ctrl_names = self.extras["ctrl_names"]
 
         self.new_ctrl_menu = Gtk.Menu()
         i = 0
@@ -202,7 +203,7 @@ class ControllersView(Gtk.Box):
             self.new_ctrl_entry.get_text(),
         )
 
-        self.trk.extras["ctrl_names"] = self.ctrl_names
+        self.trk.extras.write()
 
         self.trkview.controller_editors.append(
             ControllerEditor(self.trkview, len(self.trk.ctrl) - 1)

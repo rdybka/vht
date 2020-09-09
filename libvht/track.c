@@ -274,6 +274,7 @@ char *track_get_extras(track *trk) {
 }
 
 void track_set_extras(track *trk, char *extr) {
+	//printf("xtra: %p <- %s\n", trk, extr);
 	if (extr == NULL) {
 		free(trk->extras);
 		trk->extras = NULL;

@@ -78,19 +78,22 @@ class ControllersViewRow(Gtk.ActionBar):
             cc.undo_buff._ctrlnum = c + 1
 
     def on_name_changed(self, wdg):
+        if str(self.index) in self.parent.ctrl_names:
+            del self.parent.ctrl_names[str(self.index)]
+
         self.parent.ctrl_names[str(self.index)] = self.parn, self.entry.get_text()
-        self.parent.trk.extras["ctrl_names"] = self.parent.ctrl_names
-        self.parent.parent.parent.redraw()
+        self.parent.extras.write()
 
     def on_del_clicked(self, wdg):
         del self.parent.trkview.controller_editors[self.index - 1]
-        del self.parent.ctrl_names[self.index]
+        del self.parent.ctrl_names[str(self.index)]
+        self.parent.extras.write()
         self.trk.ctrl.delete(self.index)
 
-        for i in sorted(self.parent.ctrl_names):
+        for i in sorted([int(i) for i in self.parent.ctrl_names]):
             if i > self.index:
-                self.parent.ctrl_names[i - 1] = self.parent.ctrl_names[i]
-                del self.parent.ctrl_names[i]
+                self.parent.ctrl_names[str(i - 1)] = self.parent.ctrl_names[str(i)]
+                del self.parent.ctrl_names[str(i)]
 
         self.reassign_in_tv()
         self.parent.rebuild()
@@ -152,7 +155,7 @@ class ControllersViewRow(Gtk.ActionBar):
             self.entry.set_text("")
 
         self.parent.ctrl_names[str(self.index)] = (self.parn, self.entry.get_text())
-        self.parent.trk.extras["ctrl_names"] = self.parent.ctrl_names
+        self.parent.trk.extras.write()
         self.trk.ctrl[self.index].ctrlnum = self.ctrlnum
         self.parent.trkview.controller_editors[
             self.index - 1

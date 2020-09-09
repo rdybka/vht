@@ -198,10 +198,10 @@ class TrackView(Gtk.DrawingArea):
                         self.controller_editors.append(ControllerEditor(self, cn))
                         # we could be called on the fly while recording so let's
                         # check the extras for new ctrls
-                        if cn not in self.extras["ctrl_names"]:
+                        if str(cn) not in self.extras["ctrl_names"]:
                             n = mod.ctrls[cfg.default_ctrl_name]
                             if ctrl in n:
-                                self.extras["ctrl_names"][cn] = (
+                                self.extras["ctrl_names"][str(cn)] = (
                                     cfg.default_ctrl_name,
                                     n[ctrl],
                                 )

@@ -32,7 +32,7 @@ class VHTExtras(MutableMapping):
         self._func_get = func_get
         self._func_set = func_set
 
-        self._read()
+        self.read()
 
     @property
     def jsn(self):
@@ -41,15 +41,15 @@ class VHTExtras(MutableMapping):
     @jsn.setter
     def jsn(self, val):
         self._func_set(val)
-        self._read()
+        self.read()
 
-    def _read(self):
+    def read(self):
         if s := self._func_get():
             self._store = json.loads(s)
         else:
             self._store = dict()
 
-    def _write(self):
+    def write(self):
         self._func_set(json.dumps(self._store))
 
     def __getitem__(self, key):
@@ -57,12 +57,12 @@ class VHTExtras(MutableMapping):
 
     def __setitem__(self, key, value):
         self._store[str(key)] = value
-        self._write()
+        self.write()
 
     def __delitem__(self, key):
         del self._store[key]
-        self._write()
-        self._read()
+        self.write()
+        self.read()
 
     def __iter__(self):
         return iter(self._store)
