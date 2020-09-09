@@ -2,12 +2,11 @@
 
 # - clears the tree so we can do "git add ." (I know, I know)
 # - regenerates the wrapper for libvht
-# - don't run without swig3 installed
+# - don't run without swig4 installed
 # - also uses black and astyle
 
 rm -f *.so *.o
 rm -f libvht/*.o
-#rm -f libvht/*.so
 rf -f install.txt
 rm -rf __pycache__
 rm -rf vht/__pycache__
@@ -29,3 +28,4 @@ swig -python libvht/libcvht.h
 git add .
 git reset libvht/*.so
 git reset .idea
+git reset README.md regen.sh

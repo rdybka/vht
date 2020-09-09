@@ -28,5 +28,5 @@ and the usual GNOME stuff
 
 ## install
 ```
-pip3 install vht
+./setup.py install user
 ```
