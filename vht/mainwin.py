@@ -346,6 +346,38 @@ class MainWin(Gtk.ApplicationWindow):
         self.adj.set_value(mod.bpm)
         return True
 
+    def gui_next_seq(self):
+        mod.seqlist._highlight = -1
+
+        ind = self.sequence_view.seq.index
+
+        if type(ind) is tuple:
+            ind = mod.timeline.strips[ind[1]].col
+
+        if len(mod) > ind + 1:
+            self.sequence_view.switch(ind + 1)
+        else:
+            self.sequence_view.switch(0)
+
+        mod.curr_seq = self.sequence_view.seq.index
+        mod.seqlist.redraw()
+
+    def gui_prev_seq(self):
+        mod.seqlist._highlight = -1
+
+        ind = self.sequence_view.seq.index
+
+        if type(ind) is tuple:
+            ind = mod.timeline.strips[ind[1]].col + 1
+
+        if ind > 0:
+            self.sequence_view.switch(ind - 1)
+        else:
+            self.sequence_view.switch(len(mod) - 1)
+
+        mod.curr_seq = self.sequence_view.seq.index
+        mod.seqlist.redraw()
+
     def gui_del_seq(self, seq_id):
         # open from matrix
         if type(seq_id) is int:
@@ -381,9 +413,11 @@ class MainWin(Gtk.ApplicationWindow):
             curr = mod.curr_seq
             if type(curr) is tuple:
                 if curr[1] == seq_id[1]:
-                    mod.mainwin.sequence_view.switch(
-                        mod.timeline.strips[curr[1]].prev_id
-                    )
+                    strp = mod.timeline.strips[curr[1]]
+                    if (prev := strp.prev_id) :
+                        mod.mainwin.sequence_view.switch(prev)
+                    else:
+                        mod.mainwin.sequence_view.switch(strp.col)
 
             self.timeline_view.curr_col = -1
             self.timeline_view.curr_strip_id = -1

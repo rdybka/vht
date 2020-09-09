@@ -255,25 +255,11 @@ class SequenceView(Gtk.Box):
             return True
 
         if cfg.key["sequence_next"].matches(event):
-            mod.seqlist._highlight = -1
-            if len(mod) > self.seq.index + 1:
-                self.switch(self.seq.index + 1)
-            else:
-                self.switch(0)
-
-            mod.curr_seq = self.seq.index
-            mod.seqlist.redraw()
+            mod.mainwin.gui_next_seq()
             return True
 
         if cfg.key["sequence_prev"].matches(event):
-            mod.seqlist._highlight = -1
-            if self.seq.index > 0:
-                self.switch(self.seq.index - 1)
-            else:
-                self.switch(len(mod) - 1)
-
-            mod.curr_seq = self.seq.index
-            mod.seqlist.redraw()
+            mod.mainwin.gui_prev_seq()
             return True
 
         if cfg.key["sequence_delete"].matches(event):

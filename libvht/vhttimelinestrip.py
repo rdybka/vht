@@ -61,7 +61,7 @@ class VHTTimelineStrip:
             idx = libcvht.sequence_get_index(seq_ptr)
             return 0, idx
         else:
-            return self.col
+            return None
 
     @property
     def next_id(self):
@@ -72,7 +72,7 @@ class VHTTimelineStrip:
             idx = libcvht.sequence_get_index(seq_ptr)
             return 0, idx
         else:
-            return self.col
+            return None
 
     @property
     def seq(self):
