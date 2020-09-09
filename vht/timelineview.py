@@ -324,6 +324,23 @@ class TimelineView(Gtk.DrawingArea):
                 if rr - lrr > 1:
                     drw = True
 
+        # timechanges
+        cr.set_source_rgb(*(cfg.star_colour))
+        cr.set_line_width(2)
+
+        for t in mod.timeline.changes:
+            rr = (
+                mod.timeline.qb2t(t.row) - mod.timeline.qb2t(self.qb_start)
+            ) / self.spl
+            xx = w - tw
+
+            # cr.move_to(xx, rr)
+            cr.arc(xx, rr, 4, 0, math.pi * 2)
+            if t.linked:
+                cr.fill()
+            else:
+                cr.stroke()
+
         # grid
         cr.save()
         cr.rectangle(0, 0, w - (tw + self.scrollbar_width * 1.5), h)

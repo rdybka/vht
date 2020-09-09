@@ -71,10 +71,19 @@ void timeline_advance(timeline *tl, double period);
 long timeline_get_qb(timeline *tl, double t);
 double timeline_get_qb_time(timeline *tl, long row);
 void timeline_swap_sequence(timeline *tl, int s1, int s2);
-int timeline_change_set(timeline *tl, long row, float bpm, int linked);
-void timeline_change_del(timeline *tl, int id);
-char *timeline_get_change(timeline *tl, int id);
+
+void timechange_set_bpm(timeline *tl, timechange *tc, float bpm);
+void timechange_set_row(timeline *tl, timechange *tc, long row);
+void timechange_set_linked(timeline *tl, timechange *tc, int linked);
+float timechange_get_bpm(timechange *tc);
+long timechange_get_row(timechange *tc);
+int timechange_get_linked(timechange *tc);
+
+void timechange_del(timeline *tl, int id);
+timechange *timeline_add_change(timeline *tl, float bpm, long row, int linked);
+timechange *timeline_get_change(timeline *tl, int id);
 int timeline_get_nchanges(timeline *tl);
+
 int timeline_get_nticks(timeline *tl);
 double timeline_get_tick(timeline *tl, int n);
 int timeline_get_room(timeline *tl, int col, int qb, int ig);

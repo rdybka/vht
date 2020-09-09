@@ -1,17 +1,14 @@
 - timeline
     - bpm
     - loop
-    - scrub
+    - playhead
     - feeding
     - transport
-    ? on left
     - global ring
 - trackview
     - undo/redo
     - track colours
-    ? sound clicked note
-    - pitch repr
-- seq gui callback
+    ? sound clicked note (midclick)
 - program change
     - clear in menu
     - doubles
@@ -25,7 +22,8 @@
     - midi buttons
 - labels on tooltips
 - export
-- gui api refactor
+- seq gui callback
+- api refactor
 - console
     - autofill
     - click in statusbar

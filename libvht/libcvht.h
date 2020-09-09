@@ -218,10 +218,17 @@ extern void ctrlrow_set_anchor(ctrlrow *crw, int a);
 extern void ctrlrow_set(ctrlrow *crw, int v, int l, int s, int a);
 
 // timeline
-extern int timeline_change_set(timeline *tl, long row, float bpm, int linked);
-extern void timeline_change_del(timeline *tl, int id);
-extern char *timeline_get_change(timeline *tl, int id);
+extern void timechange_set_bpm(timeline *tl, timechange *tc, float bpm);
+extern void timechange_set_row(timeline *tl, timechange *tc, long row);
+extern void timechange_set_linked(timeline *tl, timechange *tc, int linked);
+extern float timechange_get_bpm(timechange *tc);
+extern long timechange_get_row(timechange *tc);
+extern int timechange_get_linked(timechange *tc);
+extern void timechange_del(timeline *tl, int id);
+extern timechange *timeline_get_change(timeline *tl, int id);
+extern timechange *timeline_add_change(timeline *tl, float bpm, long row, int linked);
 extern int timeline_get_nchanges(timeline *tl);
+
 extern long timeline_get_qb(timeline *tl, double t);
 extern double timeline_get_qb_time(timeline *tl, long row);
 extern int timeline_get_nticks(timeline *tl);

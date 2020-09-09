@@ -2641,11 +2641,12 @@ SWIGINTERN PyObject *SWIG_PyStaticMethod_New(PyObject *SWIGUNUSEDPARM(self), PyO
 #define SWIGTYPE_p_module swig_types[5]
 #define SWIGTYPE_p_row swig_types[6]
 #define SWIGTYPE_p_sequence swig_types[7]
-#define SWIGTYPE_p_timeline swig_types[8]
-#define SWIGTYPE_p_timestrip swig_types[9]
-#define SWIGTYPE_p_track swig_types[10]
-static swig_type_info *swig_types[12];
-static swig_module_info swig_module = {swig_types, 11, 0, 0, 0, 0};
+#define SWIGTYPE_p_timechange swig_types[8]
+#define SWIGTYPE_p_timeline swig_types[9]
+#define SWIGTYPE_p_timestrip swig_types[10]
+#define SWIGTYPE_p_track swig_types[11]
+static swig_type_info *swig_types[13];
+static swig_module_info swig_module = {swig_types, 12, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -7699,45 +7700,179 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_timeline_change_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_timechange_set_bpm(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   timeline *arg1 = (timeline *) 0 ;
-  long arg2 ;
+  timechange *arg2 = (timechange *) 0 ;
   float arg3 ;
-  int arg4 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  long val2 ;
-  int ecode2 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
   float val3 ;
   int ecode3 = 0 ;
-  int val4 ;
-  int ecode4 = 0 ;
-  PyObject *swig_obj[4] ;
-  int result;
+  PyObject *swig_obj[3] ;
   
-  if (!SWIG_Python_UnpackTuple(args, "timeline_change_set", 4, 4, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "timechange_set_bpm", 3, 3, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_change_set" "', argument " "1"" of type '" "timeline *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timechange_set_bpm" "', argument " "1"" of type '" "timeline *""'"); 
   }
   arg1 = (timeline *)(argp1);
-  ecode2 = SWIG_AsVal_long(swig_obj[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timeline_change_set" "', argument " "2"" of type '" "long""'");
-  } 
-  arg2 = (long)(val2);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_timechange, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "timechange_set_bpm" "', argument " "2"" of type '" "timechange *""'"); 
+  }
+  arg2 = (timechange *)(argp2);
   ecode3 = SWIG_AsVal_float(swig_obj[2], &val3);
   if (!SWIG_IsOK(ecode3)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "timeline_change_set" "', argument " "3"" of type '" "float""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "timechange_set_bpm" "', argument " "3"" of type '" "float""'");
   } 
   arg3 = (float)(val3);
-  ecode4 = SWIG_AsVal_int(swig_obj[3], &val4);
-  if (!SWIG_IsOK(ecode4)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "timeline_change_set" "', argument " "4"" of type '" "int""'");
+  timechange_set_bpm(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_timechange_set_row(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  timeline *arg1 = (timeline *) 0 ;
+  timechange *arg2 = (timechange *) 0 ;
+  long arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  long val3 ;
+  int ecode3 = 0 ;
+  PyObject *swig_obj[3] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "timechange_set_row", 3, 3, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timechange_set_row" "', argument " "1"" of type '" "timeline *""'"); 
+  }
+  arg1 = (timeline *)(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_timechange, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "timechange_set_row" "', argument " "2"" of type '" "timechange *""'"); 
+  }
+  arg2 = (timechange *)(argp2);
+  ecode3 = SWIG_AsVal_long(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "timechange_set_row" "', argument " "3"" of type '" "long""'");
   } 
-  arg4 = (int)(val4);
-  result = (int)timeline_change_set(arg1,arg2,arg3,arg4);
+  arg3 = (long)(val3);
+  timechange_set_row(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_timechange_set_linked(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  timeline *arg1 = (timeline *) 0 ;
+  timechange *arg2 = (timechange *) 0 ;
+  int arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject *swig_obj[3] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "timechange_set_linked", 3, 3, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timechange_set_linked" "', argument " "1"" of type '" "timeline *""'"); 
+  }
+  arg1 = (timeline *)(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_timechange, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "timechange_set_linked" "', argument " "2"" of type '" "timechange *""'"); 
+  }
+  arg2 = (timechange *)(argp2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "timechange_set_linked" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  timechange_set_linked(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_timechange_get_bpm(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  timechange *arg1 = (timechange *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  float result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timechange, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timechange_get_bpm" "', argument " "1"" of type '" "timechange *""'"); 
+  }
+  arg1 = (timechange *)(argp1);
+  result = (float)timechange_get_bpm(arg1);
+  resultobj = SWIG_From_float((float)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_timechange_get_row(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  timechange *arg1 = (timechange *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  long result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timechange, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timechange_get_row" "', argument " "1"" of type '" "timechange *""'"); 
+  }
+  arg1 = (timechange *)(argp1);
+  result = (long)timechange_get_row(arg1);
+  resultobj = SWIG_From_long((long)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_timechange_get_linked(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  timechange *arg1 = (timechange *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timechange, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timechange_get_linked" "', argument " "1"" of type '" "timechange *""'"); 
+  }
+  arg1 = (timechange *)(argp1);
+  result = (int)timechange_get_linked(arg1);
   resultobj = SWIG_From_int((int)(result));
   return resultobj;
 fail:
@@ -7745,7 +7880,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_timeline_change_del(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_timechange_del(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   timeline *arg1 = (timeline *) 0 ;
   int arg2 ;
@@ -7755,18 +7890,18 @@ SWIGINTERN PyObject *_wrap_timeline_change_del(PyObject *SWIGUNUSEDPARM(self), P
   int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
   
-  if (!SWIG_Python_UnpackTuple(args, "timeline_change_del", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "timechange_del", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_change_del" "', argument " "1"" of type '" "timeline *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timechange_del" "', argument " "1"" of type '" "timeline *""'"); 
   }
   arg1 = (timeline *)(argp1);
   ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timeline_change_del" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timechange_del" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = (int)(val2);
-  timeline_change_del(arg1,arg2);
+  timechange_del(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -7783,7 +7918,7 @@ SWIGINTERN PyObject *_wrap_timeline_get_change(PyObject *SWIGUNUSEDPARM(self), P
   int val2 ;
   int ecode2 = 0 ;
   PyObject *swig_obj[2] ;
-  char *result = 0 ;
+  timechange *result = 0 ;
   
   if (!SWIG_Python_UnpackTuple(args, "timeline_get_change", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
@@ -7796,8 +7931,54 @@ SWIGINTERN PyObject *_wrap_timeline_get_change(PyObject *SWIGUNUSEDPARM(self), P
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timeline_get_change" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = (int)(val2);
-  result = (char *)timeline_get_change(arg1,arg2);
-  resultobj = SWIG_FromCharPtr((const char *)result);
+  result = (timechange *)timeline_get_change(arg1,arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_timechange, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_timeline_add_change(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  timeline *arg1 = (timeline *) 0 ;
+  float arg2 ;
+  long arg3 ;
+  int arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  float val2 ;
+  int ecode2 = 0 ;
+  long val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  PyObject *swig_obj[4] ;
+  timechange *result = 0 ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "timeline_add_change", 4, 4, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_add_change" "', argument " "1"" of type '" "timeline *""'"); 
+  }
+  arg1 = (timeline *)(argp1);
+  ecode2 = SWIG_AsVal_float(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timeline_add_change" "', argument " "2"" of type '" "float""'");
+  } 
+  arg2 = (float)(val2);
+  ecode3 = SWIG_AsVal_long(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "timeline_add_change" "', argument " "3"" of type '" "long""'");
+  } 
+  arg3 = (long)(val3);
+  ecode4 = SWIG_AsVal_int(swig_obj[3], &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "timeline_add_change" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = (int)(val4);
+  result = (timechange *)timeline_add_change(arg1,arg2,arg3,arg4);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_timechange, 0 |  0 );
   return resultobj;
 fail:
   return NULL;
@@ -9026,9 +9207,15 @@ static PyMethodDef SwigMethods[] = {
 	 { "ctrlrow_set_smooth", _wrap_ctrlrow_set_smooth, METH_VARARGS, NULL},
 	 { "ctrlrow_set_anchor", _wrap_ctrlrow_set_anchor, METH_VARARGS, NULL},
 	 { "ctrlrow_set", _wrap_ctrlrow_set, METH_VARARGS, NULL},
-	 { "timeline_change_set", _wrap_timeline_change_set, METH_VARARGS, NULL},
-	 { "timeline_change_del", _wrap_timeline_change_del, METH_VARARGS, NULL},
+	 { "timechange_set_bpm", _wrap_timechange_set_bpm, METH_VARARGS, NULL},
+	 { "timechange_set_row", _wrap_timechange_set_row, METH_VARARGS, NULL},
+	 { "timechange_set_linked", _wrap_timechange_set_linked, METH_VARARGS, NULL},
+	 { "timechange_get_bpm", _wrap_timechange_get_bpm, METH_O, NULL},
+	 { "timechange_get_row", _wrap_timechange_get_row, METH_O, NULL},
+	 { "timechange_get_linked", _wrap_timechange_get_linked, METH_O, NULL},
+	 { "timechange_del", _wrap_timechange_del, METH_VARARGS, NULL},
 	 { "timeline_get_change", _wrap_timeline_get_change, METH_VARARGS, NULL},
+	 { "timeline_add_change", _wrap_timeline_add_change, METH_VARARGS, NULL},
 	 { "timeline_get_nchanges", _wrap_timeline_get_nchanges, METH_O, NULL},
 	 { "timeline_get_qb", _wrap_timeline_get_qb, METH_VARARGS, NULL},
 	 { "timeline_get_qb_time", _wrap_timeline_get_qb_time, METH_VARARGS, NULL},
@@ -9085,6 +9272,7 @@ static swig_type_info _swigt__p_midi_client = {"_p_midi_client", "midi_client *"
 static swig_type_info _swigt__p_module = {"_p_module", "module *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_row = {"_p_row", "row *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_sequence = {"_p_sequence", "sequence *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_timechange = {"_p_timechange", "timechange *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_timeline = {"_p_timeline", "timeline *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_timestrip = {"_p_timestrip", "timestrip *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_track = {"_p_track", "track *", 0, 0, (void*)0, 0};
@@ -9098,6 +9286,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_module,
   &_swigt__p_row,
   &_swigt__p_sequence,
+  &_swigt__p_timechange,
   &_swigt__p_timeline,
   &_swigt__p_timestrip,
   &_swigt__p_track,
@@ -9111,6 +9300,7 @@ static swig_cast_info _swigc__p_midi_client[] = {  {&_swigt__p_midi_client, 0, 0
 static swig_cast_info _swigc__p_module[] = {  {&_swigt__p_module, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_row[] = {  {&_swigt__p_row, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_sequence[] = {  {&_swigt__p_sequence, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_timechange[] = {  {&_swigt__p_timechange, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_timeline[] = {  {&_swigt__p_timeline, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_timestrip[] = {  {&_swigt__p_timestrip, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_track[] = {  {&_swigt__p_track, 0, 0, 0},{0, 0, 0, 0}};
@@ -9124,6 +9314,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_module,
   _swigc__p_row,
   _swigc__p_sequence,
+  _swigc__p_timechange,
   _swigc__p_timeline,
   _swigc__p_timestrip,
   _swigc__p_track,

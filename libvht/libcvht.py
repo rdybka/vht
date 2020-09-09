@@ -548,14 +548,32 @@ def ctrlrow_set_anchor(crw, a):
 def ctrlrow_set(crw, v, l, s, a):
     return _libcvht.ctrlrow_set(crw, v, l, s, a)
 
-def timeline_change_set(tl, row, bpm, linked):
-    return _libcvht.timeline_change_set(tl, row, bpm, linked)
+def timechange_set_bpm(tl, tc, bpm):
+    return _libcvht.timechange_set_bpm(tl, tc, bpm)
 
-def timeline_change_del(tl, id):
-    return _libcvht.timeline_change_del(tl, id)
+def timechange_set_row(tl, tc, row):
+    return _libcvht.timechange_set_row(tl, tc, row)
+
+def timechange_set_linked(tl, tc, linked):
+    return _libcvht.timechange_set_linked(tl, tc, linked)
+
+def timechange_get_bpm(tc):
+    return _libcvht.timechange_get_bpm(tc)
+
+def timechange_get_row(tc):
+    return _libcvht.timechange_get_row(tc)
+
+def timechange_get_linked(tc):
+    return _libcvht.timechange_get_linked(tc)
+
+def timechange_del(tl, id):
+    return _libcvht.timechange_del(tl, id)
 
 def timeline_get_change(tl, id):
     return _libcvht.timeline_get_change(tl, id)
+
+def timeline_add_change(tl, bpm, row, linked):
+    return _libcvht.timeline_add_change(tl, bpm, row, linked)
 
 def timeline_get_nchanges(tl):
     return _libcvht.timeline_get_nchanges(tl)

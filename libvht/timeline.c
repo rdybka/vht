@@ -45,7 +45,6 @@ timeline *timeline_new(void) {
 	ntl->length = 1024;
 	ntl->time_length = 0.0;
 	ntl->loop_start = ntl->loop_end = -1;
-
 	timeline_update_inner(ntl);
 	pthread_mutex_init(&ntl->excl, NULL);
 	return(ntl);
@@ -68,18 +67,84 @@ int timeline_get_nchanges(timeline *tl) {
 	return tl->nchanges;
 }
 
-char *timeline_get_change(timeline *tl, int id) {
-	static char rc[256];
-
-	if (id > tl->nchanges)
-		return NULL;
-
-	if (id < 0)
-		return NULL;
-
-	sprintf(rc, "[%lu,%.2f,%d]", tl->changes[id].row, tl->changes[id].bpm, tl->changes[id].linked);
-	return rc;
+timechange *timeline_get_change(timeline *tl, int id) {
+	timeline_excl_in(tl);
+	if ((id == 0) && (!tl->nchanges)) {
+		tl->changes = realloc(tl->changes, sizeof(timechange) * ++tl->nchanges);
+	}
+	timeline_excl_out(tl);
+	return &tl->changes[id];
 }
+
+timechange *timeline_add_change(timeline *tl, float bpm, long row, int linked) {
+	timeline_excl_in(tl);
+	tl->changes = realloc(tl->changes, sizeof(timechange) * ++tl->nchanges);
+	timechange *tc = &tl->changes[tl->nchanges - 1];
+	tc->bpm = bpm;
+	tc->linked = linked;
+	tc->row = row;
+	timeline_update_inner(tl);
+	timeline_excl_out(tl);
+	return tc;
+}
+
+void timechange_set(timeline *tl, timechange *tc, float bpm, long row, int linked) {
+	timeline_excl_in(tl);
+
+	tc->bpm = bpm;
+	tc->linked = linked;
+	tc->row = row;
+
+	timeline_update_inner(tl);
+	timeline_excl_out(tl);
+}
+
+void timechange_set_bpm(timeline *tl, timechange *tc, float bpm) {
+	timeline_excl_in(tl);
+	tc->bpm = bpm;
+	timeline_update_inner(tl);
+	timeline_excl_out(tl);
+}
+
+void timechange_set_row(timeline *tl, timechange *tc, long row) {
+	timeline_excl_in(tl);
+	tc->row = row;
+	timeline_update_inner(tl);
+	timeline_excl_out(tl);
+}
+
+void timechange_set_linked(timeline *tl, timechange *tc, int linked) {
+	timeline_excl_in(tl);
+	tc->row = linked;
+	timeline_update_inner(tl);
+	timeline_excl_out(tl);
+}
+
+float timechange_get_bpm(timechange *tc) {
+	return tc->bpm;
+}
+
+long timechange_get_row(timechange *tc) {
+	return tc->row;
+}
+
+int timechange_get_linked(timechange *tc) {
+	return tc->linked;
+}
+
+void timechange_del(timeline *tl, int id) {
+	timeline_excl_in(tl);
+
+	for (int r = id; r < tl->nchanges - 1; r++) {
+		tl->changes[r] = tl->changes[r+1];
+	}
+
+	tl->changes = realloc(tl->changes, sizeof(timechange) * --tl->nchanges);
+
+	timeline_update_inner(tl);
+	timeline_excl_out(tl);
+}
+
 
 int timeline_get_nticks(timeline *tl) {
 	return tl->nticks;
@@ -89,43 +154,31 @@ double timeline_get_tick(timeline *tl, int n) {
 	return tl->ticks[n];
 }
 
-int timeline_change_id_for_row(timeline *tl, long row) {
-	if (tl->nchanges == 0)
-		return -1;
-
-	for (int r = 0; r < tl->nchanges; r++)
-		if (tl->changes[r].row == row)
-			return r;
-
-	return -1;
-}
-
 void timeline_update_chunk(timeline *tl, int from, int to) {
-	long row = tl->length - 1;
-	float bpm = tl->changes[to].bpm;
-	int linked = 0;
+	long rfrom = tl->changes[from].row;
+	float bpmf = tl->changes[from].bpm;
+	long rto = tl->length;
+	float bpmt = bpmf;
 
-	if (from > -1) {
-		row = tl->changes[from].row;
-		bpm = tl->changes[from].bpm;
-		linked = tl->changes[from].linked;
-	}
-
-	if (row == tl->changes[to].row) {
+	if (rfrom > tl->nslices)
 		return;
+
+	if (to > -1) {
+		bpmt = tl->changes[to].bpm;
+		rto = tl->changes[to].row;
 	}
 
-	tl->slices[row].bpm = bpm;
+	printf("upd: %ld -> %ld\n", rfrom, rto);
+	float bpmd = (bpmt - bpmf) / (rto - rfrom);
+	if (!tl->changes[to].linked)
+		bpmd = 0.0;
 
-	float bpmd = 0;
-	if (!linked)
-		bpm = tl->changes[to].bpm;
+	if (rto > tl->nslices)
+		rto = tl->nslices;
 
-	bpmd = (tl->changes[to].bpm - bpm) / (row - tl->changes[to].row);
-	bpm += bpmd;
-	for (long r = row - 1; r > tl->changes[to].row; r--) {
-		tl->slices[r].bpm = bpm;
-		bpm += bpmd;
+	for (long r = rfrom; r < rto; r++) {
+		tl->slices[r].bpm = bpmf;
+		bpmf += bpmd;
 	}
 
 	if (tl->changes[to].row == 0) {
@@ -137,6 +190,15 @@ void timeline_update(timeline *tl) {
 	timeline_excl_in(tl);
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
+
+	for (int sl = 0; sl < tl->nslices; sl++) {
+		timeslice *ts = &tl->slices[sl];
+		printf("%d %.3f %.3f %.3f\n", sl, ts->bpm, ts->length, ts->time);
+	}
+}
+
+int timechange_compare(const void *a, const void *b) {
+	return (int)(((timechange *)a)->row - ((timechange *)b)->row);
 }
 
 void timeline_update_inner(timeline *tl) {
@@ -155,47 +217,23 @@ void timeline_update_inner(timeline *tl) {
 	if (!tl->nchanges)
 		return;
 
+	qsort(tl->changes, tl->nchanges, sizeof(timechange), timechange_compare);
+
 	tl->slices = realloc(tl->slices, sizeof(timeslice) * tl->length);
 	for (int r = 0; r < tl->length; r++) {
 		tl->slices[r].time = tl->slices[r].length = tl->slices[r].bpm = 0;
 	}
 	tl->nslices = tl->length;
 
-	long lrow = -1;
-	int lchange = -1;
-	for (int c = 0; c < tl->nchanges; c++) {
-		if (tl->changes[c].row > lrow) {
-			lrow = tl->changes[c].row;
-			lchange = c;
-		}
-	}
-
-	timeline_update_chunk(tl, -1, lchange);
-
-	long crow = lrow;
-	int cchange = lchange;
-	lrow = -1;
-	while(lchange > -1) {
-		lchange = -1;
-		lrow = -1;
-		for (int c = 0; c < tl->nchanges; c++) {
-			if ((tl->changes[c].row > lrow) && (tl->changes[c].row < crow)) {
-				lrow = tl->changes[c].row;
-				lchange = c;
-			}
-		}
-
-		if (lchange > -1) {
-			timeline_update_chunk(tl, cchange, lchange);
-		}
-
-		crow = lrow;
-		cchange = lchange;
-	}
-
 	tl->slices[0].time = 0.0;
 	tl->nticks = tl->nslices;
 	tl->ticks = realloc(tl->ticks, sizeof(double) * (tl->nticks + 1));
+
+	for (int c = 0; c < tl->nchanges - 1; c++) {
+		timeline_update_chunk(tl, c, c + 1);
+	}
+
+	timeline_update_chunk(tl, tl->nchanges - 1, -1);
 
 	for(int s = 0; s < tl->nslices; s++) {
 		tl->slices[s].length = (60.0 / tl->slices[s].bpm) / 4;
@@ -271,18 +309,6 @@ double timeline_get_qb_time(timeline *tl, long row) {
 	return tl->ticks[rr];
 }
 
-void timeline_change_del(timeline *tl, int id) {
-	timeline_excl_in(tl);
-
-	for (int r = id; r < tl->nchanges; r++) {
-		tl->changes[r] = tl->changes[r+1];
-	}
-
-	tl->changes = realloc(tl->changes, sizeof(timechange) * --tl->nchanges);
-
-	timeline_update_inner(tl);
-	timeline_excl_out(tl);
-}
 
 int timeline_get_room(timeline *tl, int col, int qb, int ig) {
 	if (col < 0)
@@ -446,24 +472,6 @@ sequence *timeline_get_prev_seq(timeline *tl, timestrip *tstr) {
 
 sequence *timeline_get_next_seq(timeline *tl, timestrip *tstr) {
 	return NULL;
-}
-
-int timeline_change_set(timeline *tl, long row, float bpm, int linked) {
-	timeline_excl_in(tl);
-
-	int r = timeline_change_id_for_row(tl, row);
-
-	if (r == -1) {
-		tl->changes = realloc(tl->changes, sizeof(timechange) * ++tl->nchanges);
-		r = tl->nchanges - 1;
-		tl->changes[r].row = row;
-	}
-
-	tl->changes[r].bpm = bpm;
-	tl->changes[r].linked = linked;
-	timeline_update_inner(tl);
-	timeline_excl_out(tl);
-	return r;
 }
 
 int timeline_get_nstrips(timeline *tl) {
