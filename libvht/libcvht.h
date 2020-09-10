@@ -226,8 +226,11 @@ extern long timechange_get_row(timechange *tc);
 extern int timechange_get_linked(timechange *tc);
 extern void timechange_del(timeline *tl, int id);
 extern timechange *timeline_get_change(timeline *tl, int id);
+extern timechange *timeline_change_get_at(timeline *tl, long row);
 extern timechange *timeline_add_change(timeline *tl, float bpm, long row, int linked);
 extern int timeline_get_nchanges(timeline *tl);
+extern float timeline_get_bpm_at_qb(timeline *tl, long row);
+extern int timeline_get_interpol_at_qb(timeline *tl, long row);
 
 extern long timeline_get_qb(timeline *tl, double t);
 extern double timeline_get_qb_time(timeline *tl, long row);

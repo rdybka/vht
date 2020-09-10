@@ -304,11 +304,11 @@ class VHTModule(Iterable):
 
     @property
     def min_bpm(self):
-        return 0.23
+        return 1
 
     @property
     def max_bpm(self):
-        return 1023  # don't crash the synth
+        return 1023  # don't crash the system
 
     # those two work non-"realtime",
     # ment for gui events
@@ -350,9 +350,9 @@ class VHTModule(Iterable):
         tl["changes"] = []
         for ch in self.timeline.changes:
             chng = {}
-            chng["row"] = ch[0]
-            chng["bpm"] = ch[1]
-            chng["lnk"] = ch[2]
+            chng["row"] = ch.row
+            chng["bpm"] = ch.bpm
+            chng["lnk"] = ch.linked
             tl["changes"].append(chng)
         tl["strips"] = []
         for strip in self.timeline.strips:
@@ -397,7 +397,11 @@ class VHTModule(Iterable):
 
             tl = jm["tl"]
             for chng in tl["changes"]:
-                self.timeline.changes.insert(chng["row"], chng["bpm"], chng["lnk"])
+                self.timeline.changes.insert(chng["bpm"], chng["row"], chng["lnk"])
+
+            if not self.timeline.changes.get_at_qb(0):
+                self.timeline.changes.insert(self.bpm, 0, 0)
+
             for strp in tl["strips"]:
                 self.timeline.strips.insert(
                     strp["col"],

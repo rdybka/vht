@@ -181,14 +181,18 @@ class StatusBar(Gtk.DrawingArea):
         xx += dx
         self.pos.append(xx)
 
-        if self.active_field == 4:
+        if self.active_field == 4 or mod.timeline_view.curr_change:
             cr.set_source_rgb(
                 *(col * cfg.intensity_txt_highlight for col in cfg.star_colour)
             )
         else:
             cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
-        txt = " bpm:%6.2f" % mod.bpm
+        if mod.timeline_view.curr_change:
+            txt = " bpm:%6.2f" % mod.timeline_view.curr_change.bpm
+        else:
+            txt = " bpm:%6.2f" % mod.bpm
+
         *_, dx, _ = cr.text_extents(txt)
         cr.move_to(self.pos[-1], h)
         cr.show_text(txt)
@@ -399,12 +403,15 @@ class StatusBar(Gtk.DrawingArea):
                 cfg.skip = max(cfg.skip - 1, -16)
 
         if self.active_field == 4:
+            bpmch = mod
+
+            if mod.timeline_view.curr_change:
+                bpmch = mod.timeline_view.curr_change
+
             if up:
-                mod.bpm = mod.bpm + 1
-                mod.mainwin.adj.set_value(mod.bpm)
+                bpmch.bpm = min(mod.max_bpm, bpmch.bpm + 1)
             if down:
-                mod.bpm = mod.bpm - 1
-                mod.mainwin.adj.set_value(mod.bpm)
+                bpmch.bpm = max(mod.min_bpm, bpmch.bpm - 1)
 
         if self.active_field == 5:
             if up:

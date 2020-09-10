@@ -76,6 +76,14 @@ timechange *timeline_get_change(timeline *tl, int id) {
 	return &tl->changes[id];
 }
 
+timechange *timeline_change_get_at(timeline *tl, long row) {
+	for (int tc = 0; tc < tl->nchanges; tc++)
+		if (tl->changes[tc].row == row)
+			return &tl->changes[tc];
+
+	return NULL;
+}
+
 timechange *timeline_add_change(timeline *tl, float bpm, long row, int linked) {
 	timeline_excl_in(tl);
 	tl->changes = realloc(tl->changes, sizeof(timechange) * ++tl->nchanges);
@@ -115,7 +123,7 @@ void timechange_set_row(timeline *tl, timechange *tc, long row) {
 
 void timechange_set_linked(timeline *tl, timechange *tc, int linked) {
 	timeline_excl_in(tl);
-	tc->row = linked;
+	tc->linked = linked;
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
 }
@@ -143,6 +151,32 @@ void timechange_del(timeline *tl, int id) {
 
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
+}
+
+float timeline_get_bpm_at_qb(timeline *tl, long row) {
+	if (row < tl->nslices)
+		return tl->slices[row].bpm;
+
+	return tl->slices[tl->nslices - 1].bpm;
+}
+
+int timeline_get_interpol_at_qb(timeline *tl, long row) {
+	int chgid = 0;
+	int maxr = tl->length;
+
+	for (int c = 0; c < tl->nchanges; c++) {
+		timechange *chg = &tl->changes[c];
+		if ((chg->row > row) && (chg->row < maxr)) {
+			chgid = c;
+			maxr = chg->row;
+		}
+	}
+
+	if (chgid > 0) {
+		return tl->changes[chgid].linked;
+	}
+
+	return 0;
 }
 
 
@@ -190,11 +224,12 @@ void timeline_update(timeline *tl) {
 	timeline_excl_in(tl);
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
-
-	for (int sl = 0; sl < tl->nslices; sl++) {
-		timeslice *ts = &tl->slices[sl];
-		printf("%d %.3f %.3f %.3f\n", sl, ts->bpm, ts->length, ts->time);
-	}
+	/*
+		for (int sl = 0; sl < tl->nslices; sl++) {
+			timeslice *ts = &tl->slices[sl];
+			printf("%d %.3f %.3f %.3f\n", sl, ts->bpm, ts->length, ts->time);
+		}
+	*/
 }
 
 int timechange_compare(const void *a, const void *b) {

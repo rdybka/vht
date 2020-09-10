@@ -23,13 +23,32 @@ class VHTTimelineChange:
         self._tl_handle = tl
         self._chg_handle = chg
 
+    def __eq__(self, other):
+        if type(other) is not type(self):
+            return False
+
+        if self.row == other.row:
+            return True
+
+        return False
+
     @property
     def bpm(self):
         return libcvht.timechange_get_bpm(self._chg_handle)
 
+    @bpm.setter
+    def bpm(self, val):
+        libcvht.timechange_set_bpm(self._tl_handle, self._chg_handle, val)
+
     @property
     def linked(self):
         return libcvht.timechange_get_linked(self._chg_handle)
+
+    @linked.setter
+    def linked(self, val):
+        libcvht.timechange_set_linked(
+            self._tl_handle, self._chg_handle, val if val == 0 else 1
+        )
 
     @property
     def row(self):

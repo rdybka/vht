@@ -82,7 +82,11 @@ int timechange_get_linked(timechange *tc);
 void timechange_del(timeline *tl, int id);
 timechange *timeline_add_change(timeline *tl, float bpm, long row, int linked);
 timechange *timeline_get_change(timeline *tl, int id);
+timechange *timeline_change_get_at(timeline *tl, long row);
 int timeline_get_nchanges(timeline *tl);
+
+float timeline_get_bpm_at_qb(timeline *tl, long row);
+int timeline_get_interpol_at_qb(timeline *tl, long row);
 
 int timeline_get_nticks(timeline *tl);
 double timeline_get_tick(timeline *tl, int n);

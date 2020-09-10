@@ -86,7 +86,6 @@ class VHTApp(Gtk.Application):
                 "file:///" + os.path.split(self.main_win.last_filename)[0]
             )
             self.main_win.set_header_from_filename(self.main_win.last_filename)
-            self.main_win.adj.set_value(mod.bpm)
 
         mod.play = cfg.start_playing
 

@@ -425,34 +425,33 @@ class SequenceView(Gtk.Box):
                 cfg.octave = 0
             return True
 
+        bpmch = mod
+
+        if mod.timeline_view.curr_change:
+            bpmch = mod.timeline_view.curr_change
+
         if cfg.key["bpm_up"].matches(event):
-            mod.bpm = mod.bpm + 1
-            mod.mainwin.adj.set_value(mod.bpm)
+            bpmch.bpm = min(mod.max_bpm, bpmch.bpm + 1)
             return True
 
         if cfg.key["bpm_down"].matches(event):
-            mod.bpm = mod.bpm - 1
-            mod.mainwin.adj.set_value(mod.bpm)
+            bpmch.bpm = max(mod.min_bpm, bpmch.bpm - 1)
             return True
 
         if cfg.key["bpm_frac_up"].matches(event):
-            mod.bpm = mod.bpm + 0.01
-            mod.mainwin.adj.set_value(mod.bpm)
+            bpmch.bpm = min(mod.max_bpm, bpmch.bpm + 0.01)
             return True
 
         if cfg.key["bpm_frac_down"].matches(event):
-            mod.bpm = mod.bpm - 0.01
-            mod.mainwin.adj.set_value(mod.bpm)
+            bpmch.bpm = max(mod.min_bpm, bpmch.bpm - 0.01)
             return True
 
         if cfg.key["bpm_10_up"].matches(event):
-            mod.bpm = mod.bpm + 10
-            mod.mainwin.adj.set_value(mod.bpm)
+            bpmch.bpm = min(mod.max_bpm, bpmch.bpm + 10)
             return True
 
         if cfg.key["bpm_10_down"].matches(event):
-            mod.bpm = mod.bpm - 10
-            mod.mainwin.adj.set_value(mod.bpm)
+            bpmch.bpm = max(mod.min_bpm, bpmch.bpm - 10)
             return True
 
         if cfg.key["rpb_up"].matches(event):

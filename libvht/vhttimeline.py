@@ -57,6 +57,16 @@ class VHTTimeline:
         else:
             return None
 
+    def bpm_at_qb(self, qb):
+        return libcvht.timeline_get_bpm_at_qb(self._tl_handle, int(qb))
+
+    def interpol_at_qb(self, qb):  # is the bpm interpolated at this point?
+        return (
+            True
+            if libcvht.timeline_get_interpol_at_qb(self._tl_handle, int(qb))
+            else False
+        )
+
     def expand_start(
         self, qb_start
     ):  # prepare strips for expanding, returns max retract value

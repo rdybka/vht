@@ -83,20 +83,6 @@ class MainWin(Gtk.ApplicationWindow):
         button.connect("clicked", self.on_start_button_activate)
         self.hb.pack_start(button)
 
-        label = Gtk.Label("BPM:")
-        self.hb.pack_start(label)
-
-        self.adj = Gtk.Adjustment(120.0, mod.min_bpm, mod.max_bpm, 1, 10.0, 1.0)
-        self.bpmbutton = Gtk.SpinButton()
-        self.bpmbutton.set_adjustment(self.adj)
-        self.bpmbutton.set_digits(2)
-        self.bpmbutton.set_numeric(True)
-        self.bpmbutton.set_increments(1, 10)
-
-        self.hb.pack_start(self.bpmbutton)
-        self.adj.set_value(mod.bpm)
-        self.adj.connect("value-changed", self.on_bpm_changed)
-
         self.time_display = Gtk.Label()
         self.time_display.use_markup = True
 
@@ -245,9 +231,6 @@ class MainWin(Gtk.ApplicationWindow):
             butt.set_active(False)
             mod.play_mode = 1
 
-    def on_bpm_changed(self, adj):
-        mod.bpm = adj.get_value()
-
     def hide_timeline(self):
         if not self.timeline_visible:
             return
@@ -343,7 +326,6 @@ class MainWin(Gtk.ApplicationWindow):
 
         self.last_filename = filename
         self.set_header_from_filename(filename)
-        self.adj.set_value(mod.bpm)
         return True
 
     def gui_next_seq(self):
