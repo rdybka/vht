@@ -21,11 +21,6 @@
 
 #include "sequence.h"
 
-typedef struct loop_t {
-	long start;
-	long end;
-} loop;
-
 typedef struct timeslice_t {
 	float bpm;
 	double length;
@@ -53,16 +48,15 @@ typedef struct timeline_t {
 	timeslice *slices;
 	timechange *changes;
 	timestrip *strips;
-	loop *loops;
 	double *ticks; // time in secs for each qb
 	long nslices;
 	int nchanges;
 	int nstrips;
 	int nticks;
 	int ncols;
-	int nloops;
-	int loop_curr;
-	int loop_last;
+	double loop_start;
+	double loop_end;
+	double loop_active;
 	int length;  // in qbeats
 	double time_length;
 	double pos;  // qb
@@ -120,13 +114,12 @@ int timestrip_can_resize_seq(timeline *tl, timestrip *tstr, int len);
 int timestrip_can_rpb_seq(timeline *tl, timestrip *tstr, int rpb);
 
 // loops
-int timeline_get_nloops(timeline *tl);
-long timeline_get_loop_start(timeline *tl, int lp_id);
-long timeline_get_loop_end(timeline *tl, int lp_id);
-void timeline_set_loop_start(timeline *tl, int lp_id, long val);
-void timeline_set_loop_end(timeline *tl, int lp_id, long val);
-void timeline_del_loop(timeline *tl, int lp_id);
-int timeline_add_loop(timeline *tl, long lp_start, long lp_end);
-int timeline_get_loop_for_qb(timeline *tl, long qb);
+int timeline_get_loop_active(timeline *tl);
+void timeline_set_loop_active(timeline *tl, int val);
+long timeline_get_loop_start(timeline *tl);
+long timeline_get_loop_end(timeline *tl);
+void timeline_set_loop_start(timeline *tl, long val);
+void timeline_set_loop_end(timeline *tl, long val);
+
 
 #endif //__TIMELINE_H__

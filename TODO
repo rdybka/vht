@@ -1,13 +1,15 @@
 - timeline
-    - loops
+    - loop
     - playhead
     - feeding
     - transport
     - global ring
 - program change
     - clear in menu
-    - doubles
+    ? doubles
     - while paused
+- trackview
+    - redo
 - configuration
     - dialogs
     - metronome
@@ -19,9 +21,7 @@
 
 - api refactor
 - seq callback
-- trackview
-    - redo
-    - track colours
+? track colours
 - console
     - autofill
     - click in statusbar

@@ -683,6 +683,24 @@ def timeline_get_prev_seq(tl, tstr):
 def timeline_get_next_seq(tl, tstr):
     return _libcvht.timeline_get_next_seq(tl, tstr)
 
+def timeline_get_loop_active(tl):
+    return _libcvht.timeline_get_loop_active(tl)
+
+def timeline_set_loop_active(tl, val):
+    return _libcvht.timeline_set_loop_active(tl, val)
+
+def timeline_get_loop_start(tl):
+    return _libcvht.timeline_get_loop_start(tl)
+
+def timeline_get_loop_end(tl):
+    return _libcvht.timeline_get_loop_end(tl)
+
+def timeline_set_loop_start(tl, val):
+    return _libcvht.timeline_set_loop_start(tl, val)
+
+def timeline_set_loop_end(tl, val):
+    return _libcvht.timeline_set_loop_end(tl, val)
+
 def timestrip_set_start(tstr, start):
     return _libcvht.timestrip_set_start(tstr, start)
 

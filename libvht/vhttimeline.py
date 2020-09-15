@@ -18,6 +18,7 @@
 from libvht.vhttimelinechanges import VHTTimelineChanges
 from libvht.vhttimelineticks import VHTTimelineTicks
 from libvht.vhttimelinestrips import VHTTimelineStrips
+from libvht.vhttimelineloop import VHTTimelineLoop
 from libvht import libcvht
 
 
@@ -30,6 +31,7 @@ class VHTTimeline:
         self.strips = VHTTimelineStrips(self._mod, self._tl_handle)
         self.ticks = VHTTimelineTicks(self._tl_handle)
         self.changes = VHTTimelineChanges(self._tl_handle)
+        self.loop = VHTTimelineLoop(self._tl_handle)
 
     def clear(self):
         libcvht.timeline_clear(self._tl_handle)

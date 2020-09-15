@@ -272,6 +272,12 @@ extern int timestrip_can_rpb_seq(timeline *tl, timestrip *tstr, int rpb);
 extern sequence *timeline_get_prev_seq(timeline *tl, timestrip *tstr);
 extern sequence *timeline_get_next_seq(timeline *tl, timestrip *tstr);
 
+extern int timeline_get_loop_active(timeline *tl);
+extern void timeline_set_loop_active(timeline *tl, int val);
+extern long timeline_get_loop_start(timeline *tl);
+extern long timeline_get_loop_end(timeline *tl);
+extern void timeline_set_loop_start(timeline *tl, long val);
+extern void timeline_set_loop_end(timeline *tl, long val);
 
 extern void timestrip_set_start(timestrip *tstr, int start);
 extern void timestrip_set_length(timestrip *tstr, int length);

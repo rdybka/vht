@@ -37,15 +37,16 @@ timeline *timeline_new(void) {
 	ntl->changes = NULL;
 	ntl->strips = NULL;
 	ntl->ticks = NULL;
-	ntl->loops = NULL;
 	ntl->nchanges = 0;
 	ntl->nstrips = 0;
 	ntl->nticks = 0;
-	ntl->nloops = 0;
 
 	ntl->pos = 0.0;
 	ntl->length = 1024;
 	ntl->time_length = 0.0;
+	ntl->loop_start = -1;
+	ntl->loop_end = -1;
+	ntl->loop_active = 0;
 	timeline_update_inner(ntl);
 	pthread_mutex_init(&ntl->excl, NULL);
 	return(ntl);
@@ -56,7 +57,6 @@ void timeline_free(timeline *tl) {
 	free(tl->slices);
 	free(tl->changes);
 	free(tl->ticks);
-	free(tl->loops);
 	for(int s = 0; s < tl->nstrips; s++) {
 		sequence_free(tl->strips[s].seq);
 	}
@@ -799,3 +799,28 @@ void timeline_advance(timeline *tl, double period) {
 	timeline_excl_out(tl);
 	//printf("%f\n", tl->pos);
 }
+
+int timeline_get_loop_active(timeline *tl) {
+	return tl->loop_active;
+}
+
+void timeline_set_loop_active(timeline *tl, int val) {
+	tl->loop_active = val;
+}
+
+long timeline_get_loop_start(timeline *tl) {
+	return tl->loop_start;
+}
+
+long timeline_get_loop_end(timeline *tl) {
+	return tl->loop_end;
+}
+
+void timeline_set_loop_start(timeline *tl, long val) {
+	tl->loop_start = val;
+}
+
+void timeline_set_loop_end(timeline *tl, long val) {
+	tl->loop_end = val;
+}
+
