@@ -110,15 +110,17 @@ class VHTTimelineStrip:
 
     @rpb_start.setter
     def rpb_start(self, value):
-        libcvht.timestrip_set_rpb_start(self._ptr, value)
+        if 0 < value <= 32:
+            libcvht.timestrip_set_rpb_start(self._ptr, value)
 
     @property
     def rpb_end(self):
         return libcvht.timestrip_get_rpb_end(self._ptr)
 
-    @rpb_start.setter
+    @rpb_end.setter
     def rpb_end(self, value):
-        libcvht.timestrip_set_rpb_end(self._ptr, value)
+        if 0 < value <= 32:
+            libcvht.timestrip_set_rpb_end(self._ptr, value)
 
     def __str__(self):
         self.update_strrep()

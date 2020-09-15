@@ -161,6 +161,8 @@ class SequenceView(Gtk.Box):
 
     def on_key_press(self, widget, event):
         # print(Gdk.keyval_name(Gdk.keyval_to_lower(event.keyval)), event.keyval)
+        mod.status_bar.on_key_press(widget, event)
+
         if cfg.key["play"].matches(event):
             # play/stop
             if mod.play:
@@ -533,6 +535,7 @@ class SequenceView(Gtk.Box):
         return False
 
     def on_key_release(self, widget, event):
+        mod.status_bar.on_key_release(widget, event)
         # triggers from keypad
         if 65465 >= event.keyval >= 65456:
             sid = event.keyval - 65456

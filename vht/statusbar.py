@@ -48,7 +48,7 @@ class StatusBar(Gtk.DrawingArea):
 
         self._surface = None
         self._context = None
-        self.min_char_width = 70
+        self.min_char_width = 73
 
         self.pos = []
         self.active_field = None
@@ -59,6 +59,11 @@ class StatusBar(Gtk.DrawingArea):
         self.tt_txt = None
 
         self.pulse = Pulsar(mod[mod.curr_seq].rpb)
+
+        self.control_held = False
+        self.shift_held = False
+
+        mod.status_bar = self
 
     def redraw(self):
         self.queue_resize()
@@ -206,7 +211,15 @@ class StatusBar(Gtk.DrawingArea):
         else:
             cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
-        txt = " rpb:%d" % seq.rpb
+        if self.shift_held and self.active_field == 5 and type(seq.index) is not int:
+            strp = mod.timeline.strips[seq.index[1]]
+            if self.control_held:
+                txt = " rpb:%d!%d" % (strp.rpb_start, strp.rpb_end)
+            else:
+                txt = " rpb:%d!%d" % (strp.rpb_start, strp.rpb_end)
+        else:
+            txt = " rpb:%d" % seq.rpb
+
         *_, dx, _ = cr.text_extents(txt)
         cr.move_to(self.pos[-1], h)
         cr.show_text(txt)
@@ -414,6 +427,21 @@ class StatusBar(Gtk.DrawingArea):
                 bpmch.bpm = max(mod.min_bpm, bpmch.bpm - 1)
 
         if self.active_field == 5:
+            if self.shift_held:
+                seqid = mod[mod.curr_seq].index
+                if type(seqid) is not int:
+                    if self.control_held:
+                        if up:
+                            mod.timeline.strips[seqid[1]].rpb_end += 1
+                        if down:
+                            mod.timeline.strips[seqid[1]].rpb_end -= 1
+                    else:
+                        if up:
+                            mod.timeline.strips[seqid[1]].rpb_start += 1
+                        if down:
+                            mod.timeline.strips[seqid[1]].rpb_start -= 1
+                return True
+
             if up:
                 org = mod[mod.curr_seq].rpb
                 mod[mod.curr_seq].rpb += 1
@@ -442,10 +470,26 @@ class StatusBar(Gtk.DrawingArea):
         return True
 
     def on_leave(self, wdg, prm):
+        self.control_held = False
+        self.shift_held = False
         self.active_field = None
 
     def on_button_press(self, widget, event):
         pass
+
+    def on_key_press(self, widget, event):
+        if 65507 <= event.keyval <= 65508:  # ctrl
+            self.control_held = True
+
+        if 65505 <= event.keyval <= 65506:  # shift
+            self.shift_held = True
+
+    def on_key_release(self, widget, event):
+        if 65507 <= event.keyval <= 65508:  # ctrl
+            self.control_held = False
+
+        if 65505 <= event.keyval <= 65506:  # shift
+            self.shift_held = False
 
     def on_button_release(self, widget, event):
         up = down = middle = False
