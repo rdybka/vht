@@ -1,5 +1,4 @@
 - timeline
-    - clone to mtx
     - rpb start / end gui
     - loop
     - playhead
@@ -19,12 +18,12 @@
     - midi buttons
 - labels on tooltips
 - export
+
 - api refactor
 - seq callback
 - trackview
     - redo
     - track colours
-    ? sound clicked note (midclick)
 - console
     - autofill
     - click in statusbar

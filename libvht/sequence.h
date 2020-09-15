@@ -75,7 +75,9 @@ void sequence_double(sequence *seq);
 void sequence_halve(sequence *seq);
 void sequence_free(sequence *);
 void sequence_advance(sequence *seq, double period, jack_nframes_t nframes);
+
 sequence *sequence_clone(sequence *seq);
+void sequence_strip_parent(sequence *seq);
 
 int sequence_get_thumb_dirty(sequence *seq);
 int sequence_get_thumb_length(sequence *seq);

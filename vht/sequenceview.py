@@ -268,9 +268,14 @@ class SequenceView(Gtk.Box):
 
         if cfg.key["sequence_clone"].matches(event):
             idx = mod.clone_sequence(mod.curr_seq).index
-            self.seq.extras["sequence_name"] = extras.get_name(
-                self.seq.extras["sequence_name"]
-            )
+
+            nname = None
+            if type(mod.curr_seq.index) is int:
+                nname = self.seq.extras["sequence_name"]
+            else:
+                nname = mod[self.seq.parent].extras["sequence_name"]
+
+            mod[idx].extras["sequence_name"] = extras.get_name(nname)
 
             self.switch(idx)
             mod.curr_seq = idx

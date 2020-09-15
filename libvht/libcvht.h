@@ -120,6 +120,7 @@ extern void sequence_set_rpb(sequence *seq, int rpb);
 
 extern int sequence_get_cue(sequence *seq);
 extern sequence *sequence_clone(sequence *seq);
+extern void sequence_strip_parent(sequence *seq);
 
 extern int sequence_get_thumb(sequence *seq, int *ret, int l);
 extern int sequence_get_thumb_dirty(sequence *seq);

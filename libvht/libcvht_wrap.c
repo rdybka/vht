@@ -5438,6 +5438,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_sequence_strip_parent(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_strip_parent" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  sequence_strip_parent(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_sequence_get_thumb(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   sequence *arg1 = (sequence *) 0 ;
@@ -9220,6 +9242,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "sequence_set_rpb", _wrap_sequence_set_rpb, METH_VARARGS, NULL},
 	 { "sequence_get_cue", _wrap_sequence_get_cue, METH_O, NULL},
 	 { "sequence_clone", _wrap_sequence_clone, METH_O, NULL},
+	 { "sequence_strip_parent", _wrap_sequence_strip_parent, METH_O, NULL},
 	 { "sequence_get_thumb", _wrap_sequence_get_thumb, METH_VARARGS, NULL},
 	 { "sequence_get_thumb_dirty", _wrap_sequence_get_thumb_dirty, METH_O, NULL},
 	 { "sequence_get_thumb_length", _wrap_sequence_get_thumb_length, METH_O, NULL},

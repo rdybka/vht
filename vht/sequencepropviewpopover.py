@@ -53,17 +53,25 @@ class SequencePropViewPopover(Gtk.Popover):
         button.add(image)
         button.connect("clicked", self.on_add_button_clicked)
         button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["track_add"]))
-        self.grid.attach(button, 0, 0, 2, 1)
+        self.grid.attach(button, 0, 0, 1, 1)
+
+        button = Gtk.Button()
+        icon = Gio.ThemedIcon(name="edit-copy")
+        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+        button.add(image)
+        button.connect("clicked", self.on_clone_button_clicked)
+        button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["sequence_clone"]))
+        self.grid.attach(button, 0, 1, 1, 1)
 
         button = Gtk.Button("double")
         button.connect("clicked", self.on_double_clicked)
         button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["sequence_double"]))
-        self.grid.attach(button, 0, 2, 1, 1)
+        self.grid.attach(button, 1, 1, 1, 1)
 
         button = Gtk.Button("halve")
         button.connect("clicked", self.on_halve_clicked)
         button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["sequence_halve"]))
-        self.grid.attach(button, 0, 3, 1, 1)
+        self.grid.attach(button, 1, 2, 1, 1)
 
         self.length_adj = Gtk.Adjustment(0, 1, seq.max_length, 1.0, 1.0)
         self.length_button = Gtk.SpinButton()
@@ -73,7 +81,7 @@ class SequencePropViewPopover(Gtk.Popover):
             "value-changed", self.on_length_changed
         )
 
-        self.grid.attach(self.length_button, 0, 1, 1, 1)
+        self.grid.attach(self.length_button, 1, 0, 1, 1)
 
         self.grid.show_all()
         self.add(self.grid)
@@ -146,6 +154,19 @@ class SequencePropViewPopover(Gtk.Popover):
     def on_add_button_clicked(self, switch):
         self.parent.add_track()
         self.parent.seqview.recalculate_row_spacing()
+
+    def on_clone_button_clicked(self, switch):
+        idx = mod.clone_sequence(self.seq.index).index
+
+        mod[idx].extras["sequence_name"] = extras.get_name(
+            mod[self.seq.index].extras["sequence_name"]
+        )
+
+    def on_rpb_toggled(self, wdg):
+        if wdg.get_active():
+            print("show")
+        else:
+            print("hide")
 
     def on_double_clicked(self, switch):
         self.parent.seqview.double()

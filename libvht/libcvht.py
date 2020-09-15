@@ -317,6 +317,9 @@ def sequence_get_cue(seq):
 def sequence_clone(seq):
     return _libcvht.sequence_clone(seq)
 
+def sequence_strip_parent(seq):
+    return _libcvht.sequence_strip_parent(seq)
+
 def sequence_get_thumb(seq, ret, l):
     return _libcvht.sequence_get_thumb(seq, ret, l)
 

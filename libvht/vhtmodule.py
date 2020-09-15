@@ -185,7 +185,16 @@ class VHTModule(Iterable):
         libcvht.timeline_update(self.timeline._tl_handle)
 
     def clone_sequence(self, s):
-        seq = libcvht.sequence_clone(self[s]._seq_handle)
+        seq = None
+        if type(s) is int:
+            seq = libcvht.sequence_clone(self[s]._seq_handle)
+        else:
+            seq = libcvht.sequence_clone(
+                libcvht.timeline_get_seq(self.timeline._tl_handle, s[1])
+            )
+
+            libcvht.sequence_strip_parent(seq)
+
         libcvht.module_add_sequence(self._mod_handle, seq)
         for cb in self.cb_new_sequence:
             cb(libcvht.sequence_get_index(seq))
