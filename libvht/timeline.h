@@ -21,6 +21,11 @@
 
 #include "sequence.h"
 
+typedef struct loop_t {
+	long start;
+	long end;
+} loop;
+
 typedef struct timeslice_t {
 	float bpm;
 	double length;
@@ -37,7 +42,7 @@ typedef struct timechange_t {
 typedef struct timestrip_t {
 	sequence *seq;
 	int col;
-	int start;
+	long start;
 	int length;
 	int rpb_start;
 	int rpb_end;
@@ -48,17 +53,19 @@ typedef struct timeline_t {
 	timeslice *slices;
 	timechange *changes;
 	timestrip *strips;
+	loop *loops;
 	double *ticks; // time in secs for each qb
 	long nslices;
 	int nchanges;
 	int nstrips;
 	int nticks;
 	int ncols;
+	int nloops;
+	int loop_curr;
+	int loop_last;
 	int length;  // in qbeats
 	double time_length;
 	double pos;  // qb
-	int loop_start;
-	int loop_end;
 
 	pthread_mutex_t excl;
 } timeline;
@@ -91,20 +98,20 @@ int timeline_get_interpol_at_qb(timeline *tl, long row);
 
 int timeline_get_nticks(timeline *tl);
 double timeline_get_tick(timeline *tl, int n);
-int timeline_get_room(timeline *tl, int col, int qb, int ig);
-int timeline_get_snap(timeline *tl, int tstr_id, int qb_delta);
+int timeline_get_room(timeline *tl, int col, long qb, int ig);
+int timeline_get_snap(timeline *tl, int tstr_id, long qb_delta);
 int timeline_place_clone(timeline *tl, int tstr_id);
 timestrip *timeline_get_strip(timeline *tl, int n);
 sequence *timeline_get_seq(timeline *tl, int n);
 sequence *timeline_get_prev_seq(timeline *tl, timestrip *tstr);
 sequence *timeline_get_next_seq(timeline *tl, timestrip *tstr);
-int timeline_expand_start(timeline *tl, int qb_start);
-int timeline_expand(timeline *tl, int qb_start, int qb_n);
+int timeline_expand_start(timeline *tl, long qb_start);
+int timeline_expand(timeline *tl, long qb_start, long qb_n);
 
-int timeline_get_strip_for_qb(timeline *tl, int col, int qb);
-int timeline_get_last_strip(timeline *tl, int col, int qb);
+int timeline_get_strip_for_qb(timeline *tl, int col, long qb);
+int timeline_get_last_strip(timeline *tl, int col, long qb);
 int timeline_get_nstrips(timeline *tl);
-timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end);
+timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, long start, int length, int rpb_start, int rpb_end);
 void timeline_del_strip(timeline *tl, int id);
 void timeline_delete_all_strips(timeline *tl, int col);
 
@@ -112,5 +119,14 @@ void timeline_delete_all_strips(timeline *tl, int col);
 int timestrip_can_resize_seq(timeline *tl, timestrip *tstr, int len);
 int timestrip_can_rpb_seq(timeline *tl, timestrip *tstr, int rpb);
 
+// loops
+int timeline_get_nloops(timeline *tl);
+long timeline_get_loop_start(timeline *tl, int lp_id);
+long timeline_get_loop_end(timeline *tl, int lp_id);
+void timeline_set_loop_start(timeline *tl, int lp_id, long val);
+void timeline_set_loop_end(timeline *tl, int lp_id, long val);
+void timeline_del_loop(timeline *tl, int lp_id);
+int timeline_add_loop(timeline *tl, long lp_start, long lp_end);
+int timeline_get_loop_for_qb(timeline *tl, long qb);
 
 #endif //__TIMELINE_H__

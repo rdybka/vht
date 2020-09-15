@@ -304,6 +304,17 @@ class VHTModule(Iterable):
         libcvht.module_set_play_mode(self._mod_handle, value)
 
     @property
+    def transport(self):
+        return True if libcvht.module_get_transport(self._mod_handle) else False
+
+    @transport.setter
+    def transport(self, val):
+        if val:
+            libcvht.module_set_transport(self._mod_handle, 1)
+        else:
+            libcvht.module_set_transport(self._mod_handle, 0)
+
+    @property
     def time(self):
         return libcvht.module_get_time(self._mod_handle)
 

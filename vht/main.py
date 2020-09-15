@@ -91,15 +91,16 @@ class VHTApp(Gtk.Application):
 
     def on_load(self, action, param):
         dialog = Gtk.FileChooserDialog(
-            "Please choose a file",
-            self.get_active_window(),
-            Gtk.FileChooserAction.OPEN,
-            (
-                Gtk.STOCK_CANCEL,
-                Gtk.ResponseType.CANCEL,
-                Gtk.STOCK_OPEN,
-                Gtk.ResponseType.OK,
-            ),
+            title="Please choose a file",
+            parent=self.get_active_window(),
+            action=Gtk.FileChooserAction.OPEN,
+        )
+
+        dialog.add_buttons(
+            Gtk.STOCK_CANCEL,
+            Gtk.ResponseType.CANCEL,
+            Gtk.STOCK_OPEN,
+            Gtk.ResponseType.OK,
         )
 
         self.add_file_filters(dialog)
@@ -141,15 +142,16 @@ class VHTApp(Gtk.Application):
 
         if not self.main_win.last_filename:
             dialog = Gtk.FileChooserDialog(
-                "Please choose a file",
-                self.get_active_window(),
-                Gtk.FileChooserAction.SAVE,
-                (
-                    Gtk.STOCK_CANCEL,
-                    Gtk.ResponseType.CANCEL,
-                    Gtk.STOCK_SAVE,
-                    Gtk.ResponseType.OK,
-                ),
+                title="Please choose a file",
+                parent=self.get_active_window(),
+                action=Gtk.FileChooserAction.SAVE,
+            )
+
+            dialog.add_buttons(
+                Gtk.STOCK_CANCEL,
+                Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_SAVE,
+                Gtk.ResponseType.OK,
             )
 
             self.add_file_filters(dialog)

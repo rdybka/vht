@@ -37,14 +37,15 @@ timeline *timeline_new(void) {
 	ntl->changes = NULL;
 	ntl->strips = NULL;
 	ntl->ticks = NULL;
+	ntl->loops = NULL;
 	ntl->nchanges = 0;
 	ntl->nstrips = 0;
 	ntl->nticks = 0;
+	ntl->nloops = 0;
 
 	ntl->pos = 0.0;
 	ntl->length = 1024;
 	ntl->time_length = 0.0;
-	ntl->loop_start = ntl->loop_end = -1;
 	timeline_update_inner(ntl);
 	pthread_mutex_init(&ntl->excl, NULL);
 	return(ntl);
@@ -55,6 +56,7 @@ void timeline_free(timeline *tl) {
 	free(tl->slices);
 	free(tl->changes);
 	free(tl->ticks);
+	free(tl->loops);
 	for(int s = 0; s < tl->nstrips; s++) {
 		sequence_free(tl->strips[s].seq);
 	}
@@ -352,7 +354,7 @@ double timeline_get_qb_time(timeline *tl, long row) {
 }
 
 
-int timeline_get_room(timeline *tl, int col, int qb, int ig) {
+int timeline_get_room(timeline *tl, int col, long qb, int ig) {
 	if (col < 0)
 		return 0;
 
@@ -383,7 +385,7 @@ int timeline_get_room(timeline *tl, int col, int qb, int ig) {
 	return ret;
 }
 
-int timeline_get_snap(timeline *tl, int tstr_id, int qb_delta) {
+int timeline_get_snap(timeline *tl, int tstr_id, long qb_delta) {
 	timestrip *tstr = &tl->strips[tstr_id];
 	int ret = tstr->start;
 
@@ -531,7 +533,7 @@ sequence *timeline_get_seq(timeline *tl, int n) {
 	return tl->strips[n].seq;
 }
 
-int timeline_get_strip_for_qb(timeline *tl, int col, int qb) {
+int timeline_get_strip_for_qb(timeline *tl, int col, long qb) {
 	for (int s = 0; s < tl->nstrips; s++)
 		if (tl->strips[s].seq->parent == col &&
 		        tl->strips[s].start <= qb &&
@@ -541,7 +543,7 @@ int timeline_get_strip_for_qb(timeline *tl, int col, int qb) {
 	return -1;
 }
 
-int timeline_get_last_strip(timeline *tl, int col, int qb) {
+int timeline_get_last_strip(timeline *tl, int col, long qb) {
 	int ret = -1;
 	int max_r = -1;
 
@@ -557,7 +559,7 @@ int timeline_get_last_strip(timeline *tl, int col, int qb) {
 	return ret;
 }
 
-int timeline_expand(timeline *tl, int qb_start, int qb_n) {
+int timeline_expand(timeline *tl, long qb_start, long qb_n) {
 	timeline_excl_in(tl);
 
 	for (int s = 0; s < tl->nstrips; s++) {
@@ -575,7 +577,7 @@ int timeline_expand(timeline *tl, int qb_start, int qb_n) {
 	return 0;
 }
 
-int timeline_expand_start(timeline *tl, int qb) {
+int timeline_expand_start(timeline *tl, long qb) {
 	// retag_all
 	for (int s = 0; s < tl->nstrips; s++) {
 		timestrip *strp = &tl->strips[s];
@@ -659,7 +661,7 @@ int timeline_expand_start(timeline *tl, int qb) {
 	return ret;
 }
 
-timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end) {
+timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, long start, int length, int rpb_start, int rpb_end) {
 	timeline_excl_in(tl);
 
 	int maxid = -1;

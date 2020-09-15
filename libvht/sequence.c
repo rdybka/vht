@@ -74,6 +74,10 @@ sequence *sequence_new(int length) {
 	return seq;
 }
 
+void sequence_strip_parent(sequence *seq) {
+	seq->parent = -1;
+}
+
 void sequence_trk_reindex(sequence *seq) {
 	for (int t = 0; t < seq->ntrk; t++) {
 		seq->trk[t]->index = t;

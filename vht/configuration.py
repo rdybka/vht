@@ -70,7 +70,11 @@ class Configuration:
         self.pointer_opacity = 1.0
         self.pointer_width = 5
         self.auto_scroll_delay = 0.2
-        self.tooltip_markup = """<span font_family="Monospace" size="large">%s</span>"""
+        self.tooltip_markup = (
+            """<span font_family="Monospace" size="medium">%s</span>"""
+        )
+        self.tooltip_markup2 = """<span font_family="Monospace" size="large">%s\n</span><span font_family="Monospace" size="medium">%s</span>"""
+
         self.window_opacity = 1.0
 
         self.sequence_name_format = "s%02d"
@@ -125,6 +129,7 @@ class Configuration:
             "quit": cfgkey("q", False, True, False),
             "toggle_timeline": cfgkey("Tab", False, True, False),
             "toggle_console": cfgkey("grave", False, False, False),
+            "toggle_transport": cfgkey("t", False, False, True),
             "play": cfgkey("Return", False, False, False),
             "reset": cfgkey("Escape", False, False, False),
             "multi_record": cfgkey("space", False, True, False),

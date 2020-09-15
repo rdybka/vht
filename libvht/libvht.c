@@ -288,10 +288,6 @@ void sequence_set_lost(sequence *seq, int p) {
 	seq->lost = p;
 }
 
-void sequence_strip_parent(sequence *seq) {
-	seq->parent = -1;
-}
-
 void track_set_playing(track *trk, int p) {
 	trk->playing = p;
 	if (p == 0) {

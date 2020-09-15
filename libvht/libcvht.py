@@ -140,6 +140,12 @@ def module_get_bpm(mod):
 def module_set_bpm(mod, arg2):
     return _libcvht.module_set_bpm(mod, arg2)
 
+def module_set_transport(mod, t):
+    return _libcvht.module_set_transport(mod, t)
+
+def module_get_transport(mod):
+    return _libcvht.module_get_transport(mod)
+
 def module_get_nseq(mod):
     return _libcvht.module_get_nseq(mod)
 

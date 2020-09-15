@@ -83,6 +83,13 @@ class MainWin(Gtk.ApplicationWindow):
         button.connect("clicked", self.on_start_button_activate)
         self.hb.pack_start(button)
 
+        self.transport_switch = Gtk.Switch()
+        self.hb.pack_start(self.transport_switch)
+        self.transport_switch.set_tooltip_markup(
+            cfg.tooltip_markup2 % ("transport", cfg.key["toggle_transport"])
+        )
+        self.transport_switch.connect("state-set", self.on_transport_switch)
+
         self.time_display = Gtk.Label()
         self.time_display.use_markup = True
 
@@ -130,21 +137,23 @@ class MainWin(Gtk.ApplicationWindow):
         self.seq_add_butt.add(image)
         self.seq_add_butt.connect("clicked", self.on_seq_add_butt_clicked)
         self.seq_add_butt.set_tooltip_markup(
-            cfg.tooltip_markup % (cfg.key["sequence_add"])
+            cfg.tooltip_markup2 % ("add seq", cfg.key["sequence_add"])
         )
 
         icon = Gio.ThemedIcon(name="process-stop")
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
         self.butt_panic.add(image)
         self.butt_panic.connect("clicked", self.on_butt_panic_clicked)
-        self.butt_panic.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["panic"]))
+        self.butt_panic.set_tooltip_markup(
+            cfg.tooltip_markup2 % ("panique", cfg.key["panic"])
+        )
 
         icon = Gio.ThemedIcon(name="media-playlist-repeat")
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
         self.seq_mode_butt.add(image)
         self.seq_mode_butt.connect("clicked", self.on_playmode_clicked)
         self.seq_mode_butt.set_tooltip_markup(
-            cfg.tooltip_markup % (cfg.key["play_mode"])
+            cfg.tooltip_markup2 % ("play mode", cfg.key["play_mode"])
         )
 
         buttbox = Gtk.Box()
@@ -204,6 +213,10 @@ class MainWin(Gtk.ApplicationWindow):
             """<span font_desc="Roboto bold" font_family="monospace" size="x-large">%s</span>"""
             % mod.time
         )
+
+        if self.transport_switch.props.state != mod.transport:
+            self.transport_switch.props.state = mod.transport
+
         return 1
 
     def on_start_button_activate(self, switch):
@@ -219,6 +232,9 @@ class MainWin(Gtk.ApplicationWindow):
 
     def on_seq_add_butt_clicked(self, butt):
         self.sequence_view.seq_add()
+
+    def on_transport_switch(self, wdg, state):
+        mod.transport = state
 
     def on_butt_panic_clicked(self, butt):
         mod.panic(True)

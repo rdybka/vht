@@ -53,6 +53,9 @@ extern int module_is_recording(module *mod);
 extern float module_get_bpm(module *mod);
 extern void module_set_bpm(module *mod, float);
 
+extern void module_set_transport(module *mod, int t);
+extern int module_get_transport(module *mod);
+
 extern int module_get_nseq(module *mod);
 extern sequence *module_get_seq(module *mod, int);
 extern void module_add_sequence(module *mod, sequence *seq);
@@ -243,16 +246,16 @@ extern void timeline_clear(timeline *tl);
 
 extern timestrip *timeline_get_strip(timeline *tl, int n);
 extern int timeline_get_nstrips(timeline *tl);
-extern timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, int start, int length, int rpb_start, int rpb_end);
-extern int timeline_get_strip_for_qb(timeline *tl, int col, int qb);
-extern int timeline_get_last_strip(timeline *tl, int col, int qb);
-extern int timeline_expand_start(timeline *tl, int qb_start);
-extern int timeline_expand(timeline *tl, int qb_start, int qb_n);
+extern timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, long start, int length, int rpb_start, int rpb_end);
+extern int timeline_get_strip_for_qb(timeline *tl, int col, long qb);
+extern int timeline_get_last_strip(timeline *tl, int col, long qb);
+extern int timeline_expand_start(timeline *tl, long qb_start);
+extern int timeline_expand(timeline *tl, long qb_start, long qb_n);
 
 extern void timeline_del_strip(timeline *tl, int id);
 extern sequence *timeline_get_seq(timeline *tl, int n);
-extern int timeline_get_room(timeline *tl, int col, int qb, int ig);
-extern int timeline_get_snap(timeline *tl, int tstr_id, int qb_delta);
+extern int timeline_get_room(timeline *tl, int col, long qb, int ig);
+extern int timeline_get_snap(timeline *tl, int tstr_id, long qb_delta);
 extern int timeline_place_clone(timeline *tl, int tstr_id);
 extern void timeline_update(timeline *tl);
 

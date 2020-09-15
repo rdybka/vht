@@ -56,7 +56,9 @@ class SequenceListViewPopover(Gtk.Popover):
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
         button.add(image)
         button.connect("clicked", self.on_remove_button_clicked)
-        button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["sequence_delete"]))
+        button.set_tooltip_markup(
+            cfg.tooltip_markup2 % ("delete", cfg.key["sequence_delete"])
+        )
         grid.attach(button, 0, 0, 1, 1)
         self._del_button = button
 
@@ -65,7 +67,9 @@ class SequenceListViewPopover(Gtk.Popover):
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
         button.add(image)
         button.connect("clicked", self.on_clone_button_clicked)
-        button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["sequence_clone"]))
+        button.set_tooltip_markup(
+            cfg.tooltip_markup2 % ("clone", cfg.key["sequence_clone"])
+        )
         grid.attach(button, 1, 0, 1, 1)
 
         self._entry = Gtk.Entry()

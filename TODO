@@ -1,5 +1,5 @@
 - timeline
-    - loop
+    - loops
     - playhead
     - feeding
     - transport
@@ -15,7 +15,6 @@
     - defaults
     - look
     - midi buttons
-- labels on tooltips
 - export
 
 - api refactor

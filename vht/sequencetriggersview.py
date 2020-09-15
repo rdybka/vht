@@ -209,9 +209,11 @@ class SequenceTriggersView(Gtk.Grid):
 
             ms = mod[self.seq].extras["mouse_cfg"]
             l = ["   ", " l ", " m ", " r "]
+            ll = ["no button assigned", "", "middle mouse", "right mouse"]
             self._mmute.set_text(l[ms[0]])
             self._mcue.set_text(l[ms[1]])
             self._mplay.set_text(l[ms[2]])
+
             self.refreshing = False
 
     def on_mouse_cfg_clicked(self, wdg, evt, d):

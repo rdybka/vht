@@ -171,6 +171,9 @@ class SequenceView(Gtk.Box):
             else:
                 mod.play = 1
 
+        if cfg.key["toggle_transport"].matches(event):
+            mod.transport = not mod.transport
+
         if cfg.key["multi_record"].matches(event):
             if mod.record == 2:
                 mod.record = 0

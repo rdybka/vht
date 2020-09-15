@@ -52,6 +52,7 @@ typedef struct module_t {
 	pthread_mutex_t excl;
 	midi_client *clt;
 	int play_mode; // 0 - seq_loop, 1 - timeline
+	int transp;
 } module;
 
 module *module_new(void);
@@ -73,6 +74,9 @@ void module_synch_output_ports(module *mod);
 
 void module_set_play_mode(module *mod, int m);
 int module_get_play_mode(module *mod);
+
+void module_set_transport(module *mod, int t);
+int module_get_transport(module *mod);
 
 void sequence_handle_record(module *mod, sequence *seq, midi_event evt);
 void module_panic(module *mod, int brutal);

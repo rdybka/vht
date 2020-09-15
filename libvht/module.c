@@ -203,6 +203,7 @@ module *module_new() {
 	mod->cur_rec_update = 0;
 	mod->tline = timeline_new();
 	mod->seq = malloc(sizeof(sequence *));
+	mod->transp = 0;
 	pthread_mutex_init(&mod->excl, NULL);
 	mod->clt = midi_client_new(mod);
 	mod->play_mode = 0;
@@ -287,6 +288,7 @@ void module_add_sequence(module *mod, sequence *seq) {
 	if (pos > 0.0) {
 		seq->pos = pos;
 		for (int t = 0; t < seq->ntrk; t++) {
+			seq->trk[t]->clt = mod->clt;
 			track_wind(seq->trk[t], pos);
 		}
 	}
@@ -404,4 +406,17 @@ void module_set_play_mode(module *mod, int m) {
 
 int module_get_play_mode(module *mod) {
 	return mod->play_mode;
+}
+
+void module_set_transport(module *mod, int t) {
+	if (t) {
+		mod->transp = 1;
+	} else {
+		mod->transp = 0;
+	}
+
+	printf("transp: %d\n", t);
+}
+int module_get_transport(module *mod) {
+	return mod->transp;
 }
