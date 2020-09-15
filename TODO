@@ -1,15 +1,11 @@
 - timeline
-    - bpm
-        - move changes
+    - clone to mtx
+    - rpb start / end gui
     - loop
     - playhead
     - feeding
     - transport
     - global ring
-- trackview
-    - undo/redo
-    - track colours
-    ? sound clicked note (midclick)
 - program change
     - clear in menu
     - doubles
@@ -23,8 +19,12 @@
     - midi buttons
 - labels on tooltips
 - export
-- seq gui callback
 - api refactor
+- seq callback
+- trackview
+    - redo
+    - track colours
+    ? sound clicked note (midclick)
 - console
     - autofill
     - click in statusbar

@@ -91,6 +91,7 @@ timechange *timeline_add_change(timeline *tl, float bpm, long row, int linked) {
 	tc->bpm = bpm;
 	tc->linked = linked;
 	tc->row = row;
+	tc->tag = 0;
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
 	return tc;
@@ -157,12 +158,16 @@ float timeline_get_bpm_at_qb(timeline *tl, long row) {
 	if (row < tl->nslices)
 		return tl->slices[row].bpm;
 
+	timechange *tc = &tl->changes[tl->nchanges - 1];
+	if (tc->row == tl->length)
+		return tc->bpm;
+
 	return tl->slices[tl->nslices - 1].bpm;
 }
 
 int timeline_get_interpol_at_qb(timeline *tl, long row) {
 	int chgid = 0;
-	int maxr = tl->length;
+	int maxr = tl->length + 1;
 
 	for (int c = 0; c < tl->nchanges; c++) {
 		timechange *chg = &tl->changes[c];
@@ -202,10 +207,11 @@ void timeline_update_chunk(timeline *tl, int from, int to) {
 		rto = tl->changes[to].row;
 	}
 
-	printf("upd: %ld -> %ld\n", rfrom, rto);
+	//printf("upd: %d -> %d => %ld -> %ld\n", from, to, rfrom, rto);
 	float bpmd = (bpmt - bpmf) / (rto - rfrom);
-	if (!tl->changes[to].linked)
-		bpmd = 0.0;
+	if (to > -1)
+		if (!tl->changes[to].linked)
+			bpmd = 0.0;
 
 	if (rto > tl->nslices)
 		rto = tl->nslices;
@@ -215,9 +221,10 @@ void timeline_update_chunk(timeline *tl, int from, int to) {
 		bpmf += bpmd;
 	}
 
-	if (tl->changes[to].row == 0) {
-		tl->slices[0].bpm = tl->changes[to].bpm;
-	}
+	if (to > -1)
+		if (tl->changes[to].row == 0) {
+			tl->slices[0].bpm = tl->changes[to].bpm;
+		}
 }
 
 void timeline_update(timeline *tl) {
@@ -225,10 +232,10 @@ void timeline_update(timeline *tl) {
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
 	/*
-		for (int sl = 0; sl < tl->nslices; sl++) {
-			timeslice *ts = &tl->slices[sl];
-			printf("%d %.3f %.3f %.3f\n", sl, ts->bpm, ts->length, ts->time);
-		}
+			for (int sl = 0; sl < tl->nslices; sl++) {
+				timeslice *ts = &tl->slices[sl];
+				printf("%d %.3f %.3f %.3f\n", sl, ts->bpm, ts->length, ts->time);
+			}
 	*/
 }
 
@@ -558,6 +565,11 @@ int timeline_expand(timeline *tl, int qb_start, int qb_n) {
 			tl->strips[s].start += qb_n;
 	}
 
+	for (int c = 0; c < tl->nchanges; c++) {
+		if (tl->changes[c].tag)
+			tl->changes[c].row += qb_n;
+	}
+
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
 	return 0;
@@ -577,9 +589,33 @@ int timeline_expand_start(timeline *tl, int qb) {
 		}
 	}
 
-	// figure out max retract value
+	for (int c = 0; c < tl->nchanges; c++) {
+		if (tl->changes[c].row >= qb) {
+			tl->changes[c].tag = 1;
+		} else {
+			tl->changes[c].tag = 0;
+		}
+	}
+
 	int ret = -1;
 
+	// figure out for timechanges
+	int minr = 0;
+	int maxr = tl->length;
+
+	for (int c = 0; c < tl->nchanges; c++) {
+		timechange *tc = &tl->changes[c];
+		if ((tc->row < qb) && (tc->row > minr))
+			minr = tc->row;
+
+		if ((tc->row >= qb) && (tc->row < maxr))
+			maxr = tc->row;
+	}
+
+	if (maxr < tl->length)
+		ret = maxr - minr - 1;
+
+	// figure out max retract value for strips
 	for (int s = 0; s < tl->nstrips; s++) {
 		timestrip *strp = &tl->strips[s];
 

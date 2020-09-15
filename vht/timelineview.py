@@ -98,6 +98,7 @@ class TimelineView(Gtk.DrawingArea):
 
         self.mouse_in_timeline = False
         self.mouse_in_changes = False
+        self.moving_bpm = False
         self.highlight_change = None
         self.curr_change = None
 
@@ -353,6 +354,17 @@ class TimelineView(Gtk.DrawingArea):
                 cr.stroke()
                 cr.restore()
 
+        # timechange insert indicator
+        if self.mouse_in_changes and self.zoom_hold:
+            if not mod.timeline.changes.get_at_qb(self.pointer_r):
+                rr = (
+                    mod.timeline.qb2t(self.pointer_r) - mod.timeline.qb2t(self.qb_start)
+                ) / self.spl
+
+                xx = w - tw
+                cr.arc(xx, rr, 2, 0, math.pi * 2)
+                cr.fill()
+
         # grid
         cr.save()
         cr.rectangle(0, 0, w - (tw + self.scrollbar_width * 1.5), h)
@@ -524,7 +536,17 @@ class TimelineView(Gtk.DrawingArea):
                 pr = self.exp_start + self.exp_last_delta
                 t = mod.timeline.qb2t(pr)
 
-            lbl = "%d %d:%02d:%02d " % (pr, t // 60, t % 60, (t * 100) % 100)
+            if self.moving_bpm:
+                pr = min(mod.timeline.nqb, self.curr_change.row)
+                t = mod.timeline.qb2t(pr)
+
+            lbl = "%d %d:%02d:%02d %.2f " % (
+                pr,
+                t // 60,
+                t % 60,
+                (t * 100) % 100,
+                mod.timeline.bpm_at_qb(pr),
+            )
 
             lblextra = ""
             # lblextra = " %d %d" % (ry, nomorelaby)
@@ -591,8 +613,7 @@ class TimelineView(Gtk.DrawingArea):
 
     def on_button_press(self, widget, event):
         self.hint = None
-
-        if not self.mouse_in_timeline:
+        if not self.moving_bpm:
             self.curr_change = None
 
         if (
@@ -616,7 +637,7 @@ class TimelineView(Gtk.DrawingArea):
             if not tc and self.pointer_r <= mod.timeline.nqb:
                 bpm = mod.timeline.bpm_at_qb(self.pointer_r)
                 lnk = mod.timeline.interpol_at_qb(self.pointer_r)
-                chg = mod.timeline.changes.insert(bpm, self.pointer_r, False)
+                chg = mod.timeline.changes.insert(bpm, self.pointer_r, lnk)
                 self.curr_change = mod.timeline.changes.get_at_qb(self.pointer_r)
                 return
 
@@ -626,7 +647,17 @@ class TimelineView(Gtk.DrawingArea):
             and event.button == cfg.select_button
             and not self.zoom_hold
         ):
-            self.curr_change = mod.timeline.changes.get_at_qb(self.pointer_r)
+            self.curr_change = (
+                self.highlight_change
+            )  # mod.timeline.changes.get_at_qb(self.pointer_r)
+            if self.curr_change:
+                if self.curr_change.row == 0:
+                    return
+
+                self.moving_bpm = True
+                self.gest_start_r = self.curr_change.row
+                self.move_start_r = self.curr_change.row
+                self.move_last_delta = 0
 
         if (
             self.mouse_in_changes
@@ -638,6 +669,10 @@ class TimelineView(Gtk.DrawingArea):
                 self.highlight_change.linked = not self.highlight_change.linked
             return
 
+        if self.moving_bpm:
+            return
+
+        # del change
         if (
             self.mouse_in_changes
             and event.button == cfg.delete_button
@@ -650,6 +685,8 @@ class TimelineView(Gtk.DrawingArea):
 
             if delid > 0:
                 del mod.timeline.changes[delid]
+
+            self.curr_change = self.highlight_change = None
 
         if self.resizing or self.moving:
             return
@@ -734,6 +771,10 @@ class TimelineView(Gtk.DrawingArea):
         self.moving = False
         self.resizing = False
         self.expanding = False
+        # self.curr_change = None
+        self.highlight_change = None
+        self.moving_bpm = False
+
         self.curr_strip_id = -1
         self.get_window().set_cursor(None)
         return True
@@ -752,7 +793,9 @@ class TimelineView(Gtk.DrawingArea):
 
         self.mouse_in_timeline = False
         self.mouse_in_changes = False
-        self.highlight_change = None
+
+        if not self.moving_bpm:
+            self.highlight_change = None
 
         if event.x > tw:
             self.mouse_in_timeline = True
@@ -778,6 +821,17 @@ class TimelineView(Gtk.DrawingArea):
                 )
                 mod.timeline.strips[self.curr_strip_id].start = snappos
                 self.move_last_delta = delta
+
+        if self.moving_bpm:
+            delta = int(math.floor(self.pointer_r - self.gest_start_r))
+            delta = round((delta / self.snap)) * self.snap
+            if self.move_last_delta != delta:
+                nrow = max(1, min(mod.timeline.nqb, self.move_start_r + delta))
+                if not mod.timeline.changes.get_at_qb(nrow):
+                    self.move_last_delta = delta
+                    self.curr_change.row = nrow
+                    self.curr_change = mod.timeline.changes.get_at_qb(nrow)
+                    self.highlight_change = self.curr_change
 
         if self.resizing and self.curr_strip_id > -1:
             strp = mod.timeline.strips[self.curr_strip_id]
@@ -950,49 +1004,39 @@ class TimelineView(Gtk.DrawingArea):
                 self.l2t(self.pointer_xy[1]) + mod.timeline.qb2t(self.qb_start)
             )
 
-            self.pointer_r = round((self.pointer_r / self.snap)) * self.snap
+            if self.mouse_in_changes and not self.moving_bpm:
+                self.highlight_change = mod.timeline.changes.get_at_qb(self.pointer_r)
 
-        self.pointer_ry_dest = max(
-            (mod.timeline.qb2t(self.pointer_r) - mod.timeline.qb2t(self.qb_start))
-            / self.spl,
-            0,
-        )
+            if not self.moving_bpm:
+                self.pointer_r = round((self.pointer_r / self.snap)) * self.snap
+
+        rr = self.pointer_r
 
         if self.curr_strip_id > -1:
             strp = mod.timeline.strips[self.curr_strip_id]
             if self.moving:
-                self.pointer_ry_dest = max(
-                    (mod.timeline.qb2t(strp.start) - mod.timeline.qb2t(self.qb_start))
-                    / self.spl,
-                    0,
-                )
+                rr = strp.start
             elif self.resizing:
-                self.pointer_ry_dest = max(
-                    (
-                        mod.timeline.qb2t(strp.start + strp.length)
-                        - mod.timeline.qb2t(self.qb_start)
-                    )
-                    / self.spl,
-                    0,
-                )
+                rr = strp.start + strp.length
 
         if self.expanding:
-            self.pointer_ry_dest = max(
-                (
-                    mod.timeline.qb2t(self.exp_start + self.exp_last_delta)
-                    - mod.timeline.qb2t(self.qb_start)
-                )
-                / self.spl,
-                0,
-            )
+            rr = self.exp_start + self.exp_last_delta
+
+        if self.moving_bpm:
+            rr = self.curr_change.row
+
+        if self.mouse_in_changes and self.highlight_change and not self.moving_bpm:
+            rr = self.highlight_change.row
+            self.pointer_r = rr
+
+        self.pointer_ry_dest = max(
+            (mod.timeline.qb2t(rr) - mod.timeline.qb2t(self.qb_start)) / self.spl, 0,
+        )
 
         hint = None
 
         if self.moving or self.resizing or self.expanding:
             return
-
-        if self.mouse_in_changes:
-            self.highlight_change = mod.timeline.changes.get_at_qb(self.pointer_r)
 
         if self.clone_hold and self.curr_strip_id > -1:
             strp = mod.timeline.strips[self.curr_strip_id]

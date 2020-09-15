@@ -31,6 +31,7 @@ typedef struct timechange_t {
 	float bpm;
 	int linked;
 	long row;
+	int tag;
 } timechange;
 
 typedef struct timestrip_t {

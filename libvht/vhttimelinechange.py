@@ -54,6 +54,10 @@ class VHTTimelineChange:
     def row(self):
         return libcvht.timechange_get_row(self._chg_handle)
 
+    @row.setter
+    def row(self, val):
+        libcvht.timechange_set_row(self._tl_handle, self._chg_handle, int(val))
+
     def __str__(self):
         ret = {"bpm": self.bpm, "linked": self.linked, "row": self.row}
 

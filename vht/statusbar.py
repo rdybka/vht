@@ -478,12 +478,15 @@ class StatusBar(Gtk.DrawingArea):
                 cfg.skip = max(cfg.skip - 1, -16)
 
         if self.active_field == 4:
+            bpmch = mod
+
+            if mod.timeline_view.curr_change:
+                bpmch = mod.timeline_view.curr_change
+
             if up:
-                mod.bpm = mod.bpm + 1
-                mod.mainwin.adj.set_value(mod.bpm)
+                bpmch.bpm = min(mod.max_bpm, bpmch.bpm + 1)
             if down:
-                mod.bpm = mod.bpm - 1
-                mod.mainwin.adj.set_value(mod.bpm)
+                bpmch.bpm = max(mod.min_bpm, bpmch.bpm - 1)
 
         if self.active_field == 5:
             if up:
