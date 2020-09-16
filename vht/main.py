@@ -19,6 +19,7 @@
 
 
 from vht.mainwin import MainWin
+from vht.shortcutmayhem import ShortcutMayhem
 from vht import mod, cfg, ctrlcfg, autoexec, bankcfg, randomcomposer
 from gi.repository import GLib, Gtk, Gio, GdkPixbuf
 import vht.extras
@@ -60,6 +61,10 @@ class VHTApp(Gtk.Application):
 
         action = Gio.SimpleAction.new("about", None)
         action.connect("activate", self.on_about_dialog)
+        self.add_action(action)
+
+        action = Gio.SimpleAction.new("keyb", None)
+        action.connect("activate", self.on_shortcut_dialog)
         self.add_action(action)
 
     def do_command_line(self, command_line):
@@ -133,6 +138,10 @@ class VHTApp(Gtk.Application):
         )
         ab.run()
         ab.close()
+
+    def on_shortcut_dialog(self, action, param):
+        dlg = ShortcutMayhem()
+        dlg.show()
 
     def save_with_dialog(self):
         mod.extras["timeline_win_pos"] = (

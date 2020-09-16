@@ -1,8 +1,6 @@
-- trackview
-    - redo
 - timeline
-    - bouncing
     - feeding
+    - bouncing
     - transport
     - playhead
     - loop

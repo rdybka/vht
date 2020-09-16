@@ -2026,6 +2026,7 @@ class TrackView(Gtk.DrawingArea):
         if cfg.key["track_resend_patch"].matches(event):
             prg = self.trk.get_program()
             self.trk.send_program_change(prg[2])
+            return
 
         if cfg.key["toggle_notes"].matches(event):
             return self.toggle_notes()

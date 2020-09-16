@@ -199,8 +199,8 @@ class Configuration:
             "velocity_10_down": cfgkey("Page_Down", False, False, True),
             "channel_up": cfgkey("KP_Add", True, False, True),
             "channel_down": cfgkey("KP_Subtract", True, False, True),
-            "port_up": cfgkey("none", True, False, True),
-            "port_down": cfgkey("none", True, False, True),
+            "port_up": cfgkey("KP_Multiply", True, False, True),
+            "port_down": cfgkey("KP_Divide", True, False, True),
             "hold_editor": cfgkey("Control_L", False, False, False),
             "node_snap": cfgkey("Control_L", False, False, False),
             "toggle_notes": cfgkey("1", False, True, False),
@@ -280,6 +280,21 @@ class cfgkey:
             return False
 
         return True
+
+    def to_accel(self):
+        ret = ""
+        if self.ctrl:
+            ret += "<ctrl>"
+
+        if self.shift:
+            ret += "<shift>"
+
+        if self.alt:
+            ret += "<alt>"
+
+        ret += "%s" % self.key
+
+        return ret
 
     def __str__(self):
         ret = ""

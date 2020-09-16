@@ -34,8 +34,7 @@ from gi.repository import Gtk, Gdk, Gio
 
 class MainWin(Gtk.ApplicationWindow):
     def __init__(self, app):
-        super().__init__(application=app)
-
+        super(MainWin, self).__init__(application=app)
         # here we GUI
 
         self.fs = False
