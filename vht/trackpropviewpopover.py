@@ -234,6 +234,10 @@ class TrackPropViewPopover(Gtk.Popover):
 
         lab = Gtk.Button.new_with_label("patch:")
         lab.connect("button-press-event", self.on_resend_patch_clicked, 0)
+        lab.set_tooltip_markup(
+            cfg.tooltip_markup2 % ("resend patch", cfg.key["track_resend_patch"])
+        )
+
         self.show_timeshift_button.set_active(self.extras["track_show_timeshift"])
 
         grid.attach(lab, 0, 3, 1, 1)
@@ -288,6 +292,15 @@ class TrackPropViewPopover(Gtk.Popover):
 
             self.patch_menu.append(m)
             i += 1
+
+        m = Gtk.SeparatorMenuItem()
+        m.show()
+        self.patch_menu.append(m)
+        m = Gtk.MenuItem("clear")
+        m.patch = -1
+        m.connect("activate", self.on_patch_menu_item_activate)
+        m.show()
+        self.patch_menu.append(m)
 
         self.patch_menu_button = Gtk.MenuButton()
         self.patch_menu_button.set_popup(self.patch_menu)
@@ -483,16 +496,20 @@ class TrackPropViewPopover(Gtk.Popover):
         self.build_clone_menu()
 
     def on_patch_menu_item_activate(self, itm):
-        self.trk.set_bank(*itm.patch[0][:2])
-
-        self.extras["last_patch_file"] = itm.name
-        self.patch_adj.set_value(itm.patch[0][2])
+        if itm.patch == -1:
+            self.trk.set_bank(-1, -1)
+            self.trk.send_program_change(-1)
+        else:
+            self.trk.set_bank(*itm.patch[0][:2])
+            self.trk.send_program_change(itm.patch[0][2])
+            self.extras["last_patch_file"] = itm.name
+            if not self.name_lab.get_active():
+                self.name_entry.set_text(itm.patch[1])
 
         b = self.trk.get_program()
+        self.patch_adj.set_value(b[2])
         self.bank_msb.set_text("%d" % b[0])
         self.bank_lsb.set_text("%d" % b[1])
-        if not self.name_lab.get_active():
-            self.name_entry.set_text(itm.patch[1])
 
     def refresh(self):
         if self.trkview.trk.nctrl == 1:

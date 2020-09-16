@@ -1,28 +1,19 @@
-- timeline
-    - loop
-    - playhead
-    - feeding
-    - transport
-    - global ring
-- program change
-    - clear in menu
-    ? doubles
-    - while paused
 - trackview
     - redo
+- timeline
+    - bouncing
+    - feeding
+    - transport
+    - playhead
+    - loop
+    - global ring
 - configuration
     - dialogs
-    - metronome
+    ? metronome
     - ports
     - defaults
     - look
     - midi buttons
-- export
-
-- api refactor
-- seq callback
-? track colours
-- console
-    - autofill
-    - click in statusbar
-    - documentation
+- export with jack_capture
+    - sampling :]
+- procedural music

@@ -15,11 +15,7 @@
         <attribute name="label">Save as</attribute>
       </item>
       <submenu>
-        <attribute name="label">Export</attribute>
-			<item>
-			<attribute name="action">app.exp_midi</attribute>
-			<attribute name="label">Midi</attribute>
-			</item>
+        <attribute name="label">Render</attribute>
 			<item>
 			<attribute name="action">app.exp_audio</attribute>
 			<attribute name="label">Audio</attribute>

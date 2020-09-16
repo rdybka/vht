@@ -29,7 +29,7 @@ class Configuration:
         self.mixer_font = "Monospace"
         self.timeline_font = "Monospace"
 
-        self.seq_font_size = 24
+        self.seq_font_size = 18
         self.mixer_font_size = 16
         self.timeline_font_size = 12
         self.mixer_padding = 1.5
@@ -37,10 +37,12 @@ class Configuration:
         self.seq_spacing = 1.05
         self.status_bar_font_size = 24
 
+        self.mainwin_size = (800, 400)
+
         self.console_scale = 1
         self.timeline_position = 200
-        self.timeline_position_y = 150
-        self.console_position = 0.7
+        self.timeline_position_y = 120
+        self.console_position = 0.6
         self.console_show = False
         self.timeline_show = False
         self.console_steal_stderr = True
@@ -73,7 +75,7 @@ class Configuration:
         self.tooltip_markup = (
             """<span font_family="Monospace" size="medium">%s</span>"""
         )
-        self.tooltip_markup2 = """<span font_family="Monospace" size="large">%s\n</span><span font_family="Monospace" size="medium">%s</span>"""
+        self.tooltip_markup2 = """<span font_family="Sans" size="large">%s\n</span><span font_family="Monospace" size="medium">%s</span>"""
 
         self.window_opacity = 1.0
 
@@ -169,6 +171,7 @@ class Configuration:
             "track_move_first": cfgkey("Home", False, True, False),
             "track_clear": cfgkey("d", True, False, False),
             "track_clone": cfgkey("n", True, True, False),
+            "track_resend_patch": cfgkey("r", False, False, True),
             "sequence_add": cfgkey("n", False, True, False),
             "sequence_play_mode": cfgkey("", False, False, False),
             "sequence_next": cfgkey("period", False, True, False),

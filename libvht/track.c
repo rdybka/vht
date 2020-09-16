@@ -584,6 +584,56 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 	}
 }
 
+void track_fix_program_change(track *trk) {
+	// send program change?
+	if (trk->prog > -1) {
+		midi_client *clt = (midi_client *)trk->clt;
+
+		if ((trk->prog_sent == 0))  {
+			int send_last = 0;
+
+			trk->prog_sent = 1;
+			midi_event evt;
+
+			evt.time = 1;
+			evt.channel = trk->channel;
+			evt.type = control_change;
+			evt.control = 0;
+			evt.data = trk->bank_msb;
+
+			if (trk->bank_msb > -1) {
+				midi_buffer_add(clt, trk->port, evt);
+				send_last = 1;
+			}
+
+			evt.time = 2;
+			evt.channel = trk->channel;
+			evt.type = control_change;
+			evt.control = 32;
+			evt.data = trk->bank_lsb;
+
+			if (trk->bank_lsb > -1) {
+				midi_buffer_add(clt, trk->port, evt);
+				send_last = 1;
+			}
+
+			evt.time = 0;
+			if (send_last) {
+				evt.time = 3;
+			}
+
+			evt.channel = trk->channel;
+			evt.type = program_change;
+			evt.control = trk->prog;
+			evt.data = 0;
+
+			midi_buffer_add(clt, trk->port, evt);
+
+			trk->indicators |= 8;
+		}
+	}
+}
+
 void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 	if (trk->resync) {
 		return;
@@ -603,56 +653,7 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 	if (row_end > trk->nrows)
 		row_end = trk->nrows;
 
-	// send program change?
-	if (trk->prog > -1) {
-		if ((trk->prog_sent == 0) && (trk->playing))  {
-			int resend = 0;
-
-			trk->prog_sent = 1;
-			midi_event evt;
-
-			evt.time = 1;
-			evt.channel = trk->channel;
-			evt.type = control_change;
-			evt.control = 0;
-			evt.data = trk->bank_msb;
-
-			if (trk->bank_msb > -1) {
-				midi_buffer_add(clt, trk->port, evt);
-				resend = 1;
-			}
-
-			evt.time = 2;
-			evt.channel = trk->channel;
-			evt.type = control_change;
-			evt.control = 32;
-			evt.data = trk->bank_lsb;
-
-			if (trk->bank_lsb > -1) {
-				midi_buffer_add(clt, trk->port, evt);
-				resend = 1;
-			}
-
-			evt.time = 0;
-			evt.channel = trk->channel;
-			evt.type = program_change;
-			evt.control = trk->prog;
-			evt.data = 0;
-
-			midi_buffer_add(clt, trk->port, evt);
-
-			if (resend) {
-				evt.time = 3;
-				evt.channel = trk->channel;
-				evt.type = program_change;
-				evt.control = trk->prog;
-				evt.data = 0;
-
-				midi_buffer_add(clt, trk->port, evt);
-			}
-			trk->indicators |= 8;
-		}
-	}
+	track_fix_program_change(trk);
 
 	// quick controls
 	if (trk->pos < trk->last_pos || trk->last_pos == 0.0 ||\

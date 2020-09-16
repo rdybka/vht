@@ -182,6 +182,13 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 			timeline_advance(mod->tline, period);
 			mod->song_pos = mod->tline->pos;
 		}
+	} else {
+		// send program changes if needed
+		for (int s = 0; s < mod->nseq; s++) {
+			for (int t = 0; t < mod->seq[s]->ntrk; t++)
+				track_fix_program_change(mod->seq[s]->trk[t]);
+		}
+
 	}
 
 	//printf("time: %02d:%02d:%03d %3.5f %d\n", module.min, module.sec, module.ms, period, module.bpm);

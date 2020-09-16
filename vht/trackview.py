@@ -2023,6 +2023,10 @@ class TrackView(Gtk.DrawingArea):
         if self.velocity_editor:
             self.velocity_editor.on_key_press(widget, event)
 
+        if cfg.key["track_resend_patch"].matches(event):
+            prg = self.trk.get_program()
+            self.trk.send_program_change(prg[2])
+
         if cfg.key["toggle_notes"].matches(event):
             return self.toggle_notes()
 

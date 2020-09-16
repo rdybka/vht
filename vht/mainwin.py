@@ -187,7 +187,7 @@ class MainWin(Gtk.ApplicationWindow):
 
         self.add(self.vbox)
 
-        self.set_default_size(800, 600)
+        self.set_default_size(*cfg.mainwin_size)
         self.show_all()
 
         self.sequence_view._sv.grab_focus()

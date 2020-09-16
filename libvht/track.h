@@ -132,6 +132,7 @@ void track_kill_notes(track *trk);
 void track_set_program(track *trk, int p);
 void track_set_bank(track *trk, int msb, int lsb);
 char *track_get_program(track *trk);
+void track_fix_program_change(track *trk);
 
 void track_set_loop(track *trk, int v);
 int track_get_loop(track *trk);
