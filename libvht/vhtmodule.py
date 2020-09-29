@@ -170,6 +170,10 @@ class VHTModule(Iterable):
                 libcvht.module_get_seq(self._mod_handle, itm), self, self.cb_new_track
             )
 
+    def new_sequence(self, length=-1):
+        seq = libcvht.sequence_new(length)
+        return VHTSequence(seq, self, self.cb_new_track)
+
     def add_sequence(self, length=-1):
         seq = libcvht.sequence_new(length)
         libcvht.module_add_sequence(self._mod_handle, seq)
@@ -301,7 +305,8 @@ class VHTModule(Iterable):
 
     @play_mode.setter
     def play_mode(self, value):
-        libcvht.module_set_play_mode(self._mod_handle, value)
+        v = 1 if value else 0
+        libcvht.module_set_play_mode(self._mod_handle, v)
 
     @property
     def transport(self):
@@ -362,6 +367,7 @@ class VHTModule(Iterable):
         jm["ctrlpr"] = self.ctrlpr
         jm["extras"] = self.extras
         jm["curr_seq"] = self.curr_seq
+        jm["play_mode"] = self.play_mode
         jm["seq"] = []
         for seq in self:
             jm["seq"].append(pack_seq(seq))
@@ -382,6 +388,7 @@ class VHTModule(Iterable):
             strp["length"] = strip.length
             strp["rpb_start"] = strip.rpb_start
             strp["rpb_end"] = strip.rpb_end
+            strp["enabled"] = strip.enabled
             strp["seq"] = pack_seq(strip.seq)
             tl["strips"].append(strp)
 
@@ -410,6 +417,7 @@ class VHTModule(Iterable):
             self.bpm = jm["bpm"]
             self.ctrlpr = jm["ctrlpr"]
             self.extras = jm["extras"]
+            self.play_mode = jm["play_mode"]
             for seq in jm["seq"]:
                 self.unpack_seq(seq, True)
 
@@ -423,7 +431,7 @@ class VHTModule(Iterable):
                 self.timeline.changes.insert(self.bpm, 0, 0)
 
             for strp in tl["strips"]:
-                self.timeline.strips.insert(
+                s = self.timeline.strips.insert(
                     strp["col"],
                     self.unpack_seq(strp["seq"]),
                     strp["start"],
@@ -431,6 +439,8 @@ class VHTModule(Iterable):
                     strp["rpb_start"],
                     strp["rpb_end"],
                 )
+
+                s.enabled = strp["enabled"]
 
             self.curr_seq = jm["curr_seq"]
             self.midi_synch_ports()

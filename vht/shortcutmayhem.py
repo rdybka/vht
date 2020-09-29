@@ -85,7 +85,7 @@ shorts = {
         ("Port down", "port_down"),
         ("Resend patch", "track_resend_patch"),
     ],
-    "Track cont.": [
+    "Track": [
         ("Add", "track_add"),
         ("Delete", "track_del"),
         ("Clear", "track_clear"),
@@ -117,22 +117,26 @@ shorts = {
         ("Transpose 12 up", "transp_12_up"),
         ("Transpose 12 down", "transp_12_down"),
     ],
-    "Controllers": [
-        ("Snap/Hold/Add node", "node_snap"),
-        ("Link", "link"),
-        ("Doodle copy", "doodle_copy"),
-        ("Doodle cut", "doodle_cut"),
-        ("Doodle paste", "doodle_paste"),
-        ("Doodle delete", "doodle_delete"),
-        ("Doodle render", "doodle_render"),
+    "Controllers": [("Link", "link"),],
+    "Doodles": [
+        ("Copy", "doodle_copy"),
+        ("Cut", "doodle_cut"),
+        ("Paste", "doodle_paste"),
+        ("Delete", "doodle_delete"),
+        ("Render", "doodle_render"),
     ],
+    "Timeline": [],
 }
-
 
 customs = {
     "General": [("Mute/Unmute", "F1...F12"), ("Piano", "z...m q...u")],
-    "Controllers": [("0-127", "z...m")],
+    "Controllers": [("0-127", "z...m"), ("Snap / Hold / Add node", "<ctrl>"),],
     "Playback": [("Trigger (keypad)", "KP_0...KP_9")],
+    "Timeline": [
+        ("Snap", "<alt>"),
+        ("Zoom / Add bpm node", "<ctrl>"),
+        ("Shift time / Clone strip", "<shift>"),
+    ],
 }
 
 

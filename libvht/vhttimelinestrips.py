@@ -53,9 +53,13 @@ class VHTTimelineStrips(Iterable):
             return None
 
     def insert(self, col, seq, start, length, rpb_start, rpb_end):
+        sq = seq
+        if type(seq) is VHTSequence:
+            sq = seq._seq_handle
+
         return VHTTimelineStrip(
             libcvht.timeline_add_strip(
-                self._tl_handle, col, seq, start, length, rpb_start, rpb_end,
+                self._tl_handle, col, sq, start, length, rpb_start, rpb_end,
             ),
             self._mod,
         )

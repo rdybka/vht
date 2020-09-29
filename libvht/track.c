@@ -211,6 +211,16 @@ void track_set_ctrl_num(track *trk, int c, int v) {
 	pthread_mutex_unlock(&trk->exclctrl);
 }
 
+int track_get_indicators(track *trk) {
+	trk->indicators &= ~8;
+	for (int c = 0; c < trk->ncols; c++) {
+		if (trk->ring[c] > -1)
+			trk->indicators |= 8;
+	}
+
+	return trk->indicators;
+}
+
 // as played
 void track_get_ctrl(track *trk, int *ret, int l, int c, int n) {
 	int ll = 0;
@@ -698,12 +708,13 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 				row r;
 				track_get_row(trk, c, nn, &r);
 
-				double trigger_time = (double)n + ((double)r.delay / 100);  //49.0
+				double trigger_time = (double)n + ((double)r.delay / 100);
 				double delay = trigger_time - trk->pos;
+				double fdelay = (clt->jack_buffer_size - nframes) + delay * tmul;
 
-				if ((delay >= 0) && (delay < tperiod)) {
+				if ((delay >= 0) && (tperiod - delay > 0.00000001)) {
 					if (trk->playing) {
-						track_play_row(trk, nn, c, (clt->jack_buffer_size - nframes) + delay * tmul);
+						track_play_row(trk, nn, c, fdelay);
 					}
 				}
 			}
@@ -812,9 +823,11 @@ void track_kill_notes(track *trk) {
 		for (int t = 0; t < trk->nrows; t++) {
 			trk->rows[c][t].ringing = 0;
 		}
-
-		pthread_mutex_unlock(&trk->excl);
 	}
+
+	trk->indicators = 0;
+
+	pthread_mutex_unlock(&trk->excl);
 }
 
 void track_ctrl_refresh_envelope(track *trk, int c) {

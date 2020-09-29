@@ -44,11 +44,19 @@ class VHTTimeline:
     def nqb(self):  # length in qbeats
         return libcvht.timeline_get_nticks(self._tl_handle)
 
+    @property
+    def pos(self):
+        return libcvht.timeline_get_pos(self._tl_handle)
+
+    @pos.setter
+    def pos(self, val):
+        libcvht.timeline_set_pos(self._tl_handle, float(val), 0)
+
     def t2qb(self, t):  # qb for time in seconds
         return libcvht.timeline_get_qb(self._tl_handle, t)
 
     def qb2t(self, qb):  # time is seconds for given qb
-        return libcvht.timeline_get_qb_time(self._tl_handle, int(qb))
+        return libcvht.timeline_get_qb_time(self._tl_handle, qb)
 
     def qb2s(self, col, qb):  # strip_id (if any) for given col and qb
         return libcvht.timeline_get_strip_for_qb(self._tl_handle, col, int(qb))

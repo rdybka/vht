@@ -1,13 +1,17 @@
+- new seqs off
+- feeding beyond strips
+- triggers while stopped
+- pointer rubbish
 - timeline
-    - feeding
-    - bouncing
-    - transport
-    - playhead
+    - switching modes (smart pre-delay for coming back to timeline)
     - loop
-    - global ring
+    - record
+- trackview:
+    - undo/redo
+        - track
+        - ctrl
 - configuration
     - dialogs
-    ? metronome
     - ports
     - defaults
     - look

@@ -83,6 +83,7 @@ class MainWin(Gtk.ApplicationWindow):
         self.hb.pack_start(button)
 
         self.transport_switch = Gtk.Switch()
+        self.transport_switch.set_state(cfg.start_transport)
         self.hb.pack_start(self.transport_switch)
         self.transport_switch.set_tooltip_markup(
             cfg.tooltip_markup2 % ("transport", cfg.key["toggle_transport"])
@@ -150,7 +151,8 @@ class MainWin(Gtk.ApplicationWindow):
         icon = Gio.ThemedIcon(name="media-playlist-repeat")
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
         self.seq_mode_butt.add(image)
-        self.seq_mode_butt.connect("clicked", self.on_playmode_clicked)
+        self.seq_mode_butt.set_active(not mod.play_mode)
+        self.seq_mode_butt.connect("toggled", self.on_playmode_toggled)
         self.seq_mode_butt.set_tooltip_markup(
             cfg.tooltip_markup2 % ("play mode", cfg.key["play_mode"])
         )
@@ -238,13 +240,8 @@ class MainWin(Gtk.ApplicationWindow):
     def on_butt_panic_clicked(self, butt):
         mod.panic(True)
 
-    def on_playmode_clicked(self, butt):
-        if mod.play_mode:
-            butt.set_active(True)
-            mod.play_mode = 0
-        else:
-            butt.set_active(False)
-            mod.play_mode = 1
+    def on_playmode_toggled(self, butt):
+        mod.play_mode = not butt.get_active()
 
     def hide_timeline(self):
         if not self.timeline_visible:
@@ -313,7 +310,7 @@ class MainWin(Gtk.ApplicationWindow):
             return True
 
         if cfg.key["play_mode"].matches(event):
-            self.on_playmode_clicked(self.seq_mode_butt)
+            self.seq_mode_butt.props.active = not self.seq_mode_butt.props.active
             return True
 
         return False

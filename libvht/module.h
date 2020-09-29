@@ -56,6 +56,7 @@ typedef struct module_t {
 } module;
 
 module *module_new(void);
+void module_play(module *mod, int);
 void module_free(module *mod);
 void module_advance(module *mod, jack_nframes_t curr_frames);
 void module_mute(module *mod);
@@ -64,6 +65,9 @@ void module_dump_notes(module *mod, int n);
 
 void module_excl_in(module *mod);
 void module_excl_out(module *mod);
+
+void module_synch_transp(module *mod, int play, jack_nframes_t frames);
+void module_send_transp(module *mod, int play, jack_nframes_t frames);
 
 void module_add_sequence(module *mod, sequence *seq);
 void module_del_sequence(module *mod, int s);

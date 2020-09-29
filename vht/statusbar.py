@@ -186,6 +186,13 @@ class StatusBar(Gtk.DrawingArea):
         xx += dx
         self.pos.append(xx)
 
+        if (
+            mod.play_mode == 1
+            and self.active_field == 4
+            and not mod.timeline_view.curr_change
+        ):
+            self.active_field = -1
+
         if self.active_field == 4 or mod.timeline_view.curr_change:
             cr.set_source_rgb(
                 *(col * cfg.intensity_txt_highlight for col in cfg.star_colour)
@@ -245,15 +252,9 @@ class StatusBar(Gtk.DrawingArea):
         else:
             cr.set_source_rgb(*(col * intensity for col in cfg.colour))
 
-        cid = cs
-        if type(cs) is tuple:
-            cid = cs[1]
-
-        txt = "%02d:%03d.%03d ***" % (
-            cid,
-            int(seq.pos),
-            (seq.pos - int(seq.pos)) * 1000,
-        )
+        r = mod.timeline.pos
+        t = mod.timeline.qb2t(r)
+        txt = "%.3f %d:%02d:%02d" % (r, t // 60, t % 60, (t * 100) % 100,)
 
         *_, dx, _ = cr.text_extents(txt)
         cr.move_to(w - dx, h)
@@ -454,6 +455,12 @@ class StatusBar(Gtk.DrawingArea):
                 if org != mod[mod.curr_seq].rpb:
                     mod.mainwin.sequence_view.highlight = mod[mod.curr_seq].rpb
                     mod.mainwin.sequence_view.redraw_track()
+
+            seqid = mod[mod.curr_seq].index
+            if type(seqid) is not int:
+                mod.timeline.strips[seqid[1]].rpb_start = mod.timeline.strips[
+                    seqid[1]
+                ].rpb_end = mod[mod.curr_seq].rpb
 
         if self.active_field == 6:
             if up:

@@ -222,6 +222,9 @@ extern void ctrlrow_set_anchor(ctrlrow *crw, int a);
 extern void ctrlrow_set(ctrlrow *crw, int v, int l, int s, int a);
 
 // timeline
+extern void timeline_set_pos(timeline *tl, double npos, int let_ring);
+extern double timeline_get_pos(timeline *tl);
+
 extern void timechange_set_bpm(timeline *tl, timechange *tc, float bpm);
 extern void timechange_set_row(timeline *tl, timechange *tc, long row);
 extern void timechange_set_linked(timeline *tl, timechange *tc, int linked);
@@ -237,7 +240,7 @@ extern float timeline_get_bpm_at_qb(timeline *tl, long row);
 extern int timeline_get_interpol_at_qb(timeline *tl, long row);
 
 extern long timeline_get_qb(timeline *tl, double t);
-extern double timeline_get_qb_time(timeline *tl, long row);
+extern double timeline_get_qb_time(timeline *tl, double row);
 extern int timeline_get_nticks(timeline *tl);
 extern double timeline_get_tick(timeline *tl, int n);
 
@@ -269,6 +272,9 @@ extern int timestrip_get_rpb_end(timestrip *tstr);
 extern int timestrip_can_resize_seq(timeline *tl, timestrip *tstr, int len);
 extern int timestrip_can_rpb_seq(timeline *tl, timestrip *tstr, int rpb);
 
+extern int timestrip_get_enabled(timestrip *tstr);
+extern void timestrip_set_enabled(timestrip *tstr, int v);
+
 extern sequence *timeline_get_prev_seq(timeline *tl, timestrip *tstr);
 extern sequence *timeline_get_next_seq(timeline *tl, timestrip *tstr);
 
@@ -280,6 +286,7 @@ extern void timeline_set_loop_start(timeline *tl, long val);
 extern void timeline_set_loop_end(timeline *tl, long val);
 
 extern void timestrip_set_start(timestrip *tstr, int start);
+extern void timestrip_set_col(timestrip *tstr, int col);
 extern void timestrip_set_length(timestrip *tstr, int length);
 extern void timestrip_set_rpb_start(timestrip *tstr, int rpb_start);
 extern void timestrip_set_rpb_end(timestrip *tstr, int rpb_end);

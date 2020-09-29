@@ -30,9 +30,10 @@ void timeline_excl_out(timeline *tl) {
 	pthread_mutex_unlock(&tl->excl);
 }
 
-timeline *timeline_new(void) {
+timeline *timeline_new(midi_client *clt) {
 	timeline *ntl = malloc(sizeof(timeline));
 
+	ntl->clt = clt;
 	ntl->slices = NULL;
 	ntl->changes = NULL;
 	ntl->strips = NULL;
@@ -234,10 +235,10 @@ void timeline_update(timeline *tl) {
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
 	/*
-			for (int sl = 0; sl < tl->nslices; sl++) {
-				timeslice *ts = &tl->slices[sl];
-				printf("%d %.3f %.3f %.3f\n", sl, ts->bpm, ts->length, ts->time);
-			}
+	for (int sl = 0; sl < tl->nslices; sl++) {
+		timeslice *ts = &tl->slices[sl];
+		printf("%d %.3f %.3f %.3f\n", sl, ts->bpm, ts->length, ts->time);
+	}
 	*/
 }
 
@@ -288,6 +289,9 @@ void timeline_update_inner(timeline *tl) {
 	}
 
 	tl->time_length = tl->slices[tl->nslices - 1].time + tl->slices[tl->nslices - 1].length;
+
+	if (tl->pos > tl->length)
+		tl->pos = 0;
 }
 
 int tick_cmp(const void *t1, const void *t2) {
@@ -336,23 +340,32 @@ long timeline_get_qb(timeline *tl, double t) {
 	return -1;
 }
 
-double timeline_get_qb_time(timeline *tl, long row) {
+double timeline_get_qb_time(timeline *tl, double row) {
 	long rr = row;
+	double ret = 0.0;
 
 	if (rr < 0)
 		return 0;
 
-	if (rr >= tl->nticks -1) {
-		double t = tl->ticks[tl->nticks -1];
+	if (rr >= tl->nticks) {
 		double rl = tl->slices[tl->nticks -1].length;
+		ret = tl->ticks[tl->nticks - 1];
 		rr -= tl->nticks;
+		ret += rl + (rl * rr);
+	} else {
+		ret = tl->ticks[rr];
 
-		return t + rl + (rl * rr);
+		if ((double)rr < row) {
+			if (rr < tl->nticks - 1) {
+				ret += (row - (double)rr) * (tl->ticks[rr + 1] - tl->ticks[rr]);
+			} else {
+				ret += tl->slices[tl->nticks -1].length * (row - (double)rr);
+			}
+		}
 	}
 
-	return tl->ticks[rr];
+	return ret;
 }
-
 
 int timeline_get_room(timeline *tl, int col, long qb, int ig) {
 	if (col < 0)
@@ -568,9 +581,13 @@ int timeline_expand(timeline *tl, long qb_start, long qb_n) {
 	}
 
 	for (int c = 0; c < tl->nchanges; c++) {
-		if (tl->changes[c].tag)
+		if ((tl->changes[c].tag) && (tl->changes[c].row > 0))
 			tl->changes[c].row += qb_n;
 	}
+
+	if (tl->pos > qb_start)
+		tl->pos += qb_n;
+
 
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
@@ -683,6 +700,12 @@ timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, long start, 
 	s->seq->index = tl->nstrips - 1;
 	s->seq->playing = 0;
 	s->seq->pos = 0;
+	s->seq->clt = tl->clt;
+	s->enabled = 1;
+
+	for (int t = 0; t < s->seq->ntrk; t++) {
+		s->seq->trk[t]->clt = tl->clt;
+	}
 
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
@@ -792,12 +815,167 @@ void timeline_swap_sequence(timeline *tl, int s1, int s2) {
 	timeline_excl_out(tl);
 }
 
-void timeline_advance(timeline *tl, double period) {
-	timeline_excl_in(tl);
-	tl->pos += period;
+void timeline_reset(timeline *tl) {
+	tl->pos = 0;
+	for (int s = 0; s < tl->nstrips; s++) {
+		tl->strips[s].seq->playing = 0;
+	}
+}
 
+double timestrip_get_rpb(timestrip *strp, double offs) {
+	double ret = strp->rpb_start;
+
+	double ioffs = trunc(offs);
+	double delta = ((double)strp->rpb_end - (double)strp->rpb_start) / strp->length;
+
+	ret = strp->rpb_start + (delta * ioffs);
+
+	if (offs > strp->length)
+		ret = strp->rpb_end;
+
+	return ret;
+}
+
+void fix_ring_for_new_strip(timeline *tl, timestrip *strp) {
+	// this will magically try to pass on ring info
+	for (int s = 0; s < tl->nstrips; s++) {
+		timestrip *ts = &tl->strips[s];
+
+		if (ts == strp || ts->col != strp->col || ts->start)
+			continue;
+
+		for (int t = 0; t < ts->seq->ntrk; t++) {
+			track *trk = ts->seq->trk[t];
+			for (int c = 0; c < trk->ncols; c++) {
+				if (trk->ring[c] > -1) {
+					int passed = 0;
+
+					for (int tt = 0; tt < strp->seq->ntrk && !passed; tt++) {
+						track *dtrk = strp->seq->trk[tt];
+						if (dtrk->port == trk->port && dtrk->channel == trk->channel) {
+							for (int cc = 0; cc < dtrk->ncols; cc++) {
+								if (dtrk->ring[cc] == -1) {
+									dtrk->ring[cc] = trk->ring[c];
+									trk->ring[c] = -1;
+									passed = 1;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes) {
+	if (tl->pos - floor(tl->pos) < 0.00000001) {
+		tl->pos = floor(tl->pos);
+	}
+
+	if (floor(tl->pos) == tl->length) // this will happen once in a while
+		tl->pos = 0;
+
+	double len = tl->slices[(long)tl->pos].length;
+	double rperiod = period / len;
+
+	double p = ceil(tl->pos) - tl->pos;
+
+	if ((rperiod - p > 0.00000001) && (p > 0)) {
+
+		jack_nframes_t frm = nframes;
+		frm *= p / rperiod;
+
+		double sp = p * len;
+		period -= sp;
+		rperiod -= p;
+		nframes -= frm;
+
+		timeline_advance_inner(tl, sp, frm);
+	}
+
+	if (tl->pos == floor(tl->pos)) {	// row boundary
+		if (tl->pos == tl->length) {
+			for (int s = 0; s < tl->nstrips; s++) {
+				timestrip *strp = &tl->strips[s];
+				strp->seq->playing = 0;
+			}
+			tl->pos = 0;
+		}
+
+		// off/on with everything
+		for (int s = 0; s < tl->nstrips; s++) {
+			timestrip *strp = &tl->strips[s];
+
+			strp->seq->playing = 0;
+
+			if (strp->start == tl->pos && strp->enabled) {
+				strp->seq->pos = 0;
+				strp->seq->playing = 1;
+				strp->seq->lost = 0;
+
+				fix_ring_for_new_strip(tl, strp);
+
+				for (int t = 0; t < strp->seq->ntrk; t++)
+					strp->seq->trk[t]->resync = 1;
+			}
+
+			// start mid_strip
+			if (strp->enabled && !strp->seq->playing)
+				if (strp->start < tl->pos && (strp->start + strp->length > tl->pos)) {
+					strp->seq->pos = 0;
+					strp->seq->lost = 0;
+
+					long rs = strp->start;
+					long re = floor(tl->pos);
+
+					//printf("catchup %ld-%ld\n", rs, re);
+
+					for (long r = rs; r < re; r++) {
+						double bpm = tl->slices[r].bpm;
+						double rl = tl->slices[r].length;
+						strp->seq->pos += rl * timestrip_get_rpb(strp, r - strp->start) * (bpm / 60.0);
+					}
+
+					double bpm = tl->slices[re].bpm;
+					double rl = tl->slices[re].length;
+					strp->seq->pos += rl * timestrip_get_rpb(strp, (double)re - strp->start) * (bpm / 60.0);
+
+					for (int t = 0; t < strp->seq->ntrk; t++) {
+						track *trk = strp->seq->trk[t];
+						track_reset(trk);
+						track_wind(trk, strp->seq->pos);
+					}
+
+					strp->seq->playing = 1;
+				}
+		}
+	}
+
+	module *mod = (module *)tl->clt->mod_ref;
+	mod->bpm = timeline_get_bpm_at_qb(tl, (long)tl->pos);
+	for (int s = 0; s < tl->nstrips; s++) {
+		timestrip *strp = &tl->strips[s];
+		double per = period;
+		if (tl->pos + rperiod > strp->start + strp->length && strp->seq->playing) {
+			printf("gotcha!\n");
+		}
+
+		if (strp->seq->playing)
+			sequence_advance(strp->seq, per * timestrip_get_rpb(strp, tl->pos - strp->start) * (mod->bpm / 60.0), nframes);
+	}
+
+	for (int s = 0; s < mod->nseq; s++) {
+		sequence_advance(mod->seq[s], period * mod->seq[s]->rpb * (mod->bpm / 60.0), mod->clt->jack_buffer_size);
+	}
+	tl->pos += rperiod;
+
+}
+
+void timeline_advance(timeline *tl, double period, jack_nframes_t nframes) {
+	timeline_excl_in(tl);
+	timeline_advance_inner(tl, period, nframes);
 	timeline_excl_out(tl);
-	//printf("%f\n", tl->pos);
 }
 
 int timeline_get_loop_active(timeline *tl) {
@@ -822,5 +1000,71 @@ void timeline_set_loop_start(timeline *tl, long val) {
 
 void timeline_set_loop_end(timeline *tl, long val) {
 	tl->loop_end = val;
+}
+
+void timeline_set_pos(timeline *tl, double npos, int let_ring) {
+	if (npos >= tl->length || npos < 0)
+		return;
+
+	module *mod = (module *)tl->clt->mod_ref;
+
+	tl->pos = npos;
+	if (!let_ring)
+		for (int s = 0; s < tl->nstrips; s++) {
+			sequence *seq = tl->strips[s].seq;
+
+			for (int t = 0; t < seq->ntrk; t++)
+				track_kill_notes(seq->trk[t]);
+		}
+
+	if (mod->play_mode == 0)
+		return;
+
+	// do magic to non-playing seqs in matrix
+	int npsl = (int)trunc(npos);
+	double ts = tl->slices[npsl].time;
+	double remts = tl->slices[npsl].length * (npos - npsl);
+	ts += remts;
+
+	for (int s = 0; s < mod->nseq; s++) {
+		sequence *seq = mod->seq[s];
+		if (seq->playing)
+			continue;
+
+		seq->pos = ts * seq->rpb * 2;
+		for (int t = 0; t < seq->ntrk; t++) {
+			track_wind(seq->trk[t], seq->pos);
+		}
+
+		while(seq->pos > seq->length)
+			seq->pos -= seq->length;
+	}
+
+	if (mod->transp) {
+		jack_nframes_t frames = ts * mod->clt->jack_sample_rate;
+		midi_send_transp(mod->clt, mod->playing, frames);
+	}
+}
+
+double timeline_get_pos(timeline *tl) {
+	return tl->pos;
+}
+
+int timestrip_get_enabled(timestrip *tstr) {
+	return tstr->enabled;
+}
+
+void timestrip_set_enabled(timestrip *tstr, int v) {
+	tstr->enabled = v;
+	sequence *seq = tstr->seq;
+
+	if (!v && seq->playing) {
+		for (int t = 0; t < seq->ntrk; t++)
+			track_kill_notes(seq->trk[t]);
+
+		seq->playing = 0;
+		seq->pos = 0;
+	}
+
 }
 

@@ -57,8 +57,10 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 	module_excl_in(mod);
 
 	double time = (curr_frames - mod->zero_time) / (double)mod->clt->jack_sample_rate;
-	double row_length = 60.0 / (double)mod->bpm;
-	double period = ((double)mod->clt->jack_buffer_size / (double)mod->clt->jack_sample_rate) / row_length;
+	if (mod->zero_time == 0)
+		time = 0;
+	//double row_length = 60.0 / (double)mod->bpm;
+	double period = ((double)mod->clt->jack_buffer_size / (double)mod->clt->jack_sample_rate);
 
 	// are we muting after stop?
 	if (!mod->playing) {
@@ -68,6 +70,8 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 					track_kill_notes(mod->seq[s]->trk[t]);
 			mod->mute = 0;
 		}
+		if (mod->zero_time)
+			mod->zero_time += curr_frames - mod->clt->jack_last_frame;
 	} else {
 		mod->sec = time;
 		mod->min = mod->sec / 60;
@@ -76,7 +80,7 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 		mod->ms = (time - floorf(time)) * 1000;
 	}
 
-	if (mod->zero_time == 0) {
+	if ((mod->playing) && (mod->zero_time == 0)) {
 		mod->zero_time = curr_frames;
 	}
 
@@ -167,7 +171,7 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 			for (int s = 0; s < mod->nseq; s++) {
 				sequence *seq = mod->seq[s];
 				if (seq->lost) {
-					seq->pos = fmod(mod->song_pos * seq->rpb, seq->length);
+					seq->pos = fmod(mod->song_pos * seq->rpb * 2, seq->length);
 
 					for (int t = 0; t < seq->ntrk; t++) {
 						seq->trk[t]->pos = seq->pos;
@@ -175,15 +179,17 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 					seq->lost = 0;
 				}
 
-				sequence_advance(seq, period * seq->rpb, mod->clt->jack_buffer_size);
+				sequence_advance(seq, period * seq->rpb * (mod->bpm / 60.0), mod->clt->jack_buffer_size);
 			}
-			mod->song_pos += period;
-		} else {
-			timeline_advance(mod->tline, period);
-			mod->song_pos = mod->tline->pos;
 		}
+
+		if (mod->play_mode == 1) {
+			timeline_advance(mod->tline, period, mod->clt->jack_buffer_size);
+		}
+
+		mod->song_pos += period;
 	} else {
-		// send program changes if needed
+		// send program changes paused
 		for (int s = 0; s < mod->nseq; s++) {
 			for (int t = 0; t < mod->seq[s]->ntrk; t++)
 				track_fix_program_change(mod->seq[s]->trk[t]);
@@ -191,8 +197,22 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 
 	}
 
-	//printf("time: %02d:%02d:%03d %3.5f %d\n", module.min, module.sec, module.ms, period, module.bpm);
+	//printf("%f %f %f %d %d\n", mod->song_pos, mod->seq[0]->pos, timeline_get_qb_time(mod->tline, mod->tline->pos), mod->clt->jack_buffer_size, mod->clt->jack_sample_rate);
 	module_excl_out(mod);
+}
+
+void module_play(module *mod, int play) {
+	module_excl_in(mod);
+	mod->playing = play;
+	module_excl_out(mod);
+
+	if (play == 0)
+		module_mute(mod);
+
+	if (mod->transp) {
+		midi_send_transp(mod->clt, play, -1);
+	}
+
 }
 
 module *module_new() {
@@ -208,11 +228,11 @@ module *module_new() {
 	mod->mute = 0;
 	mod->ctrlpr = DEFAULT_CTRLPR;
 	mod->cur_rec_update = 0;
-	mod->tline = timeline_new();
 	mod->seq = malloc(sizeof(sequence *));
 	mod->transp = 0;
 	pthread_mutex_init(&mod->excl, NULL);
 	mod->clt = midi_client_new(mod);
+	mod->tline = timeline_new(mod->clt);
 	mod->play_mode = 0;
 	timechange *tc = timeline_get_change(mod->tline, 0);
 	tc->bpm = mod->bpm;
@@ -238,6 +258,10 @@ void module_reset(module *mod) {
 		for (int t = 0; t < mod->seq[s]->ntrk; t++)
 			track_reset(mod->seq[s]->trk[t]);
 	}
+
+	timeline_reset(mod->tline);
+	if (mod->transp)
+		midi_send_transp(mod->clt, mod->playing, 0);
 }
 
 void module_panic(module *mod, int brutal) {
@@ -249,6 +273,14 @@ void module_panic(module *mod, int brutal) {
 		}
 
 		mod->seq[s]->thumb_panic = 9;
+	}
+
+	for (int s = 0; s < mod->tline->nstrips; s++) {
+		for (int t = 0; t < mod->tline->strips[s].seq->ntrk; t++) {
+			track_kill_notes(mod->tline->strips[s].seq->trk[t]);
+		}
+
+		mod->tline->strips[s].seq->thumb_panic = 9;
 	}
 }
 
@@ -285,6 +317,7 @@ void module_add_sequence(module *mod, sequence *seq) {
 	double pos = 0;
 	if (mod->nseq) {
 		pos = mod->seq[0]->pos;
+		printf("%.3f\n", pos);
 	}
 
 	mod->seq = realloc(mod->seq, sizeof(sequence *) * (mod->nseq + 1));
@@ -292,10 +325,11 @@ void module_add_sequence(module *mod, sequence *seq) {
 	seq->mod_excl = &mod->excl;
 	seq->clt = mod->clt;
 
-	if (pos > 0.0) {
-		seq->pos = pos;
-		for (int t = 0; t < seq->ntrk; t++) {
-			seq->trk[t]->clt = mod->clt;
+	for (int t = 0; t < seq->ntrk; t++) {
+		seq->trk[t]->clt = mod->clt;
+
+		if (pos > 0.0) {
+			seq->pos = pos;
 			track_wind(seq->trk[t], pos);
 		}
 	}
@@ -421,9 +455,37 @@ void module_set_transport(module *mod, int t) {
 	} else {
 		mod->transp = 0;
 	}
-
-	printf("transp: %d\n", t);
 }
 int module_get_transport(module *mod) {
 	return mod->transp;
+}
+
+void module_synch_transp(module *mod, int play, jack_nframes_t frames) {
+	if (!mod->transp)
+		return;
+
+	double pos = (double)frames / mod->clt->jack_sample_rate;
+	module_excl_in(mod);
+
+	if (play) {
+		mod->playing = 1;
+	} else {
+		mod->playing = 0;
+	}
+
+	while(pos > mod->tline->time_length)
+		pos -= mod->tline->time_length;
+
+	double rpos = timeline_get_qb(mod->tline, pos);
+	double rem = pos - mod->tline->slices[(long)rpos].time;
+	rpos += rem / mod->tline->slices[(long)rpos].length;
+
+	if (rpos >= mod->tline->length)
+		rpos = 0;
+
+	mod->transp = 0;
+	timeline_set_pos(mod->tline, rpos, 0);
+	mod->transp = 1;
+
+	module_excl_out(mod);
 }

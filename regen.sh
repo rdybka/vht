@@ -5,6 +5,7 @@
 # - don't run without swig4 installed
 # - also uses black and astyle
 
+rm -f log.txt
 rm -f *.so *.o
 rm -f libvht/*.o
 rf -f install.txt

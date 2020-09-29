@@ -66,7 +66,7 @@ class TimelineView(Gtk.DrawingArea):
         self.max_qb_start_dest = 23.0
         self.pointer_ry = 0
         self.pointer_ry_dest = 0
-
+        self.playhead_ry = 0
         self.scrollbar_height = 23
         self.scrollbar_width = 8
         self.scrollbar_pos = 0
@@ -95,6 +95,9 @@ class TimelineView(Gtk.DrawingArea):
         self.gest_start_r = 0
         self.move_start_r = 0
         self.move_last_delta = 0
+
+        self.move_start_x = 0
+        self.move_x_delta = 0
 
         self.mouse_in_timeline = False
         self.mouse_in_changes = False
@@ -242,7 +245,7 @@ class TimelineView(Gtk.DrawingArea):
         nomorelaby = ((sl - tstart) / self.spl) - txtenddx * 1.5
         cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.timeline_colour))
         do_draw = True
-        for y in range(h):
+        for y in range(int(h)):
             if not do_draw:
                 break
 
@@ -256,20 +259,7 @@ class TimelineView(Gtk.DrawingArea):
             x = w - self._txt_height
             txt = "%d:%02d" % (tim // 60, tim % 60)
 
-            if tim >= sl:
-                tim = sl
-
-                x = w - self._txt_height
-                y = (sl - tstart) / self.spl
-
-                cr.set_line_width(3)
-                cr.move_to(w - tw, y)
-                cr.line_to((w - tw) + tw * 0.5, y)
-                cr.stroke()
-
-                if tstart == 0:
-                    y = max(y, txtenddx * 2)
-                self.insert_label(cr, x, y - txtenddx / 2, txtend)
+            if tim > sl:
                 do_draw = False
                 continue
 
@@ -304,6 +294,20 @@ class TimelineView(Gtk.DrawingArea):
                 cr.move_to(w - tw, y)
                 cr.line_to((w - tw) + tw * 0.2, y)
                 cr.stroke()
+
+        x = w - self._txt_height
+        y = (sl - tstart) / self.spl
+
+        if y <= h:
+            cr.set_line_width(3)
+            cr.move_to(w - tw, y)
+            cr.line_to((w - tw) + tw * 0.5, y)
+            cr.stroke()
+
+            if tstart == 0:
+                y = max(y, txtenddx * 2)
+
+            self.insert_label(cr, x, y - txtenddx / 2, txtend)
 
         # snapticks -----------------
         r = int(math.floor(self.qb_start))
@@ -355,7 +359,11 @@ class TimelineView(Gtk.DrawingArea):
                 cr.restore()
 
         # timechange insert indicator
-        if self.mouse_in_changes and self.zoom_hold:
+        if (
+            self.mouse_in_changes
+            and self.zoom_hold
+            and self.pointer_r <= mod.timeline.nqb
+        ):
             if not mod.timeline.changes.get_at_qb(self.pointer_r):
                 rr = (
                     mod.timeline.qb2t(self.pointer_r) - mod.timeline.qb2t(self.qb_start)
@@ -399,7 +407,8 @@ class TimelineView(Gtk.DrawingArea):
             ystart = (mod.timeline.qb2t(st.start) - tstart) / self.spl
             yend = (mod.timeline.qb2t(st.start + st.length) - tstart) / self.spl
             lend = (
-                mod.timeline.qb2t(st.start + st.seq.relative_length) - tstart
+                mod.timeline.qb2t(st.start + st.seq.relative_length)
+                - tstart  # st.seq.relative_length
             ) / self.spl
 
             yend -= ystart
@@ -418,20 +427,27 @@ class TimelineView(Gtk.DrawingArea):
                 if mod_curr[1] == stid:
                     colour = cfg.star_colour
 
+            alph = 0.7
+            if st.seq.playing:
+                alph = 0.9
+
+            if not st.enabled:
+                alph = 0.5
+
             if stid == self.curr_strip_id:
                 if self.del_id == stid:
                     cr.set_source_rgb(
                         *(
-                            col * 0.7 * (1.0 - self.del_progress)
+                            col * alph * (1.0 - self.del_progress)
                             for col in cfg.timeline_colour
                         )
                     )
                 else:
-                    cr.set_source_rgb(*(col * 0.7 for col in colour))
+                    cr.set_source_rgb(*(col * alph for col in colour))
             else:
-                cr.set_source_rgb(*(col * 0.4 for col in colour))
+                cr.set_source_rgb(*(col * alph / 2 for col in colour))
 
-            cr.rectangle(thx, ystart, thxx, lend)
+            cr.rectangle(thx, ystart, thxx, min(yend, lend))
             cr.fill()
 
             thumb = mod.thumbmanager.get(ind)
@@ -445,48 +461,55 @@ class TimelineView(Gtk.DrawingArea):
                 mtx.translate(-thx, -ystart)
                 thumb.set_matrix(mtx)
                 cr.set_source(thumb)
-                cr.rectangle(thx, ystart, thxx, lend)
+                cr.rectangle(thx, ystart, thxx, min(yend, lend))
                 cr.fill()
 
-                cr.set_line_width(1.5)
-                cr.set_source_rgb(*(col * 0.9 for col in colour))
+            cr.set_line_width(1.5)
+            cr.set_source_rgb(*(col * alph for col in colour))
 
-                if stid == self.del_id:
-                    cr.rectangle(thx, ystart, thxx, yend - (yend * self.del_progress))
-                else:
-                    cr.rectangle(thx, ystart, thxx, lend)
+            if stid == self.del_id:
+                cr.rectangle(thx, ystart, thxx, yend - (yend * self.del_progress))
+                cr.stroke()
+            else:
+                cr.rectangle(thx, ystart, thxx, min(yend, lend))
+                cr.stroke()
+
+                if st.length > st.seq.relative_length:
+                    cr.move_to(thx + thxx / 2, ystart + lend)
+                    cr.line_to(thx + thxx / 2, ystart + yend)
                     cr.stroke()
-
-                    if st.length > st.seq.relative_length:
-                        cr.move_to(thx + thxx / 2, ystart + lend)
-                        cr.line_to(thx + thxx / 2, ystart + yend)
+                    cr.move_to(thx, ystart + yend - 1)
+                    cr.line_to(thx + thxx, ystart + yend - 1)
+                    cr.set_line_width(3.0)
+                    cr.stroke()
+                    if yend - lend > 14:
+                        cr.move_to(thx, ystart + yend - 5)
+                        cr.line_to(thx + thxx, ystart + yend - 5)
+                        cr.set_line_width(1.0)
                         cr.stroke()
-                        cr.move_to(thx, ystart + yend - 1)
-                        cr.line_to(thx + thxx, ystart + yend - 1)
-                        cr.set_line_width(3.0)
-                        cr.stroke()
-                        if yend - lend > 14:
-                            cr.move_to(thx, ystart + yend - 5)
-                            cr.line_to(thx + thxx, ystart + yend - 5)
-                            cr.set_line_width(1.0)
-                            cr.stroke()
 
-                            cr.arc(
-                                thx + (thxx * 0.3),
-                                ystart + yend - 10,
-                                2,
-                                0,
-                                2 * math.pi,
-                            )
-                            cr.fill()
-                            cr.arc(
-                                thx + (thxx * 0.7),
-                                ystart + yend - 10,
-                                2,
-                                0,
-                                2 * math.pi,
-                            )
-                            cr.fill()
+                        cr.arc(
+                            thx + (thxx * 0.3), ystart + yend - 10, 2, 0, 2 * math.pi,
+                        )
+                        cr.fill()
+                        cr.arc(
+                            thx + (thxx * 0.7), ystart + yend - 10, 2, 0, 2 * math.pi,
+                        )
+                        cr.fill()
+
+            if not st.enabled:
+                cr.set_line_width(3.0)
+                cr.set_source_rgb(*(col * 0.9 for col in colour))
+                xo = thxx / 4
+                lend = min(yend, lend)
+                yo = lend / 4
+
+                cr.move_to(thx + xo, ystart + yo)
+                cr.line_to(thx + thxx - xo, ystart + lend - yo)
+                cr.stroke()
+                cr.move_to(thx + thxx - xo, ystart + yo)
+                cr.line_to(thx + xo, ystart + lend - yo)
+                cr.stroke()
 
         cr.restore()
 
@@ -513,7 +536,7 @@ class TimelineView(Gtk.DrawingArea):
             ry = self.pointer_ry
 
             cr.set_source_rgb(
-                *(col * cfg.intensity_txt * 0.6 for col in cfg.timeline_colour)
+                *(col * cfg.intensity_txt * 0.8 for col in cfg.star_colour)
             )
             cr.set_line_width(1)
             cr.move_to(0, ry)
@@ -561,7 +584,7 @@ class TimelineView(Gtk.DrawingArea):
                 lblextra = lblextra + "length: %d " % (strp.length)
 
             if self.expanding:
-                lblextra = lblextra + "expand: %d " % (self.exp_last_delta)
+                lblextra = lblextra + "shift: %d " % (self.exp_last_delta)
 
             margx = 20
             margy = 7
@@ -604,6 +627,25 @@ class TimelineView(Gtk.DrawingArea):
                 cr.show_text(lblextra)
                 cr.restore()
 
+        # play head
+        ry = self.playhead_ry
+
+        cr.set_source_rgb(
+            *(col * cfg.intensity_txt * 0.8 for col in cfg.timeline_colour)
+        )
+
+        cr.set_line_width(1)
+        cr.move_to(0, ry)
+        cr.line_to(w - (tw * 0.9), ry)
+        cr.stroke()
+
+        ts = tw / 7.0
+
+        cr.move_to(w - tw - ts, ry)
+        cr.line_to(w - tw, ry - ts)
+        cr.line_to(w - tw, ry + ts)
+        cr.fill()
+
         self.get_window().invalidate_rect(None, False)
 
     def on_draw(self, widget, cr):
@@ -613,6 +655,27 @@ class TimelineView(Gtk.DrawingArea):
 
     def on_button_press(self, widget, event):
         self.hint = None
+
+        if event.button == 2:
+            if (
+                event.type == Gdk.EventType._2BUTTON_PRESS
+                or event.type == Gdk.EventType._3BUTTON_PRESS
+            ):
+                return
+
+            if self.curr_strip_id > -1:  # disable
+                strp = mod.timeline.strips[self.curr_strip_id]
+                en = not strp.enabled
+
+                if event.state & Gdk.ModifierType.CONTROL_MASK:
+                    for strp in mod.timeline.strips:
+                        if strp.seq.parent == self.curr_col:
+                            strp.enabled = en
+                else:
+                    strp.enabled = en
+
+                return True
+
         if not self.moving_bpm:
             self.curr_change = None
 
@@ -626,6 +689,10 @@ class TimelineView(Gtk.DrawingArea):
             self.exp_start = self.pointer_r
             self.exp_last_delta = 0
             self.exp_min = -mod.timeline.expand_start(self.exp_start)
+
+        if self.mouse_in_timeline and event.button == 2:
+            mod.timeline.pos = self.pointer_r
+            return
 
         # add change
         if (
@@ -698,7 +765,7 @@ class TimelineView(Gtk.DrawingArea):
                 self.del_time_start = datetime.now()
                 self.del_progress = 0.0
 
-        if event.button != cfg.select_button:
+        if event.button != cfg.select_button and event.button != 2:
             return False
 
         if self.scrollbar_highlight and self.scrollstart == -1:
@@ -730,6 +797,8 @@ class TimelineView(Gtk.DrawingArea):
                 self.move_start_r = mod.timeline.strips[self.curr_strip_id].start
                 self.gest_start_r = self.move_start_r
                 self.move_last_delta = 0
+                self.move_start_x = self.curr_col
+                self.move_x_delta = 0
             else:
                 mod.mainwin.sequence_view.switch(
                     mod.timeline.strips[self.curr_strip_id].seq.index
@@ -745,10 +814,18 @@ class TimelineView(Gtk.DrawingArea):
             rm = mod.timeline.room_at(self.curr_col, self.pointer_r)
             if rm >= mod[self.curr_col].length or rm == -1:
                 rr = int(min(self.pointer_r, mod.timeline.nqb))
-                seq = mod[self.curr_col]
-                idx = mod.timeline.strips.insert_parent(
-                    self.curr_col, rr, seq.relative_length, seq.rpb, seq.rpb,
-                ).seq.index
+                idx = None
+                if event.button == 2:  # empty
+                    seq = mod.new_sequence(mod[self.curr_col].length)
+                    seq.add_track()
+                    idx = mod.timeline.strips.insert(
+                        self.curr_col, seq, rr, seq.relative_length, seq.rpb, seq.rpb
+                    ).seq.index
+                else:
+                    seq = mod[self.curr_col]
+                    idx = mod.timeline.strips.insert_parent(
+                        self.curr_col, rr, seq.relative_length, seq.rpb, seq.rpb,
+                    ).seq.index
 
                 extras.fix_extras_new_seq(idx)
                 mod.mainwin.sequence_view.switch(idx)
@@ -761,6 +838,13 @@ class TimelineView(Gtk.DrawingArea):
         return True
 
     def on_button_release(self, widget, event):
+        if self.moving:
+            self.moving = False
+            return
+
+        if event.button == 2:
+            return
+
         if event.button == cfg.delete_button:
             self.del_id = -1
             self.del_time_start = 0
@@ -822,6 +906,13 @@ class TimelineView(Gtk.DrawingArea):
                 mod.timeline.strips[self.curr_strip_id].start = snappos
                 self.move_last_delta = delta
 
+            if col != self.move_start_x and col < len(mod):
+                strp = mod.timeline.strips[self.curr_strip_id]
+                rm = mod.timeline.room_at(int(col), strp.start)
+                if rm > strp.length or rm == -1:
+                    strp.col = int(col)
+                    self.move_start_x = strp.col
+
         if self.moving_bpm:
             delta = int(math.floor(self.pointer_r - self.gest_start_r))
             delta = round((delta / self.snap)) * self.snap
@@ -838,11 +929,9 @@ class TimelineView(Gtk.DrawingArea):
             delta = self.pointer_r - self.gest_start_r
             rm = mod.timeline.room_at(strp.col, strp.start, strp.seq.index[1])
             if rm == -1:
-                rm = max(strp.seq.relative_length, int(self.resize_start + delta))
+                rm = max(1, int(self.resize_start + delta))
 
-            nl = min(
-                rm, max(strp.seq.relative_length, int((self.resize_start + delta)))
-            )
+            nl = min(rm, max(1, int((self.resize_start + delta))))
 
             strp.length = nl
 
@@ -908,13 +997,22 @@ class TimelineView(Gtk.DrawingArea):
             self.curr_col = -1
             self.curr_strip_id = -1
 
+        self.snap_hold = False
         self.clone_hold = False
+        self.zoom_hold = False
+
         return True
 
     def on_enter(self, wdg, prm):
         return True
 
     def on_scroll(self, widget, event):
+        if event.state & Gdk.ModifierType.CONTROL_MASK:
+            self.zoom_hold = True
+
+        if event.state & (Gdk.ModifierType.MOD1_MASK | Gdk.ModifierType.MOD5_MASK):
+            self.snap_hold = True
+
         if event.state & Gdk.ModifierType.SHIFT_MASK:
             hjust = mod.mainwin.seqlist_sw.get_hadjustment()
             cw = mod.mainwin.seqlist._txt_height * cfg.mixer_padding
@@ -972,14 +1070,9 @@ class TimelineView(Gtk.DrawingArea):
         return mod.mainwin.sequence_view.on_key_press(widget, event)
 
     def on_key_release(self, widget, event):
-        if event.keyval == 65513:  # alt
-            self.snap_hold = False
-
-        if 65507 <= event.keyval <= 65508:  # ctrl
-            self.zoom_hold = False
-
-        if 65505 <= event.keyval <= 65506:  # shift
-            self.clone_hold = False
+        self.zoom_hold = False
+        self.clone_hold = False
+        self.snap_hold = False
 
         return mod.mainwin.sequence_view.on_key_release(widget, event)
 
@@ -988,7 +1081,7 @@ class TimelineView(Gtk.DrawingArea):
         self.qb_start_dest = max(0, min(self.qb_start_dest, self.max_qb_start))
 
         if self.qb_start_dest - self.qb_start != 0:
-            self.qb_start += (self.qb_start_dest - self.qb_start) / 5
+            self.qb_start += (self.qb_start_dest - self.qb_start) / 2
 
         if self.spl_dest - self.spl != 0:
             self.spl += (self.spl_dest - self.spl) / 5
@@ -1004,11 +1097,11 @@ class TimelineView(Gtk.DrawingArea):
                 self.l2t(self.pointer_xy[1]) + mod.timeline.qb2t(self.qb_start)
             )
 
+            if not self.moving_bpm:
+                self.pointer_r = math.floor((self.pointer_r / self.snap)) * self.snap
+
             if self.mouse_in_changes and not self.moving_bpm:
                 self.highlight_change = mod.timeline.changes.get_at_qb(self.pointer_r)
-
-            if not self.moving_bpm:
-                self.pointer_r = round((self.pointer_r / self.snap)) * self.snap
 
         rr = self.pointer_r
 
@@ -1030,8 +1123,17 @@ class TimelineView(Gtk.DrawingArea):
             self.pointer_r = rr
 
         self.pointer_ry_dest = max(
-            (mod.timeline.qb2t(rr) - mod.timeline.qb2t(self.qb_start)) / self.spl, 0,
+            (
+                mod.timeline.qb2t(min(rr, mod.timeline.nqb))
+                - mod.timeline.qb2t(self.qb_start)
+            )
+            / self.spl,
+            0,
         )
+
+        self.playhead_ry = (
+            mod.timeline.qb2t(mod.timeline.pos) - mod.timeline.qb2t(self.qb_start)
+        ) / self.spl
 
         hint = None
 

@@ -92,6 +92,8 @@ class VHTApp(Gtk.Application):
             )
             self.main_win.set_header_from_filename(self.main_win.last_filename)
 
+        mod.reset()
+        mod.transport = cfg.start_transport
         mod.play = cfg.start_playing
 
     def on_load(self, action, param):

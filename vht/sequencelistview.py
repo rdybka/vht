@@ -165,7 +165,8 @@ class SequenceListView(Gtk.DrawingArea):
             return False
 
         curr = int(event.x / (self._txt_height * cfg.mixer_padding))
-        if curr == self._move_handle:
+
+        if event.button == 1 and curr == self._move_handle:
             self._drag = True
             return True
 

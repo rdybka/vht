@@ -557,6 +557,12 @@ def ctrlrow_set_anchor(crw, a):
 def ctrlrow_set(crw, v, l, s, a):
     return _libcvht.ctrlrow_set(crw, v, l, s, a)
 
+def timeline_set_pos(tl, npos, let_ring):
+    return _libcvht.timeline_set_pos(tl, npos, let_ring)
+
+def timeline_get_pos(tl):
+    return _libcvht.timeline_get_pos(tl)
+
 def timechange_set_bpm(tl, tc, bpm):
     return _libcvht.timechange_set_bpm(tl, tc, bpm)
 
@@ -677,6 +683,12 @@ def timestrip_can_resize_seq(tl, tstr, len):
 def timestrip_can_rpb_seq(tl, tstr, rpb):
     return _libcvht.timestrip_can_rpb_seq(tl, tstr, rpb)
 
+def timestrip_get_enabled(tstr):
+    return _libcvht.timestrip_get_enabled(tstr)
+
+def timestrip_set_enabled(tstr, v):
+    return _libcvht.timestrip_set_enabled(tstr, v)
+
 def timeline_get_prev_seq(tl, tstr):
     return _libcvht.timeline_get_prev_seq(tl, tstr)
 
@@ -703,6 +715,9 @@ def timeline_set_loop_end(tl, val):
 
 def timestrip_set_start(tstr, start):
     return _libcvht.timestrip_set_start(tstr, start)
+
+def timestrip_set_col(tstr, col):
+    return _libcvht.timestrip_set_col(tstr, col)
 
 def timestrip_set_length(tstr, length):
     return _libcvht.timestrip_set_length(tstr, length)

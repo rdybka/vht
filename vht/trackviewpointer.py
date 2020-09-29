@@ -62,7 +62,7 @@ class TrackviewPointer:
 
         w = self._parent.get_allocated_width()
 
-        self.height = self._parent.parent.font_size  # oh yeah
+        self.height = self._parent.parent.font_size
 
         cr = self._parent._context
 
@@ -83,6 +83,9 @@ class TrackviewPointer:
 
         # sideview
         if isinstance(self.trk, VHTSequence):
+            if not self.trk.playing:
+                return
+
             i = 0.5
             if r % self.seq.rpb == 0:
                 i *= 2
@@ -107,11 +110,11 @@ class TrackviewPointer:
             gradient.add_color_stop_rgba(1.0, *(col * i for col in cl), 0)
             cr.set_source(gradient)
 
-            if type(mod.curr_seq) is int:
-                cr.rectangle(x, y, xx, self.height)
-                cr.fill()
-            else:
-                pass  # pointer for strip
+            # if type(mod.curr_seq) is int:
+            cr.rectangle(x, y, xx, self.height)
+            cr.fill()
+            # else:
+            #    pass  # pointer for strip
 
             return
 

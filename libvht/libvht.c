@@ -51,12 +51,6 @@ void module_set_bpm(module *mod, float bpm) {
 	//timeline_change_set(mod->tline, 0, 0, mod->bpm, 0);
 }
 
-void module_play(module *mod, int play) {
-	mod->playing = play;
-	if (play == 0)
-		module_mute(mod);
-}
-
 int module_is_playing(module *mod) {
 	return mod->playing;
 }
@@ -222,10 +216,6 @@ int track_get_loop(track *trk) {
 	return trk->loop;
 }
 
-int track_get_indicators(track *trk) {
-	return trk->indicators;
-}
-
 void track_set_indicators(track *trk, int i) {
 	trk->indicators = i;
 }
@@ -339,4 +329,7 @@ void timestrip_set_rpb_end(timestrip *tstr, int rpb_end) {
 	tstr->rpb_end = rpb_end;
 }
 
-
+void timestrip_set_col(timestrip *tstr, int col) {
+	tstr->col = col;
+	tstr->seq->parent = col;
+}

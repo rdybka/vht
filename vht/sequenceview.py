@@ -282,7 +282,7 @@ class SequenceView(Gtk.Box):
             idx = mod.clone_sequence(mod.curr_seq).index
 
             nname = None
-            if type(mod.curr_seq.index) is int:
+            if type(mod.curr_seq) is int:
                 nname = self.seq.extras["sequence_name"]
             else:
                 nname = mod[self.seq.parent].extras["sequence_name"]
@@ -593,9 +593,9 @@ class SequenceView(Gtk.Box):
         self._sv.grab_focus()
 
     def seq_add(self):
-        s = mod.add_sequence(cfg.default_seq_length)
+        s = mod.add_sequence(self.seq.length)
 
-        s.length = self.seq.length
+        # s.length = self.seq.length
         if cfg.new_seqs_with_tracks:
             s.add_track(length=s.length)
         mod.seqlist.configure()
@@ -803,6 +803,9 @@ class SequenceView(Gtk.Box):
             mod.timeline_view.fix_extras()
             mod.seqlist.configure()
             mod.seqlist.redraw()
+            if mod.mainwin.seq_mode_butt.props.active == mod.play_mode:
+                mod.mainwin.seq_mode_butt.props.active = not mod.play_mode
+
             return True
         else:
             mod.new()
@@ -812,6 +815,8 @@ class SequenceView(Gtk.Box):
             mod.timeline_view.fix_extras()
             mod.seqlist.configure()
             mod.seqlist.redraw()
+            if mod.mainwin.seq_mode_butt.props.active == mod.play_mode:
+                mod.mainwin.seq_mode_butt.props.active = not mod.play_mode
             return False
 
     def switch(self, new_seq):

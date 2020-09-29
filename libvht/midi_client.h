@@ -82,5 +82,6 @@ void queue_midi_note_on(midi_client *clt, sequence *seq, int port, int chn, int 
 void queue_midi_note_off(midi_client *clt, sequence *seq, int port, int chn, int note);
 void queue_midi_ctrl(midi_client *clt, sequence *seq, track *trk, int val, int ctrl);
 
+void midi_send_transp(midi_client *clt, int play, long frames);
 
 #endif //__MIDI_CLIENT_H__

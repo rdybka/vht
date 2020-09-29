@@ -47,6 +47,7 @@ class Configuration:
         self.timeline_show = False
         self.console_steal_stderr = True
         self.start_playing = True
+        self.start_transport = False
 
         c = (0.6, 1.0, 1.0)
         self.colour = c

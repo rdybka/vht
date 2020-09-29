@@ -18,7 +18,7 @@
 
 #ifndef __TIMELINE_H__
 #define __TIMELINE_H__
-
+#include "midi_client.h"
 #include "sequence.h"
 
 typedef struct timeslice_t {
@@ -42,6 +42,7 @@ typedef struct timestrip_t {
 	int rpb_start;
 	int rpb_end;
 	int tag;
+	int enabled;
 } timestrip;
 
 typedef struct timeline_t {
@@ -62,16 +63,18 @@ typedef struct timeline_t {
 	double pos;  // qb
 
 	pthread_mutex_t excl;
+	midi_client *clt;
 } timeline;
 
-timeline *timeline_new(void);
+timeline *timeline_new(midi_client *clt);
 void timeline_free(timeline *tl);
 void timeline_clear(timeline *tl);
+void timeline_reset(timeline *tl);
 void timeline_update(timeline *tl);
 void timeline_update_inner(timeline *tl);
-void timeline_advance(timeline *tl, double period);
+void timeline_advance(timeline *tl, double period, jack_nframes_t nframes);
 long timeline_get_qb(timeline *tl, double t);
-double timeline_get_qb_time(timeline *tl, long row);
+double timeline_get_qb_time(timeline *tl, double row);
 void timeline_swap_sequence(timeline *tl, int s1, int s2);
 
 void timechange_set_bpm(timeline *tl, timechange *tc, float bpm);
@@ -121,5 +124,9 @@ long timeline_get_loop_end(timeline *tl);
 void timeline_set_loop_start(timeline *tl, long val);
 void timeline_set_loop_end(timeline *tl, long val);
 
+void timeline_set_pos(timeline *tl, double npos, int let_ring);
+double timeline_get_pos(timeline *tl);
 
+int timestrip_get_enabled(timestrip *tstr);
+void timestrip_set_enabled(timestrip *tstr, int v);
 #endif //__TIMELINE_H__

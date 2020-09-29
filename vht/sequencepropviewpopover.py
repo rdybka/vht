@@ -63,7 +63,7 @@ class SequencePropViewPopover(Gtk.Popover):
         button.add(image)
         button.connect("clicked", self.on_clone_button_clicked)
         button.set_tooltip_markup(
-            cfg.tooltip_markup2 % ("(up)clone", cfg.key["sequence_clone"])
+            cfg.tooltip_markup2 % ("clone (up)", cfg.key["sequence_clone"])
         )
         self.grid.attach(button, 0, 1, 1, 1)
 

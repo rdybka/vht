@@ -96,6 +96,7 @@ int midi_start(midi_client *clt, char *clt_name) {
 	jack_set_process_callback (clt->jack_client, jack_process, clt);
 	jack_set_sample_rate_callback(clt->jack_client, jack_sample_rate_changed, clt);
 	jack_set_buffer_size_callback(clt->jack_client, jack_buffer_size_changed, clt);
+	jack_set_sync_callback(clt->jack_client, jack_synch_callback, clt);
 
 	jack_activate(clt->jack_client);
 	return 0;
@@ -160,6 +161,7 @@ void midi_buffer_add(midi_client *clt, int port, midi_event evt) {
 		return;
 
 	clt->midi_buffer[port][clt->curr_midi_event[port]++] = evt;
+	//printf("buff add %d %d\n", evt.note, evt.time);
 }
 
 int midi_buffer_compare(const void *a, const void *b) {
@@ -402,3 +404,19 @@ void midi_ignore_buffer_add(midi_client *clt, int channel, int type, int note) {
 	midi_ignore_buff_excl_out(clt);
 }
 
+void midi_send_transp(midi_client *clt, int play, long frames) {
+	//printf("transp: %d %ld\n", play, frames);
+	jack_position_t pos;
+	pos.frame = frames;
+	pos.valid = 0;
+
+	if (frames > -1) {
+		jack_transport_reposition(clt->jack_client, &pos);
+	}
+
+	if (play) {
+		jack_transport_start(clt->jack_client);
+	} else {
+		jack_transport_stop(clt->jack_client);
+	}
+}

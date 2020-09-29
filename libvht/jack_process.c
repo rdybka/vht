@@ -24,15 +24,17 @@ int jack_process(jack_nframes_t nframes, void *arg) {
 	jack_nframes_t curr_frames;
 	jack_time_t curr_usecs;
 	jack_time_t next_usecs;
+
 	float period_usecs;
 
 	midi_client *clt = (midi_client *)arg;
 	module *mod = (module *)clt->mod_ref;
 
 	jack_get_cycle_times(clt->jack_client, &curr_frames, &curr_usecs, &next_usecs, &period_usecs);
-	clt->jack_last_frame = jack_last_frame_time(clt->jack_client);
 	midi_synch_output_ports(clt);
 	module_advance(mod, curr_frames);
+	clt->jack_last_frame = jack_last_frame_time(clt->jack_client);
+
 	midi_buffer_flush(clt);
 	return 0;
 }
@@ -45,4 +47,11 @@ int jack_sample_rate_changed(jack_nframes_t srate, void *arg) {
 int jack_buffer_size_changed(jack_nframes_t size, void *arg) {
 	((midi_client *)arg)->jack_buffer_size = size;
 	return 0;
+}
+
+int jack_synch_callback(jack_transport_state_t state, jack_position_t *pos, void *arg) {
+	midi_client *clt = (midi_client *)arg;
+	module *mod = (module *)clt->mod_ref;
+	module_synch_transp(mod, state, pos->frame);
+	return 1;
 }

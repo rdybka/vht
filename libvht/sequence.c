@@ -182,6 +182,13 @@ void sequence_free(sequence *seq) {
 }
 
 void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
+	if (seq->pos - floor(seq->pos) < 0.00000001) {
+		seq->pos = floor(seq->pos);
+	}
+
+	//if (seq->parent > -1)
+	//	printf("adv %d %.5f %d [%.3f]\n", seq->index, period, nframes, seq->pos);
+
 	if ((seq->trg_quantise == 0) && (seq->trg_times[2] == -2)) {
 		seq->trg_times[2] = -1;
 		if (seq->playing && seq->trg_times[3] != -2) {
@@ -203,7 +210,7 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 	}
 
 	double p = ceil(seq->pos) - seq->pos;
-	if (period > p) {
+	if (period - p > 0.00000001) {
 		jack_nframes_t frm = nframes;
 		frm *= p / period;
 
@@ -218,7 +225,7 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 		while (r >= seq->length)
 			r-=seq->length;
 
-		//printf("%d %d %d %d\n", seq->trg_times[0], seq->trg_times[1], seq->trg_times[2], seq->trg_times[3]);
+		// printf("%d %d %d %d\n", seq->trg_times[0], seq->trg_times[1], seq->trg_times[2], seq->trg_times[3]);
 
 		// quantised play
 		if (seq->trg_times[2] == r) {
@@ -332,6 +339,8 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 	}
 
 	seq->pos += period;
+	if (seq->parent > -1)
+		printf("pos: %.3f\n", seq->pos); // skips 2? rounding error??????
 
 	if (seq->pos > seq->length)
 		seq->pos -= seq->length;

@@ -84,6 +84,10 @@ class VHTTimelineStrip:
     def col(self):
         return libcvht.timestrip_get_col(self._ptr)
 
+    @col.setter
+    def col(self, v):
+        libcvht.timestrip_set_col(self._ptr, v)
+
     @property
     def start(self):
         return libcvht.timestrip_get_start(self._ptr)
@@ -121,6 +125,14 @@ class VHTTimelineStrip:
     def rpb_end(self, value):
         if 0 < value <= 32:
             libcvht.timestrip_set_rpb_end(self._ptr, value)
+
+    @property
+    def enabled(self):
+        return True if libcvht.timestrip_get_enabled(self._ptr) else False
+
+    @enabled.setter
+    def enabled(self, val):
+        libcvht.timestrip_set_enabled(self._ptr, 1 if val else 0)
 
     def __str__(self):
         self.update_strrep()
