@@ -892,7 +892,7 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 		}
 	}
 
-	if (tl->pos == floor(tl->pos)) {	// row boundary
+	if (tl->pos - floor(tl->pos) < 0.0000001) {	// row boundary
 		if (tl->pos == tl->length) {
 			for (int s = 0; s < tl->nstrips; s++) {
 				timestrip *strp = &tl->strips[s];
@@ -904,8 +904,7 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 		// off/on with everything
 		for (int s = 0; s < tl->nstrips; s++) {
 			timestrip *strp = &tl->strips[s];
-
-			if (!strp->seq->playing)
+			if (!strp->seq->playing) {
 				if (strp->start == round(tl->pos) && strp->enabled) {
 					strp->seq->pos = 0;
 					strp->seq->playing = 1;
@@ -917,6 +916,7 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 						track_reset(strp->seq->trk[t]);
 					}
 				}
+			}
 
 			// start mid_strip
 			if (strp->enabled && !strp->seq->playing)
@@ -945,7 +945,6 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 
 					strp->seq->playing = 1;
 				}
-
 		}
 	}
 
@@ -1001,7 +1000,7 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 	}
 
 	tl->pos += rperiod;
-
+	//printf("tl[%.5f]\n", tl->pos);
 }
 
 void timeline_advance(timeline *tl, double period, jack_nframes_t nframes) {

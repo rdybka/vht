@@ -218,7 +218,7 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 		}
 	}
 
-	if (seq->pos == floor(seq->pos)) {
+	if (seq->pos - floor(seq->pos) < 0.0000001) {
 		int r = (int)seq->pos;
 		while (r >= seq->length)
 			r-=seq->length;
