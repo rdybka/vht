@@ -4651,7 +4651,7 @@ SWIGINTERN PyObject *_wrap_sequence_get_relative_length(PyObject *SWIGUNUSEDPARM
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  int result;
+  double result;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -4660,8 +4660,8 @@ SWIGINTERN PyObject *_wrap_sequence_get_relative_length(PyObject *SWIGUNUSEDPARM
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_get_relative_length" "', argument " "1"" of type '" "sequence *""'"); 
   }
   arg1 = (sequence *)(argp1);
-  result = (int)sequence_get_relative_length(arg1);
-  resultobj = SWIG_From_int((int)(result));
+  result = (double)sequence_get_relative_length(arg1);
+  resultobj = SWIG_From_double((double)(result));
   return resultobj;
 fail:
   return NULL;

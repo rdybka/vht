@@ -655,6 +655,13 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 	double tperiod = ((double)trk->nrows / (double)trk->nsrows) * speriod;
 	double tmul = (double) nframes / tperiod;
 
+	if (nframes < 1) {
+		trk->last_pos = trk->pos;
+		trk->last_period = tperiod;
+		trk->pos += tperiod;
+		return;
+	}
+
 	int row_start = floorf(trk->pos);
 	if (row_start == trk->nrows)
 		row_start = 0;
@@ -712,7 +719,7 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 				double delay = trigger_time - trk->pos;
 				double fdelay = (clt->jack_buffer_size - nframes) + delay * tmul;
 
-				if ((delay >= 0) && (tperiod - delay > 0.00000001)) {
+				if ((delay >= 0.0) && (tperiod - delay > 0.0)) {
 					if (trk->playing) {
 						track_play_row(trk, nn, c, fdelay);
 					}

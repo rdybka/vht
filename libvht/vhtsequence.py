@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import math
+
 from collections.abc import Iterable
 from libvht.vhttrack import VHTTrack
 from libvht.vhtextras import VHTExtras
@@ -145,7 +147,7 @@ class VHTSequence(Iterable):
             libcvht.sequence_set_rpb(self._seq_handle, value)
 
             if tstr:
-                tstr.length = tstr.seq.relative_length
+                tstr.length = int(math.ceil(tstr.seq.relative_length))
                 libcvht.timeline_update(self._mod.timeline._tl_handle)
 
     @property

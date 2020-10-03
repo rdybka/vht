@@ -333,7 +333,7 @@ class VHTModule(Iterable):
 
     @property
     def max_bpm(self):
-        return 1023  # don't crash the system
+        return 1023.69  # don't crash the system
 
     # those two work non-"realtime",
     # ment for gui events

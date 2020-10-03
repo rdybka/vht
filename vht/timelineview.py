@@ -407,7 +407,7 @@ class TimelineView(Gtk.DrawingArea):
             ystart = (mod.timeline.qb2t(st.start) - tstart) / self.spl
             yend = (mod.timeline.qb2t(st.start + st.length) - tstart) / self.spl
             lend = (
-                mod.timeline.qb2t(st.start + st.seq.relative_length)
+                mod.timeline.qb2t(st.start + math.ceil(st.seq.relative_length))
                 - tstart  # st.seq.relative_length
             ) / self.spl
 
@@ -474,7 +474,7 @@ class TimelineView(Gtk.DrawingArea):
                 cr.rectangle(thx, ystart, thxx, min(yend, lend))
                 cr.stroke()
 
-                if st.length > st.seq.relative_length:
+                if st.length > math.ceil(st.seq.relative_length):
                     cr.move_to(thx + thxx / 2, ystart + lend)
                     cr.line_to(thx + thxx / 2, ystart + yend)
                     cr.stroke()
@@ -819,12 +819,21 @@ class TimelineView(Gtk.DrawingArea):
                     seq = mod.new_sequence(mod[self.curr_col].length)
                     seq.add_track()
                     idx = mod.timeline.strips.insert(
-                        self.curr_col, seq, rr, seq.relative_length, seq.rpb, seq.rpb
+                        self.curr_col,
+                        seq,
+                        rr,
+                        math.ceil(seq.relative_length),
+                        seq.rpb,
+                        seq.rpb,
                     ).seq.index
                 else:
                     seq = mod[self.curr_col]
                     idx = mod.timeline.strips.insert_parent(
-                        self.curr_col, rr, seq.relative_length, seq.rpb, seq.rpb,
+                        self.curr_col,
+                        rr,
+                        math.ceil(seq.relative_length),
+                        seq.rpb,
+                        seq.rpb,
                     ).seq.index
 
                 extras.fix_extras_new_seq(idx)
@@ -1150,7 +1159,7 @@ class TimelineView(Gtk.DrawingArea):
                 if rm >= mod[self.curr_col].length or rm == -1:
                     hint = (
                         min(self.pointer_r, mod.timeline.nqb),
-                        mod[self.curr_col].relative_length,
+                        math.ceil(mod[self.curr_col].relative_length),
                     )
 
         if hint != self.hint:

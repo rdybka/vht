@@ -89,7 +89,7 @@ extern timeline *module_get_timeline(module *mod);
 extern sequence *sequence_new(int length);
 extern int sequence_get_ntrk(sequence *seq);
 extern int sequence_get_length(sequence *seq);
-extern int sequence_get_relative_length(sequence *seq);
+extern double sequence_get_relative_length(sequence *seq);
 extern int sequence_get_max_length(void);
 extern int sequence_get_index(sequence *seq);
 extern int sequence_get_parent(sequence *seq);

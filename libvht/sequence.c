@@ -182,13 +182,6 @@ void sequence_free(sequence *seq) {
 }
 
 void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
-	if (seq->pos - floor(seq->pos) < 0.00000001) {
-		seq->pos = floor(seq->pos);
-	}
-
-	//if (seq->parent > -1)
-	//	printf("adv %d %.5f %d [%.3f]\n", seq->index, period, nframes, seq->pos);
-
 	if ((seq->trg_quantise == 0) && (seq->trg_times[2] == -2)) {
 		seq->trg_times[2] = -1;
 		if (seq->playing && seq->trg_times[3] != -2) {
@@ -209,15 +202,20 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 		}
 	}
 
+
 	double p = ceil(seq->pos) - seq->pos;
+
 	if (period - p > 0.00000001) {
+
 		jack_nframes_t frm = nframes;
 		frm *= p / period;
 
-		period -= p;
-		nframes -= frm;
+		if (frm > 0) {
+			period -= p;
+			nframes -= frm;
 
-		sequence_advance(seq, p, frm);// :]
+			sequence_advance(seq, p, frm);// :]
+		}
 	}
 
 	if (seq->pos == floor(seq->pos)) {
@@ -240,7 +238,8 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 				}
 
 				for (int t = 0; t < seq->ntrk; t++)
-					track_reset(seq->trk[t]);
+					for (int t = 0; t < seq->ntrk; t++)
+						track_reset(seq->trk[t]);
 			} else {
 				seq->playing = 0;
 				seq->lost = 1;
@@ -329,21 +328,14 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 
 		for (int t = 0; t < seq->ntrk; t++) {
 			track_advance(seq->trk[t], period, nframes);
-
-			// if track past end, stop playing
-			if (seq->trk[t]->pos > seq->trk[t]->nrows)
-
-				if (!seq->trk[t]->loop)
-					seq->trk[t]->playing = 0;
 		}
 	}
 
 	seq->pos += period;
-	if (seq->parent > -1)
-		printf("pos: %.3f\n", seq->pos); // skips 2? rounding error??????
 
-	if (seq->pos > seq->length)
+	if (seq->pos > seq->length) {
 		seq->pos -= seq->length;
+	}
 }
 
 void sequence_del_track(sequence *seq, int t) {
@@ -416,11 +408,11 @@ int sequence_get_playing(sequence *seq) {
 	return seq->playing;
 }
 
-int sequence_get_relative_length(sequence *seq) {
+double sequence_get_relative_length(sequence *seq) {
 	double l = seq->length;
 	double rpb = seq->rpb;
 
-	return (int)ceil((4.0 / rpb) * l);
+	return (4.0 / rpb) * l;
 }
 
 int sequence_get_cue(sequence *seq) {

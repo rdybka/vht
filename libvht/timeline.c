@@ -837,11 +837,11 @@ double timestrip_get_rpb(timestrip *strp, double offs) {
 }
 
 void fix_ring_for_new_strip(timeline *tl, timestrip *strp) {
-	// this will magically try to pass on ring info
+	// this will magically try to pass on ring info - don't think about it
 	for (int s = 0; s < tl->nstrips; s++) {
 		timestrip *ts = &tl->strips[s];
 
-		if (ts == strp || ts->col != strp->col || ts->start)
+		if (ts == strp || ts->col != strp->col)
 			continue;
 
 		for (int t = 0; t < ts->seq->ntrk; t++) {
@@ -869,11 +869,7 @@ void fix_ring_for_new_strip(timeline *tl, timestrip *strp) {
 }
 
 void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes) {
-	if (tl->pos - floor(tl->pos) < 0.00000001) {
-		tl->pos = floor(tl->pos);
-	}
-
-	if (floor(tl->pos) == tl->length) // this will happen once in a while
+	if (floor(tl->pos) == tl->length)
 		tl->pos = 0;
 
 	double len = tl->slices[(long)tl->pos].length;
@@ -881,17 +877,19 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 
 	double p = ceil(tl->pos) - tl->pos;
 
-	if ((rperiod - p > 0.00000001) && (p > 0)) {
-
+	if (rperiod - p > 0.0000001) {
 		jack_nframes_t frm = nframes;
 		frm *= p / rperiod;
-
 		double sp = p * len;
 		period -= sp;
 		rperiod -= p;
-		nframes -= frm;
 
-		timeline_advance_inner(tl, sp, frm);
+		if (frm > 0 && frm < nframes) {
+			nframes -= frm;
+			timeline_advance_inner(tl, sp, frm);
+		} else {
+			tl->pos = ceil(tl->pos);
+		}
 	}
 
 	if (tl->pos == floor(tl->pos)) {	// row boundary
@@ -907,29 +905,27 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 		for (int s = 0; s < tl->nstrips; s++) {
 			timestrip *strp = &tl->strips[s];
 
-			strp->seq->playing = 0;
+			if (!strp->seq->playing)
+				if (strp->start == round(tl->pos) && strp->enabled) {
+					strp->seq->pos = 0;
+					strp->seq->playing = 1;
+					strp->seq->lost = 0;
 
-			if (strp->start == tl->pos && strp->enabled) {
-				strp->seq->pos = 0;
-				strp->seq->playing = 1;
-				strp->seq->lost = 0;
+					fix_ring_for_new_strip(tl, strp);
 
-				fix_ring_for_new_strip(tl, strp);
-
-				for (int t = 0; t < strp->seq->ntrk; t++)
-					strp->seq->trk[t]->resync = 1;
-			}
+					for (int t = 0; t < strp->seq->ntrk; t++) {
+						track_reset(strp->seq->trk[t]);
+					}
+				}
 
 			// start mid_strip
 			if (strp->enabled && !strp->seq->playing)
-				if (strp->start < tl->pos && (strp->start + strp->length > tl->pos)) {
+				if (strp->start < tl->pos && (strp->start + sequence_get_relative_length(strp->seq) > tl->pos)) {
 					strp->seq->pos = 0;
 					strp->seq->lost = 0;
 
 					long rs = strp->start;
-					long re = floor(tl->pos);
-
-					//printf("catchup %ld-%ld\n", rs, re);
+					long re = floor(tl->pos) -1;
 
 					for (long r = rs; r < re; r++) {
 						double bpm = tl->slices[r].bpm;
@@ -949,6 +945,7 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 
 					strp->seq->playing = 1;
 				}
+
 		}
 	}
 
@@ -956,18 +953,53 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 	mod->bpm = timeline_get_bpm_at_qb(tl, (long)tl->pos);
 	for (int s = 0; s < tl->nstrips; s++) {
 		timestrip *strp = &tl->strips[s];
-		double per = period;
-		if (tl->pos + rperiod > strp->start + strp->length && strp->seq->playing) {
-			printf("gotcha!\n");
-		}
+		double toffi = period * timestrip_get_rpb(strp, tl->pos - strp->start) * (mod->bpm / 60.0);
+		int frm = nframes;
 
-		if (strp->seq->playing)
-			sequence_advance(strp->seq, per * timestrip_get_rpb(strp, tl->pos - strp->start) * (mod->bpm / 60.0), nframes);
+		if (strp->seq->playing) {
+			double rll = sequence_get_relative_length(strp->seq);
+
+			// finish off seq?
+			if ((long)ceil(tl->pos) == (long)(strp->start + strp->length)) {
+				if ((strp->seq->pos + toffi) - strp->seq->length > 0.0) {
+					if (strp->length == ceil(rll)) {
+						double toff = toffi;
+						toffi = strp->seq->length - strp->seq->pos;
+
+						frm *= (toffi / toff);
+						sequence_advance(strp->seq, toffi, frm);
+						toffi = 0.0;
+						strp->seq->playing = 0;
+					}
+				}
+			}
+
+			// finish off strip?
+			if (strp->seq->playing)
+				if ((long)ceil(tl->pos) == (long)(strp->start + strp->length)) {
+					//printf("near end: %d %f %ld\n", strp->seq->index, tl->pos, strp->start + strp->length);
+					if (tl->pos + rperiod > strp->start + strp->length) {
+						double sp = (strp->start + strp->length) - tl->pos;
+						frm = nframes;
+						frm *= (sp / rperiod);
+						sp *= timestrip_get_rpb(strp, tl->pos - strp->start) * (mod->bpm / 60.0);
+						sequence_advance(strp->seq, toffi, frm);
+						toffi = 0.0;
+						strp->seq->playing = 0;
+					}
+				}
+
+
+			if (toffi > 0.0) {
+				sequence_advance(strp->seq, toffi, frm);
+			}
+		}
 	}
 
 	for (int s = 0; s < mod->nseq; s++) {
 		sequence_advance(mod->seq[s], period * mod->seq[s]->rpb * (mod->bpm / 60.0), mod->clt->jack_buffer_size);
 	}
+
 	tl->pos += rperiod;
 
 }
@@ -1012,9 +1044,12 @@ void timeline_set_pos(timeline *tl, double npos, int let_ring) {
 	if (!let_ring)
 		for (int s = 0; s < tl->nstrips; s++) {
 			sequence *seq = tl->strips[s].seq;
+			if (seq->playing) {
+				for (int t = 0; t < seq->ntrk; t++)
+					track_kill_notes(seq->trk[t]);
 
-			for (int t = 0; t < seq->ntrk; t++)
-				track_kill_notes(seq->trk[t]);
+				seq->playing = 0;
+			}
 		}
 
 	if (mod->play_mode == 0)

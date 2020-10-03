@@ -317,7 +317,6 @@ void module_add_sequence(module *mod, sequence *seq) {
 	double pos = 0;
 	if (mod->nseq) {
 		pos = mod->seq[0]->pos;
-		printf("%.3f\n", pos);
 	}
 
 	mod->seq = realloc(mod->seq, sizeof(sequence *) * (mod->nseq + 1));
