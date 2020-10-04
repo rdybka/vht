@@ -481,7 +481,14 @@ void sequence_handle_record(module *mod, sequence *seq, midi_event evt) {
 
 void sequence_trigger_mute(sequence *seq) {
 	//printf("mute %d\n", seq->index);
-	seq->trg_times[0] = 0;
+	midi_client *clt = (midi_client *)seq->clt;
+	module *mod = (module *)clt->mod_ref;
+
+	if (!mod->playing) {
+		seq->playing = !seq->playing;
+	} else {
+		seq->trg_times[0] = 0;
+	}
 }
 
 
@@ -496,6 +503,11 @@ void sequence_trigger_cue(sequence *seq) {
 
 void sequence_trigger_play_on(sequence *seq) {
 	//printf("play %d\n", seq->index);
+	midi_client *clt = (midi_client *)seq->clt;
+	module *mod = (module *)clt->mod_ref;
+
+	if (!mod->playing)
+		return;
 
 	if ((seq->trg_playmode == TRIGGER_HOLD) && (seq->playing)) {
 		seq->trg_times[3] = 0;
@@ -529,6 +541,11 @@ void sequence_trigger_play_on(sequence *seq) {
 
 void sequence_trigger_play_off(sequence *seq) {
 	//printf("release %d : %d\n", seq->index, seq->playing);
+	midi_client *clt = (midi_client *)seq->clt;
+	module *mod = (module *)clt->mod_ref;
+
+	if (!mod->playing)
+		return;
 
 	if (seq->trg_playmode == TRIGGER_HOLD) {
 		if (seq->playing) {

@@ -314,22 +314,24 @@ void module_dump_notes(module *mod, int n) {
 void module_add_sequence(module *mod, sequence *seq) {
 	module_excl_in(mod);
 
-	double pos = 0;
-	if (mod->nseq) {
-		pos = mod->seq[0]->pos;
-	}
-
 	mod->seq = realloc(mod->seq, sizeof(sequence *) * (mod->nseq + 1));
 	mod->seq[mod->nseq++] = seq;
 	seq->mod_excl = &mod->excl;
 	seq->clt = mod->clt;
 
+	if (!mod->play_mode) {
+		seq->pos = mod->song_pos;
+	} else {
+		if (mod->nseq) {
+			seq->pos = mod->seq[0]->pos;
+		}
+	}
+
 	for (int t = 0; t < seq->ntrk; t++) {
 		seq->trk[t]->clt = mod->clt;
 
-		if (pos > 0.0) {
-			seq->pos = pos;
-			track_wind(seq->trk[t], pos);
+		if (seq->pos > 0.0) {
+			track_wind(seq->trk[t], seq->pos);
 		}
 	}
 

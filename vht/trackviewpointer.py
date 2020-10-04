@@ -83,7 +83,7 @@ class TrackviewPointer:
 
         # sideview
         if isinstance(self.trk, VHTSequence):
-            if not self.trk.playing:
+            if self.seq.pos > self.seq.length:
                 return
 
             i = 0.5

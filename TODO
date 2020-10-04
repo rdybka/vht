@@ -1,7 +1,3 @@
-- new seqs off time
-- triggers while stopped
-- pointer rubbish
-
 - timeline
     - switching modes (smart pre-delay for coming back to timeline)
     - loop
