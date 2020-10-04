@@ -1,7 +1,7 @@
-- new seqs off
+- new seqs off time
 - triggers while stopped
 - pointer rubbish
-- double / halve magic rpb seqs
+
 - timeline
     - switching modes (smart pre-delay for coming back to timeline)
     - loop

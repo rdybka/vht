@@ -50,14 +50,13 @@ def fix_extras_new_seq(s):
     x = mod[s].extras
     xx = {}
 
+    xx["mouse_cfg"] = [3, 2, 0]
+    xx["font_size"] = cfg.seq_font_size
+    xx["sequence_name"] = ""
+
     if type(s) is int:
-        xx["mouse_cfg"] = [3, 2, 0]
-        xx["sequence_name"] = ""
         txt = get_name(cfg.sequence_name_format % s)
         xx["sequence_name"] = txt
-        xx["font_size"] = cfg.seq_font_size
-    else:
-        xx["font_size"] = cfg.seq_font_size
 
     for k, v in xx.items():
         if k not in x:

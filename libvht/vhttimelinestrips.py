@@ -57,12 +57,19 @@ class VHTTimelineStrips(Iterable):
         if type(seq) is VHTSequence:
             sq = seq._seq_handle
 
-        return VHTTimelineStrip(
+        strp = VHTTimelineStrip(
             libcvht.timeline_add_strip(
                 self._tl_handle, col, sq, start, length, rpb_start, rpb_end,
             ),
             self._mod,
         )
+
+        strp.seq.extras["sequence_name"] = self._mod[col].extras["sequence_name"]
+
+        for cb in self._mod.cb_new_sequence:
+            cb(strp.seq.index)
+
+        return strp
 
     def insert_parent(self, seq_id, start, length, rpb_start, rpb_end):
         ns = libcvht.sequence_clone(libcvht.module_get_seq(self._mod_handle, seq_id))

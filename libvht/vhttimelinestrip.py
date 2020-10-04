@@ -76,9 +76,14 @@ class VHTTimelineStrip:
 
     @property
     def seq(self):
-        return VHTSequence(
+        sq = VHTSequence(
             libcvht.timestrip_get_seq(self._ptr), self._mod, self._mod.cb_new_track
         )
+
+        for cb in self._mod.cb_new_sequence:
+            cb(sq.index)
+
+        return sq
 
     @property
     def col(self):
