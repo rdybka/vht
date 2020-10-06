@@ -918,7 +918,7 @@ class TimelineView(Gtk.DrawingArea):
             if col != self.move_start_x and col < len(mod):
                 strp = mod.timeline.strips[self.curr_strip_id]
                 rm = mod.timeline.room_at(int(col), strp.start)
-                if rm > strp.length or rm == -1:
+                if rm >= strp.length or rm == -1:
                     strp.col = int(col)
                     self.move_start_x = strp.col
 
@@ -1002,7 +1002,7 @@ class TimelineView(Gtk.DrawingArea):
     def on_leave(self, wdg, prm):
         if not self.moving and not self.resizing and not self.expanding:
             self.pointer_xy = None
-            self.pointer_r = -1
+            # self.pointer_r = -1
             self.curr_col = -1
             self.curr_strip_id = -1
 
@@ -1099,7 +1099,7 @@ class TimelineView(Gtk.DrawingArea):
             self.max_qb_start += (self.max_qb_start_dest - self.max_qb_start) / 3
 
         if self.pointer_ry_dest - self.pointer_ry != 0:
-            self.pointer_ry += (self.pointer_ry_dest - self.pointer_ry) / 3
+            self.pointer_ry += (self.pointer_ry_dest - self.pointer_ry) / 1.5
 
         if self.pointer_xy:
             self.pointer_r = mod.timeline.t2qb(
