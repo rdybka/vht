@@ -76,6 +76,10 @@ int module_get_ctrlpr(module *mod) {
 	return mod->ctrlpr;
 }
 
+int module_get_switch_req(module *mod) {
+	return mod->switch_req;
+}
+
 void module_set_ctrlpr(module *mod, int ctrlpr) {
 	mod->ctrlpr = ctrlpr;
 }

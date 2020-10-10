@@ -52,6 +52,8 @@ typedef struct module_t {
 	pthread_mutex_t excl;
 	midi_client *clt;
 	int play_mode; // 0 - seq_loop, 1 - timeline
+	double switch_delay;
+	int switch_req;
 	int transp;
 } module;
 

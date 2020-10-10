@@ -237,6 +237,10 @@ class VHTModule(Iterable):
         return libcvht.module_is_playing(self._mod_handle)
 
     @property
+    def switch_req(self):
+        return libcvht.module_get_switch_req(self._mod_handle)
+
+    @property
     def record(self):
         return libcvht.module_is_recording(self._mod_handle)
 

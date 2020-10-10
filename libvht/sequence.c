@@ -213,7 +213,7 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 		if (frm > 0) {
 			period -= p;
 			nframes -= frm;
-
+			//printf("re-adv seq %f %d\n", p, frm);
 			sequence_advance(seq, p, frm);// :]
 		}
 	}

@@ -4200,6 +4200,29 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_module_get_switch_req(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_get_switch_req" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (int)module_get_switch_req(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_track_get_rec_update(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   track *arg1 = (track *) 0 ;
@@ -9547,6 +9570,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "module_set_play_mode", _wrap_module_set_play_mode, METH_VARARGS, NULL},
 	 { "module_get_play_mode", _wrap_module_get_play_mode, METH_O, NULL},
 	 { "module_get_jack_pos", _wrap_module_get_jack_pos, METH_O, NULL},
+	 { "module_get_switch_req", _wrap_module_get_switch_req, METH_O, NULL},
 	 { "track_get_rec_update", _wrap_track_get_rec_update, METH_O, NULL},
 	 { "track_clear_updates", _wrap_track_clear_updates, METH_O, NULL},
 	 { "midi_in_get_event", _wrap_midi_in_get_event, METH_O, NULL},

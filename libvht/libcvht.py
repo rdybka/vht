@@ -185,6 +185,9 @@ def module_get_play_mode(mod):
 def module_get_jack_pos(mod):
     return _libcvht.module_get_jack_pos(mod)
 
+def module_get_switch_req(mod):
+    return _libcvht.module_get_switch_req(mod)
+
 def track_get_rec_update(trk):
     return _libcvht.track_get_rec_update(trk)
 

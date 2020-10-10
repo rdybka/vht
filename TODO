@@ -1,17 +1,15 @@
 - timeline
-    - switching modes (smart pre-delay for coming back to timeline)
     - loop
-    - record
 - trackview:
     - undo/redo
         - track
         - ctrl
+    - loop
+- export with jack_capture
+    - sampling :]
 - configuration
-    - dialogs
     - ports
+    - dialogs
     - defaults
     - look
     - midi buttons
-- export with jack_capture
-    - sampling :]
-? procedural music

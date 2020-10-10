@@ -108,7 +108,6 @@ void track_reset(track *trk) {
 	trk->qc1_last = -1;
 	trk->qc2_last = -1;
 	trk->loop = 1;
-	track_kill_notes(trk);
 }
 
 void track_set_row(track *trk, int c, int n, int type, int note, int velocity, int delay) {
@@ -702,6 +701,8 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 		}
 	}
 
+	//printf("%f %f %f\n", trk->pos, floor(trk->pos), round(trk->pos));
+
 	// play notes
 	for (int c = 0; c < trk->ncols; c++)
 		for (int n = row_start; n <= row_end; n++) {
@@ -718,10 +719,16 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 				double trigger_time = (double)n + ((double)r.delay / 100);
 				double delay = trigger_time - trk->pos;
 				double fdelay = (clt->jack_buffer_size - nframes) + delay * tmul;
+				unsigned int frm = fabs(round(fdelay));
 
-				if ((delay >= 0.0) && (tperiod - delay > 0.0)) {
+				if (frm == 0 && fdelay < 0.0)
+					fdelay = 0.0;
+
+//				printf("--- %f %d %f\n", fdelay, frm, delay);
+
+				if (fdelay >= 0.0 && frm < clt->jack_buffer_size) {
 					if (trk->playing) {
-						track_play_row(trk, nn, c, fdelay);
+						track_play_row(trk, nn, c, frm);
 					}
 				}
 			}
@@ -808,6 +815,7 @@ void track_wind(track *trk, double period) {
 }
 
 void track_kill_notes(track *trk) {
+	printf("kill notes!\n");
 	pthread_mutex_lock(&trk->excl);
 
 	for (int c = 0; c < trk->ncols; c++) {

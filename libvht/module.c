@@ -184,17 +184,50 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 		}
 
 		if (mod->play_mode == 1) {
-			timeline_advance(mod->tline, period, mod->clt->jack_buffer_size);
+			double per = period;
+
+			if (mod->switch_req && mod->switch_delay < period) {
+				per = mod->switch_delay;
+			}
+
+			timeline_advance(mod->tline, per, mod->clt->jack_buffer_size);
 		}
 
 		mod->song_pos += period;
+
+		// fix mode switching
+		if (mod->switch_req && mod->nseq) {
+			//printf("delaying: %f\n", mod->switch_delay);
+
+			if (mod->play_mode == 0) {
+				double per = period * mod->seq[0]->rpb * (mod->bpm / 60.0);
+				mod->switch_delay -= per;
+
+
+				if (mod->switch_delay < 0.00000001) {
+					if (fabs(mod->switch_delay) < 0.0000001) { // round off
+						mod->switch_delay = 0.0;
+					}
+
+					int frm = (double)mod->clt->jack_buffer_size * (fabs(mod->switch_delay) / per);
+
+					//printf("correction %f %d!!!!\n", mod->switch_delay, frm);
+					if (frm) {
+						timeline_advance(mod->tline, -mod->switch_delay, frm);
+					}
+
+					mod->switch_delay = 0;
+					mod->switch_req = 0;
+					mod->play_mode = 1;
+				}
+			}
+		}
 	} else {
 		// send program changes paused
 		for (int s = 0; s < mod->nseq; s++) {
 			for (int t = 0; t < mod->seq[s]->ntrk; t++)
 				track_fix_program_change(mod->seq[s]->trk[t]);
 		}
-
 	}
 
 	//printf("%f %f %f %d %d\n", mod->song_pos, mod->seq[0]->pos, timeline_get_qb_time(mod->tline, mod->tline->pos), mod->clt->jack_buffer_size, mod->clt->jack_sample_rate);
@@ -234,6 +267,8 @@ module *module_new() {
 	mod->clt = midi_client_new(mod);
 	mod->tline = timeline_new(mod->clt);
 	mod->play_mode = 0;
+	mod->switch_delay = 0.0;
+	mod->switch_req = 0;
 	timechange *tc = timeline_get_change(mod->tline, 0);
 	tc->bpm = mod->bpm;
 	tc->row = 0;
@@ -439,11 +474,42 @@ void module_synch_output_ports(module *mod) {
 }
 
 void module_set_play_mode(module *mod, int m) {
-	if (!m) {
-		mod->play_mode = 0;
+	module_excl_in(mod);
+
+	if (mod->playing) {
+		if (mod->play_mode == 0) {
+			if (mod->tline->pos == 0.0) {
+				mod->switch_delay = mod->seq[0]->length - mod->seq[0]->pos;
+				mod->switch_req = 1;
+			}
+
+			if (mod->tline->pos > 0.0) {
+				double rl = sequence_get_relative_length(mod->seq[0]);
+				double rat = mod->seq[0]->length / rl;
+				//printf("rat:%f  rl:%f  sl:%d tl-pos:%f seq-pos:%f mod:%f rel-sq-pos:%f\n", rat, rl, mod->seq[0]->length, mod->tline->pos, mod->seq[0]->pos, fmod(mod->tline->pos, rl), (mod->seq[0]->pos / mod->seq[0]->length) * rl);
+				mod->switch_delay = (fmod(mod->tline->pos, rl) * rat) + mod->seq[0]->length - (mod->seq[0]->pos);
+
+				//while(mod->switch_delay < 0.0)
+				//	mod->switch_delay += rl;
+
+				//printf("delay %f\n", mod->switch_delay);
+				//if (mod->switch_delay > 0.0)
+				mod->switch_req = 1;
+			}
+		}
+
+		if (mod->play_mode == 1) {
+			mod->play_mode = 0;
+		}
 	} else {
-		mod->play_mode = 1;
+		if (!m) {
+			mod->play_mode = 0;
+		} else {
+			mod->play_mode = 1;
+		}
 	}
+
+	module_excl_out(mod);
 }
 
 int module_get_play_mode(module *mod) {

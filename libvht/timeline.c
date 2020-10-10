@@ -837,7 +837,7 @@ double timestrip_get_rpb(timestrip *strp, double offs) {
 }
 
 void fix_ring_for_new_strip(timeline *tl, timestrip *strp) {
-	// this will magically try to pass on ring info - don't think about it
+	// this will magically try to pass on ring info
 	for (int s = 0; s < tl->nstrips; s++) {
 		timestrip *ts = &tl->strips[s];
 
@@ -886,6 +886,7 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 
 		if (frm > 0 && frm < nframes) {
 			nframes -= frm;
+			//printf("re-adv tl %f %d\n", sp, frm);
 			timeline_advance_inner(tl, sp, frm);
 		} else {
 			tl->pos = ceil(tl->pos);
@@ -995,8 +996,10 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 		}
 	}
 
-	for (int s = 0; s < mod->nseq; s++) {
-		sequence_advance(mod->seq[s], period * mod->seq[s]->rpb * (mod->bpm / 60.0), mod->clt->jack_buffer_size);
+	if (mod->play_mode == 1) {
+		for (int s = 0; s < mod->nseq; s++) {
+			sequence_advance(mod->seq[s], period * mod->seq[s]->rpb * (mod->bpm / 60.0), mod->clt->jack_buffer_size);
+		}
 	}
 
 	tl->pos += rperiod;

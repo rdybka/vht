@@ -110,7 +110,7 @@ class VHTTimelineStrip:
 
     @length.setter
     def length(self, value):
-        libcvht.timestrip_set_length(self._ptr, value)
+        libcvht.timestrip_set_length(self._ptr, int(value))
         self._mod.timeline.update()
 
     @property
