@@ -276,6 +276,8 @@ extern int timestrip_can_rpb_seq(timeline *tl, timestrip *tstr, int rpb);
 extern int timestrip_get_enabled(timestrip *tstr);
 extern void timestrip_set_enabled(timestrip *tstr, int v);
 
+extern void timestrip_noteoffise(timeline *tl, timestrip *tstr);
+
 extern sequence *timeline_get_prev_seq(timeline *tl, timestrip *tstr);
 extern sequence *timeline_get_next_seq(timeline *tl, timestrip *tstr);
 

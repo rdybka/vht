@@ -9141,6 +9141,35 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_timestrip_noteoffise(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  timeline *arg1 = (timeline *) 0 ;
+  timestrip *arg2 = (timestrip *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "timestrip_noteoffise", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timestrip_noteoffise" "', argument " "1"" of type '" "timeline *""'"); 
+  }
+  arg1 = (timeline *)(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_timestrip, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "timestrip_noteoffise" "', argument " "2"" of type '" "timestrip *""'"); 
+  }
+  arg2 = (timestrip *)(argp2);
+  timestrip_noteoffise(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_timeline_get_prev_seq(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   timeline *arg1 = (timeline *) 0 ;
@@ -9739,6 +9768,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "timestrip_can_rpb_seq", _wrap_timestrip_can_rpb_seq, METH_VARARGS, NULL},
 	 { "timestrip_get_enabled", _wrap_timestrip_get_enabled, METH_O, NULL},
 	 { "timestrip_set_enabled", _wrap_timestrip_set_enabled, METH_VARARGS, NULL},
+	 { "timestrip_noteoffise", _wrap_timestrip_noteoffise, METH_VARARGS, NULL},
 	 { "timeline_get_prev_seq", _wrap_timeline_get_prev_seq, METH_VARARGS, NULL},
 	 { "timeline_get_next_seq", _wrap_timeline_get_next_seq, METH_VARARGS, NULL},
 	 { "timeline_get_loop_active", _wrap_timeline_get_loop_active, METH_O, NULL},

@@ -51,6 +51,9 @@ class VHTTimelineStrip:
             self._mod.timeline._tl_handle, self._ptr, rpb
         )
 
+    def noteoffise(self):
+        libcvht.timestrip_noteoffise(self._mod.timeline._tl_handle, self._ptr)
+
     @property
     def prev_id(self):
         seq_ptr = libcvht.timeline_get_prev_seq(

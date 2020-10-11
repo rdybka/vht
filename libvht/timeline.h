@@ -55,9 +55,9 @@ typedef struct timeline_t {
 	int nstrips;
 	int nticks;
 	int ncols;
-	double loop_start;
-	double loop_end;
-	double loop_active;
+	long loop_start;
+	long loop_end;
+	int loop_active;
 	int length;  // in qbeats
 	double time_length;
 	double pos;  // qb
@@ -129,4 +129,6 @@ double timeline_get_pos(timeline *tl);
 
 int timestrip_get_enabled(timestrip *tstr);
 void timestrip_set_enabled(timestrip *tstr, int v);
+
+void timestrip_noteoffise(timeline *tl, timestrip *tstr);
 #endif //__TIMELINE_H__

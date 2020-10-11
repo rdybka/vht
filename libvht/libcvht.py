@@ -692,6 +692,9 @@ def timestrip_get_enabled(tstr):
 def timestrip_set_enabled(tstr, v):
     return _libcvht.timestrip_set_enabled(tstr, v)
 
+def timestrip_noteoffise(tl, tstr):
+    return _libcvht.timestrip_noteoffise(tl, tstr)
+
 def timeline_get_prev_seq(tl, tstr):
     return _libcvht.timeline_get_prev_seq(tl, tstr)
 

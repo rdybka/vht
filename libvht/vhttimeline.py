@@ -52,6 +52,30 @@ class VHTTimeline:
     def pos(self, val):
         libcvht.timeline_set_pos(self._tl_handle, float(val), 0)
 
+    @property
+    def loop_active(self):
+        return libcvht.timeline_get_loop_active(self._tl_handle)
+
+    @loop_active.setter
+    def loop_active(self, val):
+        libcvht.timeline_set_loop_active(self._tl_handle, 1 if val else 0)
+
+    @property
+    def loop_start(self):
+        return libcvht.timeline_get_loop_start(self._tl_handle)
+
+    @loop_start.setter
+    def loop_start(self, val):
+        libcvht.timeline_set_loop_start(self._tl_handle, int(val))
+
+    @property
+    def loop_end(self):
+        return libcvht.timeline_get_loop_end(self._tl_handle)
+
+    @loop_end.setter
+    def loop_end(self, val):
+        libcvht.timeline_set_loop_end(self._tl_handle, int(val))
+
     def t2qb(self, t):  # qb for time in seconds
         return libcvht.timeline_get_qb(self._tl_handle, t)
 

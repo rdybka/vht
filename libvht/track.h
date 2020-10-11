@@ -72,6 +72,7 @@ typedef struct track_t {
 
 	int arows; // allocated rows
 	int *ring;
+	int *lplayed;
 
 	int resync;
 

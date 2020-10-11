@@ -75,11 +75,14 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 
 	trk->rows = malloc(sizeof(row*) * trk->ncols);
 	trk->ring = malloc(sizeof(int) * trk->ncols);
+	trk->lplayed = malloc(sizeof(int) * trk->ncols);
+
 	for (int c = 0; c < trk->ncols; c++) {
 		trk->rows[c] = malloc(sizeof(row) * trk->nrows);
 		track_clear_rows(trk, c);
 
 		trk->ring[c] = -1;
+		trk->lplayed[c] = -1;
 	}
 
 	trk->ctrlpr = ctrlpr;
@@ -317,6 +320,7 @@ void track_free(track *trk) {
 	free(trk->extras);
 	free(trk->crows);
 	free(trk->ring);
+	free(trk->lplayed);
 	free(trk->rows);
 	free(trk->ctrl);
 	free(trk->ctrlnum);
@@ -527,10 +531,18 @@ int col_last_note(track *trk, int col, double pos) {
 // yooohoooo!!!
 void track_play_row(track *trk, int pos, int c, int delay) {
 	row r;
+
+	if (trk->lplayed[c] == pos)
+		return;
+
 	track_get_row(trk, c, pos, &r);
+	trk->lplayed[c] = pos;
 
 	if (r.type == none)
 		return;
+
+	midi_client *clt = (midi_client *)trk->clt;
+	module *mod = (module *)clt->mod_ref;
 
 	midi_event evt;
 
@@ -540,7 +552,7 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 			evt.channel = trk->channel;
 			evt.type = note_off;
 			evt.note = trk->ring[c];
-			evt.velocity = 0;
+			evt.velocity = 64;
 			midi_buffer_add(trk->clt, trk->port, evt);
 			trk->indicators |= 4;
 			trk->ring[c] = -1;
@@ -557,7 +569,13 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 		//printf("note: %d %d \n", evt.note, evt.time);
 		midi_buffer_add(trk->clt, trk->port, evt);
 
-		// fix wandering notes
+		// fix wandering notes?
+		if (!mod->recording) {
+			if (r.type == note_on)
+				trk->ring[c] = r.note;
+			return;
+		}
+
 		int wanderer = track_get_wandering_note(trk, c, pos);
 		if (wanderer > -1) {
 			int found = 0;
@@ -584,7 +602,6 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 			track_set_row(trk, dest_col, wanderer, r.type, r.note, r.velocity, r.delay);
 			track_set_wanderer(trk, dest_col, wanderer, 1);
 		}
-
 	}
 
 	if (r.type == note_on) {
@@ -724,10 +741,9 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 				if (frm == 0 && fdelay < 0.0)
 					fdelay = 0.0;
 
-//				printf("--- %f %d %f\n", fdelay, frm, delay);
-
 				if (fdelay >= 0.0 && frm < clt->jack_buffer_size) {
 					if (trk->playing) {
+						//printf("--- %f %d %f\n", fdelay, frm, delay);
 						track_play_row(trk, nn, c, frm);
 					}
 				}
@@ -815,7 +831,6 @@ void track_wind(track *trk, double period) {
 }
 
 void track_kill_notes(track *trk) {
-	printf("kill notes!\n");
 	pthread_mutex_lock(&trk->excl);
 
 	for (int c = 0; c < trk->ncols; c++) {
@@ -856,7 +871,10 @@ void track_add_col(track *trk) {
 	trk->rows = realloc(trk->rows, sizeof(row*) * trk->ncols);
 	trk->rows[trk->ncols -1] = malloc(sizeof(row) * trk->arows);
 	trk->ring = realloc(trk->ring, sizeof(int) * trk->ncols);
+	trk->lplayed = realloc(trk->lplayed, sizeof(int) * trk->ncols);
+
 	trk->ring[trk->ncols - 1] = -1;
+	trk->lplayed[trk->ncols - 1] = -1;
 	trk->dirty = 1;
 	pthread_mutex_unlock(&trk->excl);
 
@@ -902,12 +920,15 @@ void track_del_col(track *trk, int c) {
 	for (int cc = c; cc < trk->ncols - 1; cc++) {
 		trk->rows[cc] = trk->rows[cc+1];
 		trk->ring[cc] = trk->ring[cc+1];
+		trk->lplayed[cc] = trk->lplayed[cc+1];
 	}
 
 	trk->ncols--;
 
 	trk->rows = realloc(trk->rows, sizeof(row*) * trk->ncols);
 	trk->ring = realloc(trk->ring, sizeof(int) * trk->ncols);
+	trk->lplayed = realloc(trk->lplayed, sizeof(int) * trk->ncols);
+
 	trk->dirty = 1;
 	trk_mod_excl_out(trk);
 }

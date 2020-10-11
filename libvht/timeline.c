@@ -45,8 +45,8 @@ timeline *timeline_new(midi_client *clt) {
 	ntl->pos = 0.0;
 	ntl->length = 1024;
 	ntl->time_length = 0.0;
-	ntl->loop_start = -1;
-	ntl->loop_end = -1;
+	ntl->loop_start = 5;
+	ntl->loop_end = 15;
 	ntl->loop_active = 0;
 	timeline_update_inner(ntl);
 	pthread_mutex_init(&ntl->excl, NULL);
@@ -919,9 +919,10 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 				}
 			}
 
+			//if (strp->start < tl->pos && (strp->start + sequence_get_relative_length(strp->seq) > tl->pos)) {
 			// start mid_strip
 			if (strp->enabled && !strp->seq->playing)
-				if (strp->start < tl->pos && (strp->start + sequence_get_relative_length(strp->seq) > tl->pos)) {
+				if (strp->start < tl->pos && (strp->start + strp->length > tl->pos)) {
 					strp->seq->pos = 0;
 					strp->seq->lost = 0;
 
@@ -1105,3 +1106,55 @@ void timestrip_set_enabled(timestrip *tstr, int v) {
 
 }
 
+void timestrip_insert_noteoff(timestrip *tstr, track *src_trk) {
+	sequence *seq = tstr->seq;
+
+	int port = src_trk->port;
+	int channel = src_trk->channel;
+	int ctrlpr = src_trk->ctrlpr;
+
+	int found = -1;
+	for (int t = 0; t < seq->ntrk && found == -1; t++) {
+		if (seq->trk[t]->port == port && seq->trk[t]->channel == channel) {
+			found = t;
+		}
+	}
+
+	track *trk = NULL;
+	if (found > -1) {
+		trk = seq->trk[found];
+		track_add_col(trk);
+		trk->rows[trk->ncols - 1][0].type = note_off;
+
+	} else {
+		trk = track_new(port, channel, seq->length, seq->length, ctrlpr);
+		trk->rows[0][0].type = note_off;
+		sequence_add_track(seq, trk);
+	}
+}
+
+void timestrip_noteoffise(timeline *tl, timestrip *tstr) {
+	timeline_excl_in(tl);
+	sequence *prev = timeline_get_prev_seq(tl, tstr);
+	if (!prev)
+		return;
+
+	for (int t = 0; t < prev->ntrk; t++) {
+		for (int c = 0; c < prev->trk[t]->ncols; c++) {
+			int found = -1;
+			for (int r = prev->trk[t]->nrows - 1; r >= 0 && found == -1; r--) {
+				if (prev->trk[t]->rows[c][r].type != none)
+					found = r;
+			}
+
+			if (found > -1) {
+				track *trk = prev->trk[t];
+				if (trk->rows[c][found].type == note_on)
+					timestrip_insert_noteoff(tstr, trk);
+			}
+
+		}
+	}
+
+	timeline_excl_out(tl);
+}
