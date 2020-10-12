@@ -45,8 +45,8 @@ timeline *timeline_new(midi_client *clt) {
 	ntl->pos = 0.0;
 	ntl->length = 1024;
 	ntl->time_length = 0.0;
-	ntl->loop_start = 5;
-	ntl->loop_end = 15;
+	ntl->loop_start = -1;
+	ntl->loop_end = -1;
 	ntl->loop_active = 0;
 	timeline_update_inner(ntl);
 	pthread_mutex_init(&ntl->excl, NULL);
@@ -232,14 +232,20 @@ void timeline_update_chunk(timeline *tl, int from, int to) {
 
 void timeline_update(timeline *tl) {
 	timeline_excl_in(tl);
+	int exp_loop = 0;
+	if ((tl->loop_start == 0) && (tl->loop_end == tl->length))
+		exp_loop = 1;
+
 	timeline_update_inner(tl);
-	timeline_excl_out(tl);
-	/*
-	for (int sl = 0; sl < tl->nslices; sl++) {
-		timeslice *ts = &tl->slices[sl];
-		printf("%d %.3f %.3f %.3f\n", sl, ts->bpm, ts->length, ts->time);
+
+	if (exp_loop) {
+		tl->loop_end = tl->length;
 	}
-	*/
+
+	if (tl->loop_end > tl->length) {
+		tl->loop_end = tl->length;
+	}
+	timeline_excl_out(tl);
 }
 
 int timechange_compare(const void *a, const void *b) {
@@ -869,9 +875,6 @@ void fix_ring_for_new_strip(timeline *tl, timestrip *strp) {
 }
 
 void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes) {
-	if (floor(tl->pos) == tl->length)
-		tl->pos = 0;
-
 	double len = tl->slices[(long)tl->pos].length;
 	double rperiod = period / len;
 
@@ -894,12 +897,20 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 	}
 
 	if (tl->pos - floor(tl->pos) < 0.0000001) {	// row boundary
+		if (tl->loop_active) {
+			if (round(tl->pos) >= tl->loop_end) {
+				timeline_set_pos(tl, tl->loop_start, 0);
+				return;
+			}
+		}
+
 		if (tl->pos == tl->length) {
 			for (int s = 0; s < tl->nstrips; s++) {
 				timestrip *strp = &tl->strips[s];
 				strp->seq->playing = 0;
 			}
-			tl->pos = 0;
+
+			//tl->pos = 0;
 		}
 
 		// off/on with everything
@@ -1004,7 +1015,9 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 	}
 
 	tl->pos += rperiod;
-	//printf("tl[%.5f]\n", tl->pos);
+	if (tl->pos > tl->length) {
+		tl->pos = tl->length;
+	}
 }
 
 void timeline_advance(timeline *tl, double period, jack_nframes_t nframes) {
@@ -1018,6 +1031,9 @@ int timeline_get_loop_active(timeline *tl) {
 }
 
 void timeline_set_loop_active(timeline *tl, int val) {
+//	if (val && tl->pos >= tl->length) {
+//		timeline_set_pos(tl, tl->loop_start, 0);
+//	}
 	tl->loop_active = val;
 }
 

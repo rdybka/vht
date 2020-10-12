@@ -152,10 +152,11 @@ class MainWin(Gtk.ApplicationWindow):
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
         self.seq_mode_butt.add(image)
         self.seq_mode_butt.set_active(not mod.play_mode)
-        self.seq_mode_butt.connect("toggled", self.on_playmode_toggled)
+        self.seq_mode_butt.connect("clicked", self.on_playmode_toggled)
         self.seq_mode_butt.set_tooltip_markup(
             cfg.tooltip_markup2 % ("play mode", cfg.key["play_mode"])
         )
+        self.seq_mode_butt_ignore_signal = False
 
         buttbox = Gtk.Box()
         self.seqlist_butts = buttbox
@@ -241,6 +242,9 @@ class MainWin(Gtk.ApplicationWindow):
         mod.panic(True)
 
     def on_playmode_toggled(self, butt):
+        if self.seq_mode_butt_ignore_signal:
+            return
+
         mod.play_mode = not butt.get_active()
 
     def hide_timeline(self):

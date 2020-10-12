@@ -249,7 +249,11 @@ class TimelineView(Gtk.DrawingArea):
         cr.save()
 
         col = cfg.star_colour if mod.timeline.loop_active else cfg.timeline_colour
-        i = cfg.intensity_txt_highlight if self.highlight_loop else cfg.intensity_txt
+        i = (
+            cfg.intensity_txt_highlight
+            if self.highlight_loop
+            else cfg.intensity_txt * 0.7
+        )
 
         cr.set_source_rgb(*(c * i for c in col))
         cr.set_line_width(1)
@@ -1239,7 +1243,7 @@ class TimelineView(Gtk.DrawingArea):
                 self.l2t(self.pointer_xy[1]) + mod.timeline.qb2t(self.qb_start)
             )
 
-            if not self.moving_bpm and not self.mouse_in_loop:
+            if not self.moving_bpm:
                 self.pointer_r = math.floor((self.pointer_r / self.snap)) * self.snap
 
             if self.mouse_in_changes and not self.moving_bpm:

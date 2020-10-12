@@ -486,14 +486,7 @@ void module_set_play_mode(module *mod, int m) {
 			if (mod->tline->pos > 0.0) {
 				double rl = sequence_get_relative_length(mod->seq[0]);
 				double rat = mod->seq[0]->length / rl;
-				//printf("rat:%f  rl:%f  sl:%d tl-pos:%f seq-pos:%f mod:%f rel-sq-pos:%f\n", rat, rl, mod->seq[0]->length, mod->tline->pos, mod->seq[0]->pos, fmod(mod->tline->pos, rl), (mod->seq[0]->pos / mod->seq[0]->length) * rl);
 				mod->switch_delay = (fmod(mod->tline->pos, rl) * rat) + mod->seq[0]->length - (mod->seq[0]->pos);
-
-				//while(mod->switch_delay < 0.0)
-				//	mod->switch_delay += rl;
-
-				//printf("delay %f\n", mod->switch_delay);
-				//if (mod->switch_delay > 0.0)
 				mod->switch_req = 1;
 			}
 		}
@@ -556,3 +549,4 @@ void module_synch_transp(module *mod, int play, jack_nframes_t frames) {
 
 	module_excl_out(mod);
 }
+

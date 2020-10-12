@@ -1,11 +1,7 @@
-- seqview
-    - loop
-- looping in engine
+- ports
+- sampling :]
 - export with jack_capture
-    - sampling :]
 - configuration
-    - ports
-    - dialogs
     - defaults
     - look
     - midi buttons

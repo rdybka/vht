@@ -821,6 +821,9 @@ class SequenceView(Gtk.Box):
             mod.timeline_view.fix_extras()
             mod.seqlist.configure()
             mod.seqlist.redraw()
+            mod.mainwin.seq_mode_butt_ignore_signal = True
+            mod.mainwin.seq_mode_butt.set_active(not mod.play_mode)
+            mod.mainwin.seq_mode_butt_ignore_signal = False
             return True
         else:
             mod.new()
@@ -830,6 +833,9 @@ class SequenceView(Gtk.Box):
             mod.timeline_view.fix_extras()
             mod.seqlist.configure()
             mod.seqlist.redraw()
+            mod.mainwin.seq_mode_butt_ignore_signal = True
+            mod.mainwin.seq_mode_butt.set_active(not mod.play_mode)
+            mod.mainwin.seq_mode_butt_ignore_signal = False
             return False
 
     def switch(self, new_seq):

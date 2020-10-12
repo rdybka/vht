@@ -238,7 +238,7 @@ class VHTModule(Iterable):
 
     @property
     def switch_req(self):
-        return libcvht.module_get_switch_req(self._mod_handle)
+        return True if libcvht.module_get_switch_req(self._mod_handle) else False
 
     @property
     def record(self):
@@ -377,6 +377,10 @@ class VHTModule(Iterable):
             jm["seq"].append(pack_seq(seq))
 
         tl = {}
+        tl["loop_start"] = self.timeline.loop_start
+        tl["loop_end"] = self.timeline.loop_end
+        tl["loop_active"] = self.timeline.loop_active
+
         tl["changes"] = []
         for ch in self.timeline.changes:
             chng = {}
@@ -421,13 +425,17 @@ class VHTModule(Iterable):
             self.bpm = jm["bpm"]
             self.ctrlpr = jm["ctrlpr"]
             self.extras = jm["extras"]
-            # self.play_mode = jm["play_mode"]
+            self.play_mode = jm["play_mode"]
             for seq in jm["seq"]:
                 self.unpack_seq(seq, True)
 
             self.timeline.clear()
 
             tl = jm["tl"]
+            self.timeline.loop_start = tl["loop_start"]
+            self.timeline.loop_end = tl["loop_end"]
+            self.timeline.loop_active = tl["loop_active"]
+
             for chng in tl["changes"]:
                 self.timeline.changes.insert(chng["bpm"], chng["row"], chng["lnk"])
 
