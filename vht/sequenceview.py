@@ -319,6 +319,24 @@ class SequenceView(Gtk.Box):
             self.halve()
             return True
 
+        if cfg.key["sequence_loop"].matches(event):
+            if type(mod.curr_seq) is int:
+                return
+
+            strp = mod.timeline.strips[mod.curr_seq[1]]
+
+            if (
+                mod.timeline.loop_start == strp.start
+                and mod.timeline.loop_end == strp.start + strp.length
+            ):
+                mod.timeline.loop_active = not mod.timeline.loop_active
+                return True
+
+            mod.timeline.loop_start = strp.start
+            mod.timeline.loop_end = strp.start + strp.length
+            mod.timeline.loop_active = True
+            return True
+
         if cfg.key["undo"].matches(event):
             if mod.active_track:
                 return mod.active_track.on_key_press(widget, event)
@@ -803,9 +821,6 @@ class SequenceView(Gtk.Box):
             mod.timeline_view.fix_extras()
             mod.seqlist.configure()
             mod.seqlist.redraw()
-            if mod.mainwin.seq_mode_butt.props.active == mod.play_mode:
-                mod.mainwin.seq_mode_butt.props.active = not mod.play_mode
-
             return True
         else:
             mod.new()
@@ -815,8 +830,6 @@ class SequenceView(Gtk.Box):
             mod.timeline_view.fix_extras()
             mod.seqlist.configure()
             mod.seqlist.redraw()
-            if mod.mainwin.seq_mode_butt.props.active == mod.play_mode:
-                mod.mainwin.seq_mode_butt.props.active = not mod.play_mode
             return False
 
     def switch(self, new_seq):

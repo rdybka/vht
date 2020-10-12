@@ -80,7 +80,7 @@ class TimelineView(Gtk.DrawingArea):
         self.pointer_xy = None
         self.pointer_r = -1
 
-        self.snap = 8
+        self.snap = 1
 
         self.fix_extras()
 
@@ -102,6 +102,8 @@ class TimelineView(Gtk.DrawingArea):
         self.mouse_in_timeline = False
         self.mouse_in_changes = False
 
+        self.moving_playhead = False
+
         self.moving_bpm = False
         self.highlight_change = None
         self.curr_change = None
@@ -120,6 +122,9 @@ class TimelineView(Gtk.DrawingArea):
 
         self.highlight_loop = False
         self.mouse_in_loop = False
+        self.drawing_loop = False
+        self.drawing_loop_active = False
+        self.drawing_loop_fallback = None
 
         self.hint = None
         self.hint_alpha = 0
@@ -266,22 +271,22 @@ class TimelineView(Gtk.DrawingArea):
             ) / self.spl
 
         if lsr > -1 and ler > -1:
-            xx = w - tw / 4.0
+            xx = w - self._txt_height * 1.2
+
+            cr.move_to(w - tw, lsr)
+            cr.line_to(xx, lsr)
+            cr.line_to(xx, lsr + ll)
+            cr.fill()
+
+            cr.move_to(w - tw, ler)
+            cr.line_to(xx, ler)
+            cr.line_to(xx, ler - ll)
+            cr.fill()
+
+            cr.set_line_width(2)
 
             cr.move_to(xx, lsr)
-            cr.line_to(w, lsr)
-            cr.line_to(w, lsr + ll)
-            cr.fill()
-
-            cr.move_to(xx, ler)
-            cr.line_to(w, ler)
-            cr.line_to(w, ler - ll)
-            cr.fill()
-
-            cr.set_line_width(4)
-
-            cr.move_to(w, lsr)
-            cr.line_to(w, ler)
+            cr.line_to(xx, ler)
             cr.stroke()
 
         cr.restore()
@@ -613,6 +618,9 @@ class TimelineView(Gtk.DrawingArea):
                 pr = min(mod.timeline.nqb, self.curr_change.row)
                 t = mod.timeline.qb2t(pr)
 
+            if self.moving_playhead or self.drawing_loop:
+                pr = max(pr, 0)
+
             lbl = "%d %d:%02d:%02d %.2f " % (
                 pr,
                 t // 60,
@@ -713,6 +721,35 @@ class TimelineView(Gtk.DrawingArea):
             ):
                 return
 
+        if self.highlight_loop:
+            if event.button == cfg.delete_button:
+                mod.timeline.loop_start = 0
+                mod.timeline.loop_end = mod.timeline.nqb
+                return
+
+            if event.button == 2:
+                mod.timeline.loop_active = not mod.timeline.loop_active
+                return
+
+        if (
+            self.mouse_in_timeline
+            and not self.clone_hold
+            and not self.highlight_change
+            and event.button == cfg.select_button
+            and not self.zoom_hold
+        ):
+            self.drawing_loop_active = mod.timeline.loop_active
+            self.drawing_loop_fallback = (
+                mod.timeline.loop_start,
+                mod.timeline.loop_end,
+            )
+            self.drawing_loop = True
+            self.gest_start_r = self.pointer_r
+            mod.timeline.loop_active = False
+            mod.timeline.loop_start = mod.timeline.loop_end = self.gest_start_r
+            return
+
+        if event.button == 2:
             if self.curr_strip_id > -1:  # disable
                 strp = mod.timeline.strips[self.curr_strip_id]
                 en = not strp.enabled
@@ -741,14 +778,9 @@ class TimelineView(Gtk.DrawingArea):
             self.exp_min = -mod.timeline.expand_start(self.exp_start)
 
         if self.mouse_in_timeline and event.button == 2:
+            self.moving_playhead = True
             mod.timeline.pos = self.pointer_r
             return
-
-        if self.highlight_loop:
-            if event.button == cfg.delete_button:
-                mod.timeline.loop_active = False
-                mod.timeline.loop_start = -1
-                mod.timeline.loop_end = -1
 
         # add change
         if (
@@ -905,6 +937,17 @@ class TimelineView(Gtk.DrawingArea):
         return True
 
     def on_button_release(self, widget, event):
+        self.moving_playhead = False
+
+        if self.drawing_loop:
+            self.drawing_loop = False
+            if mod.timeline.loop_start == mod.timeline.loop_end:
+                (
+                    mod.timeline.loop_start,
+                    mod.timeline.loop_end,
+                ) = self.drawing_loop_fallback
+            mod.timeline.loop_active = self.drawing_loop_active
+
         if self.moving:
             self.moving = False
             return
@@ -937,6 +980,7 @@ class TimelineView(Gtk.DrawingArea):
         tw = w - mod.mainwin.seqlist_butts.get_allocated_width()
         cw = mod.mainwin.seqlist._txt_height * cfg.mixer_padding
         col = event.x // cw
+
         if not self.moving:
             self.curr_col = -1 if col >= len(mod) else int(col)
 
@@ -954,10 +998,25 @@ class TimelineView(Gtk.DrawingArea):
         if abs(event.x - tw) < (w - tw) / 4:
             self.mouse_in_changes = True
 
-        if (w - event.x) < ((w - tw) / 4):
+        if self.mouse_in_timeline and not self.mouse_in_changes:
             self.mouse_in_loop = True
         else:
             self.mouse_in_loop = False
+
+        if self.drawing_loop:
+            s = self.gest_start_r
+            e = self.gest_start_r
+
+            if self.pointer_r == self.gest_start_r:
+                mod.timeline.loop_start = mod.timeline.loop_end = s
+            else:
+                if self.pointer_r > self.gest_start_r:
+                    e = self.pointer_r
+                else:
+                    s = self.pointer_r
+
+                mod.timeline.loop_start = max(s, 0)
+                mod.timeline.loop_end = min(e, mod.timeline.nqb)
 
         if self.expanding:
             xp = max(self.exp_min, self.pointer_r - self.gest_start_r)
@@ -1031,6 +1090,10 @@ class TimelineView(Gtk.DrawingArea):
 
         self.pointer_xy = (event.x, event.y)
 
+        if self.moving_playhead:
+            mod.timeline.pos = max(self.pointer_r, 0)
+            return
+
         r = mod.timeline.t2qb(
             self.l2t(self.pointer_xy[1]) + mod.timeline.qb2t(self.qb_start)
         )
@@ -1063,8 +1126,15 @@ class TimelineView(Gtk.DrawingArea):
         return True
 
     def on_leave(self, wdg, prm):
-        if not self.moving and not self.resizing and not self.expanding:
+        if (
+            not self.moving
+            and not self.resizing
+            and not self.expanding
+            and not self.drawing_loop
+        ):
             self.pointer_xy = None
+            self.highlight_loop = False
+            self.mouse_in_loop = False
             # self.pointer_r = -1
             self.curr_col = -1
             self.curr_strip_id = -1
@@ -1207,12 +1277,14 @@ class TimelineView(Gtk.DrawingArea):
             mod.timeline.qb2t(mod.timeline.pos) - mod.timeline.qb2t(self.qb_start)
         ) / self.spl
 
-        self.highlight_loop = False
-        if self.mouse_in_loop:
-            ls = mod.timeline.loop_start
-            le = mod.timeline.loop_end
-            if self.pointer_r >= ls and self.pointer_r <= le:
-                self.highlight_loop = True
+        if not self.drawing_loop:
+            self.highlight_loop = False
+
+            if self.mouse_in_loop:
+                ls = mod.timeline.loop_start
+                le = mod.timeline.loop_end
+                if self.pointer_r >= ls and self.pointer_r <= le:
+                    self.highlight_loop = True
 
         hint = None
 

@@ -73,6 +73,7 @@ shorts = {
         ("Previous", "sequence_prev"),
         ("Move left", "sequence_move_left"),
         ("Move right", "sequence_move_right"),
+        ("Loop", "sequence_loop"),
     ],
     "Track": [
         ("Toggle notes", "toggle_notes"),

@@ -183,6 +183,7 @@ class Configuration:
             "sequence_halve": cfgkey("u", False, True, False),
             "sequence_delete": cfgkey("d", True, True, False),
             "sequence_clone": cfgkey("l", True, True, False),
+            "sequence_loop": cfgkey("l", False, False, False),
             "select_all": cfgkey("a", False, True, False),
             "copy": cfgkey("c", False, True, False),
             "cut": cfgkey("x", False, True, False),
@@ -209,7 +210,7 @@ class Configuration:
             "toggle_pitch": cfgkey("3", False, True, False),
             "toggle_controls": cfgkey("4", False, True, False),
             # controllereditor
-            "link": cfgkey("l", False, False, False),
+            "link": cfgkey("l", False, True, False),
             "doodle_copy": cfgkey("c", True, True, False),
             "doodle_cut": cfgkey("x", True, True, False),
             "doodle_paste": cfgkey("v", True, True, False),

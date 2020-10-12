@@ -1,10 +1,6 @@
-- timeline
+- seqview
     - loop
-- trackview:
-    - undo/redo
-        - track
-        - ctrl
-    - loop
+- looping in engine
 - export with jack_capture
     - sampling :]
 - configuration

@@ -421,7 +421,7 @@ class VHTModule(Iterable):
             self.bpm = jm["bpm"]
             self.ctrlpr = jm["ctrlpr"]
             self.extras = jm["extras"]
-            self.play_mode = jm["play_mode"]
+            # self.play_mode = jm["play_mode"]
             for seq in jm["seq"]:
                 self.unpack_seq(seq, True)
 

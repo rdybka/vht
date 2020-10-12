@@ -1055,8 +1055,9 @@ void timeline_set_pos(timeline *tl, double npos, int let_ring) {
 			}
 		}
 
-	if (mod->play_mode == 0)
-		return;
+	if (mod->play_mode == 0 || mod->playing == 0) {
+		timeline_advance(tl, 0, 0);
+	}
 
 	// do magic to non-playing seqs in matrix
 	int npsl = (int)trunc(npos);
