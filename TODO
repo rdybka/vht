@@ -1,4 +1,5 @@
 - ports
+    - window
 - sampling :]
 - export with jack_capture
 - configuration

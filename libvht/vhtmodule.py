@@ -19,6 +19,7 @@ from collections.abc import Iterable
 from libvht import libcvht
 from libvht.vhtsequence import VHTSequence
 from libvht.vhttimeline import VHTTimeline
+from libvht.vhtports import VHTPorts
 import pickle
 
 
@@ -104,7 +105,7 @@ class VHTModule(Iterable):
     """
     This is your interface to the VHT magic
 
-    libvht.mod()
+    libvht.mod() will return an instance
     """
 
     def __init__(self):
@@ -113,10 +114,10 @@ class VHTModule(Iterable):
 
         self._mod_handle = libcvht.module_new()
         self._clt_handle = libcvht.module_get_midi_client(self._mod_handle)
-        self.extras = {}  # will be saved - for stuff like names of tracks
+        self.extras = {}  # will be saved - used for settings
 
         self.timeline = VHTTimeline(self)
-
+        self.ports = VHTPorts(self._clt_handle)
         # default values for extras
         self.cb_new_sequence = []  # will be called after new seq with seq_id as param
         self.cb_new_track = []  # will be called after new track with trk_id as param
@@ -125,7 +126,7 @@ class VHTModule(Iterable):
         libcvht.module_free(self._mod_handle)
         libcvht.midi_stop(self._clt_handle)
 
-    # this will connect and initialise an empty module
+    # connect to jack
     def midi_start(self, name=None):
         return libcvht.midi_start(self._clt_handle, name)
 
@@ -141,11 +142,8 @@ class VHTModule(Iterable):
         for s in range(len(self)):
             self.del_sequence(0)
 
-        # libcvht.module_free(self._mod_handle)
-        # self._mod_handle = libcvht.module_new()
-        # self._clt_handle = libcvht.module_get_midi_client(self._mod_handle)
         self.extras = {}
-        # self.timeline = VHTTimeline(libcvht, self._mod_handle)
+        self.reset()
 
     def __len__(self):
         return libcvht.module_get_nseq(self._mod_handle)
@@ -420,7 +418,6 @@ class VHTModule(Iterable):
             self.play = 0
 
             self.new()
-            self.reset()
 
             self.bpm = jm["bpm"]
             self.ctrlpr = jm["ctrlpr"]

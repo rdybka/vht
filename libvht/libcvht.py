@@ -221,6 +221,51 @@ def set_default_midi_port(mod, port):
 def module_get_timeline(mod):
     return _libcvht.module_get_timeline(mod)
 
+def midi_refresh_port_names(clt):
+    return _libcvht.midi_refresh_port_names(clt)
+
+def midi_nport_names(clt):
+    return _libcvht.midi_nport_names(clt)
+
+def midi_get_port_name(clt, prt):
+    return _libcvht.midi_get_port_name(clt, prt)
+
+def midi_get_port_ref(clt, name):
+    return _libcvht.midi_get_port_ref(clt, name)
+
+def midi_get_port_type(prtref):
+    return _libcvht.midi_get_port_type(prtref)
+
+def midi_get_port_mine(clt, prtref):
+    return _libcvht.midi_get_port_mine(clt, prtref)
+
+def midi_get_port_input(prtref):
+    return _libcvht.midi_get_port_input(prtref)
+
+def midi_get_port_output(prtref):
+    return _libcvht.midi_get_port_output(prtref)
+
+def midi_get_port_physical(prtref):
+    return _libcvht.midi_get_port_physical(prtref)
+
+def midi_get_port_connections(clt, prtref):
+    return _libcvht.midi_get_port_connections(clt, prtref)
+
+def midi_free_charpp(cpp):
+    return _libcvht.midi_free_charpp(cpp)
+
+def charpp_nitems(cpp):
+    return _libcvht.charpp_nitems(cpp)
+
+def charpp_item(cpp, itm):
+    return _libcvht.charpp_item(cpp, itm)
+
+def midi_port_connect(clt, prtref, prtref2):
+    return _libcvht.midi_port_connect(clt, prtref, prtref2)
+
+def midi_port_disconnect(clt, prtref, prtref2):
+    return _libcvht.midi_port_disconnect(clt, prtref, prtref2)
+
 def sequence_new(length):
     return _libcvht.sequence_new(length)
 

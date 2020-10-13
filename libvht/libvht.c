@@ -26,6 +26,20 @@
 // getters/setters and stuff for python
 // bad idea, probably
 
+int charpp_nitems(char **cpp) {
+	if (!cpp)
+		return 0;
+
+	int p = 0;
+	while(cpp[p++]);
+	return --p;
+}
+
+char *charpp_item(char **cpp, int itm) {
+	return cpp[itm];
+}
+
+
 midi_client *module_get_midi_client(module *mod) {
 	return mod->clt;
 }

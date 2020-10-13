@@ -19,9 +19,9 @@
 #ifndef __MIDI_CLIENT_H__
 #define __MIDI_CLIENT_H__
 
-#define MIDI_CLIENT_NAME 		"valhalla"
-#define MIDI_CLIENT_MAX_PORTS	16
-#define MIDI_EVT_BUFFER_LENGTH  1023
+#define MIDI_CLIENT_NAME "valhalla"
+#define MIDI_CLIENT_MAX_PORTS 16
+#define MIDI_EVT_BUFFER_LENGTH 1023
 
 #include <pthread.h>
 #include <jack/jack.h>
@@ -29,7 +29,7 @@
 #include "midi_event.h"
 
 /* should be easy enough to refactor this into some kind of driver architecture
-have fun! */
+- have fun! */
 
 typedef struct midi_client_t {
 	void *mod_ref;
@@ -59,6 +59,9 @@ typedef struct midi_client_t {
 	midi_event midi_queue_buffer[MIDI_CLIENT_MAX_PORTS][MIDI_EVT_BUFFER_LENGTH];
 	midi_event midi_in_buffer[MIDI_EVT_BUFFER_LENGTH];
 	midi_event midi_ignore_buffer[MIDI_EVT_BUFFER_LENGTH];
+
+	const char **ports;
+
 } midi_client;
 
 midi_client *midi_client_new(void *mod);
@@ -83,5 +86,20 @@ void queue_midi_note_off(midi_client *clt, sequence *seq, int port, int chn, int
 void queue_midi_ctrl(midi_client *clt, sequence *seq, track *trk, int val, int ctrl);
 
 void midi_send_transp(midi_client *clt, int play, long frames);
+
+void midi_refresh_port_names(midi_client *clt);
+int midi_nport_names(midi_client *clt);
+char *midi_get_port_name(midi_client *clt, int prt);
+jack_port_t *midi_get_port_ref(midi_client *clt, char *name);
+char *midi_get_port_type(jack_port_t *prtref);
+int midi_get_port_mine(midi_client *clt, jack_port_t *prtref);
+int midi_get_port_input(jack_port_t *prtref);
+int midi_get_port_output(jack_port_t *prtref);
+int midi_get_port_physical(jack_port_t *prtref);
+const char **midi_get_port_connections(midi_client *clt, jack_port_t *prtref);
+void midi_free_charpp(char **cpp);
+void midi_port_connect(midi_client *clt, const char *prtref, const char *prtref2);
+void midi_port_disconnect(midi_client *clt, const char *prtref, const char *prtref2);
+
 
 #endif //__MIDI_CLIENT_H__

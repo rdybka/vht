@@ -82,9 +82,25 @@ extern void queue_midi_note_on(midi_client *clt, sequence *seq, int port, int ch
 extern void queue_midi_note_off(midi_client *clt, sequence *seq, int port, int chn, int note);
 extern void queue_midi_ctrl(midi_client *clt, sequence *seq, track *trk, int val, int ctrl);
 
-
 extern void set_default_midi_port(module *mod, int port);
 extern timeline *module_get_timeline(module *mod);
+
+extern void midi_refresh_port_names(midi_client *clt);
+extern int midi_nport_names(midi_client *clt);
+extern char *midi_get_port_name(midi_client *clt, int prt);
+extern jack_port_t *midi_get_port_ref(midi_client *clt, char *name);
+extern char *midi_get_port_type(jack_port_t *prtref);
+extern int midi_get_port_mine(midi_client *clt, jack_port_t *prtref);
+extern int midi_get_port_input(jack_port_t *prtref);
+extern int midi_get_port_output(jack_port_t *prtref);
+extern int midi_get_port_physical(jack_port_t *prtref);
+
+extern const char **midi_get_port_connections(midi_client *clt, jack_port_t *prtref);
+extern void midi_free_charpp(char **cpp);
+extern int charpp_nitems(char **cpp);
+extern char *charpp_item(char **cpp, int itm);
+extern void midi_port_connect(midi_client *clt, const char *prtref, const char *prtref2);
+extern void midi_port_disconnect(midi_client *clt, const char *prtref, const char *prtref2);
 
 // sequence
 extern sequence *sequence_new(int length);

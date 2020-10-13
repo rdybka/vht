@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <jack/midiport.h>
+#include <errno.h>
 #include "jack_process.h"
 #include "module.h"
 #include "midi_event.h"
@@ -36,6 +37,7 @@ midi_client *midi_client_new(void *mod) {
 	clt->mod_ref = mod;
 	clt->running = 0;
 	clt->dump_notes = 0;
+	clt->ports = 0;
 
 	for (int p = 0; p < MIDI_CLIENT_MAX_PORTS; p++) {
 		clt->ports_to_open[p] = 0;
@@ -99,6 +101,8 @@ int midi_start(midi_client *clt, char *clt_name) {
 	jack_set_sync_callback(clt->jack_client, jack_synch_callback, clt);
 
 	jack_activate(clt->jack_client);
+
+	midi_refresh_port_names(clt);
 	return 0;
 }
 
@@ -118,8 +122,13 @@ void midi_synch_output_ports(midi_client *clt) {
 }
 
 void midi_stop(midi_client *clt) {
-	if(clt->running)
+	if(clt->running) {
+		if (clt->ports) {
+			jack_free(clt->ports);
+			clt->ports = 0;
+		}
 		jack_client_close(clt->jack_client);
+	}
 
 	clt->running = 0;
 }
@@ -420,3 +429,85 @@ void midi_send_transp(midi_client *clt, int play, long frames) {
 		jack_transport_stop(clt->jack_client);
 	}
 }
+
+void midi_refresh_port_names(midi_client *clt) {
+	if (clt->ports)
+		jack_free(clt->ports);
+
+	clt->ports = jack_get_ports(clt->jack_client, 0, 0, 0);
+}
+
+int midi_nport_names(midi_client *clt) {
+	if (!clt->ports)
+		return 0;
+
+	int p = 0;
+	while(clt->ports[p++]);
+	return --p;
+}
+
+char *midi_get_port_name(midi_client *clt, int prt) {
+	static char buff[1023];
+
+	if (prt >= midi_nport_names(clt)) {
+		return NULL;
+	}
+
+	strcpy(buff, clt->ports[prt]);
+	return buff;
+}
+
+jack_port_t *midi_get_port_ref(midi_client *clt, char *name) {
+	return jack_port_by_name(clt->jack_client, name);
+}
+
+char *midi_get_port_type(jack_port_t *prtref) {
+	static char buff[1023];
+	const char *t = jack_port_type(prtref);
+	if (t) {
+		strcpy(buff, t);
+		return buff;
+	}
+
+	return NULL;
+}
+
+int midi_get_port_mine(midi_client *clt, jack_port_t *prtref) {
+	return jack_port_is_mine(clt->jack_client, prtref);
+}
+
+int midi_get_port_input(jack_port_t *prtref) {
+	return jack_port_flags(prtref) & JackPortIsInput;
+}
+
+int midi_get_port_output(jack_port_t *prtref) {
+	return jack_port_flags(prtref) & JackPortIsOutput;
+}
+
+int midi_get_port_physical(jack_port_t *prtref) {
+	return jack_port_flags(prtref) & JackPortIsPhysical;
+}
+
+const char **midi_get_port_connections(midi_client *clt, jack_port_t *prtref) {
+	return jack_port_get_all_connections(clt->jack_client, prtref);
+}
+
+void midi_free_charpp(char **cpp) {
+	if (cpp)
+		jack_free(cpp);
+}
+
+void midi_port_connect(midi_client *clt, const char *prtref, const char *prtref2) {
+	int stat = jack_connect(clt->jack_client, prtref, prtref2);
+	if (stat == EEXIST)
+		stat = 0;
+
+	printf("%s >> %s : %s\n", prtref, prtref2, stat == 0?"OK":"Failed");
+}
+
+void midi_port_disconnect(midi_client *clt, const char *prtref, const char *prtref2) {
+	int stat = jack_disconnect(clt->jack_client, prtref, prtref2);
+
+	printf("%s >< %s : %s\n", prtref, prtref2, stat == 0?"OK":"Failed");
+}
+
