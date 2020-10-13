@@ -277,15 +277,23 @@ class TimelineView(Gtk.DrawingArea):
         if lsr > -1 and ler > -1:
             xx = w - self._txt_height * 1.2
 
-            cr.move_to(w - tw, lsr)
+            cr.move_to(w - tw / 2, lsr)
             cr.line_to(xx, lsr)
             cr.line_to(xx, lsr + ll)
             cr.fill()
 
-            cr.move_to(w - tw, ler)
+            cr.move_to(w - tw, lsr)
+            cr.line_to(xx, lsr)
+            cr.stroke()
+
+            cr.move_to(w - tw / 2, ler)
             cr.line_to(xx, ler)
             cr.line_to(xx, ler - ll)
             cr.fill()
+
+            cr.move_to(w - tw, ler)
+            cr.line_to(xx, ler)
+            cr.stroke()
 
             cr.set_line_width(2)
 
@@ -786,6 +794,9 @@ class TimelineView(Gtk.DrawingArea):
             mod.timeline.pos = self.pointer_r
             return
 
+        if event.button == 2:
+            return
+
         # add change
         if (
             self.mouse_in_changes
@@ -1002,7 +1013,11 @@ class TimelineView(Gtk.DrawingArea):
         if abs(event.x - tw) < (w - tw) / 4:
             self.mouse_in_changes = True
 
-        if self.mouse_in_timeline and not self.mouse_in_changes:
+        if (
+            self.mouse_in_timeline
+            and not self.mouse_in_changes
+            and not self.moving_playhead
+        ):
             self.mouse_in_loop = True
         else:
             self.mouse_in_loop = False
