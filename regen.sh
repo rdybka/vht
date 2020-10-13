@@ -8,7 +8,7 @@
 rm -f log.txt
 rm -f *.so *.o
 rm -f libvht/*.o
-rf -f install.txt
+rm rf -f install.txt
 rm -rf __pycache__
 rm -rf vht/__pycache__
 rm -rf libvht/__pycache__
