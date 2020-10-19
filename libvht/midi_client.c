@@ -140,8 +140,6 @@ int midi_port_is_open(midi_client *clt, int prt) {
 	if (prt < 0 || prt >= MIDI_CLIENT_MAX_PORTS)
 		return 0;
 
-
-
 	if (clt->jack_output_ports[prt])
 		return 1;
 
@@ -191,6 +189,9 @@ void midi_synch_output_ports(midi_client *clt) {
 			clt->jack_output_ports[p] = jack_port_register (clt->jack_client, pname, JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
 		}
 	}
+
+	set_default_midi_out_port(clt, clt->default_midi_port);
+
 	midi_ports_excl_out(clt);
 }
 
@@ -584,4 +585,42 @@ char *midi_get_output_port_name(midi_client *clt, int prt) {
 	sprintf(buff, MIDI_CLIENT_PORT_NAME, prt);
 	strcat(pname, buff);
 	return pname;
+}
+
+void set_default_midi_out_port(midi_client *clt, int port) {
+	if (port == clt->default_midi_port)
+		if (midi_port_is_open(clt, port))
+			return;
+
+	int p = port;
+	int search_up = 1;
+
+	if (p < clt->default_midi_port)
+		search_up = 0;
+
+	if (p < 0)
+		p = MIDI_CLIENT_MAX_PORTS - 1;
+
+	if (p >= MIDI_CLIENT_MAX_PORTS)
+		p = 0;
+
+	while(!midi_port_is_open(clt, p) && p != 0) {
+		if (search_up) {
+			p++;
+		} else {
+			p--;
+		}
+
+		if (p >= MIDI_CLIENT_MAX_PORTS)
+			p = 0;
+
+		if (p < 0)
+			p = MIDI_CLIENT_MAX_PORTS - 1;
+	}
+
+	clt->default_midi_port = p;
+}
+
+int get_default_midi_out_port(midi_client *clt) {
+	return clt->default_midi_port;
 }

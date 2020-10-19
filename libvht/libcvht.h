@@ -44,6 +44,8 @@ extern char *get_midi_error(module *mod);
 extern char *module_get_time(module *mod);
 extern int module_get_max_ports(module *mod);
 extern void module_synch_output_ports(module *mod);
+extern void set_default_midi_out_port(midi_client *clt, int port);
+extern int get_default_midi_out_port(midi_client *clt);
 
 extern void module_play(module *mod, int);
 extern int module_is_playing(module *mod);
@@ -82,7 +84,7 @@ extern void queue_midi_note_on(midi_client *clt, sequence *seq, int port, int ch
 extern void queue_midi_note_off(midi_client *clt, sequence *seq, int port, int chn, int note);
 extern void queue_midi_ctrl(midi_client *clt, sequence *seq, track *trk, int val, int ctrl);
 
-extern void set_default_midi_port(module *mod, int port);
+
 extern timeline *module_get_timeline(module *mod);
 
 extern void midi_refresh_port_names(midi_client *clt);

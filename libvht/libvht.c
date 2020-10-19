@@ -56,10 +56,6 @@ float module_get_bpm(module *mod) {
 	return mod->bpm;
 }
 
-int get_max_ports(module *mod) {
-	return MIDI_CLIENT_MAX_PORTS;
-}
-
 void module_set_bpm(module *mod, float bpm) {
 	mod->bpm = bpm;
 	//timeline_change_set(mod->tline, 0, 0, mod->bpm, 0);

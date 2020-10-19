@@ -243,7 +243,7 @@ class StatusBar(Gtk.DrawingArea):
         else:
             cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
-        txt = " prt:%d" % cfg.default_midi_out_port
+        txt = " prt:%d" % mod.default_midi_out_port
         *_, dx, _ = cr.text_extents(txt)
         cr.move_to(self.pos[-1], h)
         cr.show_text(txt)
@@ -473,15 +473,12 @@ class StatusBar(Gtk.DrawingArea):
 
         if self.active_field == 6:
             if up:
-                cfg.default_midi_out_port = min(
-                    max(cfg.default_midi_out_port + 1, 0), mod.max_ports - 1
-                )
-                mod.set_default_midi_port(cfg.default_midi_out_port)
+                mod.default_midi_out_port += 1
+
             if down:
-                cfg.default_midi_out_port = min(
-                    max(cfg.default_midi_out_port - 1, 0), mod.max_ports - 1
-                )
-                mod.set_default_midi_port(cfg.default_midi_out_port)
+                mod.default_midi_out_port -= 1
+
+            mod.extras["default_out_port"] = mod.default_midi_out_port
 
         return True
 

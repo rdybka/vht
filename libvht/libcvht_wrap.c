@@ -3630,6 +3630,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_set_default_midi_out_port(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "set_default_midi_out_port", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "set_default_midi_out_port" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "set_default_midi_out_port" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  set_default_midi_out_port(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_get_default_midi_out_port(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "get_default_midi_out_port" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  result = (int)get_default_midi_out_port(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_module_play(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   module *arg1 = (module *) 0 ;
@@ -4542,35 +4594,6 @@ SWIGINTERN PyObject *_wrap_queue_midi_ctrl(PyObject *SWIGUNUSEDPARM(self), PyObj
   } 
   arg5 = (int)(val5);
   queue_midi_ctrl(arg1,arg2,arg3,arg4,arg5);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_set_default_midi_port(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  module *arg1 = (module *) 0 ;
-  int arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  PyObject *swig_obj[2] ;
-  
-  if (!SWIG_Python_UnpackTuple(args, "set_default_midi_port", 2, 2, swig_obj)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_module, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "set_default_midi_port" "', argument " "1"" of type '" "module *""'"); 
-  }
-  arg1 = (module *)(argp1);
-  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "set_default_midi_port" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = (int)(val2);
-  set_default_midi_port(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -10142,6 +10165,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "module_get_time", _wrap_module_get_time, METH_O, NULL},
 	 { "module_get_max_ports", _wrap_module_get_max_ports, METH_O, NULL},
 	 { "module_synch_output_ports", _wrap_module_synch_output_ports, METH_O, NULL},
+	 { "set_default_midi_out_port", _wrap_set_default_midi_out_port, METH_VARARGS, NULL},
+	 { "get_default_midi_out_port", _wrap_get_default_midi_out_port, METH_O, NULL},
 	 { "module_play", _wrap_module_play, METH_VARARGS, NULL},
 	 { "module_is_playing", _wrap_module_is_playing, METH_O, NULL},
 	 { "module_record", _wrap_module_record, METH_VARARGS, NULL},
@@ -10173,7 +10198,6 @@ static PyMethodDef SwigMethods[] = {
 	 { "queue_midi_note_on", _wrap_queue_midi_note_on, METH_VARARGS, NULL},
 	 { "queue_midi_note_off", _wrap_queue_midi_note_off, METH_VARARGS, NULL},
 	 { "queue_midi_ctrl", _wrap_queue_midi_ctrl, METH_VARARGS, NULL},
-	 { "set_default_midi_port", _wrap_set_default_midi_port, METH_VARARGS, NULL},
 	 { "module_get_timeline", _wrap_module_get_timeline, METH_O, NULL},
 	 { "midi_refresh_port_names", _wrap_midi_refresh_port_names, METH_O, NULL},
 	 { "midi_nport_names", _wrap_midi_nport_names, METH_O, NULL},

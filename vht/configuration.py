@@ -95,7 +95,6 @@ class Configuration:
         self.velocity = 100
         self.page_height = 16
         self.skip = 1
-        self.default_midi_out_port = 0
 
         self.select_button = 1
         self.delete_button = 3

@@ -228,7 +228,15 @@ class MainWin(Gtk.ApplicationWindow):
             self._status_bar.portpopover.set_pointing_to(
                 self._status_bar.portpopover_rect
             )
-            self._status_bar.portpopover.pop()
+
+            show_pop = True
+            for prt in mod.ports:
+                if prt.mine:
+                    if prt.connections:
+                        show_pop = False
+
+            if show_pop:
+                self._status_bar.portpopover.pop()
 
         if mod.ports_changed:
             refresh_connections(mod)

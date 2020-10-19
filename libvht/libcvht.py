@@ -122,6 +122,12 @@ def module_get_max_ports(mod):
 def module_synch_output_ports(mod):
     return _libcvht.module_synch_output_ports(mod)
 
+def set_default_midi_out_port(clt, port):
+    return _libcvht.set_default_midi_out_port(clt, port)
+
+def get_default_midi_out_port(clt):
+    return _libcvht.get_default_midi_out_port(clt)
+
 def module_play(mod, arg2):
     return _libcvht.module_play(mod, arg2)
 
@@ -214,9 +220,6 @@ def queue_midi_note_off(clt, seq, port, chn, note):
 
 def queue_midi_ctrl(clt, seq, trk, val, ctrl):
     return _libcvht.queue_midi_ctrl(clt, seq, trk, val, ctrl)
-
-def set_default_midi_port(mod, port):
-    return _libcvht.set_default_midi_port(mod, port)
 
 def module_get_timeline(mod):
     return _libcvht.module_get_timeline(mod)

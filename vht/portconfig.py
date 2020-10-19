@@ -84,6 +84,13 @@ def refresh_connections(mod):
 
         mod.ports.refresh()
 
+    if "default_out_port" in mod.extras:
+        p = mod.extras["default_out_port"]
+        mod.default_midi_out_port = p
 
-def disconnect(mod):
-    print("disc", mod.extras)
+
+def close_connections(mod):
+    for prt in mod.ports:
+        if prt.mine:
+            for c in prt.connections:
+                prt.disconnect(c)

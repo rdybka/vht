@@ -377,17 +377,11 @@ class SequenceView(Gtk.Box):
             return True
 
         if cfg.key["def_port_up"].matches(event):
-            cfg.default_midi_out_port = min(
-                max(cfg.default_midi_out_port + 1, 0), mod.max_ports - 1
-            )
-            mod.set_default_midi_port(cfg.default_midi_out_port)
+            mod.default_midi_out_port += 1
             return True
 
         if cfg.key["def_port_down"].matches(event):
-            cfg.default_midi_out_port = min(
-                max(cfg.default_midi_out_port - 1, 0), mod.max_ports - 1
-            )
-            mod.set_default_midi_port(cfg.default_midi_out_port)
+            mod.default_midi_out_port -= 1
             return True
 
         if cfg.key["track_add"].matches(event):
@@ -794,6 +788,7 @@ class SequenceView(Gtk.Box):
         self._side_box.remove(self._side_box.get_children()[0])
 
     def load(self, filename):
+        close_connections(mod)
         TrackView.leave_all()
         self.clear()
         for i in self.trk_cache:
@@ -821,6 +816,15 @@ class SequenceView(Gtk.Box):
             self.build()
 
             refresh_connections(mod)
+
+            show_pop = True
+            for prt in mod.ports:
+                if prt.mine:
+                    if prt.connections:
+                        show_pop = False
+
+            if show_pop:
+                mod.mainwin._status_bar.portpopover.pop()
 
             mod.timeline_view.fix_extras()
             mod.seqlist.configure()
