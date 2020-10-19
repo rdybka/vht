@@ -17,6 +17,7 @@
 
 from vht.pulsar import Pulsar
 from vht.trackview import TrackView
+from vht.portconfigpopover import PortConfigPopover
 from vht import *
 import cairo
 from gi.repository import Gdk, Gtk, Gio
@@ -63,6 +64,8 @@ class StatusBar(Gtk.DrawingArea):
         self.control_held = False
         self.shift_held = False
 
+        self.portpopover = None
+        self.portpopover_rect = Gdk.Rectangle()
         mod.status_bar = self
 
     def redraw(self):
@@ -244,6 +247,12 @@ class StatusBar(Gtk.DrawingArea):
         *_, dx, _ = cr.text_extents(txt)
         cr.move_to(self.pos[-1], h)
         cr.show_text(txt)
+
+        self.portpopover_rect.x = xx
+        self.portpopover_rect.y = 0
+        self.portpopover_rect.width = dx
+        self.portpopover_rect.height = 10
+
         xx += dx
         self.pos.append(xx)
 
@@ -482,7 +491,15 @@ class StatusBar(Gtk.DrawingArea):
         self.active_field = None
 
     def on_button_press(self, widget, event):
-        pass
+        if event.button == 1 and self.active_field == 6:
+            if not self.portpopover:
+                self.portpopover = PortConfigPopover(self)
+
+            self.portpopover.set_pointing_to(self.portpopover_rect)
+            self.portpopover.pop()
+            return True
+
+        return False
 
     def on_key_press(self, widget, event):
         if 65507 <= event.keyval <= 65508:  # ctrl
@@ -555,18 +572,6 @@ class StatusBar(Gtk.DrawingArea):
 
             if middle:
                 mod[mod.curr_seq].ketchup()
-
-        if self.active_field == 6:
-            if up:
-                cfg.default_midi_out_port = min(
-                    max(cfg.default_midi_out_port + 1, 0), mod.max_ports - 1
-                )
-                mod.set_default_midi_port(cfg.default_midi_out_port)
-            if down:
-                cfg.default_midi_out_port = min(
-                    max(cfg.default_midi_out_port - 1, 0), mod.max_ports - 1
-                )
-                mod.set_default_midi_port(cfg.default_midi_out_port)
 
     def on_tooltip(self, wdg, x, y, kbd, tt):
         if not self.active_field:

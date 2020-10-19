@@ -25,5 +25,6 @@ int jack_process(jack_nframes_t nframes, void *arg);
 int jack_sample_rate_changed(jack_nframes_t srate, void *arg);
 int jack_buffer_size_changed(jack_nframes_t size, void *arg);
 int jack_synch_callback(jack_transport_state_t state, jack_position_t *pos, void *arg);
+void jack_port_register_callback(jack_port_id_t port, int reg, void *arg);
 
 #endif //__JACK_PROCESS_H__

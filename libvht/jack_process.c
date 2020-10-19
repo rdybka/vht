@@ -55,3 +55,8 @@ int jack_synch_callback(jack_transport_state_t state, jack_position_t *pos, void
 	module_synch_transp(mod, state, pos->frame);
 	return 1;
 }
+
+void jack_port_register_callback(jack_port_id_t port, int reg, void *arg) {
+	midi_client *clt = (midi_client *)arg;
+	clt->ports_changed = 1;
+}

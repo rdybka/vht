@@ -21,6 +21,7 @@
 
 #define MIDI_CLIENT_NAME "valhalla"
 #define MIDI_CLIENT_MAX_PORTS 16
+#define MIDI_CLIENT_PORT_NAME "out_%02d"
 #define MIDI_EVT_BUFFER_LENGTH 1023
 
 #include <pthread.h>
@@ -41,12 +42,15 @@ typedef struct midi_client_t {
 	jack_client_t *jack_client;
 	jack_port_t *jack_input_port;
 	int ports_to_open[MIDI_CLIENT_MAX_PORTS];
+	int autoports[MIDI_CLIENT_MAX_PORTS];
+
 	jack_port_t *jack_output_ports[MIDI_CLIENT_MAX_PORTS];
 	jack_status_t jack_status;
 	jack_nframes_t jack_sample_rate;
 	jack_nframes_t jack_buffer_size;
 	jack_nframes_t jack_last_frame;
 
+	pthread_mutex_t midi_ports_exl;
 	pthread_mutex_t midi_buff_exl;
 	pthread_mutex_t midi_in_buff_exl;
 	pthread_mutex_t midi_ignore_buff_exl;
@@ -61,7 +65,7 @@ typedef struct midi_client_t {
 	midi_event midi_ignore_buffer[MIDI_EVT_BUFFER_LENGTH];
 
 	const char **ports;
-
+	int ports_changed;
 } midi_client;
 
 midi_client *midi_client_new(void *mod);
@@ -88,6 +92,7 @@ void queue_midi_ctrl(midi_client *clt, sequence *seq, track *trk, int val, int c
 void midi_send_transp(midi_client *clt, int play, long frames);
 
 void midi_refresh_port_names(midi_client *clt);
+int midi_port_names_changed(midi_client *clt);
 int midi_nport_names(midi_client *clt);
 char *midi_get_port_name(midi_client *clt, int prt);
 jack_port_t *midi_get_port_ref(midi_client *clt, char *name);
@@ -101,5 +106,10 @@ void midi_free_charpp(char **cpp);
 void midi_port_connect(midi_client *clt, const char *prtref, const char *prtref2);
 void midi_port_disconnect(midi_client *clt, const char *prtref, const char *prtref2);
 
+// those are for outputs
+int midi_port_is_open(midi_client *clt, int prt);
+void midi_close_port(midi_client *clt, int prt);
+void midi_open_port(midi_client *clt, int prt);
+char *midi_get_output_port_name(midi_client *clt, int prt);
 
 #endif //__MIDI_CLIENT_H__

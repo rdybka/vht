@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from vht.trackpropview import TrackPropView
+from vht.portconfig import *
 from vht.propview import PropView
 from vht.trackview import TrackView
 from vht import *
@@ -818,9 +819,13 @@ class SequenceView(Gtk.Box):
                 mod.mainwin.timeline_box.set_position(mod.extras["timeline_win_pos_y"])
 
             self.build()
+
+            refresh_connections(mod)
+
             mod.timeline_view.fix_extras()
             mod.seqlist.configure()
             mod.seqlist.redraw()
+
             mod.mainwin.seq_mode_butt_ignore_signal = True
             mod.mainwin.seq_mode_butt.set_active(not mod.play_mode)
             mod.mainwin.seq_mode_butt_ignore_signal = False

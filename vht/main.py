@@ -20,6 +20,7 @@
 
 from vht.mainwin import MainWin
 from vht.shortcutmayhem import ShortcutMayhem
+from vht.portconfig import refresh_connections
 from vht import mod, cfg, ctrlcfg, autoexec, bankcfg, randomcomposer
 from gi.repository import GLib, Gtk, Gio, GdkPixbuf
 import vht.extras
@@ -93,6 +94,7 @@ class VHTApp(Gtk.Application):
             self.main_win.set_header_from_filename(self.main_win.last_filename)
 
         mod.reset()
+        refresh_connections(mod)
         mod.transport = cfg.start_transport
         mod.play = cfg.start_playing
 

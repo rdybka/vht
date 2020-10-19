@@ -5022,6 +5022,147 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_midi_port_names_changed(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "midi_port_names_changed" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  result = (int)midi_port_names_changed(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_midi_port_is_open(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  int result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "midi_port_is_open", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "midi_port_is_open" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "midi_port_is_open" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  result = (int)midi_port_is_open(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_midi_close_port(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "midi_close_port", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "midi_close_port" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "midi_close_port" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  midi_close_port(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_midi_open_port(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "midi_open_port", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "midi_open_port" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "midi_open_port" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  midi_open_port(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_midi_get_output_port_name(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  char *result = 0 ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "midi_get_output_port_name", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "midi_get_output_port_name" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "midi_get_output_port_name" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  result = (char *)midi_get_output_port_name(arg1,arg2);
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_sequence_new(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   int arg1 ;
@@ -10049,6 +10190,11 @@ static PyMethodDef SwigMethods[] = {
 	 { "charpp_item", _wrap_charpp_item, METH_VARARGS, NULL},
 	 { "midi_port_connect", _wrap_midi_port_connect, METH_VARARGS, NULL},
 	 { "midi_port_disconnect", _wrap_midi_port_disconnect, METH_VARARGS, NULL},
+	 { "midi_port_names_changed", _wrap_midi_port_names_changed, METH_O, NULL},
+	 { "midi_port_is_open", _wrap_midi_port_is_open, METH_VARARGS, NULL},
+	 { "midi_close_port", _wrap_midi_close_port, METH_VARARGS, NULL},
+	 { "midi_open_port", _wrap_midi_open_port, METH_VARARGS, NULL},
+	 { "midi_get_output_port_name", _wrap_midi_get_output_port_name, METH_VARARGS, NULL},
 	 { "sequence_new", _wrap_sequence_new, METH_O, NULL},
 	 { "sequence_get_ntrk", _wrap_sequence_get_ntrk, METH_O, NULL},
 	 { "sequence_get_length", _wrap_sequence_get_length, METH_O, NULL},

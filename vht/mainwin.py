@@ -21,6 +21,10 @@ from vht.timelineview import TimelineView
 from vht.statusbar import StatusBar
 from vht.sequenceview import SequenceView
 from vht.thumbmanager import ThumbManager
+from vht.portconfig import *
+
+from vht.portconfigpopover import PortConfigPopover
+
 from vht import *
 import vht.extras
 
@@ -218,6 +222,18 @@ class MainWin(Gtk.ApplicationWindow):
 
         if self.transport_switch.props.state != mod.transport:
             self.transport_switch.props.state = mod.transport
+
+        if not self._status_bar.portpopover:
+            self._status_bar.portpopover = PortConfigPopover(self._status_bar)
+            self._status_bar.portpopover.set_pointing_to(
+                self._status_bar.portpopover_rect
+            )
+            self._status_bar.portpopover.pop()
+
+        if mod.ports_changed:
+            refresh_connections(mod)
+            if self._status_bar.portpopover.pooped:
+                self._status_bar.portpopover.refresh()
 
         return 1
 

@@ -28,7 +28,21 @@ class VHTPort:
 
         if self._prtref:
             self._valid = True
-        self.update_strrep()
+
+        if self._valid:
+            self.update_strrep()
+
+    def __eq__(self, other):
+        if type(other) is str:
+            if self._name == other:
+                return True
+            else:
+                return False
+
+        if self._name == other._name:
+            return True
+
+        return False
 
     def update_strrep(self):
         name = self._name

@@ -38,9 +38,11 @@ midi_client *midi_client_new(void *mod) {
 	clt->running = 0;
 	clt->dump_notes = 0;
 	clt->ports = 0;
+	clt->ports_changed = 0;
 
 	for (int p = 0; p < MIDI_CLIENT_MAX_PORTS; p++) {
 		clt->ports_to_open[p] = 0;
+		clt->autoports[p] = 0;
 		clt->jack_output_ports[p] = 0;
 		clt->curr_midi_event[p] = 0;
 		clt->curr_midi_queue_event[p] = 0;
@@ -50,6 +52,7 @@ midi_client *midi_client_new(void *mod) {
 	clt->curr_midi_in_event = 0;
 	clt->curr_midi_ignore_event = 0;
 
+	pthread_mutex_init(&clt->midi_ports_exl, NULL);
 	pthread_mutex_init(&clt->midi_buff_exl, NULL);
 	pthread_mutex_init(&clt->midi_in_buff_exl, NULL);
 	pthread_mutex_init(&clt->midi_ignore_buff_exl, NULL);
@@ -61,6 +64,7 @@ void midi_client_free(midi_client *clt) {
 	if (clt->running)
 		midi_stop(clt);
 
+	pthread_mutex_destroy(&clt->midi_ports_exl);
 	pthread_mutex_destroy(&clt->midi_buff_exl);
 	pthread_mutex_destroy(&clt->midi_ignore_buff_exl);
 	pthread_mutex_destroy(&clt->midi_in_buff_exl);
@@ -99,26 +103,95 @@ int midi_start(midi_client *clt, char *clt_name) {
 	jack_set_sample_rate_callback(clt->jack_client, jack_sample_rate_changed, clt);
 	jack_set_buffer_size_callback(clt->jack_client, jack_buffer_size_changed, clt);
 	jack_set_sync_callback(clt->jack_client, jack_synch_callback, clt);
-
+	jack_set_port_registration_callback(clt->jack_client, jack_port_register_callback, clt);
 	jack_activate(clt->jack_client);
 
 	midi_refresh_port_names(clt);
 	return 0;
 }
 
+void midi_close_port(midi_client *clt, int prt) {
+	if (prt < 0 || prt >= MIDI_CLIENT_MAX_PORTS)
+		return;
+
+	//printf("close %d\n", prt);
+
+	clt->ports_to_open[prt] = 0;
+	midi_synch_output_ports(clt);
+};
+
+void midi_open_port(midi_client *clt, int prt) {
+	if (prt < 0 || prt >= MIDI_CLIENT_MAX_PORTS)
+		return;
+
+	if (clt->jack_output_ports[prt])
+		return;
+
+	char pname[32];
+	sprintf(pname, MIDI_CLIENT_PORT_NAME, prt);
+	clt->jack_output_ports[prt] = jack_port_register (clt->jack_client, pname, JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
+	clt->ports_to_open[prt] = 1;
+	midi_synch_output_ports(clt);
+
+	//printf("open %d - %s\n", prt, pname);
+};
+
+int midi_port_is_open(midi_client *clt, int prt) {
+	if (prt < 0 || prt >= MIDI_CLIENT_MAX_PORTS)
+		return 0;
+
+
+
+	if (clt->jack_output_ports[prt])
+		return 1;
+
+	return 0;
+}
+
+void midi_ports_excl_in(midi_client *clt) {
+	pthread_mutex_lock(&clt->midi_ports_exl);
+}
+
+void midi_ports_excl_out(midi_client *clt) {
+	pthread_mutex_unlock(&clt->midi_ports_exl);
+}
+
+void midi_buff_excl_in(midi_client *clt) {
+	pthread_mutex_lock(&clt->midi_buff_exl);
+}
+void midi_buff_excl_out(midi_client *clt) {
+	pthread_mutex_unlock(&clt->midi_buff_exl);
+}
+void midi_ignore_buff_excl_in(midi_client *clt) {
+	pthread_mutex_lock(&clt->midi_ignore_buff_exl);
+}
+void midi_ignore_buff_excl_out(midi_client *clt) {
+	pthread_mutex_unlock(&clt->midi_ignore_buff_exl);
+}
+void midi_in_buff_excl_in(midi_client *clt) {
+	pthread_mutex_lock(&clt->midi_in_buff_exl);
+}
+void midi_in_buff_excl_out(midi_client *clt) {
+	pthread_mutex_unlock(&clt->midi_in_buff_exl);
+}
+
 void midi_synch_output_ports(midi_client *clt) {
+	midi_ports_excl_in(clt);
+	clt->autoports[0] = 1;
+
 	for (int p = 0; p < MIDI_CLIENT_MAX_PORTS; p++) {
-		if ((clt->ports_to_open[p] == 0) && (clt->jack_output_ports[p])) {
+		if ((clt->autoports[p] == 0) && (clt->ports_to_open[p] == 0) && (clt->jack_output_ports[p])) {
 			jack_port_unregister(clt->jack_client, clt->jack_output_ports[p]);
 			clt->jack_output_ports[p] = 0;
 		}
 
-		if ((clt->ports_to_open[p] == 1) && (clt->jack_output_ports[p] == 0)) {
-			char pname[256];
-			sprintf(pname, "out_%02d", p);
+		if ((clt->autoports[p] == 1) && (clt->jack_output_ports[p] == 0)) {
+			char pname[32];
+			sprintf(pname, MIDI_CLIENT_PORT_NAME, p);
 			clt->jack_output_ports[p] = jack_port_register (clt->jack_client, pname, JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput, 0);
 		}
 	}
+	midi_ports_excl_out(clt);
 }
 
 void midi_stop(midi_client *clt) {
@@ -138,26 +211,6 @@ void set_default_midi_port(module *mod, int port) {
 		return;
 
 	mod->clt->default_midi_port = port;
-}
-
-
-void midi_buff_excl_in(midi_client *clt) {
-	pthread_mutex_lock(&clt->midi_buff_exl);
-}
-void midi_buff_excl_out(midi_client *clt) {
-	pthread_mutex_unlock(&clt->midi_buff_exl);
-}
-void midi_ignore_buff_excl_in(midi_client *clt) {
-	pthread_mutex_lock(&clt->midi_ignore_buff_exl);
-}
-void midi_ignore_buff_excl_out(midi_client *clt) {
-	pthread_mutex_unlock(&clt->midi_ignore_buff_exl);
-}
-void midi_in_buff_excl_in(midi_client *clt) {
-	pthread_mutex_lock(&clt->midi_in_buff_exl);
-}
-void midi_in_buff_excl_out(midi_client *clt) {
-	pthread_mutex_unlock(&clt->midi_in_buff_exl);
 }
 
 void midi_buffer_clear(midi_client *clt) {
@@ -431,10 +484,13 @@ void midi_send_transp(midi_client *clt, int play, long frames) {
 }
 
 void midi_refresh_port_names(midi_client *clt) {
+	midi_ports_excl_in(clt);
 	if (clt->ports)
 		jack_free(clt->ports);
 
 	clt->ports = jack_get_ports(clt->jack_client, 0, 0, 0);
+	clt->ports_changed = 0;
+	midi_ports_excl_out(clt);
 }
 
 int midi_nport_names(midi_client *clt) {
@@ -501,13 +557,31 @@ void midi_port_connect(midi_client *clt, const char *prtref, const char *prtref2
 	int stat = jack_connect(clt->jack_client, prtref, prtref2);
 	if (stat == EEXIST)
 		stat = 0;
-
-	printf("%s >> %s : %s\n", prtref, prtref2, stat == 0?"OK":"Failed");
 }
 
 void midi_port_disconnect(midi_client *clt, const char *prtref, const char *prtref2) {
-	int stat = jack_disconnect(clt->jack_client, prtref, prtref2);
-
-	printf("%s >< %s : %s\n", prtref, prtref2, stat == 0?"OK":"Failed");
+	jack_disconnect(clt->jack_client, prtref, prtref2);
 }
 
+int midi_port_names_changed(midi_client *clt) {
+	if (clt->ports_changed) {
+		midi_refresh_port_names(clt);
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+char *midi_get_output_port_name(midi_client *clt, int prt) {
+	if (prt < 0 || prt >= MIDI_CLIENT_MAX_PORTS)
+		return NULL;
+
+	static char pname[256];
+	char buff[256];
+	pname[0] = 0;
+	sprintf(buff, "%s:", MIDI_CLIENT_NAME);
+	strcat(pname, buff);
+	sprintf(buff, MIDI_CLIENT_PORT_NAME, prt);
+	strcat(pname, buff);
+	return pname;
+}

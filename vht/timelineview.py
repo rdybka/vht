@@ -794,9 +794,6 @@ class TimelineView(Gtk.DrawingArea):
             mod.timeline.pos = self.pointer_r
             return
 
-        if event.button == 2:
-            return
-
         # add change
         if (
             self.mouse_in_changes
@@ -871,7 +868,11 @@ class TimelineView(Gtk.DrawingArea):
         if event.button != cfg.select_button and event.button != 2:
             return False
 
-        if self.scrollbar_highlight and self.scrollstart == -1:
+        if (
+            self.scrollbar_highlight
+            and self.scrollstart == -1
+            and event.button == cfg.select_button
+        ):
             self.scrollstart = event.y
             self.scrollstart_qb = self.qb_start
             return True

@@ -459,16 +459,14 @@ void module_synch_output_ports(module *mod) {
 	midi_buff_excl_in(mod->clt);
 
 	for (int p = 0; p < MIDI_CLIENT_MAX_PORTS; p++) {
-		mod->clt->ports_to_open[p] = 0;
+		mod->clt->autoports[p] = 0;
 		if (mod->clt->curr_midi_queue_event[p])
-			mod->clt->ports_to_open[p] = 1;
+			mod->clt->autoports[p] = 1;
 	}
-
-	mod->clt->ports_to_open[mod->clt->default_midi_port] = 1;
 
 	for (int s = 0; s < mod->nseq; s++)
 		for (int t = 0; t < mod->seq[s]->ntrk; t++)
-			mod->clt->ports_to_open[mod->seq[s]->trk[t]->port] = 1;
+			mod->clt->autoports[mod->seq[s]->trk[t]->port] = 1;
 
 	midi_buff_excl_out(mod->clt);
 }

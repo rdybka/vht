@@ -101,7 +101,11 @@ extern int charpp_nitems(char **cpp);
 extern char *charpp_item(char **cpp, int itm);
 extern void midi_port_connect(midi_client *clt, const char *prtref, const char *prtref2);
 extern void midi_port_disconnect(midi_client *clt, const char *prtref, const char *prtref2);
-
+extern int midi_port_names_changed(midi_client *clt);
+extern int midi_port_is_open(midi_client *clt, int prt);
+extern void midi_close_port(midi_client *clt, int prt);
+extern void midi_open_port(midi_client *clt, int prt);
+extern char *midi_get_output_port_name(midi_client *clt, int prt);
 // sequence
 extern sequence *sequence_new(int length);
 extern int sequence_get_ntrk(sequence *seq);

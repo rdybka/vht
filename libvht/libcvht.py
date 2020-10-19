@@ -266,6 +266,21 @@ def midi_port_connect(clt, prtref, prtref2):
 def midi_port_disconnect(clt, prtref, prtref2):
     return _libcvht.midi_port_disconnect(clt, prtref, prtref2)
 
+def midi_port_names_changed(clt):
+    return _libcvht.midi_port_names_changed(clt)
+
+def midi_port_is_open(clt, prt):
+    return _libcvht.midi_port_is_open(clt, prt)
+
+def midi_close_port(clt, prt):
+    return _libcvht.midi_close_port(clt, prt)
+
+def midi_open_port(clt, prt):
+    return _libcvht.midi_open_port(clt, prt)
+
+def midi_get_output_port_name(clt, prt):
+    return _libcvht.midi_get_output_port_name(clt, prt)
+
 def sequence_new(length):
     return _libcvht.sequence_new(length)
 

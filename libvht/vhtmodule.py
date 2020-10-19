@@ -137,6 +137,10 @@ class VHTModule(Iterable):
     def midi_synch_ports(self):
         libcvht.module_synch_output_ports(self._mod_handle)
 
+    @property
+    def ports_changed(self):
+        return True if libcvht.midi_port_names_changed(self._clt_handle) else False
+
     def new(self):
         self.play = 0
         for s in range(len(self)):

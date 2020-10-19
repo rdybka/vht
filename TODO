@@ -1,8 +1,8 @@
-- ports
-    - window
-- sampling :]
-- export with jack_capture
 - configuration
     - defaults
     - look
-    - midi buttons
+    - midi buttons    
+- export with jack_capture
+- sampling :]
+
+

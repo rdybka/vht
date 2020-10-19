@@ -33,9 +33,14 @@ class VHTPorts(Iterable):
 
     def __iter__(self):
         for itm in range(self.__len__()):
-            yield VHTPort(
-                self._clt_handle, libcvht.midi_get_port_name(self._clt_handle, itm)
-            )
+            try:
+                p = VHTPort(
+                    self._clt_handle, libcvht.midi_get_port_name(self._clt_handle, itm)
+                )
+                if p.valid:
+                    yield p
+            except Exception as err:
+                print(err)
 
     def __getitem__(self, itm):
         if 0 > itm >= self.__len__():
@@ -51,3 +56,23 @@ class VHTPorts(Iterable):
             ret += "%2d: %s\n" % (n, p)
 
         return ret
+
+    def output_is_open(self, prt):
+        return True if libcvht.midi_port_is_open(self._clt_handle, prt) else False
+
+    def output_open(self, prt):
+        libcvht.midi_open_port(self._clt_handle, prt)
+
+    def output_close(self, prt):
+        libcvht.midi_close_port(self._clt_handle, prt)
+
+    def output_get_name(self, prt):
+        return libcvht.midi_get_output_port_name(self._clt_handle, prt)
+
+    def get_by_name(self, name):
+        self.refresh()
+        for p in self:
+            if p.name == name:
+                return p
+
+        return None
