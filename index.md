@@ -11,7 +11,7 @@ it tries to do one thing well
 - minimalistic by design
 - minimalistic by necessity
 - can save and load files
-- sparsely documented for hacking pleasure
+- sparsely [documented](https://github.com/rdybka/vht/wiki) for hacking pleasure
 
 ## in zip
 - C library which talks to JACK and runs gameloop
