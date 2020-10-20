@@ -1,4 +1,4 @@
-![vht header](/data/vht_header.png)
+![vht header](vht_header.png)
 ## about
 Valhalla Tracker aims to be a MIDI sequencing companion
 for GNU/Linux audio setups. Adhering to Unix philosophy,
