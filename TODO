@@ -1,7 +1,8 @@
 - configuration
     - defaults
     - look
-    - midi buttons    
+    - midi buttons
+! autostart ports again
 - export with jack_capture
 - sampling :]
 

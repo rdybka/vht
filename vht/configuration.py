@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import configparser
 
 import gi
 
@@ -24,6 +25,8 @@ from gi.repository import Gdk
 
 class Configuration:
     def __init__(self):
+        self.filename = None
+
         self.seq_font = "Monospace"
         self.console_font = "Monospace"
         self.mixer_font = "Monospace"
@@ -32,6 +35,7 @@ class Configuration:
         self.seq_font_size = 18
         self.mixer_font_size = 16
         self.timeline_font_size = 12
+
         self.mixer_padding = 1.5
         self.seq_line_width = 1.0
         self.seq_spacing = 1.05
@@ -102,8 +106,8 @@ class Configuration:
         self.default_ctrl_name = "zyn"
 
         self.dark_theme = True
-        self.notebook_mouseover = False
-        self.track_prop_mouseover = False
+        self.notebook_mouseover = True
+        self.track_prop_mouseover = True
 
         self.quick_controls_desc = "vol/pan:"
         self.quick_control_1_ctrl = 7
@@ -115,7 +119,6 @@ class Configuration:
         self.new_seqs_with_tracks = True
 
         self.default_seq_length = 16
-
         self.controller_resolution = 8
 
         self.last_load_path = ""
@@ -227,6 +230,33 @@ class Configuration:
         self.velocity_keys = "zxcvbnm"
         self.piano_white_keys = "zxcvbnmqwertyu"
         self.piano_black_keys = "sdghj23567"
+
+        self.cfg_parser = self.build_parser()
+
+    def build_parser(self):
+        cfg = configparser.ConfigParser()
+        cfg["looknfeel"] = {
+            "seq_font": self.seq_font,
+            "console_font": self.console_font,
+            "matrix_font": self.mixer_font,
+            "timeline_font": self.timeline_font,
+            "seq_colour": self.colour,
+            "console_colour": self.console_colour,
+            "matrix_colour": self.mixer_colour,
+            "timeline_colour": self.timeline_colour,
+        }
+
+        return cfg
+
+    def save(self):
+        with open(self.filename, "w") as cfgfile:
+            self.cfg_parser.write(cfgfile)
+
+    def load(self, filename):
+        self.filename = filename
+
+        if self.cfg_parser.read(filename):
+            print("load %s" % self.filename)
 
 
 key_aliases = {

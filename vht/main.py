@@ -20,6 +20,8 @@
 
 from vht.mainwin import MainWin
 from vht.shortcutmayhem import ShortcutMayhem
+from vht.preferenceswin import PreferencesWin
+
 from vht.portconfig import refresh_connections
 from vht import mod, cfg, ctrlcfg, autoexec, bankcfg, randomcomposer
 from gi.repository import GLib, Gtk, Gio, GdkPixbuf
@@ -68,6 +70,10 @@ class VHTApp(Gtk.Application):
         action.connect("activate", self.on_shortcut_dialog)
         self.add_action(action)
 
+        action = Gio.SimpleAction.new("prefs", None)
+        action.connect("activate", self.on_prefs)
+        self.add_action(action)
+
     def do_command_line(self, command_line):
         self.activate()
         return 0
@@ -83,6 +89,8 @@ class VHTApp(Gtk.Application):
 
         self.main_win = MainWin(self)
 
+        self.add_window(self.main_win)
+
         if mod.start_error:
             self.quit()
 
@@ -97,6 +105,10 @@ class VHTApp(Gtk.Application):
         refresh_connections(mod)
         mod.transport = cfg.start_transport
         mod.play = cfg.start_playing
+        self.on_prefs(None, None)
+
+    def on_prefs(self, action, param):
+        PreferencesWin(self.main_win, cfg).show()
 
     def on_load(self, action, param):
         dialog = Gtk.FileChooserDialog(
@@ -264,11 +276,13 @@ def run():
     # fix patches
     mod.bank = bankcfg.load()
 
+    cfg.load(os.path.join(mod.cfg_path, "config.ini"))
     autoexec.run()
 
     app = VHTApp()
     app.run(sys.argv)
 
+    cfg.save()
     mod.play = 0
     time.sleep(0.096)
     mod.panic()
