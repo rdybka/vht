@@ -1,37 +1,32 @@
-## Welcome to GitHub Pages
+![vht header](/data/vht_header.png)
+## about
+Valhalla Tracker aims to be a MIDI sequencing companion
+for GNU/Linux audio setups. Adhering to Unix philosophy,
+it tries to do one thing well
 
-You can use the [editor on GitHub](https://github.com/rdybka/vht/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+- by itself produces no sound and won't run on Windows™
+- timing/input/output relies 100% on JACK
+- seems to work fine with fluidsynth, ZynAddSubFX and a MIDI controller
+- probably most suitable for loop based music
+- minimalistic by design
+- minimalistic by necessity
+- can save and load files
+- sparsely documented for hacking pleasure
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## in zip
+- C library which talks to JACK and runs gameloop
+- it's Python counterpart, lazily wrapped with SWIG
+- GTK human interface also written in snake language
 
-### Markdown
+## deps
+```
+fedora - python3-devel jack-audio-connection-kit-devel
+ubuntu - python3-dev libjack-jackd2-dev
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+and the usual GNOME stuff
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/rdybka/vht/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+## install
+```
+./setup.py install user
+```
