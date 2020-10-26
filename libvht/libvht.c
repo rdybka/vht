@@ -329,10 +329,12 @@ int timestrip_get_rpb_end(timestrip *tstr) {
 
 void timestrip_set_start(timestrip *tstr, int start) {
 	tstr->start = start;
+	tstr->seq->playing = 0;
 }
 
 void timestrip_set_length(timestrip *tstr, int length) {
 	tstr->length = length;
+	tstr->seq->playing = 0;
 }
 
 void timestrip_set_rpb_start(timestrip *tstr, int rpb_start) {
