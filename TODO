@@ -1,6 +1,4 @@
-- moving loop_points
-- crashes:
+- timeline
     - moving (inside loops?)
-    - mid-click
 - export with jack_capture
 - sampling :]

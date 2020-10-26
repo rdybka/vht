@@ -47,8 +47,10 @@ timeline *timeline_new(midi_client *clt) {
 	ntl->time_length = 0.0;
 	ntl->loop_start = -1;
 	ntl->loop_end = -1;
-	ntl->loop_active = 0;
+	ntl->loop_active = 1;
 	timeline_update_inner(ntl);
+	ntl->loop_start = 0;
+	ntl->loop_end = ntl->length;
 	pthread_mutex_init(&ntl->excl, NULL);
 	return(ntl);
 }
@@ -253,6 +255,11 @@ int timechange_compare(const void *a, const void *b) {
 }
 
 void timeline_update_inner(timeline *tl) {
+	int extend_loop = 0;
+
+	if (tl->loop_end == tl->length)
+		extend_loop = 1;
+
 	tl->length = 32;
 	tl->ncols = 0;
 
@@ -298,6 +305,10 @@ void timeline_update_inner(timeline *tl) {
 
 	if (tl->pos > tl->length)
 		tl->pos = 0;
+
+	if (extend_loop) {
+		tl->loop_end = tl->length;
+	}
 }
 
 int tick_cmp(const void *t1, const void *t2) {
@@ -1150,10 +1161,11 @@ void timestrip_insert_noteoff(timestrip *tstr, track *src_trk) {
 }
 
 void timestrip_noteoffise(timeline *tl, timestrip *tstr) {
-	timeline_excl_in(tl);
 	sequence *prev = timeline_get_prev_seq(tl, tstr);
 	if (!prev)
 		return;
+
+	timeline_excl_in(tl);
 
 	for (int t = 0; t < prev->ntrk; t++) {
 		for (int c = 0; c < prev->trk[t]->ncols; c++) {
