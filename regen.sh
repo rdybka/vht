@@ -28,5 +28,4 @@ black vht/*.py libvht/*.py
 swig -python libvht/libcvht.h
 git add .
 git reset libvht/*.so
-git reset .idea
-git reset README.md regen.sh
+

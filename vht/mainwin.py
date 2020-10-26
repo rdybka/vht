@@ -239,7 +239,7 @@ class MainWin(Gtk.ApplicationWindow):
                 self._status_bar.portpopover.pop()
 
         if mod.ports_changed:
-            refresh_connections(mod)
+            refresh_connections(mod, cfg)
             if self._status_bar.portpopover.pooped:
                 self._status_bar.portpopover.refresh()
 

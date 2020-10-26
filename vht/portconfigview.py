@@ -87,17 +87,8 @@ class PortConfigView(Gtk.Grid):
         self.attach(self.box_out, 1, 0, 1, 1)
         self.attach(self.tv_unv_in, 0, 1, 1, 1)
 
-        if not "portconfig" in mod.extras:
-            pc = {}
-            pc["in"] = []
-            pc["out"] = {}
-
-            for p in range(mod.max_ports):
-                pc["out"][p] = []
-
-            mod.extras["portconfig"] = pc
-
         self.show_all()
+        refresh_connections(mod, cfg)
         self.populate()
 
     def populate(self):
@@ -212,7 +203,7 @@ class PortConfigView(Gtk.Grid):
                 if pname in mod.extras["portconfig"]["in"]:
                     mod.extras["portconfig"]["in"].remove(pname)
 
-        refresh_connections(mod)
+        refresh_connections(mod, cfg)
         self.populate()
 
     def on_output_toggled(self, widget, path):
@@ -243,7 +234,7 @@ class PortConfigView(Gtk.Grid):
             if pname in mod.extras["portconfig"]["out"][act_out]:
                 mod.extras["portconfig"]["out"][act_out].remove(pname)
 
-        refresh_connections(mod)
+        refresh_connections(mod, cfg)
         self.populate()
 
     def on_unv_output_toggled(self, widget, path):

@@ -103,13 +103,13 @@ class Configuration:
         self.select_button = 1
         self.delete_button = 3
 
-        self.default_ctrl_name = "zyn"
+        self.default_ctrl_name = "gm"
 
         self.dark_theme = True
-        self.notebook_mouseover = True
-        self.track_prop_mouseover = True
+        self.notebook_mouseover = False
+        self.track_prop_mouseover = False
 
-        self.quick_controls_desc = "vol/pan:"
+        self.quick_controls_desc = "vol/pan"
         self.quick_control_1_ctrl = 7
         self.quick_control_1_def = 100
         self.quick_control_2_ctrl = 10
@@ -220,12 +220,23 @@ class Configuration:
             "doodle_render": cfgkey("d", True, True, False),
         }
 
+        self.mappable_keys = [
+            "play",
+            "reset",
+            "record",
+            "multi_record",
+            "track_clear",
+            "panic",
+            "play_mode",
+        ]
+
         self.midi_in = {
-            "play": [16, 4, 117, 127],
-            "multi_record": [16, 4, 118, 127],
-            "reset": [16, 4, 116, 127],
-            "track_clear": [16, 4, 113, 127],
+            "play": None,
+            "multi_record": None,
         }
+
+        self.midi_default_input = ""
+        self.midi_default_output = ""
 
         self.velocity_keys = "zxcvbnm"
         self.piano_white_keys = "zxcvbnmqwertyu"
@@ -244,11 +255,75 @@ class Configuration:
             "console_colour": self.console_colour,
             "matrix_colour": self.mixer_colour,
             "timeline_colour": self.timeline_colour,
+            "star_colour": self.star_colour,
+            "record_colour": self.record_colour,
+            "seq_spacing": self.seq_spacing,
+            "notebook_mouseover": self.notebook_mouseover,
+            "track_prop_mouseover": self.track_prop_mouseover,
+            "dark_theme": self.dark_theme,
         }
 
+        cfg["advanced"] = {
+            "new_tracks_left": self.new_tracks_left,
+            "new_seqs_with_tracks": self.new_seqs_with_tracks,
+            "quick_controls_desc": self.quick_controls_desc,
+            "quick_control_1_ctrl": self.quick_control_1_ctrl,
+            "quick_control_1_def": self.quick_control_1_def,
+            "quick_control_2_ctrl": self.quick_control_2_ctrl,
+            "quick_control_2_def": self.quick_control_2_def,
+            "piano_white_keys": self.piano_white_keys,
+            "piano_black_keys": self.piano_black_keys,
+            "velocity_keys": self.velocity_keys,
+        }
+
+        cfg["midi"] = {
+            "midi_default_input": self.midi_default_input,
+            "midi_default_output": self.midi_default_output,
+        }
+
+        cfg["midi_map"] = {}
         return cfg
 
     def save(self):
+        lnf = self.cfg_parser["looknfeel"]
+        lnf["seq_font"] = self.seq_font
+        lnf["console_font"] = self.console_font
+        lnf["matrix_font"] = self.mixer_font
+        lnf["timeline_font"] = self.timeline_font
+        lnf["seq_spacing"] = str(self.seq_spacing)
+        lnf["seq_colour"] = str(self.colour)
+        lnf["console_colour"] = str(self.console_colour)
+        lnf["matrix_colour"] = str(self.mixer_colour)
+        lnf["timeline_colour"] = str(self.timeline_colour)
+        lnf["star_colour"] = str(self.star_colour)
+        lnf["record_colour"] = str(self.record_colour)
+        lnf["notebook_mouseover"] = str(self.notebook_mouseover)
+        lnf["track_prop_mouseover"] = str(self.track_prop_mouseover)
+        lnf["dark_theme"] = str(self.dark_theme)
+
+        adv = self.cfg_parser["advanced"]
+        adv["new_tracks_left"] = str(self.new_tracks_left)
+        adv["new_seqs_with_tracks"] = str(self.new_seqs_with_tracks)
+        adv["quick_controls_desc"] = self.quick_controls_desc
+        adv["quick_control_1_ctrl"] = str(self.quick_control_1_ctrl)
+        adv["quick_control_1_def"] = str(self.quick_control_1_def)
+        adv["quick_control_2_ctrl"] = str(self.quick_control_2_ctrl)
+        adv["quick_control_2_def"] = str(self.quick_control_2_def)
+        adv["piano_white_keys"] = self.piano_white_keys
+        adv["piano_black_keys"] = self.piano_black_keys
+        adv["velocity_keys"] = self.velocity_keys
+
+        mid = self.cfg_parser["midi"]
+
+        mid["midi_default_input"] = self.midi_default_input
+        mid["midi_default_output"] = self.midi_default_output
+
+        mmp = self.cfg_parser["midi_map"]
+        mmp.clear()
+        for mi, mn in self.midi_in.items():
+            if mn:
+                mmp[mi] = str(mn)
+
         with open(self.filename, "w") as cfgfile:
             self.cfg_parser.write(cfgfile)
 
@@ -256,7 +331,75 @@ class Configuration:
         self.filename = filename
 
         if self.cfg_parser.read(filename):
-            print("load %s" % self.filename)
+            lnf = self.cfg_parser["looknfeel"]
+            self.seq_font = lnf["seq_font"]
+            self.console_font = lnf["console_font"]
+            self.mixer_font = lnf["matrix_font"]
+            self.timeline_font = lnf["timeline_font"]
+            self.seq_spacing = float(lnf["seq_spacing"])
+            self.colour = tuple(
+                [float(a.strip(" '")) for a in lnf["seq_colour"].strip("()").split(",")]
+            )
+            self.console_colour = tuple(
+                [
+                    float(a.strip(" '"))
+                    for a in lnf["console_colour"].strip("()").split(",")
+                ]
+            )
+            self.mixer_colour = tuple(
+                [
+                    float(a.strip(" '"))
+                    for a in lnf["matrix_colour"].strip("()").split(",")
+                ]
+            )
+            self.timeline_colour = tuple(
+                [
+                    float(a.strip(" '"))
+                    for a in lnf["timeline_colour"].strip("()").split(",")
+                ]
+            )
+            self.star_colour = tuple(
+                [
+                    float(a.strip(" '"))
+                    for a in lnf["star_colour"].strip("()").split(",")
+                ]
+            )
+            self.record_colour = tuple(
+                [
+                    float(a.strip(" '"))
+                    for a in lnf["record_colour"].strip("()").split(",")
+                ]
+            )
+
+            self.notebook_mouseover = lnf.getboolean("notebook_mouseover")
+            self.track_prop_mouseover = lnf.getboolean("track_prop_mouseover")
+            self.dark_theme = lnf.getboolean("dark_theme")
+
+            adv = self.cfg_parser["advanced"]
+            self.new_tracks_left = adv.getboolean("new_tracks_left")
+            self.new_seqs_with_tracks = adv.getboolean("new_seqs_with_tracks")
+            self.quick_controls_desc = adv["quick_controls_desc"]
+            self.quick_control_1_ctrl = adv.getint("quick_control_1_ctrl")
+            self.quick_control_1_def = adv.getint("quick_control_1_def")
+            self.quick_control_2_ctrl = adv.getint("quick_control_2_ctrl")
+            self.quick_control_2_def = adv.getint("quick_control_2_def")
+            self.piano_white_keys = adv["piano_white_keys"]
+            self.piano_black_keys = adv["piano_black_keys"]
+            self.velocity_keys = adv["velocity_keys"]
+
+            mid = self.cfg_parser["midi"]
+
+            self.midi_default_input = mid["midi_default_input"]
+            self.midi_default_output = mid["midi_default_output"]
+
+            mmp = self.cfg_parser["midi_map"]
+            if mmp:
+                self.midi_in.clear()
+
+            for m, mm in mmp.items():
+                self.midi_in[m] = tuple(
+                    [int(a.strip(" '")) for a in mm.strip("()").split(",")]
+                )
 
 
 key_aliases = {

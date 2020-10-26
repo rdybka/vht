@@ -27,37 +27,51 @@ class PoorMansPiano:
     def __init__(self, trk, seq):
         self.seq = seq
         self.trk = trk
-        self.notes = {
-            122: "c",
-            115: "c#",
-            120: "d",
-            100: "d#",
-            99: "e",
-            118: "f",
-            103: "f#",
-            98: "g",
-            104: "g#",
-            110: "a",
-            106: "a#",
-            109: "b",
-        }
-        self.notes2 = {
-            113: "c",
-            50: "c#",
-            119: "d",
-            51: "d#",
-            101: "e",
-            114: "f",
-            53: "f#",
-            116: "g",
-            54: "g#",
-            121: "a",
-            55: "a#",
-            117: "b",
-        }
 
-        self.mnotes = [122, 115, 120, 100, 99, 118, 103, 98, 104, 110, 106, 109]
-        self.mnotes2 = [113, 50, 119, 51, 101, 114, 53, 116, 54, 121, 55, 117]
+        ape_pattern = "wbwbwwbwbwbw"
+        wk = cfg.piano_white_keys
+        bk = cfg.piano_black_keys
+        if len(wk + bk) == len(ape_pattern) * 2:
+            self.mnotes = []
+
+            offsw = 0
+            offsb = 0
+            for c in ape_pattern * 2:
+                k = wk[offsw]
+                offsw += 1
+                if c == "b":
+                    k = bk[offsb]
+                    offsb += 1
+                    offsw -= 1
+
+                self.mnotes.append(Gdk.unicode_to_keyval(ord(k)))
+        else:
+            self.mnotes = [
+                122,
+                115,
+                120,
+                100,
+                99,
+                118,
+                103,
+                98,
+                104,
+                110,
+                106,
+                109,
+                113,
+                50,
+                119,
+                51,
+                101,
+                114,
+                53,
+                116,
+                54,
+                121,
+                55,
+                117,
+            ]
 
         self.note_on = None
         self.mnotes.append(self.mnotes)
@@ -99,11 +113,9 @@ class PoorMansPiano:
 
     def key2note(self, key, note_off=False):
         mnt = -23
+
         if key in self.mnotes:
             mnt = self.mnotes.index(key)
-
-        if key in self.mnotes2:
-            mnt = self.mnotes2.index(key) + 12
 
         if mnt == -23:
             return -1

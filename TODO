@@ -1,9 +1,11 @@
-- configuration
-    - defaults
-    - look
-    - midi buttons
-! autostart ports again
+- unclick in mtx
+- clipboard - copy tracks - ctrl-v not in edit mode
+    - adding columns
+- opening timeline
+- indicate mode_switch
+- moving loop_points
+- crashes:
+    - moving (inside loops?)
+    - mid-click
 - export with jack_capture
 - sampling :]
-
-

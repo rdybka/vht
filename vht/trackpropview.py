@@ -348,8 +348,9 @@ class TrackPropView(Gtk.DrawingArea):
         cr.fill()
 
         if active:
+            txth = self.txt_height * cfg.seq_spacing
             alpha = 2
-            gradient = cairo.LinearGradient(0, 0, 0, self.txt_height * 2)
+            gradient = cairo.LinearGradient(0, 0, 0, txth * 2)
             gradient.add_color_stop_rgba(
                 0,
                 *(col * cfg.intensity_txt_highlight for col in cfg.record_colour),
@@ -384,28 +385,23 @@ class TrackPropView(Gtk.DrawingArea):
                 xto = kf.x_to + width
                 xfrom -= width
 
-            cr.move_to(xfrom, self.txt_height * yy * 2.5)
+            cr.move_to(xfrom, txth * yy * 2.5)
             cr.curve_to(
                 xfrom + width,
-                self.txt_height * 1.8,
+                txth * 1.8,
                 xfrom + width,
-                self.txt_height * yy,
+                txth * yy,
                 xfrom + (width * 1.8),
-                self.txt_height * yy,
+                txth * yy,
             )
 
-            cr.line_to(xto - (width * 1.8), self.txt_height * yy)
+            cr.line_to(xto - (width * 1.8), txth * yy)
             cr.curve_to(
-                xto - width,
-                self.txt_height * yy,
-                xto - width,
-                self.txt_height * 1.8,
-                xto,
-                self.txt_height * 2.5,
+                xto - width, txth * yy, xto - width, txth * 1.8, xto, txth * 2.5,
             )
 
-            cr.line_to(self.width - width, self.txt_height * yy * 10)
-            cr.line_to(-1, self.txt_height * yy * 10)
+            cr.line_to(self.width - width, txth * yy * 10)
+            cr.line_to(-1, txth * yy * 10)
             cr.stroke_preserve()
             cr.fill()
 

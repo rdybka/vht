@@ -16,7 +16,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+#
+# I hereby testify,
+# on Pungenday, the 6th day of The Aftermath in the YOLD 3186,
+# that everything in this program checks out with
+# The Law of Fives and also 4.999s*
+# it's naive reliance on floating point numbers
+# makes it unpredictible af, often in strange moments
+# which must be what Our Lady has led us to believe she likes to pretend she wants
+# oh, and it's a real memory hog as well,
+# which seems to be in line with our call
 
 from vht.mainwin import MainWin
 from vht.shortcutmayhem import ShortcutMayhem
@@ -102,13 +111,29 @@ class VHTApp(Gtk.Application):
             self.main_win.set_header_from_filename(self.main_win.last_filename)
 
         mod.reset()
-        refresh_connections(mod)
+
+        if not "portconfig" in mod.extras:
+            pc = {}
+            pc["in"] = []
+            pc["out"] = {}
+
+            for p in range(mod.max_ports):
+                pc["out"][p] = []
+
+            mod.extras["portconfig"] = pc
+
+            if cfg.midi_default_input and cfg.midi_default_input not in pc["in"]:
+                pc["in"].append(cfg.midi_default_input)
+
+            if cfg.midi_default_output and cfg.midi_default_output not in pc["out"][0]:
+                pc["out"][0].append(cfg.midi_default_output)
+
+        refresh_connections(mod, cfg)
         mod.transport = cfg.start_transport
         mod.play = cfg.start_playing
-        self.on_prefs(None, None)
 
     def on_prefs(self, action, param):
-        PreferencesWin(self.main_win, cfg).show()
+        PreferencesWin(self.main_win, mod, cfg).show()
 
     def on_load(self, action, param):
         dialog = Gtk.FileChooserDialog(
@@ -235,12 +260,21 @@ def run():
     if mod.midi_start() != 0:
         mod.start_error = "you will need JACK for this"
 
+    # fix local config path
+    mod.cfg_path = os.path.expanduser("~/.config/vht")
+    if not os.path.exists(mod.cfg_path):
+        print("creating", mod.cfg_path)
+        os.mkdir(mod.cfg_path)
+
+    cfg.load(os.path.join(mod.cfg_path, "config.ini"))
+
     mod.ctrlpr = cfg.controller_resolution
     mod.saving = False
     mod.play_mode = 0
     midig = []
     for val in cfg.midi_in.values():
-        midig.append(tuple(val[:-1]))
+        if val:
+            midig.append(val)
 
     vht.extras.register(mod)
     mod.set_midi_record_ignore(midig)
@@ -265,18 +299,11 @@ def run():
         if os.path.exists(p):
             mod.data_path = p
 
-    # fix local config path
-    mod.cfg_path = os.path.expanduser("~/.config/vht")
-    if not os.path.exists(mod.cfg_path):
-        print("creating", mod.cfg_path)
-        os.mkdir(mod.cfg_path)
-
     # fix controller configs
     mod.ctrls = ctrlcfg.load()
     # fix patches
     mod.bank = bankcfg.load()
 
-    cfg.load(os.path.join(mod.cfg_path, "config.ini"))
     autoexec.run()
 
     app = VHTApp()

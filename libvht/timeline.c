@@ -879,7 +879,7 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 	double rperiod = period / len;
 
 	double p = ceil(tl->pos) - tl->pos;
-
+	// *five < 5
 	if (rperiod - p > 0.0000001) {
 		jack_nframes_t frm = nframes;
 		frm *= p / rperiod;
@@ -889,7 +889,6 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 
 		if (frm > 0 && frm < nframes) {
 			nframes -= frm;
-			//printf("re-adv tl %f %d\n", sp, frm);
 			timeline_advance_inner(tl, sp, frm);
 		} else {
 			tl->pos = ceil(tl->pos);

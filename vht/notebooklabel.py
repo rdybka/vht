@@ -32,9 +32,10 @@ class NotebookLabel(Gtk.EventBox):
         self.add_events(Gdk.EventMask.POINTER_MOTION_MASK)
 
         self.add(Gtk.Label(name))
-        if cfg.notebook_mouseover:
-            self.connect("motion-notify-event", self.motion)
+
+        self.connect("motion-notify-event", self.motion)
         self.show_all()
 
     def motion(self, wdg, evt):
-        self.nb.set_current_page(self.pos)
+        if cfg.notebook_mouseover:
+            self.nb.set_current_page(self.pos)

@@ -184,7 +184,7 @@ class TrackPropViewPopover(Gtk.Popover):
         grid.attach(self.show_pitchwheel_button, 3, 0, 1, 1)
         grid.attach(self.show_controllers_button, 4, 0, 1, 1)
 
-        lab = Gtk.Label(cfg.quick_controls_desc)
+        lab = Gtk.Label(cfg.quick_controls_desc + ":")
         lab.set_vexpand(True)
         grid.attach(lab, 0, 2, 1, 1)
         lab.set_vexpand(True)

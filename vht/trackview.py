@@ -209,6 +209,7 @@ class TrackView(Gtk.DrawingArea):
         self._back_context.select_font_face(
             cfg.seq_font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD
         )
+
         self._back_context.set_font_size(self.parent.font_size)
 
         w = self.get_allocated_width()

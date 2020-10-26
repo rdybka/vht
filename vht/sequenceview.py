@@ -60,7 +60,7 @@ class SequenceView(Gtk.Box):
         self.seq = seq
 
         mod.curr_seq = seq.index
-        self.font_size = cfg.seq_font_size
+        # self.font_size = cfg.seq_font_size
         self.font_size = self.seq.extras["font_size"]
 
         self.last_count = len(seq)
@@ -580,7 +580,6 @@ class SequenceView(Gtk.Box):
         if self.font_size < 1:
             self.font_size = 1
 
-        cfg.seq_font_size = self.font_size
         cfg.pointer_height = 0.7 * self.font_size
         self.redraw_track(None)
         self._side_prop.redraw()
@@ -815,7 +814,7 @@ class SequenceView(Gtk.Box):
 
             self.build()
 
-            refresh_connections(mod)
+            refresh_connections(mod, cfg)
 
             show_pop = True
             for prt in mod.ports:
@@ -977,7 +976,7 @@ class SequenceView(Gtk.Box):
                     if midin["channel"] == m[0]:
                         if midin["type"] == m[1]:
                             if midin["note"] == m[2]:
-                                if midin["velocity"] == m[3]:
+                                if midin["velocity"] > 0:
 
                                     class kbd_evt:
                                         pass
@@ -1005,6 +1004,14 @@ class SequenceView(Gtk.Box):
                                         )
 
                                     self.on_key_press(self, kev)
+
+                                    if k == "panic":
+                                        mod.panic(True)
+
+                                    if k == "play_mode":
+                                        mod.mainwin.seq_mode_butt.props.active = (
+                                            not mod.mainwin.seq_mode_butt.props.active
+                                        )
 
                 midin = mod.get_midi_in_event()
 

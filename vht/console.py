@@ -82,20 +82,13 @@ class Console(Vte.Terminal):
         self.browsing = False
         self.hist_ptr = 0
 
-        self.set_color_background(
-            Gdk.RGBA(*(col * cfg.intensity_background for col in cfg.console_colour), 1)
-        )
-        self.set_color_foreground(
-            Gdk.RGBA(*(col * cfg.intensity_txt for col in cfg.console_colour), 1)
-        )
+        self.refresh()
 
+        self.set_font_scale(cfg.console_scale)
         self.set_rewrap_on_resize(True)
         self.set_scroll_on_output(True)
         self.set_scroll_on_keystroke(True)
 
-        self.set_font_scale(cfg.console_scale)
-
-        self.set_font(Pango.FontDescription.from_string(cfg.console_font))
         self.fs = int(cfg.console_scale * 50)
         self.set_input_enabled(True)
         mod.termfile = HackerIO(self)
@@ -109,6 +102,16 @@ class Console(Vte.Terminal):
         t.daemon = True
 
         t.start()
+
+    def refresh(self):
+        self.set_color_background(
+            Gdk.RGBA(*(col * cfg.intensity_background for col in cfg.console_colour), 1)
+        )
+        self.set_color_foreground(
+            Gdk.RGBA(*(col * cfg.intensity_txt for col in cfg.console_colour), 1)
+        )
+
+        self.set_font(Pango.FontDescription.from_string(cfg.console_font))
 
     def on_scroll(self, widget, event):
         if event.state & Gdk.ModifierType.CONTROL_MASK:  # we're zooming!

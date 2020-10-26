@@ -16,12 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-def refresh_connections(mod):
+def refresh_connections(mod, cfg):
     if "portconfig" not in mod.extras:
         return
 
     mod.ports.refresh()
-
     pcfg = mod.extras["portconfig"]
 
     # inputs
@@ -64,7 +63,7 @@ def refresh_connections(mod):
 
     # disable unused outputs
     if need_refr:
-        refresh_connections(mod)
+        refresh_connections(mod, cfg)
         return
 
     need_refr = False

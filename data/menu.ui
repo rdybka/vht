@@ -33,10 +33,6 @@
         <attribute name="label">_Keyboard Shortcuts</attribute>
       </item>
       <item>
-        <attribute name="action">app.help</attribute>
-        <attribute name="label">_Help</attribute>
-      </item>
-      <item>
         <attribute name="action">app.about</attribute>
         <attribute name="label">_About Valhalla Tracker</attribute>
       </item>
