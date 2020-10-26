@@ -244,8 +244,8 @@ class MainWin(Gtk.ApplicationWindow):
                 self._status_bar.portpopover.refresh()
 
         if mod.switch_req:
-            v = self._status_bar.pulse.intensity(mod[mod.curr_seq].pos)
-            if v < 0.5:
+            v = self._status_bar.pulse.intensity(mod[0].pos)
+            if v < 0.2:
                 for w in self.seq_mode_butt.get_children():
                     self.seq_mode_butt.remove(w)
             else:
