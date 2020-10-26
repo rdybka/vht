@@ -1829,7 +1829,6 @@ class TrackView(Gtk.DrawingArea):
 
             if new_y:
                 self.edit = self.edit[0], new_y
-            self.redraw()
         else:
             ssx = min(self.select_start[0], len(self.trk) - 1)
             ssy = self.select_start[1]
@@ -1869,6 +1868,8 @@ class TrackView(Gtk.DrawingArea):
                 yy += 1
                 if yy >= len(d):
                     yy = 0
+
+        self.parent.redraw_track(self.trk.index)
 
     def midi_in(self, midin):
         m_note = midin["note"]

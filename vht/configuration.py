@@ -44,7 +44,7 @@ class Configuration:
         self.mainwin_size = (800, 400)
 
         self.console_scale = 1
-        self.timeline_position = 200
+        self.timeline_position_x = 200
         self.timeline_position_y = 120
         self.console_position = 0.6
         self.console_show = False
@@ -246,41 +246,9 @@ class Configuration:
 
     def build_parser(self):
         cfg = configparser.ConfigParser()
-        cfg["looknfeel"] = {
-            "seq_font": self.seq_font,
-            "console_font": self.console_font,
-            "matrix_font": self.mixer_font,
-            "timeline_font": self.timeline_font,
-            "seq_colour": self.colour,
-            "console_colour": self.console_colour,
-            "matrix_colour": self.mixer_colour,
-            "timeline_colour": self.timeline_colour,
-            "star_colour": self.star_colour,
-            "record_colour": self.record_colour,
-            "seq_spacing": self.seq_spacing,
-            "notebook_mouseover": self.notebook_mouseover,
-            "track_prop_mouseover": self.track_prop_mouseover,
-            "dark_theme": self.dark_theme,
-        }
-
-        cfg["advanced"] = {
-            "new_tracks_left": self.new_tracks_left,
-            "new_seqs_with_tracks": self.new_seqs_with_tracks,
-            "quick_controls_desc": self.quick_controls_desc,
-            "quick_control_1_ctrl": self.quick_control_1_ctrl,
-            "quick_control_1_def": self.quick_control_1_def,
-            "quick_control_2_ctrl": self.quick_control_2_ctrl,
-            "quick_control_2_def": self.quick_control_2_def,
-            "piano_white_keys": self.piano_white_keys,
-            "piano_black_keys": self.piano_black_keys,
-            "velocity_keys": self.velocity_keys,
-        }
-
-        cfg["midi"] = {
-            "midi_default_input": self.midi_default_input,
-            "midi_default_output": self.midi_default_output,
-        }
-
+        cfg["looknfeel"] = {}
+        cfg["advanced"] = {}
+        cfg["midi"] = {}
         cfg["midi_map"] = {}
         return cfg
 
@@ -300,6 +268,7 @@ class Configuration:
         lnf["notebook_mouseover"] = str(self.notebook_mouseover)
         lnf["track_prop_mouseover"] = str(self.track_prop_mouseover)
         lnf["dark_theme"] = str(self.dark_theme)
+        lnf["timeline_show"] = str(self.timeline_show)
 
         adv = self.cfg_parser["advanced"]
         adv["new_tracks_left"] = str(self.new_tracks_left)
@@ -374,6 +343,7 @@ class Configuration:
             self.notebook_mouseover = lnf.getboolean("notebook_mouseover")
             self.track_prop_mouseover = lnf.getboolean("track_prop_mouseover")
             self.dark_theme = lnf.getboolean("dark_theme")
+            self.timeline_show = lnf.getboolean("timeline_show")
 
             adv = self.cfg_parser["advanced"]
             self.new_tracks_left = adv.getboolean("new_tracks_left")

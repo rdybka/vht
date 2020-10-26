@@ -261,13 +261,30 @@ class StatusBar(Gtk.DrawingArea):
         else:
             cr.set_source_rgb(*(col * intensity for col in cfg.colour))
 
-        r = mod.timeline.pos
-        t = mod.timeline.qb2t(r)
-        txt = "%.3f %d:%02d:%02d" % (r, t // 60, t % 60, (t * 100) % 100,)
+        dx = 0
+        if not cfg.timeline_show:
+            if self.active_field == 8:
+                cr.set_source_rgb(
+                    *(col * cfg.intensity_txt_highlight for col in cfg.star_colour)
+                )
+            else:
+                cr.set_source_rgb(*(col * intensity for col in cfg.record_colour))
 
-        *_, dx, _ = cr.text_extents(txt)
-        cr.move_to(w - dx, h)
-        cr.show_text(txt)
+            txt = "***"
+            *_, dx, _ = cr.text_extents(txt)
+            self.pos.append(w - dx)
+            self.pos.append(w)
+            cr.move_to(w - dx, h)
+            cr.show_text(txt)
+        else:
+            r = mod.timeline.pos
+            t = mod.timeline.qb2t(r)
+            txt = "%.3f %d:%02d:%02d" % (r, t // 60, t % 60, (t * 100) % 100,)
+
+            *_, dx, _ = cr.text_extents(txt)
+            cr.move_to(w - dx, h)
+            cr.show_text(txt)
+
         end_x = w - dx
 
         if mod.mainwin.fs and mod.mainwin.hb.props.title:
@@ -495,6 +512,9 @@ class StatusBar(Gtk.DrawingArea):
             self.portpopover.set_pointing_to(self.portpopover_rect)
             self.portpopover.pop()
             return True
+
+        if event.button == 1 and self.active_field == 8:
+            mod.mainwin.show_timeline()
 
         return False
 

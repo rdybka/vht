@@ -278,6 +278,7 @@ class MainWin(Gtk.ApplicationWindow):
         self.timeline_box.hide()
 
         self.timeline_visible = False
+        cfg.timeline_show = False
 
     def show_timeline(self):
         if self.timeline_visible:
@@ -286,12 +287,13 @@ class MainWin(Gtk.ApplicationWindow):
         if 1 == len(self.hbox.get_children()):
             self.hbox.pack2(self.timeline_box, False, True)
             self.hbox.set_position(
-                self.get_window().get_width() - cfg.timeline_position
+                self.get_window().get_width() - cfg.timeline_position_x
             )
 
         self.hbox.set_wide_handle(True)
         self.timeline_visible = True
         self.timeline_box.show_all()
+        cfg.timeline_show = True
 
     def hide_console(self):
         if not mod.console_visible:
