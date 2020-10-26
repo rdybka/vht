@@ -171,6 +171,11 @@ class SequenceListViewPopover(Gtk.Popover):
         self._trgview.refresh()
         self.get_window().thaw_updates()
 
+    def unpop(self):
+        self.hide()
+        self.pooped = False
+        self._trgview.capture = -1
+
     def pop(self, curr):
         mod.clear_popups(self)
         self.time_want_to_leave = 0

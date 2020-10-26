@@ -180,7 +180,10 @@ class SequenceListView(Gtk.DrawingArea):
             if event.y > h - self._txt_height * 2.7:
                 if event.y < h - self._txt_height * 1.5:
                     self.pop_point_to(curr)
-                    self._popup.pop(curr)
+                    if self._popup.pooped:
+                        self._popup.unpop()
+                    else:
+                        self._popup.pop(curr)
             else:
                 mod.curr_seq = curr
                 self.redraw(curr)
