@@ -1,4 +1,3 @@
-- indicate mode_switch
 - moving loop_points
 - crashes:
     - moving (inside loops?)

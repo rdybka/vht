@@ -153,8 +153,8 @@ class MainWin(Gtk.ApplicationWindow):
         )
 
         icon = Gio.ThemedIcon(name="media-playlist-repeat")
-        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-        self.seq_mode_butt.add(image)
+        self.seq_mode_butt_image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+        self.seq_mode_butt.add(self.seq_mode_butt_image)
         self.seq_mode_butt.set_active(not mod.play_mode)
         self.seq_mode_butt.connect("clicked", self.on_playmode_toggled)
         self.seq_mode_butt.set_tooltip_markup(
@@ -243,7 +243,30 @@ class MainWin(Gtk.ApplicationWindow):
             if self._status_bar.portpopover.pooped:
                 self._status_bar.portpopover.refresh()
 
+        if mod.switch_req:
+            v = self._status_bar.pulse.intensity(mod[mod.curr_seq].pos)
+            if v < 0.5:
+                for w in self.seq_mode_butt.get_children():
+                    self.seq_mode_butt.remove(w)
+            else:
+                ch = self.seq_mode_butt.get_children()
+                if not ch:
+                    self.seq_mode_butt.add(self.seq_mode_butt_image)
+        else:
+            ch = self.seq_mode_butt.get_children()
+            if not ch:
+                self.seq_mode_butt.add(self.seq_mode_butt_image)
+
         return 1
+
+    def on_seq_mode_butt_draw(self, wdg, ctx):
+        ctx.set_source_rgb(0, 0, 0)
+        srf = ctx.get_target()
+
+        w = srf.get_width()
+        h = srf.get_height()
+        ctx.rectangle(0, 0, w, h)
+        ctx.fill()
 
     def on_start_button_activate(self, switch):
         mod.play = 1
