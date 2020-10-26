@@ -95,6 +95,8 @@ class VHTApp(Gtk.Application):
         if self.start_load_file:
             if not mod.load(self.start_load_file):
                 self.quit()
+        else:
+            mod.play = cfg.start_playing
 
         self.main_win = MainWin(self)
 
@@ -130,7 +132,6 @@ class VHTApp(Gtk.Application):
 
         refresh_connections(mod, cfg)
         mod.transport = cfg.start_transport
-        mod.play = cfg.start_playing
 
     def on_prefs(self, action, param):
         PreferencesWin(self.main_win, mod, cfg).show()

@@ -379,6 +379,7 @@ class VHTModule(Iterable):
         jm["extras"] = self.extras
         jm["curr_seq"] = self.curr_seq
         jm["play_mode"] = self.play_mode
+        jm["playing"] = self.play
         jm["seq"] = []
         for seq in self:
             jm["seq"].append(pack_seq(seq))
@@ -423,7 +424,6 @@ class VHTModule(Iterable):
                 print("Couln't load", filename)
                 return False
 
-            p = self.play
             self.play = 0
 
             self.new()
@@ -479,7 +479,7 @@ class VHTModule(Iterable):
                     for cb in self.cb_new_track:
                         cb(s.seq.index, t.index)
 
-            self.play = p
+            self.play = jm["playing"]
 
         return True
 
