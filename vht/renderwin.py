@@ -131,8 +131,8 @@ class RenderWin(Gtk.Window):
         self.mode_cmb.set_active(cfg.render_mode)
 
         if not mod.renderer.available:
-            rbutt.set_sensitive(False)
-            rbutt.set_label("jack_capture not found")
+            self.rbutt.set_sensitive(False)
+            self.rbutt.set_label("jack_capture not found")
 
         self.add(self.grid)
         self.show_all()

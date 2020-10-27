@@ -186,8 +186,8 @@ class Renderer:
         self._pre_delay_start = datetime.now()
 
     def stop(self):
-        # if self.running:
-        #    self._proc.terminate()
+        if self.running:
+            self._proc.terminate()
 
         self._queue = []
         self._finished = True
