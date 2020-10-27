@@ -6,12 +6,12 @@ it tries to do one thing well
 
 - by itself produces no sound and won't run on Windows™
 - timing/input/output relies 100% on JACK
-- seems to work fine with fluidsynth, ZynAddSubFX and a MIDI controller
+- seems to work with fluidsynth, Carla, ZynAddSubFX and a MIDI controller
 - probably most suitable for loop based music
 - minimalistic by design
 - minimalistic by necessity
 - can save and load files
-- sparsely [documented](https://github.com/rdybka/vht/wiki) for hacking pleasure
+- sparsely documented for hacking pleasure
 
 ## in zip
 - C library which talks to JACK and runs gameloop
@@ -20,13 +20,13 @@ it tries to do one thing well
 
 ## deps
 ```
-fedora - python3-devel jack-audio-connection-kit-devel
-ubuntu - python3-dev libjack-jackd2-dev
+fedora - python3-devel jack-audio-connection-kit-devel jack-capture
+ubuntu - build-essential python3-dev python3-setuptools libjack-jackd2-dev jack-capture
 
-and the usual GNOME stuff
+and the usual jack/GNOME stuff
 ```
 
 ## install
 ```
-./setup.py install user
+./setup.py install --user
 ```
