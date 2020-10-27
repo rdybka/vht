@@ -65,6 +65,10 @@ int module_is_playing(module *mod) {
 	return mod->playing;
 }
 
+void module_set_render_lead_out(module *mod, int lead_out) {
+	mod->render_lead_out = lead_out;
+}
+
 void module_record(module *mod, int rec) {
 	mod->recording = rec;
 }

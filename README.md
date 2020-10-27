@@ -6,7 +6,7 @@ it tries to do one thing well
 
 - by itself produces no sound and won't run on Windows™
 - timing/input/output relies 100% on JACK
-- seems to work fine with fluidsynth, ZynAddSubFX and a MIDI controller
+- seems to work fine with fluidsynth, Carla, ZynAddSubFX and a MIDI controller
 - probably most suitable for loop based music
 - minimalistic by design
 - minimalistic by necessity

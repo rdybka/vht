@@ -890,7 +890,11 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 	double rperiod = period / len;
 
 	double p = ceil(tl->pos) - tl->pos;
-	// *five < 5
+
+	module *mod = (module *)tl->clt->mod_ref;
+	if (mod->render_mode == 3)
+		return;
+
 	if (rperiod - p > 0.0000001) {
 		jack_nframes_t frm = nframes;
 		frm *= p / rperiod;
@@ -909,7 +913,14 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 	if (tl->pos - floor(tl->pos) < 0.0000001) {	// row boundary
 		if (tl->loop_active) {
 			if (round(tl->pos) >= tl->loop_end) {
-				timeline_set_pos(tl, tl->loop_start, 0);
+				if (!mod->render_mode) {
+					timeline_set_pos(tl, tl->loop_start, 0);
+				} else {
+					mod->render_mode = 3;
+					mod->end_time = mod->clt->jack_last_frame;
+					return;
+				}
+
 				return;
 			}
 		}
@@ -971,7 +982,6 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 		}
 	}
 
-	module *mod = (module *)tl->clt->mod_ref;
 	mod->bpm = timeline_get_bpm_at_qb(tl, (long)tl->pos);
 	for (int s = 0; s < tl->nstrips; s++) {
 		timestrip *strp = &tl->strips[s];
@@ -1027,6 +1037,10 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 	tl->pos += rperiod;
 	if (tl->pos > tl->length) {
 		tl->pos = tl->length;
+		if (mod->render_mode) {
+			mod->render_mode = 3;
+			mod->end_time = mod->clt->jack_last_frame;
+		}
 	}
 }
 

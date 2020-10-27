@@ -1,4 +1,4 @@
-# ctrlcfg.py - Valhalla Tracker
+# bankcfg.py - Valhalla Tracker
 #
 # Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #

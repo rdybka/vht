@@ -55,6 +55,9 @@ typedef struct module_t {
 	double switch_delay;
 	int switch_req;
 	int transp;
+	int render_mode;
+	jack_nframes_t end_time;
+	int render_lead_out;
 } module;
 
 module *module_new(void);
@@ -86,5 +89,11 @@ int module_get_transport(module *mod);
 
 void sequence_handle_record(module *mod, sequence *seq, midi_event evt);
 void module_panic(module *mod, int brutal);
+
+void module_set_render_mode(module *mod, int mode);
+int module_get_render_mode(module *mod);
+
+void module_set_render_lead_out(module *mod, int lead_out);
+
 
 #endif //__MODULE_H__

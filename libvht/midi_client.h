@@ -113,5 +113,5 @@ void midi_open_port(midi_client *clt, int prt);
 char *midi_get_output_port_name(midi_client *clt, int prt);
 void set_default_midi_out_port(midi_client *clt, int port);
 int get_default_midi_out_port(midi_client *clt);
-
+void midi_set_freewheel(midi_client *clt, int on);
 #endif //__MIDI_CLIENT_H__

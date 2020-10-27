@@ -182,6 +182,12 @@ void sequence_free(sequence *seq) {
 }
 
 void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
+	midi_client *clt = (midi_client *)seq->clt;
+	module *mod = (module *)clt->mod_ref;
+
+	if (mod->render_mode == 3)
+		return;
+
 	if ((seq->trg_quantise == 0) && (seq->trg_times[2] == -2)) {
 		seq->trg_times[2] = -1;
 		if (seq->playing && seq->trg_times[3] != -2) {
@@ -220,8 +226,18 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 
 	if (seq->pos - floor(seq->pos) < 0.0000001) {
 		int r = (int)seq->pos;
-		while (r >= seq->length)
+
+		if (r >= seq->length) {
+			if (mod->render_mode == 1 && seq->playing) {
+				mod->render_mode = 3;
+				mod->end_time = mod->clt->jack_last_frame;
+				return;
+			}
+		}
+
+		while (r >= seq->length) {
 			r-=seq->length;
+		}
 
 		// printf("%d %d %d %d\n", seq->trg_times[0], seq->trg_times[1], seq->trg_times[2], seq->trg_times[3]);
 

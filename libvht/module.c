@@ -54,6 +54,15 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 		return;
 	}
 
+	if (mod->render_mode == 3) {
+		double t = (curr_frames - mod->end_time) / (double)mod->clt->jack_sample_rate;
+		if (t > mod->render_lead_out) {
+			midi_set_freewheel(mod->clt, 0);
+			mod->playing = 0;
+			mod->render_mode = 0;
+		}
+	}
+
 	module_excl_in(mod);
 
 	double time = (curr_frames - mod->zero_time) / (double)mod->clt->jack_sample_rate;
@@ -166,6 +175,10 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 		}
 	}
 
+	if (mod->render_mode == 3) {
+
+	}
+
 	if (mod->playing) {
 		if (mod->play_mode == 0) {
 			for (int s = 0; s < mod->nseq; s++) {
@@ -234,9 +247,21 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 	module_excl_out(mod);
 }
 
+void module_set_render_mode(module *mod, int mode) {
+	mod->render_mode = mode;
+}
+
+int module_get_render_mode(module *mod) {
+	return mod->render_mode;
+}
+
 void module_play(module *mod, int play) {
 	module_excl_in(mod);
 	mod->playing = play;
+	if (mod->render_mode > 0) {
+		midi_set_freewheel(mod->clt, 1);
+	}
+
 	module_excl_out(mod);
 
 	if (play == 0)
@@ -269,6 +294,8 @@ module *module_new() {
 	mod->play_mode = 0;
 	mod->switch_delay = 0.0;
 	mod->switch_req = 0;
+	mod->render_mode = 0;
+	mod->render_lead_out = 0;
 	timechange *tc = timeline_get_change(mod->tline, 0);
 	tc->bpm = mod->bpm;
 	tc->row = 0;

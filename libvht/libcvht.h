@@ -48,6 +48,9 @@ extern void set_default_midi_out_port(midi_client *clt, int port);
 extern int get_default_midi_out_port(midi_client *clt);
 
 extern void module_play(module *mod, int);
+extern void module_set_render_mode(module *mod, int mode);
+extern int module_get_render_mode(module *mod);
+extern void module_set_render_lead_out(module *mod, int lead_out);
 extern int module_is_playing(module *mod);
 extern void module_record(module *mod, int);
 extern int module_is_recording(module *mod);

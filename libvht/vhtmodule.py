@@ -289,6 +289,17 @@ class VHTModule(Iterable):
             self.record = 0
 
     @property
+    def render_mode(self):
+        return libcvht.module_get_render_mode(self._mod_handle)
+
+    @render_mode.setter
+    def render_mode(self, value):
+        libcvht.module_set_render_mode(self._mod_handle, int(value))
+
+    def set_lead_out(self, value):
+        libcvht.module_set_render_lead_out(self._mod_handle, int(value))
+
+    @property
     def dump_notes(self):
         return 0  # what is this?
 

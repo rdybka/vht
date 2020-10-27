@@ -131,6 +131,15 @@ def get_default_midi_out_port(clt):
 def module_play(mod, arg2):
     return _libcvht.module_play(mod, arg2)
 
+def module_set_render_mode(mod, mode):
+    return _libcvht.module_set_render_mode(mod, mode)
+
+def module_get_render_mode(mod):
+    return _libcvht.module_get_render_mode(mod)
+
+def module_set_render_lead_out(mod, lead_out):
+    return _libcvht.module_set_render_lead_out(mod, lead_out)
+
 def module_is_playing(mod):
     return _libcvht.module_is_playing(mod)
 

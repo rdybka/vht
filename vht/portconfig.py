@@ -20,6 +20,9 @@ def refresh_connections(mod, cfg):
     if "portconfig" not in mod.extras:
         return
 
+    if mod.render_mode:
+        return
+
     mod.ports.refresh()
     pcfg = mod.extras["portconfig"]
 

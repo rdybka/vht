@@ -14,14 +14,10 @@
         <attribute name="action">app.save_as</attribute>
         <attribute name="label">Save as</attribute>
       </item>
-      <submenu>
+      <item>
+        <attribute name="action">app.render</attribute>
         <attribute name="label">Render</attribute>
-			<item>
-			<attribute name="action">app.exp_audio</attribute>
-			<attribute name="label">Audio</attribute>
-			</item>
-      </submenu>
-      
+      </item>
     </section>
     <section>
       <item>

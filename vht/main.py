@@ -16,20 +16,17 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+
 # I hereby testify,
-# on Pungenday, the 6th day of The Aftermath in the YOLD 3186,
-# that everything in this program checks out with
-# The Law of Fives and also 4.999s*
-# it's naive reliance on floating point numbers
-# makes it unpredictible af, often in strange moments
-# which must be what Our Lady has led us to believe she likes to pretend she wants
-# oh, and it's a real memory hog as well,
-# which seems to be in line with our call
+# on Setting Orange, the 8th day of The Aftermath in the YOLD 3186,
+# that everything in this program checks out with The Law of Fives.
+
+# [intentionally left blank]
 
 from vht.mainwin import MainWin
 from vht.shortcutmayhem import ShortcutMayhem
 from vht.preferenceswin import PreferencesWin
+from vht.renderwin import RenderWin
 
 from vht.portconfig import refresh_connections
 from vht import mod, cfg, ctrlcfg, autoexec, bankcfg, randomcomposer
@@ -83,6 +80,10 @@ class VHTApp(Gtk.Application):
         action.connect("activate", self.on_prefs)
         self.add_action(action)
 
+        action = Gio.SimpleAction.new("render", None)
+        action.connect("activate", self.on_render)
+        self.add_action(action)
+
     def do_command_line(self, command_line):
         self.activate()
         return 0
@@ -101,7 +102,7 @@ class VHTApp(Gtk.Application):
         self.main_win = MainWin(self)
 
         self.add_window(self.main_win)
-
+        mod.render_win_showing = False
         if mod.start_error:
             self.quit()
 
@@ -133,8 +134,14 @@ class VHTApp(Gtk.Application):
         refresh_connections(mod, cfg)
         mod.transport = cfg.start_transport
 
+        # RenderWin(self.main_win, mod, cfg).show()
+
     def on_prefs(self, action, param):
         PreferencesWin(self.main_win, mod, cfg).show()
+
+    def on_render(self, action, param):
+        if not mod.render_win_showing:
+            RenderWin(self.main_win, mod, cfg).show()
 
     def on_load(self, action, param):
         dialog = Gtk.FileChooserDialog(

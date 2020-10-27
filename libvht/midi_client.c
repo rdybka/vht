@@ -624,3 +624,7 @@ void set_default_midi_out_port(midi_client *clt, int port) {
 int get_default_midi_out_port(midi_client *clt) {
 	return clt->default_midi_port;
 }
+
+void midi_set_freewheel(midi_client *clt, int on) {
+	jack_set_freewheel(clt->jack_client, on);
+}

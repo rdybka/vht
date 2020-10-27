@@ -21,6 +21,7 @@ from vht.timelineview import TimelineView
 from vht.statusbar import StatusBar
 from vht.sequenceview import SequenceView
 from vht.thumbmanager import ThumbManager
+from vht.renderer import Renderer
 from vht.portconfig import *
 
 from vht.portconfigpopover import PortConfigPopover
@@ -47,6 +48,7 @@ class MainWin(Gtk.ApplicationWindow):
         mod.thumbmanager = ThumbManager(mod)
         self.timeline_visible = False
         mod.console_visible = False
+        mod.renderer = Renderer(mod, cfg)
         self.last_filename = None
         self.last_filename_naked = None
 

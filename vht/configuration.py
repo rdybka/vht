@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from pathlib import Path
 import configparser
 
 import gi
@@ -128,6 +129,12 @@ class Configuration:
 
         self.timeline_delete_time = 0.25
         self.timeline_hint_time = 0.25
+
+        self.render_mode = 2
+        self.render_meter = 0
+        self.render_secs = 5
+        self.render_format = "flac"
+        self.render_folder = str(Path.home())
 
         self.key = {
             # sequenceview		shift, ctrl, alt
@@ -246,10 +253,51 @@ class Configuration:
 
     def build_parser(self):
         cfg = configparser.ConfigParser()
-        cfg["looknfeel"] = {}
-        cfg["advanced"] = {}
-        cfg["midi"] = {}
+        cfg["looknfeel"] = {
+            "seq_font": self.seq_font,
+            "console_font": self.console_font,
+            "matrix_font": self.mixer_font,
+            "timeline_font": self.timeline_font,
+            "seq_colour": self.colour,
+            "console_colour": self.console_colour,
+            "matrix_colour": self.mixer_colour,
+            "timeline_colour": self.timeline_colour,
+            "star_colour": self.star_colour,
+            "record_colour": self.record_colour,
+            "seq_spacing": self.seq_spacing,
+            "notebook_mouseover": self.notebook_mouseover,
+            "track_prop_mouseover": self.track_prop_mouseover,
+            "dark_theme": self.dark_theme,
+        }
+
+        cfg["advanced"] = {
+            "new_tracks_left": self.new_tracks_left,
+            "new_seqs_with_tracks": self.new_seqs_with_tracks,
+            "quick_controls_desc": self.quick_controls_desc,
+            "quick_control_1_ctrl": self.quick_control_1_ctrl,
+            "quick_control_1_def": self.quick_control_1_def,
+            "quick_control_2_ctrl": self.quick_control_2_ctrl,
+            "quick_control_2_def": self.quick_control_2_def,
+            "piano_white_keys": self.piano_white_keys,
+            "piano_black_keys": self.piano_black_keys,
+            "velocity_keys": self.velocity_keys,
+        }
+
+        cfg["midi"] = {
+            "midi_default_input": self.midi_default_input,
+            "midi_default_output": self.midi_default_output,
+        }
+
         cfg["midi_map"] = {}
+
+        cfg["render"] = {
+            "render_mode": str(self.render_mode),
+            "render_secs": str(self.render_secs),
+            "render_meter": str(self.render_meter),
+            "render_format": self.render_format,
+            "render_folder": self.render_folder,
+        }
+
         return cfg
 
     def save(self):
@@ -292,6 +340,13 @@ class Configuration:
         for mi, mn in self.midi_in.items():
             if mn:
                 mmp[mi] = str(mn)
+
+        rnd = self.cfg_parser["render"]
+        rnd["render_mode"] = str(self.render_mode)
+        rnd["render_secs"] = str(self.render_secs)
+        rnd["render_meter"] = str(self.render_meter)
+        rnd["render_format"] = self.render_format
+        rnd["render_folder"] = self.render_folder
 
         with open(self.filename, "w") as cfgfile:
             self.cfg_parser.write(cfgfile)
@@ -370,6 +425,14 @@ class Configuration:
                 self.midi_in[m] = tuple(
                     [int(a.strip(" '")) for a in mm.strip("()").split(",")]
                 )
+
+            rnd = self.cfg_parser["render"]
+
+            self.render_mode = rnd.getint("render_mode")
+            self.render_secs = rnd.getint("render_secs")
+            self.render_meter = rnd.getint("render_meter")
+            self.render_format = rnd["render_format"]
+            self.render_folder = rnd["render_folder"]
 
 
 key_aliases = {
