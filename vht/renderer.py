@@ -80,19 +80,9 @@ class Renderer:
         p = self._proc.poll()
 
         if self._proc.returncode != None:
-            self._proc = None
-            if self._queue:
-                self.start_queue()
-            else:
-                self._finished = True
-                self.mod.render_mode = 0
-                if self._seqs:
-                    for s in self.mod:
-                        s.playing = 0
-                    for s in self._seqs:
-                        self.mod[s].playing = 1
-
-                return False
+            self._finished = True
+            self.mod.render_mode = 0
+            return False
 
         return True
 
@@ -206,9 +196,8 @@ class Renderer:
     def stop(self):
         if self._proc:
             self._proc.terminate()
-            self._proc = None
+            return
 
         self._queue = []
         self._finished = True
-        self.mod.play = 0
         self.mod.render_mode = 0
