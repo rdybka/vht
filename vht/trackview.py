@@ -2047,8 +2047,9 @@ class TrackView(Gtk.DrawingArea):
                 return True
 
         if cfg.key["track_clear"].matches(event):
-            self.undo_buff.restore()
+            self.undo_buff.add_state()
             self.trk.clear()
+            self.undo_buff.add_state()
             self.trk.kill_notes()
             self.redraw()
             return True

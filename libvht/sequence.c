@@ -227,14 +227,6 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 	if (seq->pos - floor(seq->pos) < 0.0000001) {
 		int r = (int)seq->pos;
 
-		if (r >= seq->length) {
-			if (mod->render_mode == 1 && seq->playing) {
-				mod->render_mode = 3;
-				mod->end_time = mod->clt->jack_last_frame;
-				return;
-			}
-		}
-
 		while (r >= seq->length) {
 			r-=seq->length;
 		}
@@ -348,6 +340,14 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 	}
 
 	seq->pos += period;
+
+	if (seq->pos >= seq->length) {
+		if (mod->render_mode == 1 && seq->playing) {
+
+			mod->render_mode = 3;
+			mod->end_time = mod->clt->jack_last_frame;
+		}
+	}
 
 	if (seq->pos > seq->length) {
 		seq->pos -= seq->length;

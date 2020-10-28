@@ -57,6 +57,23 @@ class Renderer:
         if self._pre_delay_start:
             return True
 
+        if self.mod.render_mode == 3 and self.mod.play == 0:
+            if self._queue:
+                self.start_queue()
+            else:
+                self._finished = True
+                if self._proc:
+                    self._proc.terminate()
+                self.mod.render_mode = 0
+                if self._seqs:
+                    for s in self.mod:
+                        s.playing = 0
+                    for s in self._seqs:
+                        self.mod[s].playing = 1
+
+        if self._finished:
+            return False
+
         if not self._proc:
             return False
 
@@ -68,13 +85,14 @@ class Renderer:
                 self.start_queue()
             else:
                 self._finished = True
+                self.mod.render_mode = 0
                 if self._seqs:
                     for s in self.mod:
                         s.playing = 0
                     for s in self._seqs:
                         self.mod[s].playing = 1
 
-            return False
+                return False
 
         return True
 
@@ -186,8 +204,11 @@ class Renderer:
         self._pre_delay_start = datetime.now()
 
     def stop(self):
-        if self.running:
+        if self._proc:
             self._proc.terminate()
+            self._proc = None
 
         self._queue = []
         self._finished = True
+        self.mod.play = 0
+        self.mod.render_mode = 0

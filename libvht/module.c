@@ -54,12 +54,17 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 		return;
 	}
 
-	if (mod->render_mode == 3) {
+	if (mod->render_mode == 3 && !mod->playing) {
+		return;
+	}
+
+	if (mod->render_mode == 3 && mod->playing) {
 		double t = (curr_frames - mod->end_time) / (double)mod->clt->jack_sample_rate;
 		if (t > mod->render_lead_out) {
 			midi_set_freewheel(mod->clt, 0);
 			mod->playing = 0;
-			mod->render_mode = 0;
+			return;
+			//mod->render_mode = 0;
 		}
 	}
 
@@ -249,6 +254,8 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 
 void module_set_render_mode(module *mod, int mode) {
 	mod->render_mode = mode;
+	//if (mode == 0)
+	//midi_set_freewheel(mod->clt, 0);
 }
 
 int module_get_render_mode(module *mod) {
@@ -257,8 +264,10 @@ int module_get_render_mode(module *mod) {
 
 void module_play(module *mod, int play) {
 	module_excl_in(mod);
+	int prev_state = mod->playing;
 	mod->playing = play;
-	if (mod->render_mode > 0) {
+
+	if (mod->render_mode > 0 && mod->playing && !prev_state) {
 		midi_set_freewheel(mod->clt, 1);
 	}
 

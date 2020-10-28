@@ -222,6 +222,10 @@ class PreferencesWin(Gtk.Window):
             if prt.type == "midi" and not prt.mine and prt.output:
                 pp.append(prt.name)
 
+        dinp = self.cfg.midi_default_input
+        if dinp and dinp not in pp:
+            pp.append(dinp)
+
         for prt in pp:
             cmb.append_text(prt)
 
@@ -244,6 +248,10 @@ class PreferencesWin(Gtk.Window):
         for prt in self.mod.ports:
             if prt.type == "midi" and not prt.mine and prt.input:
                 pp.append(prt.name)
+
+        doutp = self.cfg.midi_default_output
+        if doutp and doutp not in pp:
+            pp.append(doutp)
 
         for prt in pp:
             cmb.append_text(prt)

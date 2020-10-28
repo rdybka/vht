@@ -139,6 +139,7 @@ class SequenceView(Gtk.Box):
         if event.button == cfg.delete_button:
             TrackView.leave_all()
             mod.record = 0
+            mod.timeline_view.curr_change = mod.timeline_view.highlight_change = None
 
     def on_sv_vadj_changed(self, adj):
         dest_adj = None

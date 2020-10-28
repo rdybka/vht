@@ -185,6 +185,8 @@ class RenderWin(Gtk.Window):
                     self.cfg.render_meter,
                 )
 
+                wdg.set_label("Stop")
+
             if self.cfg.render_mode == 1:
                 self.rend.start_timeline(
                     self.cfg.render_folder,
@@ -194,6 +196,8 @@ class RenderWin(Gtk.Window):
                 )
 
                 self.set_modal(True)
+                wdg.set_label("Working")
+                wdg.set_sensitive(False)
 
             if self.cfg.render_mode == 0:
                 self.rend.start_sequence(
@@ -204,9 +208,11 @@ class RenderWin(Gtk.Window):
                 )
 
                 self.set_modal(True)
+                wdg.set_label("Working")
+                wdg.set_sensitive(False)
 
             self.add_tick_callback(self.tick)
-            wdg.set_label("Stop")
+
             self.secs_button.set_sensitive(False)
             self.butt_fc.set_sensitive(False)
             self.format_cmb.set_sensitive(False)
@@ -240,6 +246,7 @@ class RenderWin(Gtk.Window):
             self.exit_on()
             self.capturing = False
             self.rbutt.set_label("Start")
+            self.rbutt.set_sensitive(True)
             if self.cfg.render_mode < 2:
                 self.secs_button.set_sensitive(True)
                 self.meter_cmb.set_sensitive(False)
