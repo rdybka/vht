@@ -20,7 +20,7 @@ it tries to do one thing well
 
 ## deps
 ```
-fedora - python3-devel jack-audio-connection-kit-devel jack-capture
+fedora - python3-devel jack-audio-connection-kit-devel jack_capture
 ubuntu - build-essential python3-dev python3-setuptools libjack-jackd2-dev jack-capture
 
 and the usual jack/GNOME stuff
