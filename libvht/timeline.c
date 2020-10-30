@@ -247,7 +247,12 @@ void timeline_update(timeline *tl) {
 	if (tl->loop_end > tl->length) {
 		tl->loop_end = tl->length;
 	}
+
 	timeline_excl_out(tl);
+
+	for (int c = tl->nchanges -1; c > 0; c--)
+		if (tl->changes[c].row > tl->length)
+			timechange_del(tl, c);
 }
 
 int timechange_compare(const void *a, const void *b) {
@@ -255,11 +260,6 @@ int timechange_compare(const void *a, const void *b) {
 }
 
 void timeline_update_inner(timeline *tl) {
-	int extend_loop = 0;
-
-	if (tl->loop_end == tl->length)
-		extend_loop = 1;
-
 	tl->length = 32;
 	tl->ncols = 0;
 
@@ -305,10 +305,6 @@ void timeline_update_inner(timeline *tl) {
 
 	if (tl->pos > tl->length)
 		tl->pos = 0;
-
-	if (extend_loop) {
-		tl->loop_end = tl->length;
-	}
 }
 
 int tick_cmp(const void *t1, const void *t2) {
