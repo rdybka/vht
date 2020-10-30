@@ -335,8 +335,8 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 		}
 
 		for (int t = 0; t < seq->ntrk; t++) {
-			if (seq->parent > -1)
-				seq->trk[t]->loop = 0;
+			//if (seq->parent > -1)
+			//	seq->trk[t]->loop = 0;
 
 			track_advance(seq->trk[t], period, nframes);
 		}
