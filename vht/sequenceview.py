@@ -974,6 +974,9 @@ class SequenceView(Gtk.Box):
 
                 for k in cfg.midi_in.keys():
                     m = cfg.midi_in[k]
+                    if not m:
+                        continue
+
                     if midin["channel"] == m[0]:
                         if midin["type"] == m[1]:
                             if midin["note"] == m[2]:
