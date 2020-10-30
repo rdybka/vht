@@ -39,6 +39,7 @@ midi_client *midi_client_new(void *mod) {
 	clt->dump_notes = 0;
 	clt->ports = 0;
 	clt->ports_changed = 0;
+	clt->jack_client_name = 0;
 
 	for (int p = 0; p < MIDI_CLIENT_MAX_PORTS; p++) {
 		clt->ports_to_open[p] = 0;
@@ -86,6 +87,8 @@ int midi_start(midi_client *clt, char *clt_name) {
 		fprintf (stderr, "%s\n", clt->error);
 		return 1;
 	}
+
+	clt->jack_client_name = jack_get_client_name(clt->jack_client);
 
 	clt->running = 1;
 
@@ -580,7 +583,7 @@ char *midi_get_output_port_name(midi_client *clt, int prt) {
 	static char pname[256];
 	char buff[256];
 	pname[0] = 0;
-	sprintf(buff, "%s:", MIDI_CLIENT_NAME);
+	sprintf(buff, "%s:", clt->jack_client_name);
 	strcat(pname, buff);
 	sprintf(buff, MIDI_CLIENT_PORT_NAME, prt);
 	strcat(pname, buff);

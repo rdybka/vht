@@ -63,6 +63,7 @@ typedef struct midi_client_t {
 	midi_event midi_queue_buffer[MIDI_CLIENT_MAX_PORTS][MIDI_EVT_BUFFER_LENGTH];
 	midi_event midi_in_buffer[MIDI_EVT_BUFFER_LENGTH];
 	midi_event midi_ignore_buffer[MIDI_EVT_BUFFER_LENGTH];
+	char *jack_client_name;
 
 	const char **ports;
 	int ports_changed;
