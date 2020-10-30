@@ -195,7 +195,7 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 			for (int s = 0; s < mod->nseq; s++) {
 				sequence *seq = mod->seq[s];
 				if (seq->lost) {
-					seq->pos = fmod(mod->song_pos * seq->rpb * 2, seq->length);
+					seq->pos = fmod(mod->song_pos * seq->rpb * (mod->bpm / 60.0), seq->length);
 
 					for (int t = 0; t < seq->ntrk; t++) {
 						seq->trk[t]->pos = seq->pos;
@@ -213,7 +213,6 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 					}
 
 				sequence_advance(seq, pp, frm);
-
 			}
 		}
 
@@ -245,7 +244,6 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 
 					int frm = (double)mod->clt->jack_buffer_size * (fabs(mod->switch_delay) / per);
 
-					//printf("correction %f %d!!!!\n", mod->switch_delay, frm);
 					if (frm) {
 						timeline_advance(mod->tline, -mod->switch_delay, frm);
 					}
@@ -407,7 +405,11 @@ void module_add_sequence(module *mod, sequence *seq) {
 	seq->clt = mod->clt;
 
 	if (!mod->play_mode) {
-		seq->pos = mod->song_pos;
+		if (mod->nseq > 1) {
+			seq->pos = mod->seq[0]->pos;
+			seq->lost = 0;
+		}
+		//seq->pos = mod->song_pos;
 	} else {
 		if (mod->nseq) {
 			seq->pos = mod->seq[0]->pos;
@@ -542,6 +544,9 @@ void module_set_play_mode(module *mod, int m) {
 		}
 
 		if (mod->play_mode == 1) {
+			for (int s = 0; s < mod->nseq; s++) {
+				mod->seq[s]->lost = 0;
+			}
 			mod->play_mode = 0;
 		}
 	} else {
