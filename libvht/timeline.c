@@ -921,7 +921,7 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 					return;
 				}
 
-				return;
+				//return;
 			}
 		}
 

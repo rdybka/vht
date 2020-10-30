@@ -743,7 +743,6 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 
 				if (fdelay >= 0.0 && frm < clt->jack_buffer_size) {
 					if (trk->playing) {
-						//printf("--- %f %d %f\n", fdelay, frm, delay);
 						track_play_row(trk, nn, c, frm);
 					}
 				}

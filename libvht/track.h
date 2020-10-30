@@ -79,7 +79,7 @@ typedef struct track_t {
 	rec_upd updates[MIDI_EVT_BUFFER_LENGTH];
 	int cur_rec_update;
 
-	int loop;  // extend in timeline
+	int loop;
 
 	pthread_mutex_t excl; // for atomic row access
 	pthread_mutex_t exclrec; // for row changes
