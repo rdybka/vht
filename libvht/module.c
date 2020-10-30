@@ -50,6 +50,16 @@ int trg_equal(trigger *trg, midi_event *mev) {
 
 // the god-function
 void module_advance(module *mod, jack_nframes_t curr_frames) {
+	if (mod->playing < 0) {
+		mod->playing++;
+		if (mod->playing == 0) {
+			mod->playing = 1;
+			mod->zero_time = curr_frames;
+		} else {
+			return;
+		}
+	}
+
 	if (mod->nseq == 0) {
 		return;
 	}
@@ -180,10 +190,6 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 		}
 	}
 
-	if (mod->render_mode == 3) {
-
-	}
-
 	if (mod->playing) {
 		if (mod->play_mode == 0) {
 			for (int s = 0; s < mod->nseq; s++) {
@@ -197,7 +203,17 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 					seq->lost = 0;
 				}
 
-				sequence_advance(seq, period * seq->rpb * (mod->bpm / 60.0), mod->clt->jack_buffer_size);
+				double pp = period * seq->rpb * (mod->bpm / 60.0);
+				int frm = mod->clt->jack_buffer_size;
+				if (mod->render_mode == 1) // don't overfeed while exporting
+					if (seq->pos + pp > seq->length) {
+						double ppp = seq->length - seq->pos;
+						frm = frm * (ppp / pp);
+						pp = ppp;
+					}
+
+				sequence_advance(seq, pp, frm);
+
 			}
 		}
 
@@ -268,6 +284,7 @@ void module_play(module *mod, int play) {
 	mod->playing = play;
 
 	if (mod->render_mode > 0 && mod->playing && !prev_state) {
+		mod->playing = -2; // this will skip first callback from jack
 		midi_set_freewheel(mod->clt, 1);
 	}
 
@@ -276,10 +293,9 @@ void module_play(module *mod, int play) {
 	if (play == 0)
 		module_mute(mod);
 
-	if (mod->transp) {
+	if (mod->transp && !mod->render_mode) {
 		midi_send_transp(mod->clt, play, -1);
 	}
-
 }
 
 module *module_new() {

@@ -227,7 +227,6 @@ void midi_buffer_add(midi_client *clt, int port, midi_event evt) {
 		return;
 
 	clt->midi_buffer[port][clt->curr_midi_event[port]++] = evt;
-	//printf("buff add %d %d\n", evt.note, evt.time);
 }
 
 int midi_buffer_compare(const void *a, const void *b) {

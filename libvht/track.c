@@ -532,8 +532,9 @@ int col_last_note(track *trk, int col, double pos) {
 void track_play_row(track *trk, int pos, int c, int delay) {
 	row r;
 
-	if (trk->lplayed[c] == pos)
+	if (trk->lplayed[c] == pos) {
 		return;
+	}
 
 	track_get_row(trk, c, pos, &r);
 	trk->lplayed[c] = pos;
@@ -566,7 +567,6 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 		evt.note = r.note;
 		evt.velocity = r.velocity;
 
-		//printf("note: %d %d \n", evt.note, evt.time);
 		midi_buffer_add(trk->clt, trk->port, evt);
 
 		// fix wandering notes?
@@ -725,9 +725,13 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 		for (int n = row_start; n <= row_end; n++) {
 			int nn = n;
 
-			if (trk->loop)
-				if (nn >= trk->nrows)
-					nn = 0;
+
+			if (nn >= trk->nrows) {
+				nn = 0;
+				if (!trk->loop) {
+					return;
+				}
+			}
 
 			if (nn < trk->nrows) {
 				row r;

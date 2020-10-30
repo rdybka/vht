@@ -212,7 +212,6 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 	double p = ceil(seq->pos) - seq->pos;
 
 	if (period - p > 0.00000001) {
-
 		jack_nframes_t frm = nframes;
 		frm *= p / period;
 
@@ -335,7 +334,7 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 		}
 
 		for (int t = 0; t < seq->ntrk; t++) {
-			//if (seq->parent > -1)
+			// if (seq->parent > -1 || mod->render_mode == 1)
 			//	seq->trk[t]->loop = 0;
 
 			track_advance(seq->trk[t], period, nframes);
