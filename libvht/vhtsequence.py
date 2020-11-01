@@ -268,10 +268,10 @@ class VHTSequence(Iterable):
         libcvht.sequence_trigger_cue(self._seq_handle)
 
     def trigger_play_on(self):
-        libcvht.sequence_trigger_play_on(self._seq_handle)
+        libcvht.sequence_trigger_play_on(self._seq_handle, 1)
 
     def trigger_play_off(self):
-        libcvht.sequence_trigger_play_off(self._seq_handle)
+        libcvht.sequence_trigger_play_off(self._seq_handle, 1)
 
     def __str__(self):
         ret = ""

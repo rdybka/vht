@@ -374,11 +374,11 @@ def sequence_trigger_mute(seq):
 def sequence_trigger_cue(seq):
     return _libcvht.sequence_trigger_cue(seq)
 
-def sequence_trigger_play_on(seq):
-    return _libcvht.sequence_trigger_play_on(seq)
+def sequence_trigger_play_on(seq, blk):
+    return _libcvht.sequence_trigger_play_on(seq, blk)
 
-def sequence_trigger_play_off(seq):
-    return _libcvht.sequence_trigger_play_off(seq)
+def sequence_trigger_play_off(seq, blk):
+    return _libcvht.sequence_trigger_play_off(seq, blk)
 
 def sequence_get_playing(seq):
     return _libcvht.sequence_get_playing(seq)

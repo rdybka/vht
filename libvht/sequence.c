@@ -188,6 +188,8 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 	if (mod->render_mode == 3)
 		return;
 
+	//printf("*** %d %d %d %d -", seq->trg_times[0], seq->trg_times[1], seq->trg_times[2], seq->trg_times[3]);
+
 	if ((seq->trg_quantise == 0) && (seq->trg_times[2] == -2)) {
 		seq->trg_times[2] = -1;
 		if (seq->playing && seq->trg_times[3] != -2) {
@@ -200,7 +202,7 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 			seq->playing = 1;
 			seq->pos = 0;
 			if (seq->trg_playmode == TRIGGER_ONESHOT)
-				seq->trg_times[3] = -4;
+				seq->trg_times[3] = -3;
 
 			for (int t = 0; t < seq->ntrk; t++) {
 				track_reset(seq->trk[t]);
@@ -208,6 +210,7 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 		}
 	}
 
+	//printf("> %d %d %d %d\n", seq->trg_times[0], seq->trg_times[1], seq->trg_times[2], seq->trg_times[3]);
 
 	double p = ceil(seq->pos) - seq->pos;
 
@@ -230,7 +233,7 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 			r-=seq->length;
 		}
 
-		// printf("%d %d %d %d\n", seq->trg_times[0], seq->trg_times[1], seq->trg_times[2], seq->trg_times[3]);
+		//printf("%03d %d %d %d %d\n", r, seq->trg_times[0], seq->trg_times[1], seq->trg_times[2], seq->trg_times[3]);
 
 		// quantised play
 		if (seq->trg_times[2] == r) {
@@ -260,8 +263,10 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 			seq->trg_times[3] = 0;
 			seq->playing = 0;
 			seq->lost = 1;
-			for (int t = 0; t < seq->ntrk; t++)
-				track_reset(seq->trk[t]);
+			for (int t = 0; t < seq->ntrk; t++) {
+				track_kill_notes(seq->trk[t]);
+				//track_reset(seq->trk[t]);
+			}
 		}
 
 		if(r == 0 && seq->trg_playmode == TRIGGER_ONESHOT && seq->playing) {
@@ -334,9 +339,6 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 		}
 
 		for (int t = 0; t < seq->ntrk; t++) {
-			// if (seq->parent > -1 || mod->render_mode == 1)
-			//	seq->trk[t]->loop = 0;
-
 			track_advance(seq->trk[t], period, nframes);
 		}
 	}
@@ -345,7 +347,6 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 
 	if (seq->pos >= seq->length) {
 		if (mod->render_mode == 1 && seq->playing) {
-
 			mod->render_mode = 3;
 			mod->end_time = mod->clt->jack_last_frame;
 		}
@@ -519,17 +520,19 @@ void sequence_trigger_cue(sequence *seq) {
 	}
 }
 
-void sequence_trigger_play_on(sequence *seq) {
-	//printf("play %d\n", seq->index);
+void sequence_trigger_play_on(sequence *seq, int blk) {
 	midi_client *clt = (midi_client *)seq->clt;
 	module *mod = (module *)clt->mod_ref;
 
+	if (blk)
+		module_excl_in(mod);
+
 	if (!mod->playing)
-		return;
+		goto done;
 
 	if ((seq->trg_playmode == TRIGGER_HOLD) && (seq->playing)) {
 		seq->trg_times[3] = 0;
-		return;
+		goto done;
 	}
 
 	if (seq->playing) {
@@ -539,7 +542,7 @@ void sequence_trigger_play_on(sequence *seq) {
 			np-=seq->length;
 
 		seq->trg_times[2] = np;
-		return;
+		goto done;
 	}
 
 	if (seq->trg_quantise == 0) {
@@ -555,15 +558,21 @@ void sequence_trigger_play_on(sequence *seq) {
 
 		seq->trg_times[2] = np;
 	}
+
+done:
+	if (blk)
+		module_excl_out(mod);
 }
 
-void sequence_trigger_play_off(sequence *seq) {
-	//printf("release %d : %d\n", seq->index, seq->playing);
+void sequence_trigger_play_off(sequence *seq, int blk) {
 	midi_client *clt = (midi_client *)seq->clt;
 	module *mod = (module *)clt->mod_ref;
 
+	if (blk)
+		module_excl_in(mod);
+
 	if (!mod->playing)
-		return;
+		goto done;
 
 	if (seq->trg_playmode == TRIGGER_HOLD) {
 		if (seq->playing) {
@@ -571,13 +580,17 @@ void sequence_trigger_play_off(sequence *seq) {
 		}  else {
 			seq->playing = 0;
 			seq->lost = 1;
+			seq->pos = 0;
 			seq->trg_times[3] = 0;
 			seq->trg_times[2] = -1;
 			for (int t = 0; t < seq->ntrk; t++)
 				track_reset(seq->trk[t]);
-
 		}
 	}
+
+done:
+	if (blk)
+		module_excl_out(mod);
 }
 
 int sequence_get_thumb_dirty(sequence *seq) {

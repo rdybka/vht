@@ -111,6 +111,9 @@ void track_reset(track *trk) {
 	trk->qc1_last = -1;
 	trk->qc2_last = -1;
 	trk->loop = 1;
+	for (int c = 0; c < trk->ncols; c++) {
+		trk->lplayed[c] = -1;
+	}
 }
 
 void track_set_row(track *trk, int c, int n, int type, int note, int velocity, int delay) {

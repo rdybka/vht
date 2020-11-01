@@ -138,7 +138,7 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 					}
 
 					if ((mod->seq[s]->triggers[2].type) && trg_equal(&mod->seq[s]->triggers[2], &mev)) {
-						sequence_trigger_play_on(mod->seq[s]);
+						sequence_trigger_play_on(mod->seq[s], 0);
 					}
 				}
 
@@ -148,7 +148,7 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 				        (mev.channel == trg.channel) && \
 				        (mev.type == note_off) && \
 				        (mev.note == trg.note)) {
-					sequence_trigger_play_off(mod->seq[s]);
+					sequence_trigger_play_off(mod->seq[s], 0);
 				}
 
 				if ((mod->seq[s]->triggers[2].type == control_change) && \
@@ -156,7 +156,7 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 				        (mev.type == trg.type) && \
 				        (mev.note == trg.note) && \
 				        (mev.velocity == 0)) {
-					sequence_trigger_play_off(mod->seq[s]);
+					sequence_trigger_play_off(mod->seq[s], 0);
 				}
 			}
 
