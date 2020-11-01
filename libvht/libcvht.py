@@ -140,6 +140,9 @@ def module_get_render_mode(mod):
 def module_set_render_lead_out(mod, lead_out):
     return _libcvht.module_set_render_lead_out(mod, lead_out)
 
+def module_set_freewheel(mod, on):
+    return _libcvht.module_set_freewheel(mod, on)
+
 def module_is_playing(mod):
     return _libcvht.module_is_playing(mod)
 

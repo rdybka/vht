@@ -71,10 +71,8 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 	if (mod->render_mode == 3 && mod->playing) {
 		double t = (curr_frames - mod->end_time) / (double)mod->clt->jack_sample_rate;
 		if (t > mod->render_lead_out) {
-			midi_set_freewheel(mod->clt, 0);
 			mod->playing = 0;
 			return;
-			//mod->render_mode = 0;
 		}
 	}
 
@@ -605,3 +603,6 @@ void module_synch_transp(module *mod, int play, jack_nframes_t frames) {
 	module_excl_out(mod);
 }
 
+void module_set_freewheel(module *mod, int on) {
+	midi_set_freewheel(mod->clt, on);
+}

@@ -572,3 +572,9 @@ class VHTModule(Iterable):
                     rr.delay = row["delay"]
 
         return sq
+
+    def freewheel_off(self):
+        libcvht.module_set_freewheel(self._mod_handle, 0)
+
+    def freewheel_on(self):
+        libcvht.module_set_freewheel(self._mod_handle, 1)

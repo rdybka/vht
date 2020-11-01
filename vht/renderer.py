@@ -58,6 +58,7 @@ class Renderer:
             return True
 
         if self.mod.render_mode == 3 and self.mod.play == 0:
+            self.mod.freewheel_off()
             if self._proc:
                 stdout, stderr = self._proc.communicate(input="\n", timeout=5)
                 self._proc = None

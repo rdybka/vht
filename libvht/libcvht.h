@@ -51,6 +51,7 @@ extern void module_play(module *mod, int);
 extern void module_set_render_mode(module *mod, int mode);
 extern int module_get_render_mode(module *mod);
 extern void module_set_render_lead_out(module *mod, int lead_out);
+extern void module_set_freewheel(module *mod, int on);
 extern int module_is_playing(module *mod);
 extern void module_record(module *mod, int);
 extern int module_is_recording(module *mod);

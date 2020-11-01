@@ -3792,6 +3792,35 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_module_set_freewheel(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "module_set_freewheel", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_set_freewheel" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "module_set_freewheel" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  module_set_freewheel(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_module_is_playing(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   module *arg1 = (module *) 0 ;
@@ -10252,6 +10281,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "module_set_render_mode", _wrap_module_set_render_mode, METH_VARARGS, NULL},
 	 { "module_get_render_mode", _wrap_module_get_render_mode, METH_O, NULL},
 	 { "module_set_render_lead_out", _wrap_module_set_render_lead_out, METH_VARARGS, NULL},
+	 { "module_set_freewheel", _wrap_module_set_freewheel, METH_VARARGS, NULL},
 	 { "module_is_playing", _wrap_module_is_playing, METH_O, NULL},
 	 { "module_record", _wrap_module_record, METH_VARARGS, NULL},
 	 { "module_is_recording", _wrap_module_is_recording, METH_O, NULL},

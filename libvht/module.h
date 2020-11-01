@@ -94,6 +94,6 @@ void module_set_render_mode(module *mod, int mode);
 int module_get_render_mode(module *mod);
 
 void module_set_render_lead_out(module *mod, int lead_out);
-
+void module_set_freewheel(module *mod, int on);
 
 #endif //__MODULE_H__
