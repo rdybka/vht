@@ -1023,13 +1023,16 @@ void track_resize(track *trk, int size) {
 	pthread_mutex_lock(&trk->excl);
 
 	// no need to realloc?
-	if (trk->arows >= size) {
+	/*if (trk->arows >= size) {
 		trk->nrows = size;
 		trk->resync = 1;
+
+
+
 		pthread_mutex_unlock(&trk->excl);
 		return;
 	}
-
+	*/
 	trk->arows = size * 2;
 
 	pthread_mutex_lock(&trk->exclctrl);
@@ -1048,19 +1051,21 @@ void track_resize(track *trk, int size) {
 	for (int c = 0; c < trk->nctrl; c++) {
 		trk->ctrl[c] = realloc(trk->ctrl[c], sizeof(int) * trk->arows * trk->ctrlpr);
 		trk->crows[c] = realloc(trk->crows[c], sizeof(ctrlrow) * trk->arows);
-		for (int n = trk->nrows; n < trk->arows; n++) {
+		for (int n = trk->nrows - 1; n < trk->arows; n++) {
 			trk->crows[c][n].velocity = -1;
 			trk->crows[c][n].linked = 0;
 			trk->crows[c][n].smooth = 0;
 			trk->crows[c][n].anchor = 0;
 		}
 
-		envelope_resize(trk->env[c], trk->arows, trk->ctrlpr);
-		for (int n = trk->nrows; n < trk->arows; n++) {
+		for (int n = trk->nrows - 1; n < trk->arows; n++) {
 			for (int nn = 0; nn < trk->ctrlpr; nn++) {
 				trk->ctrl[c][(n * trk->ctrlpr) + nn] = -1;
 			}
 		}
+
+		envelope_resize(trk->env[c], trk->nrows, trk->ctrlpr);
+		track_ctrl_refresh_envelope(trk, c);
 	}
 
 	pthread_mutex_unlock(&trk->exclctrl);

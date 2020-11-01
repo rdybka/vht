@@ -15,13 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from vht import *
-import cairo
-from gi.repository import GObject, Gdk, Gtk, Gio
-from datetime import datetime
 import gi
+import cairo
+from datetime import datetime
+from vht import *
+from vht.trackview import TrackView
 
 gi.require_version("Gtk", "3.0")
+from gi.repository import GObject, Gdk, Gtk, Gio
 
 
 class SequencePropViewPopover(Gtk.Popover):
@@ -124,6 +125,12 @@ class SequencePropViewPopover(Gtk.Popover):
         val = int(adj.get_value())
         if self.seq.length == val:
             return
+
+        ed = None
+        if mod.active_track:
+            ed = mod.active_track.edit
+        if ed and val <= ed[1]:
+            TrackView.leave_all()
 
         self.seq.length = val
         for trk in self.seq:
