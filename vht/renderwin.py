@@ -221,8 +221,8 @@ class RenderWin(Gtk.Window):
             return
 
         self.capturing = False
-        self.rend.stop()
         self.exit_on()
+
         wdg.set_label("Start")
         if self.cfg.render_mode < 2:
             self.secs_button.set_sensitive(True)
@@ -233,6 +233,7 @@ class RenderWin(Gtk.Window):
         self.butt_fc.set_sensitive(True)
         self.format_cmb.set_sensitive(True)
         self.mode_cmb.set_sensitive(True)
+        self.rend.stop()
 
     def tick(self, wdg, param):
         if not self.capturing:

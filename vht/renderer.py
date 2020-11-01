@@ -58,6 +58,9 @@ class Renderer:
             return True
 
         if self.mod.render_mode == 3 and self.mod.play == 0:
+            if self._proc:
+                stdout, stderr = self._proc.communicate(input="\n", timeout=5)
+                self._proc = None
             if self._queue:
                 self.start_queue()
             else:
@@ -77,12 +80,12 @@ class Renderer:
         if not self._proc:
             return False
 
-        p = self._proc.poll()
+        # p = self._proc.poll()
 
-        if self._proc.returncode != None:
-            self._finished = True
-            self.mod.render_mode = 0
-            return False
+        # if self._proc.returncode != None:
+        #    self._finished = True
+        #    self.mod.render_mode = 0
+        #    return False
 
         return True
 
@@ -107,7 +110,11 @@ class Renderer:
             opts.append(meters[meter])
 
         self._proc = subprocess.Popen(
-            opts, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            opts,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
         )
 
         self._finished = False
@@ -123,7 +130,7 @@ class Renderer:
 
         opts = ["jack_capture"]
         opts.append("-jf")
-        opts.append("--daemon")
+        # opts.append("--daemon")
         opts.append("-f")
         opts.append(fmt)
         opts.append("-fp")
@@ -145,7 +152,11 @@ class Renderer:
                 m.playing = 0
 
         self._proc = subprocess.Popen(
-            opts  # , stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            opts,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
         )
 
         self._pre_delay_start = datetime.now()
@@ -170,7 +181,7 @@ class Renderer:
 
         opts = ["jack_capture"]
         opts.append("-jf")
-        opts.append("--daemon")
+        # opts.append("--daemon")
         opts.append("-f")
         opts.append(fmt)
         opts.append("-fp")
@@ -188,16 +199,19 @@ class Renderer:
             self.mod.timeline.pos = self.mod.timeline.loop_start
 
         self._proc = subprocess.Popen(
-            opts  # , stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            opts,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            text=True,
         )
 
         self._pre_delay_start = datetime.now()
 
     def stop(self):
         if self._proc:
-            self._proc.terminate()
-            return
-
-        self._queue = []
-        self._finished = True
-        self.mod.render_mode = 0
+            stdout, stderr = self._proc.communicate(input="\n", timeout=5)
+            self._proc = None
+            self._queue = []
+            self._finished = True
+            self.mod.render_mode = 0
