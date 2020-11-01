@@ -86,7 +86,7 @@ shorts = {
         ("Port down", "port_down"),
         ("Resend patch", "track_resend_patch"),
     ],
-    "Track": [
+    "Track cont.": [
         ("Add", "track_add"),
         ("Delete", "track_del"),
         ("Clear", "track_clear"),
