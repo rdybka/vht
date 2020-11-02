@@ -463,7 +463,8 @@ class MainWin(Gtk.ApplicationWindow):
             if type(curr) is tuple:
                 if curr[1] == seq_id[1]:
                     strp = mod.timeline.strips[curr[1]]
-                    if (prev := strp.prev_id) :
+                    prev = strp.prev_id
+                    if prev:
                         mod.mainwin.sequence_view.switch(prev)
                     else:
                         mod.mainwin.sequence_view.switch(strp.col)

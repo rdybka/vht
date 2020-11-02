@@ -86,7 +86,8 @@ class VHTTimeline:
         return libcvht.timeline_get_strip_for_qb(self._tl_handle, col, int(qb))
 
     def last_strip(self, col, qb):  # last strip (if any) for given col and qb
-        if (ls := libcvht.timeline_get_last_strip(self._tl_handle, col, int(qb))) > -1:
+        ls = libcvht.timeline_get_last_strip(self._tl_handle, col, int(qb))
+        if ls > -1:
             return self.strips[ls]
         else:
             return None

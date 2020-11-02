@@ -44,7 +44,8 @@ class VHTExtras(MutableMapping):
         self.read()
 
     def read(self):
-        if s := self._func_get():
+        s = self._func_get()
+        if s:
             self._store = json.loads(s)
         else:
             self._store = dict()
