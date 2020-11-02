@@ -275,7 +275,7 @@ class TimelineView(Gtk.DrawingArea):
                 - mod.timeline.qb2t(self.qb_start)
             ) / self.spl
 
-        if lsr > -1 and ler > -1:
+        if mod.timeline.loop_start > -1 and mod.timeline.loop_end > -1:
             xx = w - self._txt_height * 1.2
 
             cr.move_to(w - tw / 2, lsr)
