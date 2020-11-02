@@ -705,6 +705,9 @@ class TrackPropViewPopover(Gtk.Popover):
 
     def on_nrows_changed(self, adj):
         self.trk.nrows = int(adj.get_value())
+        if self.trkview.edit and self.trkview.edit[1] >= self.trk.nrows:
+            self.trkview.leave_all()
+
         self.trkview.select_end, self.trkview.select_start = None, None
         self.parent.seqview.recalculate_row_spacing()
 

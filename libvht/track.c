@@ -1082,6 +1082,8 @@ void track_resize(track *trk, int size) {
 
 void track_set_nrows(track *trk, int n) {
 	track_resize(trk, n);
+	trk->resync = 1;
+	trk->dirty = 1;
 }
 
 void track_set_nsrows(track *trk, int n) {
