@@ -446,6 +446,25 @@ class MainWin(Gtk.ApplicationWindow):
             if nxt == len(mod) - 1:
                 nxt = max(nxt - 1, 0)
 
+            if curr == seq_id:
+                if curr < len(mod) - 1:
+                    self.sequence_view.switch(curr + 1)
+                else:
+                    self.sequence_view.switch(curr - 1)
+
+                self.gui_del_seq(curr)
+                return
+
+            # remove cached trks from substrips
+            for strp in mod.timeline.strips:
+                if strp.col == seq_id:
+                    for trk in strp.seq:
+                        if int(trk) in self.sequence_view.trk_cache:
+                            del self.sequence_view.trk_cache[int(trk)]
+
+                        if int(trk) in self.sequence_view.prop_view.trk_prop_cache:
+                            del self.sequence_view.prop_view.trk_prop_cache[int(trk)]
+
             for trk in mod[seq_id]:
                 if int(trk) in self.sequence_view.trk_cache:
                     del self.sequence_view.trk_cache[int(trk)]
