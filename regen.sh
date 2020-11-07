@@ -13,6 +13,7 @@ rm -rf __pycache__
 rm -rf vht/__pycache__
 rm -rf libvht/__pycache__
 rm -rf build
+rm -rf deb_dist
 rm -f dist/*.gz
 rm -f MANIFEST
 rm -rf libvht/*.pyc

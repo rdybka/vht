@@ -97,6 +97,13 @@ class VHTSequence(Iterable):
 
         if tstr:
             if self.relative_length > tstr.length:
+                if (
+                    self._mod.timeline.loop_start == tstr.start
+                    and self._mod.timeline.loop_end - self._mod.timeline.loop_start
+                    == tstr.length
+                ):
+                    self._mod.timeline.loop_end = tstr.start + tstr.seq.relative_length
+
                 tstr.length = self.relative_length
 
         libcvht.timeline_update(self._mod.timeline._tl_handle)
@@ -113,6 +120,13 @@ class VHTSequence(Iterable):
         libcvht.sequence_halve(self._seq_handle)
 
         if tstr:
+            if (
+                self._mod.timeline.loop_start == tstr.start
+                and self._mod.timeline.loop_end - self._mod.timeline.loop_start
+                == tstr.length
+            ):
+                self._mod.timeline.loop_end = tstr.start + tstr.seq.relative_length
+
             tstr.length = self.relative_length
 
         libcvht.timeline_update(self._mod.timeline._tl_handle)
@@ -185,6 +199,13 @@ class VHTSequence(Iterable):
         libcvht.sequence_set_length(self._seq_handle, value)
 
         if tstr:
+            if (
+                self._mod.timeline.loop_start == tstr.start
+                and self._mod.timeline.loop_end - self._mod.timeline.loop_start
+                == tstr.length
+            ):
+                self._mod.timeline.loop_end = tstr.start + tstr.seq.relative_length
+
             tstr.length = tstr.seq.relative_length
             libcvht.timeline_update(self._mod.timeline._tl_handle)
 

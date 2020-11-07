@@ -1,1 +1,2 @@
 include libvht/*.h
+include LICENSE

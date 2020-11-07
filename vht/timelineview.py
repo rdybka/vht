@@ -727,6 +727,7 @@ class TimelineView(Gtk.DrawingArea):
     def on_button_press(self, widget, event):
         self.hint = None
 
+        # filter double clicks
         if event.button == 2:
             if (
                 event.type == Gdk.EventType._2BUTTON_PRESS
@@ -734,16 +735,31 @@ class TimelineView(Gtk.DrawingArea):
             ):
                 return
 
+        # reset loop
         if self.highlight_loop:
             if event.button == cfg.delete_button:
-                mod.timeline.loop_start = 0
-                mod.timeline.loop_end = mod.timeline.nqb
+                if (
+                    mod.timeline.loop_start == 0
+                    and mod.timeline.loop_end == mod.timeline.nqb
+                ):
+                    strp = (
+                        mod.timeline.strips[mod.curr_seq[1]]
+                        if type(mod.curr_seq) is tuple
+                        else None
+                    )
+                    if strp:
+                        mod.timeline.loop_start = strp.start
+                        mod.timeline.loop_end = strp.start + strp.length
+                else:
+                    mod.timeline.loop_start = 0
+                    mod.timeline.loop_end = mod.timeline.nqb
                 return
 
             if event.button == 2:
                 mod.timeline.loop_active = not mod.timeline.loop_active
                 return
 
+        # draw loop
         if (
             self.mouse_in_timeline
             and not self.clone_hold
@@ -788,11 +804,16 @@ class TimelineView(Gtk.DrawingArea):
 
                 return True
 
+            # playpos
+            self.moving_playhead = True
+            mod.timeline.pos = self.pointer_r
+            return
+
         if not self.moving_bpm:
             self.curr_change = None
 
         if (
-            self.mouse_in_timeline
+            self.curr_strip_id == -1
             and event.button == cfg.select_button
             and self.clone_hold
         ):
@@ -801,11 +822,6 @@ class TimelineView(Gtk.DrawingArea):
             self.exp_start = self.pointer_r
             self.exp_last_delta = 0
             self.exp_min = -mod.timeline.expand_start(self.exp_start)
-
-        if self.mouse_in_timeline and event.button == 2:
-            self.moving_playhead = True
-            mod.timeline.pos = self.pointer_r
-            return
 
         # add change
         if (
@@ -872,11 +888,28 @@ class TimelineView(Gtk.DrawingArea):
             return
 
         currs = mod.curr_seq[1] if type(mod.curr_seq) is tuple else -1
-        if event.button == cfg.delete_button and not self.resizing and not self.moving:
+        if (
+            event.button == cfg.delete_button
+            and not self.resizing
+            and not self.moving
+            and not self.show_resize_handle
+        ):
             if self.curr_strip_id > -1:
                 self.del_id = self.curr_strip_id
                 self.del_time_start = datetime.now()
                 self.del_progress = 0.0
+
+        if (
+            event.button == cfg.delete_button
+            and not self.resizing
+            and not self.moving
+            and self.show_resize_handle
+        ):
+            if self.curr_strip_id > -1:
+                strp = mod.timeline.strips[self.curr_strip_id]
+                strp.length = strp.seq.length
+                self.show_resize_handle = False
+                self.get_window().set_cursor(None)
 
         if event.button != cfg.select_button and event.button != 2:
             return False
@@ -975,6 +1008,7 @@ class TimelineView(Gtk.DrawingArea):
                     mod.timeline.loop_start,
                     mod.timeline.loop_end,
                 ) = self.drawing_loop_fallback
+
             mod.timeline.loop_active = self.drawing_loop_active
 
         if self.moving:
@@ -1014,7 +1048,8 @@ class TimelineView(Gtk.DrawingArea):
             self.curr_col = -1 if col >= len(mod) else int(col)
 
         mod.mainwin.set_focus(self)
-
+        if not self.drawing_loop:
+            self.highlight_loop = False
         self.mouse_in_timeline = False
         self.mouse_in_changes = False
 

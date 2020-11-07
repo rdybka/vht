@@ -248,6 +248,10 @@ void timeline_update(timeline *tl) {
 		tl->loop_end = tl->length;
 	}
 
+	if (tl->loop_start >= tl->loop_end) {
+		tl->loop_start = 0;
+	}
+
 	timeline_excl_out(tl);
 
 	for (int c = tl->nchanges -1; c > 0; c--)
@@ -911,8 +915,10 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 		if (tl->loop_active) {
 			if (round(tl->pos) >= tl->loop_end) {
 				if (!mod->render_mode) {
-					timeline_set_pos(tl, tl->loop_start, 0);
-					return;
+					if (mod->play_mode == 1) {
+						timeline_set_pos(tl, tl->loop_start, 0);
+						return;
+					}
 				} else {
 					mod->render_mode = 3;
 					mod->end_time = mod->clt->jack_last_frame;
