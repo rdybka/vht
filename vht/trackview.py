@@ -171,7 +171,7 @@ class TrackView(Gtk.DrawingArea):
             self._surface.finish()
 
         if self._back_surface:
-            self._surface.finish()
+            self._back_surface.finish()
 
     def tick(self):
         if self._context and self._back_context:

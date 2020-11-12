@@ -103,6 +103,8 @@ char *sequence_get_trig(sequence *seq, int t);
 char *sequence_get_extras(sequence *seq);
 void sequence_set_extras(sequence *seq, char *extr);
 
+void sequence_rotate(sequence *seq, int n);
+
 void seq_mod_excl_in(sequence *seq);
 void seq_mod_excl_out(sequence *seq);
 #endif //__SEQUENCE_H__

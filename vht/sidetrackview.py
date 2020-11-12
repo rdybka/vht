@@ -63,22 +63,30 @@ class SideTrackView(Gtk.DrawingArea):
         self.zero_pattern_surface = None
         self.zero_pattern_highlight = -1
         self.zero_pattern = None
+        self.spacing = 1.0
+
+        self.resize_curs = Gdk.Cursor.new_from_name(
+            mod.mainwin.get_display(), "row-resize"
+        )
 
         self.hover = None
-
-    def __del__(self):
-        if self._surface:
-            self._surface.finish()
-
-        if self._back_surface:
-            self._surface.finish()
+        self.rotating = False
+        self.rotate_zero = 0
 
     def on_button_press(self, widget, event):
-        print("butt press", event)
+        if event.state & Gdk.ModifierType.CONTROL_MASK:
+            if event.button == cfg.select_button:
+                self.rotating = True
+                self.rotate_zero = self.hover
+
         return True
 
     def on_button_release(self, widget, event):
-        print("butt release", event)
+        self.rotating = False
+
+        if event.button == cfg.select_button:
+            self.rotating = False
+
         return True
 
     def configure(self):
@@ -208,7 +216,7 @@ class SideTrackView(Gtk.DrawingArea):
             cr.rectangle(0, r * self.txt_height, w, self.txt_height)
             cr.fill()
 
-            if self.hover and r == self.hover[1]:
+            if r == self.hover:
                 cr.set_source_rgb(
                     *(col * cfg.intensity_txt_highlight * 1.2 for col in cfg.colour)
                 )
@@ -341,6 +349,21 @@ class SideTrackView(Gtk.DrawingArea):
         return True
 
     def on_motion(self, widget, event):
+        self.show_resize_handle = False
+        self.hover = int(event.y / self.txt_height)
+
+        if self.rotating:
+            offs = self.hover - self.rotate_zero
+            if offs:
+                self.seq.rotate(offs)
+                self.parent.redraw_track()
+                self.rotate_zero = self.hover
+
+        if self.show_resize_handle:
+            self.get_window().set_cursor(self.resize_curs)
+        else:
+            self.get_window().set_cursor(None)
+
         return True
 
     def on_leave(self, wdg, prm):

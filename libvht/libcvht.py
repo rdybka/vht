@@ -422,6 +422,9 @@ def sequence_get_extras(seq):
 def sequence_set_extras(seq, extr):
     return _libcvht.sequence_set_extras(seq, extr)
 
+def sequence_rotate(seq, n):
+    return _libcvht.sequence_rotate(seq, n)
+
 def track_get_row_ptr(arg1, c, r):
     return _libcvht.track_get_row_ptr(arg1, c, r)
 

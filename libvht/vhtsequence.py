@@ -140,6 +140,9 @@ class VHTSequence(Iterable):
     def set_midi_focus(self, foc):
         libcvht.sequence_set_midi_focus(self._seq_handle, foc)
 
+    def rotate(self, val):
+        libcvht.sequence_rotate(self._seq_handle, int(val))
+
     @property
     def pos(self):
         return libcvht.sequence_get_pos(self._seq_handle)

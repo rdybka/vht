@@ -737,3 +737,39 @@ void sequence_set_extras(sequence *seq, char *extr) {
 	seq->extras = malloc(l + 1);
 	strcpy(seq->extras, extr);
 }
+
+void sequence_rotate(sequence *seq, int n) {
+	seq_mod_excl_in(seq);
+
+	for (int t = 0; t < seq->ntrk; t++) {
+		track *trk = seq->trk[t];
+
+		if (!trk->playing)
+			continue;
+
+		int nn = n;
+		while(nn) {
+			if (nn > 0) {
+				for (int r = trk->nrows - 2; r > -1; r--) {
+					track_swap_rows(trk, r, r > 0?r - 1:trk->nrows -1);
+				}
+			}
+
+			if (nn < 0) {
+				for (int r = 1; r < trk->nrows; r++) {
+					track_swap_rows(trk, r, r < trk->nrows -1?r + 1:0);
+				}
+			}
+
+			if (nn > 0)
+				nn--;
+			if (nn < 0)
+				nn++;
+		}
+
+		for (int c = 0; c < trk->nctrl; c++)
+			envelope_regenerate(trk->env[c], trk->crows[c]);
+	}
+
+	seq_mod_excl_out(seq);
+}

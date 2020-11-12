@@ -159,6 +159,7 @@ extern int sequence_gen_thumb(sequence *seq);
 
 extern char *sequence_get_extras(sequence *seq);
 extern void sequence_set_extras(sequence *seq, char *extr);
+extern void sequence_rotate(sequence *seq, int n);
 
 // track
 extern row *track_get_row_ptr(track *, int c, int r);

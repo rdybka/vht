@@ -1388,3 +1388,37 @@ char *track_get_envelope(track *trk, int c) {
 	strcat(ret, "]");
 	return ret;
 }
+
+void track_swap_rows(track *trk, int rw1, int rw2) {
+	for (int c = 0; c < trk->ncols; c++) {
+		row curr_rw = trk->rows[c][rw2];
+		trk->rows[c][rw2] = trk->rows[c][rw1];
+		trk->rows[c][rw1] = curr_rw;
+	}
+
+	int *curr_dood = malloc(sizeof(int) * trk->ctrlpr);
+	for (int c = 0; c < trk->nctrl; c++) {
+		ctrlrow curr = trk->crows[c][rw2];
+		trk->crows[c][rw2] = trk->crows[c][rw1];
+		trk->crows[c][rw1] = curr;
+
+
+
+		int ll = 0;
+		for (int nn = rw2 * trk->ctrlpr ; nn < (rw2 + 1) * trk->ctrlpr; nn++) {
+			curr_dood[ll++] = trk->ctrl[c][nn];
+		}
+
+		ll = 0;
+		int nn2 = rw1 * trk->ctrlpr;
+		for (int nn = rw2 * trk->ctrlpr ; nn < (rw2 + 1) * trk->ctrlpr; nn++) {
+			trk->ctrl[c][nn] = trk->ctrl[c][nn2 + ll++];
+		}
+
+		ll = 0;
+		for (int nn = rw1 * trk->ctrlpr ; nn < (rw1 + 1) * trk->ctrlpr; nn++) {
+			trk->ctrl[c][nn] = curr_dood[ll++];
+		}
+	}
+	free(curr_dood);
+}
