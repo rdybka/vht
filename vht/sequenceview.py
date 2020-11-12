@@ -19,6 +19,7 @@ from vht.trackpropview import TrackPropView
 from vht.portconfig import *
 from vht.propview import PropView
 from vht.trackview import TrackView
+from vht.sidetrackview import SideTrackView
 from vht import *
 import cairo
 import gi
@@ -633,7 +634,7 @@ class SequenceView(Gtk.Box):
             self.prop_view.add_track(trk, t)
 
         else:
-            t = TrackView(self.seq, None, self)
+            t = SideTrackView(self.seq, self)
             self._side_box.pack_start(t, False, True, 0)
 
         if not quick:
@@ -914,7 +915,7 @@ class SequenceView(Gtk.Box):
 
         vtarget = (r * trk.txt_height) + trk.txt_height / 2.0
         trk_height = trk.txt_height * trk.trk.nrows
-        vtarget = vtarget - (h / 2.0)
+        vtarget = vtarget - (h / 2)
 
         if vtarget < 0:
             vtarget = 0

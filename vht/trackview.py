@@ -183,7 +183,7 @@ class TrackView(Gtk.DrawingArea):
         return True
 
     def configure(self):
-        if self.trk:  # and not self.controller_editors:
+        if self.trk:
             for cn, ctrl in enumerate(self.trk.ctrls):
                 if ctrl == -1:
                     if not self.pitchwheel_editor:
@@ -226,42 +226,31 @@ class TrackView(Gtk.DrawingArea):
         self.txt_height = float(height) * self.spacing * cfg.seq_spacing
         self.txt_width = int(dx)
 
-        if not self.trk:
-            (x, y, width, height, dx, dy) = cr.text_extents("000|")
+        nw = 0
+        if self.show_notes:
+            nw = self.txt_width * len(self.trk)
 
-            self.txt_height = float(height) * self.spacing * cfg.seq_spacing
-            self.txt_width = int(dx)
+        if self.velocity_editor:
+            self.velocity_editor.precalc(cr)
+            nw = nw + self.velocity_editor.width
 
-            nw = dx
-            nh = self.txt_height * self.seq.length + 10
-            self.set_size_request(nw, nh)
-            self.width = nw
-        else:
-            nw = 0
-            if self.show_notes:
-                nw = self.txt_width * len(self.trk)
+        if self.timeshift_editor:
+            self.timeshift_editor.precalc(cr)
+            nw = nw + self.timeshift_editor.width
 
-            if self.velocity_editor:
-                self.velocity_editor.precalc(cr)
-                nw = nw + self.velocity_editor.width
+        if self.pitchwheel_editor:
+            self.pitchwheel_editor.precalc(cr, nw)
+            if self.show_pitchwheel:
+                nw = nw + self.pitchwheel_editor.width
 
-            if self.timeshift_editor:
-                self.timeshift_editor.precalc(cr)
-                nw = nw + self.timeshift_editor.width
+        if self.show_controllers:
+            for ctrl in self.controller_editors:
+                ctrl.precalc(cr, nw)
+                nw = nw + ctrl.width
 
-            if self.pitchwheel_editor:
-                self.pitchwheel_editor.precalc(cr, nw)
-                if self.show_pitchwheel:
-                    nw = nw + self.pitchwheel_editor.width
-
-            if self.show_controllers:
-                for ctrl in self.controller_editors:
-                    ctrl.precalc(cr, nw)
-                    nw = nw + ctrl.width
-
-            nh = (self.txt_height * self.trk.nrows) + 5
-            self.set_size_request(nw, nh)
-            self.width = nw
+        nh = (self.txt_height * self.trk.nrows) + 5
+        self.set_size_request(nw, nh)
+        self.width = nw
 
         if self.pitchwheel_editor:
             self.pitchwheel_editor.configure()
@@ -316,9 +305,6 @@ class TrackView(Gtk.DrawingArea):
             # because rowheight is float
             matrix.scale(1.0, round(self.txt_height * 2) / (self.txt_height * 2))
             self.zero_pattern.set_matrix(matrix)
-
-            if not self.trk:
-                return
 
             # empty pattern
             empl = self.zero_pattern_highlight
@@ -442,34 +428,6 @@ class TrackView(Gtk.DrawingArea):
         if from_row > to_row:
             from_row, to_row = to_row, from_row
 
-        # side_column
-        if not self.trk:
-            rows_to_draw = []
-
-            if complete:
-                rows_to_draw = range(self.seq.length)
-            else:
-                for r in range(self.seq.length):
-                    if from_row <= r <= to_row:
-                        rows_to_draw.append(r)
-
-            if not complete:
-                for r in rows_to_draw:
-                    ir.x = 0
-                    ir.width = w
-                    ir.y = int(r * self.txt_height)
-                    ir.height = self.txt_height * 2
-                    crf.rectangle(ir.x, ir.y, ir.width, ir.height)
-                    crf.fill()
-                    wnd.invalidate_rect(ir, False)
-
-            if complete:
-                crf.set_source_surface(self._back_surface)
-                crf.paint()
-                self.queue_draw()
-
-            return
-
         rows_to_draw = []
 
         if complete:
@@ -543,107 +501,6 @@ class TrackView(Gtk.DrawingArea):
 
         if from_row > to_row:
             from_row, to_row = to_row, from_row
-
-        # --------------  side_column -------------
-        if not self.trk:
-            (x, y, width, height, dx, dy) = cr.text_extents("000|")
-
-            self.txt_height = float(height) * self.spacing * cfg.seq_spacing
-            self.txt_width = int(dx)
-
-            nw = dx
-            nh = self.txt_height * self.seq.length + 10
-            self.set_size_request(nw, nh)
-            self.width = nw
-            if complete:
-                cr.set_source_rgb(
-                    *(col * cfg.intensity_background for col in cfg.colour)
-                )
-                cr.rectangle(0, 0, w, h)
-                cr.fill()
-
-            rows_to_draw = []
-
-            (x, y, width, height, dx, dy) = cr.text_extents(cfg.row_number_format % 999)
-
-            if complete:
-                self.configure()
-                rows_to_draw = range(self.seq.length)
-            else:
-                for r in range(self.seq.length):
-                    if from_row <= r <= to_row:
-                        rows_to_draw.append(r)
-
-            for r in rows_to_draw:
-                even_high = cfg.even_highlight
-                if r % 2 == 0:
-                    even_high = 1.0
-
-                cr.set_source_rgb(
-                    *(
-                        col * cfg.intensity_background * (even_high)
-                        for col in cfg.colour
-                    )
-                )
-                cr.rectangle(0, r * self.txt_height, w, self.txt_height)
-                cr.fill()
-
-                if self.hover and r == self.hover[1]:
-                    cr.set_source_rgb(
-                        *(col * cfg.intensity_txt_highlight * 1.2 for col in cfg.colour)
-                    )
-                else:
-                    if r % self.seq.rpb == 0:
-                        cr.set_source_rgb(
-                            *(col * cfg.intensity_txt_highlight for col in cfg.colour)
-                        )
-                    else:
-                        cr.set_source_rgb(
-                            *(col * cfg.intensity_txt for col in cfg.colour)
-                        )
-
-                yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2.0)
-                cr.move_to(x, yy)
-                cr.show_text(cfg.row_number_format % r)
-
-                if not complete:
-                    (x, y, width, height, dx, dy) = cr.text_extents("|")
-                    cr.set_source_rgb(
-                        *(col * cfg.intensity_lines for col in cfg.colour)
-                    )
-                    cr.set_antialias(cairo.ANTIALIAS_NONE)
-                    cr.set_line_width(
-                        (self.parent.font_size / 6.0) * cfg.seq_line_width
-                    )
-                    cr.move_to(self.txt_width - (dx / 2), 0)
-                    cr.line_to(
-                        self.txt_width - (dx / 2), (self.seq.length) * self.txt_height
-                    )
-                    cr.stroke()
-
-                    ir.x = 0
-                    ir.width = w
-                    ir.y = int(r * self.txt_height)
-                    ir.height = self.txt_height * 2
-                    crf.rectangle(ir.x, ir.y, ir.width, ir.height)
-                    crf.fill()
-                    wnd.invalidate_rect(ir, False)
-
-            if complete:
-                (x, y, width, height, dx, dy) = cr.text_extents("|")
-                cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
-                cr.set_antialias(cairo.ANTIALIAS_NONE)
-                cr.set_line_width((self.parent.font_size / 6.0) * cfg.seq_line_width)
-                cr.move_to(self.txt_width - (dx / 2), 0)
-                cr.line_to(
-                    self.txt_width - (dx / 2), (self.seq.length) * self.txt_height
-                )
-                cr.stroke()
-
-                crf.set_source_surface(self._back_surface)
-                crf.paint()
-                self.queue_draw()
-            return
 
         # normal view
         rows_to_draw = []
