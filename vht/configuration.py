@@ -49,7 +49,7 @@ class Configuration:
         self.timeline_position_y = 120
         self.console_position = 0.6
         self.console_show = False
-        self.timeline_show = False
+        self.timeline_show = True
         self.console_steal_stderr = True
         self.start_playing = True
         self.start_transport = False
