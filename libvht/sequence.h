@@ -61,6 +61,9 @@ typedef struct sequence_t {
 	int thumb_last_ring;
 	int thumb_length;
 	int thumb_panic;
+	int loop_active;
+	int loop_start;
+	int loop_end;
 } sequence;
 
 sequence *sequence_new(int length);

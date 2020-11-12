@@ -144,6 +144,30 @@ class VHTSequence(Iterable):
         libcvht.sequence_rotate(self._seq_handle, int(val))
 
     @property
+    def loop_active(self):
+        return True if libcvht.sequence_get_loop_active(self._seq_handle) else False
+
+    @loop_active.setter
+    def loop_active(self, v):
+        libcvht.sequence_set_loop_active(self._seq_handle, int(v))
+
+    @property
+    def loop_start(self):
+        return libcvht.sequence_get_loop_start(self._seq_handle)
+
+    @property
+    def loop_end(self):
+        return libcvht.sequence_get_loop_end(self._seq_handle)
+
+    @loop_start.setter
+    def loop_start(self, v):
+        libcvht.sequence_set_loop_start(self._seq_handle, int(v))
+
+    @loop_end.setter
+    def loop_end(self, v):
+        libcvht.sequence_set_loop_end(self._seq_handle, int(v))
+
+    @property
     def pos(self):
         return libcvht.sequence_get_pos(self._seq_handle)
 

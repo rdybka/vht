@@ -69,23 +69,72 @@ class SideTrackView(Gtk.DrawingArea):
             mod.mainwin.get_display(), "row-resize"
         )
 
+        self.show_resize_handle = False
+
         self.hover = None
         self.rotating = False
         self.rotate_zero = 0
+
+        self.drawing_loop = False
+        self.drawing_start = -1
 
     def on_button_press(self, widget, event):
         if event.state & Gdk.ModifierType.CONTROL_MASK:
             if event.button == cfg.select_button:
                 self.rotating = True
                 self.rotate_zero = self.hover
-
-        return True
-
-    def on_button_release(self, widget, event):
-        self.rotating = False
+                for tv in self.parent.get_tracks():
+                    tv.undo_buff.add_state()
+                return True
 
         if event.button == cfg.select_button:
-            self.rotating = False
+            if self.show_resize_handle:
+                if self.hover == self.seq.loop_start:
+                    self.drawing_start = self.seq.loop_end
+                    self.drawing_loop = True
+                if self.hover == self.seq.loop_end:
+                    self.drawing_start = self.seq.loop_start
+                    self.drawing_loop = True
+            else:
+                self.seq.loop_active = False
+                self.drawing_start = self.hover
+                self.seq.loop_start = self.hover
+                self.seq.loop_end = self.hover
+                self.drawing_loop = True
+                self.redraw()
+            return True
+
+        if event.button == cfg.delete_button:
+            self.seq.loop_active = False
+            self.seq.loop_start = -1
+            self.seq.loop_end = -1
+            self.redraw()
+            return True
+
+        return False
+
+    def on_button_release(self, widget, event):
+        if self.rotating:
+            if event.button == cfg.select_button:
+                self.rotating = False
+                for tv in self.parent.get_tracks():
+                    tv.undo_buff.add_state()
+
+        if self.drawing_loop:
+            self.drawing_loop = False
+            if self.hover != self.drawing_start:
+                self.seq.loop_active = True
+            else:
+                self.seq.loop_start = -1
+                self.seq.loop_end = -1
+                self.redraw()
+
+        self.show_resize_handle = False
+
+        if self.show_resize_handle:
+            self.get_window().set_cursor(self.resize_curs)
+        else:
+            self.get_window().set_cursor(None)
 
         return True
 
@@ -206,13 +255,26 @@ class SideTrackView(Gtk.DrawingArea):
                     rows_to_draw.append(r)
 
         for r in rows_to_draw:
+            in_loop = False
+            if r >= self.seq.loop_start and r <= self.seq.loop_end:
+                in_loop = True
+
             even_high = cfg.even_highlight
             if r % 2 == 0:
                 even_high = 1.0
 
-            cr.set_source_rgb(
-                *(col * cfg.intensity_background * (even_high) for col in cfg.colour)
-            )
+            if in_loop:
+                cr.set_source_rgb(
+                    *(col * cfg.intensity_txt * (even_high) for col in cfg.colour)
+                )
+            else:
+                cr.set_source_rgb(
+                    *(
+                        col * cfg.intensity_background * (even_high)
+                        for col in cfg.colour
+                    )
+                )
+
             cr.rectangle(0, r * self.txt_height, w, self.txt_height)
             cr.fill()
 
@@ -228,9 +290,14 @@ class SideTrackView(Gtk.DrawingArea):
                 else:
                     cr.set_source_rgb(*(col * cfg.intensity_txt for col in cfg.colour))
 
+            if in_loop:
+                cr.set_source_rgb(0, 0, 0)
+
             yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2.0)
+
             cr.move_to(x, yy)
-            cr.show_text(cfg.row_number_format % r)
+            txt = cfg.row_number_format % r
+            cr.show_text(txt)
 
             if not complete:
                 (x, y, width, height, dx, dy) = cr.text_extents("|")
@@ -352,12 +419,39 @@ class SideTrackView(Gtk.DrawingArea):
         self.show_resize_handle = False
         self.hover = int(event.y / self.txt_height)
 
+        if self.drawing_loop:
+            ds = self.drawing_start
+            de = self.hover
+            if ds > de:
+                ds, de = de, ds
+
+            redr = False
+
+            if self.seq.loop_start != ds:
+                self.seq.loop_start = ds
+                redr = True
+
+            if self.seq.loop_end != de:
+                self.seq.loop_end = de
+                redr = True
+
+            if redr:
+                self.redraw()
+            return
+
         if self.rotating:
             offs = self.hover - self.rotate_zero
             if offs:
                 self.seq.rotate(offs)
                 self.parent.redraw_track()
                 self.rotate_zero = self.hover
+            return True
+
+        if self.hover == self.seq.loop_start:
+            self.show_resize_handle = True
+
+        if self.hover == self.seq.loop_end:
+            self.show_resize_handle = True
 
         if self.show_resize_handle:
             self.get_window().set_cursor(self.resize_curs)

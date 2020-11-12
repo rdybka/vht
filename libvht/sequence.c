@@ -71,6 +71,9 @@ sequence *sequence_new(int length) {
 	seq->thumb_length = 0;
 	seq->thumb_panic = 0;
 	seq->extras = NULL;
+	seq->loop_active = 0;
+	seq->loop_start = -1;
+	seq->loop_end = -1;
 	return seq;
 }
 
@@ -228,6 +231,17 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 
 	if (seq->pos - floor(seq->pos) < 0.0000001) {
 		int r = (int)seq->pos;
+
+		if (seq->parent == -1 && mod->render_mode != 1 && seq->loop_active) {
+			if (r > seq->loop_end || r < seq->loop_start) {
+				seq->pos = seq->loop_start;
+				r = seq->loop_start;
+				for (int t = 0; t < seq->ntrk; t++) {
+					track_reset(seq->trk[t]);
+					track_wind(seq->trk[t], seq->pos);
+				}
+			}
+		}
 
 		while (r >= seq->length) {
 			r-=seq->length;
@@ -773,3 +787,4 @@ void sequence_rotate(sequence *seq, int n) {
 
 	seq_mod_excl_out(seq);
 }
+

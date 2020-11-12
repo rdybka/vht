@@ -425,6 +425,24 @@ def sequence_set_extras(seq, extr):
 def sequence_rotate(seq, n):
     return _libcvht.sequence_rotate(seq, n)
 
+def sequence_get_loop_active(seq):
+    return _libcvht.sequence_get_loop_active(seq)
+
+def sequence_set_loop_active(seq, v):
+    return _libcvht.sequence_set_loop_active(seq, v)
+
+def sequence_get_loop_start(seq):
+    return _libcvht.sequence_get_loop_start(seq)
+
+def sequence_set_loop_start(seq, s):
+    return _libcvht.sequence_set_loop_start(seq, s)
+
+def sequence_get_loop_end(seq):
+    return _libcvht.sequence_get_loop_end(seq)
+
+def sequence_set_loop_end(seq, e):
+    return _libcvht.sequence_set_loop_end(seq, e)
+
 def track_get_row_ptr(arg1, c, r):
     return _libcvht.track_get_row_ptr(arg1, c, r)
 

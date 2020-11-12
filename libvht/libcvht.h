@@ -161,6 +161,13 @@ extern char *sequence_get_extras(sequence *seq);
 extern void sequence_set_extras(sequence *seq, char *extr);
 extern void sequence_rotate(sequence *seq, int n);
 
+extern int sequence_get_loop_active(sequence *seq);
+extern void sequence_set_loop_active(sequence *seq, int v);
+extern int sequence_get_loop_start(sequence *seq);
+extern void sequence_set_loop_start(sequence *seq, int s);
+extern int sequence_get_loop_end(sequence *seq);
+extern void sequence_set_loop_end(sequence *seq, int e);
+
 // track
 extern row *track_get_row_ptr(track *, int c, int r);
 extern ctrlrow *track_get_ctrlrow_ptr(track *, int c, int r);
