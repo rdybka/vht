@@ -51,6 +51,14 @@ class VHTTimelineStrip:
             self._mod.timeline._tl_handle, self._ptr, rpb
         )
 
+    def double(self):
+        if self.can_resize(self.length * 2):
+            self.length *= 2
+
+    def halve(self):
+        if self.length > 4:
+            self.length /= 2
+
     def noteoffise(self):
         libcvht.timestrip_noteoffise(self._mod.timeline._tl_handle, self._ptr)
 

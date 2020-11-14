@@ -281,6 +281,11 @@ class SequenceView(Gtk.Box):
             ind = self.seq.index
             mod.mainwin.gui_del_seq(ind)
 
+        if cfg.key["sequence_replace"].matches(event):
+            if type(mod.curr_seq) is int:
+                return
+            mod.replace_sequence(mod.curr_seq[1])
+
         if cfg.key["sequence_clone"].matches(event):
             idx = mod.clone_sequence(mod.curr_seq).index
 
@@ -321,6 +326,20 @@ class SequenceView(Gtk.Box):
         if cfg.key["sequence_halve"].matches(event):
             self.halve()
             return True
+
+        if cfg.key["strip_double"].matches(event):
+            if type(mod.curr_seq) is int:
+                return
+
+            mod.timeline.strips[mod.curr_seq[1]].double()
+            return
+
+        if cfg.key["strip_halve"].matches(event):
+            if type(mod.curr_seq) is int:
+                return
+
+            mod.timeline.strips[mod.curr_seq[1]].halve()
+            return
 
         if cfg.key["sequence_loop"].matches(event):
             if type(mod.curr_seq) is int:

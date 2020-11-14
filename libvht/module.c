@@ -478,6 +478,29 @@ void module_swap_sequence(module *mod, int s1, int s2) {
 	module_excl_out(mod);
 }
 
+sequence *module_sequence_replace(module *mod, int s, sequence *seq) {
+	if (s < 0 || s >= mod->nseq)
+		return NULL;
+
+	module_excl_in(mod);
+	sequence_free(mod->seq[s]);
+	mod->seq[s] = seq;
+	module_seqs_reindex(mod);
+
+	seq->pos = mod->song_pos;
+
+	for (int t = 0; t < seq->ntrk; t++) {
+		seq->trk[t]->clt = mod->clt;
+
+		if (seq->pos > 0.0) {
+			track_wind(seq->trk[t], seq->pos);
+		}
+	}
+
+	module_excl_out(mod);
+	return seq;
+}
+
 timeline *module_get_timeline(module *mod) {
 	return mod->tline;
 }

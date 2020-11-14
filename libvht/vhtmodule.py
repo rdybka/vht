@@ -211,6 +211,19 @@ class VHTModule(Iterable):
 
         return VHTSequence(seq, self, self.cb_new_track)
 
+    def replace_sequence(self, s):  # s: strip_id
+
+        seq = libcvht.sequence_clone(
+            libcvht.timeline_get_seq(self.timeline._tl_handle, s)
+        )
+
+        libcvht.sequence_strip_parent(seq)
+
+        idx = self.timeline.strips[s].col
+        pl = libcvht.sequence_get_playing(libcvht.module_get_seq(self._mod_handle, idx))
+        seq = libcvht.module_sequence_replace(self._mod_handle, idx, seq)
+        libcvht.sequence_set_playing(seq, pl)
+
     def __str__(self):
         ret = "seq: %d\n" % self.__len__()
         for itm in self:

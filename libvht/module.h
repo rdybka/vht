@@ -77,6 +77,7 @@ void module_send_transp(module *mod, int play, jack_nframes_t frames);
 void module_add_sequence(module *mod, sequence *seq);
 void module_del_sequence(module *mod, int s);
 void module_swap_sequence(module *mod, int s1, int s2);
+sequence *module_sequence_replace(module *mod, int s, sequence *seq);
 char *modue_get_time(module *mod);
 double module_get_jack_pos(module *mod);
 void module_synch_output_ports(module *mod);

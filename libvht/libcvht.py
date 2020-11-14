@@ -179,6 +179,9 @@ def module_del_sequence(mod, s):
 def module_swap_sequence(mod, s1, s2):
     return _libcvht.module_swap_sequence(mod, s1, s2)
 
+def module_sequence_replace(mod, s, seq):
+    return _libcvht.module_sequence_replace(mod, s, seq)
+
 def module_get_curr_seq(mod):
     return _libcvht.module_get_curr_seq(mod)
 
@@ -422,8 +425,8 @@ def sequence_get_extras(seq):
 def sequence_set_extras(seq, extr):
     return _libcvht.sequence_set_extras(seq, extr)
 
-def sequence_rotate(seq, n):
-    return _libcvht.sequence_rotate(seq, n)
+def sequence_rotate(seq, n, trknum):
+    return _libcvht.sequence_rotate(seq, n, trknum)
 
 def sequence_get_loop_active(seq):
     return _libcvht.sequence_get_loop_active(seq)

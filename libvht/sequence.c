@@ -752,13 +752,16 @@ void sequence_set_extras(sequence *seq, char *extr) {
 	strcpy(seq->extras, extr);
 }
 
-void sequence_rotate(sequence *seq, int n) {
+void sequence_rotate(sequence *seq, int n, int trknum) {
 	seq_mod_excl_in(seq);
 
 	for (int t = 0; t < seq->ntrk; t++) {
 		track *trk = seq->trk[t];
 
-		if (!trk->playing)
+		if (!trk->playing && trknum == -1)
+			continue;
+
+		if (trknum > -1 && t != trknum)
 			continue;
 
 		int nn = n;

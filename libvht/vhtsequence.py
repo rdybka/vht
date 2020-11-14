@@ -54,7 +54,7 @@ class VHTSequence(Iterable):
 
     def __getitem__(self, itm):
         if itm >= self.__len__():
-            raise IndexError()
+            return None
 
         if itm < 0:
             if not len(self) >= -itm:
@@ -140,8 +140,8 @@ class VHTSequence(Iterable):
     def set_midi_focus(self, foc):
         libcvht.sequence_set_midi_focus(self._seq_handle, foc)
 
-    def rotate(self, val):
-        libcvht.sequence_rotate(self._seq_handle, int(val))
+    def rotate(self, val, trk=-1):
+        libcvht.sequence_rotate(self._seq_handle, int(val), int(trk))
 
     @property
     def loop_active(self):

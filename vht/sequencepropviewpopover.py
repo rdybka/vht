@@ -42,6 +42,7 @@ class SequencePropViewPopover(Gtk.Popover):
 
         self.parent = parent
         self.seq = seq
+        self.strip = None
         self.grid = Gtk.Grid()
         self.grid.set_column_spacing(3)
         self.grid.set_row_spacing(3)
@@ -58,26 +59,6 @@ class SequencePropViewPopover(Gtk.Popover):
         )
         self.grid.attach(button, 0, 0, 1, 1)
 
-        button = Gtk.Button()
-        icon = Gio.ThemedIcon(name="edit-copy")
-        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-        button.add(image)
-        button.connect("clicked", self.on_clone_button_clicked)
-        button.set_tooltip_markup(
-            cfg.tooltip_markup2 % ("clone (up)", cfg.key["sequence_clone"])
-        )
-        self.grid.attach(button, 0, 1, 1, 1)
-
-        button = Gtk.Button("double")
-        button.connect("clicked", self.on_double_clicked)
-        button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["sequence_double"]))
-        self.grid.attach(button, 1, 1, 1, 1)
-
-        button = Gtk.Button("halve")
-        button.connect("clicked", self.on_halve_clicked)
-        button.set_tooltip_markup(cfg.tooltip_markup % (cfg.key["sequence_halve"]))
-        self.grid.attach(button, 1, 2, 1, 1)
-
         self.length_adj = Gtk.Adjustment(0, 1, seq.max_length, 1.0, 1.0)
         self.length_button = Gtk.SpinButton()
         self.length_button.set_adjustment(self.length_adj)
@@ -88,7 +69,110 @@ class SequencePropViewPopover(Gtk.Popover):
 
         self.grid.attach(self.length_button, 1, 0, 1, 1)
 
+        self.clone_button = Gtk.Button()
+        icon = Gio.ThemedIcon(name="edit-copy")
+        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+        self.clone_button.add(image)
+        self.clone_button.connect("clicked", self.on_clone_button_clicked)
+        self.clone_button.set_tooltip_markup(
+            cfg.tooltip_markup2 % ("clone", cfg.key["sequence_clone"])
+        )
+
+        self.grid.attach(self.clone_button, 0, 1, 1, 1)
+
+        self.double_button = Gtk.Button("double")
+        self.double_button.connect("clicked", self.on_double_clicked)
+        self.double_button.set_tooltip_markup(
+            cfg.tooltip_markup % (cfg.key["sequence_double"])
+        )
+        self.grid.attach(self.double_button, 1, 1, 1, 1)
+
+        self.halve_button = Gtk.Button("halve")
+        self.halve_button.connect("clicked", self.on_halve_clicked)
+        self.halve_button.set_tooltip_markup(
+            cfg.tooltip_markup % (cfg.key["sequence_halve"])
+        )
+        self.grid.attach(self.halve_button, 1, 2, 1, 1)
+
+        self.strip_clone_button = Gtk.MenuButton()
+        self.strip_clone_menu = Gtk.Menu()
+        self.strip_clone_button.set_popup(self.strip_clone_menu)
+        icon = Gio.ThemedIcon(name="edit-copy")
+        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
+        self.strip_clone_button.add(image)
+        txt = (
+            "   make new - "
+            + str(cfg.key["sequence_clone"])
+            + " \nreplace top - "
+            + str(cfg.key["sequence_replace"])
+        )
+        self.strip_clone_button.set_tooltip_markup(cfg.tooltip_markup % txt)
+
+        m = self.strip_clone_menu
+        mitm = Gtk.MenuItem("make new sequence")
+        mitm.op = 1
+        mitm.connect("activate", self.on_clone_menu_item_activate)
+        mitm.show()
+        m.append(mitm)
+        mitm = Gtk.MenuItem("replace top")
+        mitm.op = 2
+        mitm.connect("activate", self.on_clone_menu_item_activate)
+        mitm.show()
+        m.append(mitm)
+
+        self.grid.attach(self.strip_clone_button, 0, 3, 1, 1)
+
+        self.strip_double_button = Gtk.MenuButton("double")
+        self.strip_double_menu = Gtk.Menu()
+        self.strip_double_button.set_popup(self.strip_double_menu)
+        txt = (
+            "sequence - "
+            + str(cfg.key["sequence_double"])
+            + " \n   strip - "
+            + str(cfg.key["strip_double"])
+        )
+        self.strip_double_button.set_tooltip_markup(cfg.tooltip_markup % txt)
+        self.grid.attach(self.strip_double_button, 1, 3, 1, 1)
+
+        m = self.strip_double_menu
+        mitm = Gtk.MenuItem("sequence")
+        mitm.op = 1
+        mitm.connect("activate", self.on_double_menu_item_activate)
+        mitm.show()
+        m.append(mitm)
+        mitm = Gtk.MenuItem("strip")
+        mitm.op = 2
+        mitm.connect("activate", self.on_double_menu_item_activate)
+        mitm.show()
+        m.append(mitm)
+
+        self.strip_halve_button = Gtk.MenuButton("halve")
+        self.strip_halve_menu = Gtk.Menu()
+        self.strip_halve_button.set_popup(self.strip_halve_menu)
+        txt = (
+            "sequence - "
+            + str(cfg.key["sequence_halve"])
+            + " \n   strip - "
+            + str(cfg.key["strip_halve"])
+        )
+
+        self.strip_halve_button.set_tooltip_markup(cfg.tooltip_markup % txt)
+        self.grid.attach(self.strip_halve_button, 1, 4, 1, 1)
+
+        m = self.strip_halve_menu
+        mitm = Gtk.MenuItem("sequence")
+        mitm.op = 1
+        mitm.connect("activate", self.on_halve_menu_item_activate)
+        mitm.show()
+        m.append(mitm)
+        mitm = Gtk.MenuItem("strip")
+        mitm.op = 2
+        mitm.connect("activate", self.on_halve_menu_item_activate)
+        mitm.show()
+        m.append(mitm)
+
         self.grid.show_all()
+
         self.add(self.grid)
         self.set_modal(False)
 
@@ -99,6 +183,18 @@ class SequencePropViewPopover(Gtk.Popover):
             return True
 
     def tick(self, wdg, param):
+        if self.strip_clone_menu.is_visible():
+            self.time_want_to_leave = 0
+            return True
+
+        if self.strip_double_menu.is_visible():
+            self.time_want_to_leave = 0
+            return True
+
+        if self.strip_halve_menu.is_visible():
+            self.time_want_to_leave = 0
+            return True
+
         if self.time_want_to_leave == 0:  # normal
             op = self.get_opacity()
             if op < 1.0:
@@ -173,12 +269,6 @@ class SequencePropViewPopover(Gtk.Popover):
             mod[self.seq.index].extras["sequence_name"]
         )
 
-    def on_rpb_toggled(self, wdg):
-        if wdg.get_active():
-            print("show")
-        else:
-            print("hide")
-
     def on_double_clicked(self, switch):
         self.parent.seqview.double()
         self.length_adj.set_value(self.seq.length)
@@ -190,6 +280,58 @@ class SequencePropViewPopover(Gtk.Popover):
     def pop(self):
         mod.clear_popups(self)
         self.length_adj.set_value(self.seq.length)
+        self.strip = None
+        if type(self.seq.index) is tuple:
+            self.strip = mod.timeline.strips[self.seq.index[1]]
+
+        if self.strip:
+            self.clone_button.hide()
+            self.double_button.hide()
+            self.halve_button.hide()
+            self.strip_clone_button.show()
+            self.strip_double_button.show()
+            self.strip_halve_button.show()
+        else:
+            self.clone_button.show()
+            self.double_button.show()
+            self.halve_button.show()
+            self.strip_clone_button.hide()
+            self.strip_double_button.hide()
+            self.strip_halve_button.hide()
+
         self.time_want_to_leave = 0
         self.add_tick_callback(self.tick)
         self.show()
+
+    def on_clone_menu_item_activate(self, itm):
+        if itm.op == 1:
+            idx = mod.clone_sequence(self.seq.index).index
+
+            mod[idx].extras["sequence_name"] = extras.get_name(
+                mod[self.seq.index].extras["sequence_name"]
+            )
+            return
+
+        if itm.op == 2:
+            mod.replace_sequence(self.strip.seq.index[1])
+            return
+
+    def on_double_menu_item_activate(self, itm):
+        if itm.op == 1:
+            self.parent.seqview.double()
+            self.length_adj.set_value(self.seq.length)
+            return
+
+        if itm.op == 2:
+            self.strip.double()
+            return
+
+    def on_halve_menu_item_activate(self, itm):
+        if itm.op == 1:
+            self.parent.seqview.halve()
+            self.length_adj.set_value(self.seq.length)
+            return
+
+        if itm.op == 2:
+            self.strip.halve()
+            return

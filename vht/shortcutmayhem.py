@@ -127,6 +127,11 @@ shorts = {
         ("Render", "doodle_render"),
     ],
     "Timeline": [],
+    "Strip": [
+        ("Replace top", "sequence_replace"),
+        ("Double", "strip_double"),
+        ("Halve", "strip_halve"),
+    ],
 }
 
 customs = {

@@ -67,6 +67,7 @@ extern sequence *module_get_seq(module *mod, int);
 extern void module_add_sequence(module *mod, sequence *seq);
 extern void module_del_sequence(module *mod, int s);
 extern void module_swap_sequence(module *mod, int s1, int s2);
+extern sequence *module_sequence_replace(module *mod, int s, sequence *seq);
 extern sequence *module_get_curr_seq(module *mod);
 extern void module_set_curr_seq(module *mod, int t, int s);
 extern void module_dump_notes(module *mod, int n);
@@ -159,7 +160,7 @@ extern int sequence_gen_thumb(sequence *seq);
 
 extern char *sequence_get_extras(sequence *seq);
 extern void sequence_set_extras(sequence *seq, char *extr);
-extern void sequence_rotate(sequence *seq, int n);
+extern void sequence_rotate(sequence *seq, int n, int trknum);
 
 extern int sequence_get_loop_active(sequence *seq);
 extern void sequence_set_loop_active(sequence *seq, int v);

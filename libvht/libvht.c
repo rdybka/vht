@@ -315,9 +315,6 @@ void sequence_set_loop_active(sequence *seq, int v) {
 }
 
 int sequence_get_loop_start(sequence *seq) {
-	if (seq->parent > -1)
-		return -1;
-
 	return seq->loop_start;
 }
 
@@ -326,9 +323,6 @@ void sequence_set_loop_start(sequence *seq, int s) {
 }
 
 int sequence_get_loop_end(sequence *seq) {
-	if (seq->parent > -1)
-		return -1;
-
 	return seq->loop_end;
 }
 

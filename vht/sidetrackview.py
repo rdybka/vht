@@ -127,6 +127,7 @@ class SideTrackView(Gtk.DrawingArea):
             else:
                 self.seq.loop_start = -1
                 self.seq.loop_end = -1
+                self.seq.loop_active = False
                 self.redraw()
 
         self.show_resize_handle = False
@@ -440,9 +441,14 @@ class SideTrackView(Gtk.DrawingArea):
             return
 
         if self.rotating:
+            rtrk = -1
+            for wdg in self.parent.get_tracks():
+                if wdg.edit:
+                    rtrk = wdg.trk.index
+
             offs = self.hover - self.rotate_zero
             if offs:
-                self.seq.rotate(offs)
+                self.seq.rotate(offs, rtrk)
                 self.parent.redraw_track()
                 self.rotate_zero = self.hover
             return True
