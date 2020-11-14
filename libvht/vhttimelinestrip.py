@@ -166,3 +166,14 @@ class VHTTimelineStrip:
     def __str__(self):
         self.update_strrep()
         return self._strrep
+
+    def __eq__(self, other):
+        if type(other) is not VHTTimelineStrip:
+            return False
+
+        h1 = int(self._ptr)
+        h2 = int(other._ptr)
+        if h1 == h2:
+            return True
+
+        return False

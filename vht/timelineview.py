@@ -465,6 +465,10 @@ class TimelineView(Gtk.DrawingArea):
 
         mod_curr = mod.curr_seq
 
+        cstr = None
+        if self.curr_strip_id > -1 and (self.moving or self.resizing):
+            cstr = mod.timeline.strips[self.curr_strip_id]
+
         # print(self.qb_start, qbend, tend)
         for stid, st in enumerate(mod.timeline.strips):
             if st.start > qbend:
@@ -578,6 +582,33 @@ class TimelineView(Gtk.DrawingArea):
                 cr.move_to(thx + thxx - xo, ystart + yo)
                 cr.line_to(thx + xo, ystart + lend - yo)
                 cr.stroke()
+
+            # highlight alignment
+            if cstr and cstr != st:
+                line = -1
+                if st.start == cstr.start:
+                    line = ystart
+
+                if st.start + st.length == cstr.start:
+                    line = ystart + yend
+
+                if line:
+                    cr.set_line_width(3.0)
+                    cr.set_source_rgb(*(col * 0.7 for col in colour))
+                    cr.move_to(0, line)
+                    cr.line_to(w, line)
+                    cr.stroke()
+
+                line = -1
+                if st.start == cstr.start + cstr.length:
+                    line = ystart
+
+                if line:
+                    cr.set_line_width(3.0)
+                    cr.set_source_rgb(*(col * 0.7 for col in colour))
+                    cr.move_to(0, line)
+                    cr.line_to(w, line)
+                    cr.stroke()
 
         cr.restore()
 
@@ -1274,6 +1305,10 @@ class TimelineView(Gtk.DrawingArea):
         if self.zoom_hold:
             if event.direction == Gdk.ScrollDirection.UP:
                 self.spl_dest = max(self.spl * 0.8, math.pow(0.5, 6))
+                if type(mod.curr_seq) is tuple:
+                    strp = mod.timeline.strips[mod.curr_seq[1]]
+                    self.qb_start_dest = max(0, strp.start - (strp.length / 2))
+
             if event.direction == Gdk.ScrollDirection.DOWN:
                 self.spl_dest = min(self.spl / 0.8, 0.25)
 
@@ -1313,7 +1348,7 @@ class TimelineView(Gtk.DrawingArea):
         self.qb_start_dest = max(0, min(self.qb_start_dest, self.max_qb_start))
 
         if self.qb_start_dest - self.qb_start != 0:
-            self.qb_start += (self.qb_start_dest - self.qb_start) / 2
+            self.qb_start += (self.qb_start_dest - self.qb_start) / 4
 
         if self.spl_dest - self.spl != 0:
             self.spl += (self.spl_dest - self.spl) / 5
