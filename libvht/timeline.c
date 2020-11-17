@@ -605,6 +605,11 @@ int timeline_expand(timeline *tl, long qb_start, long qb_n) {
 	if (tl->pos > qb_start)
 		tl->pos += qb_n;
 
+	if (tl->loop_start > qb_start)
+		tl->loop_start += qb_n;
+
+	if (tl->loop_end > qb_start)
+		tl->loop_end += qb_n;
 
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);

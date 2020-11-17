@@ -799,7 +799,7 @@ int sequence_get_loop_active(sequence *seq) {
 }
 
 void sequence_set_loop_active(sequence *seq, int v) {
-	int prev = seq->loop_active;
+	//int prev = seq->loop_active;
 	seq->loop_active = v;
 
 	if (seq->parent > -1) {
