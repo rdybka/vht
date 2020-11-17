@@ -848,10 +848,12 @@ class TimelineView(Gtk.DrawingArea):
             and self.clone_hold
         ):
             self.expanding = True
+            self.hint = None
             self.gest_start_r = self.pointer_r
             self.exp_start = self.pointer_r
             self.exp_last_delta = 0
             self.exp_min = -mod.timeline.expand_start(self.exp_start)
+            return
 
         # add change
         if (
