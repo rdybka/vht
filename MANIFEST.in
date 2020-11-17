@@ -1,2 +1,3 @@
 include libvht/*.h
+include doc/*
 include LICENSE
