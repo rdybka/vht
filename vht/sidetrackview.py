@@ -78,6 +78,10 @@ class SideTrackView(Gtk.DrawingArea):
         self.drawing_loop = False
         self.drawing_start = -1
 
+        self.last_loop_active = False
+        self.last_loop_start = -1
+        self.last_loop_end = -1
+
     def on_button_press(self, widget, event):
         if event.state & Gdk.ModifierType.CONTROL_MASK:
             if event.button == cfg.select_button:
@@ -105,9 +109,16 @@ class SideTrackView(Gtk.DrawingArea):
             return True
 
         if event.button == cfg.delete_button:
+            if type(self.seq.index) is not tuple:
+                self.seq.loop_start = -1
+                self.seq.loop_end = -1
+                self.seq.loop_active = False
+                self.redraw()
+                return True
+
+            act = mod.timeline.loop_active
             self.seq.loop_active = False
-            self.seq.loop_start = -1
-            self.seq.loop_end = -1
+            mod.timeline.loop_active = act
             self.redraw()
             return True
 
@@ -122,13 +133,7 @@ class SideTrackView(Gtk.DrawingArea):
 
         if self.drawing_loop:
             self.drawing_loop = False
-            if self.hover != self.drawing_start:
-                self.seq.loop_active = True
-            else:
-                self.seq.loop_start = -1
-                self.seq.loop_end = -1
-                self.seq.loop_active = False
-                self.redraw()
+            self.seq.loop_active = True
 
         self.show_resize_handle = False
 
@@ -418,6 +423,7 @@ class SideTrackView(Gtk.DrawingArea):
 
     def on_motion(self, widget, event):
         self.show_resize_handle = False
+        lh = self.hover
         self.hover = int(event.y / self.txt_height)
 
         if self.drawing_loop:
@@ -459,6 +465,12 @@ class SideTrackView(Gtk.DrawingArea):
         if self.hover == self.seq.loop_end:
             self.show_resize_handle = True
 
+        if lh != self.hover:
+            if lh:
+                self.redraw(lh)
+            if self.hover:
+                self.redraw(self.hover)
+
         if self.show_resize_handle:
             self.get_window().set_cursor(self.resize_curs)
         else:
@@ -468,6 +480,7 @@ class SideTrackView(Gtk.DrawingArea):
 
     def on_leave(self, wdg, prm):
         self.hover = None
+        self.redraw()
 
     def on_destroy(self, wdg):
         if self._surface:
@@ -480,6 +493,24 @@ class SideTrackView(Gtk.DrawingArea):
             self.zero_pattern_surface.finish()
 
     def tick(self):
+        redr = False
+        if self.last_loop_active != self.seq.loop_active:
+            self.last_loop_active = self.seq.loop_active
+            redr = True
+
+        if self.last_loop_start != self.seq.loop_start:
+            self.last_loop_start = self.seq.loop_start
+            redr = True
+
+        if self.last_loop_end != self.seq.loop_end:
+            self.last_loop_end = self.seq.loop_end
+            redr = True
+
+        # if self.last_strip_pos !=
+
+        if redr:
+            self.redraw()
+
         if self._context and self._back_context:
             self._pointer.draw(self.seq.pos)
 

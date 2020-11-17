@@ -791,3 +791,97 @@ void sequence_rotate(sequence *seq, int n, int trknum) {
 	seq_mod_excl_out(seq);
 }
 
+int sequence_get_loop_active(sequence *seq) {
+	if (seq->parent > -1)
+		return 0;
+
+	return seq->loop_active;
+}
+
+void sequence_set_loop_active(sequence *seq, int v) {
+	int prev = seq->loop_active;
+	seq->loop_active = v;
+
+	if (seq->parent > -1) {
+		midi_client *clt = (midi_client *)seq->clt;
+		module *mod = (module *)clt->mod_ref;
+		timeline *tl = mod->tline;
+		timestrip *strp = &mod->tline->strips[seq->index];
+		double mlt = sequence_get_relative_length(seq) / seq->length;
+
+		if (v) {
+			int tls = strp->start;
+			tls += round((seq->loop_start * mlt));
+
+
+			tl->loop_start = tls;
+
+			tls = strp->start;
+			tls += round((seq->loop_end + 1) * mlt);
+
+			tl->loop_end = tls;
+			tl->loop_active = 1;
+			timeline_update_loops_in_strips(tl);
+		}
+
+		if (!v) {
+			tl->loop_start = strp->start;
+			int tls = strp->start;
+			tls += round((seq->length) * mlt);
+			tl->loop_end = tls;
+			tl->loop_active = 0;
+			timeline_update_loops_in_strips(tl);
+			return;
+		}
+	}
+}
+
+int sequence_get_loop_start(sequence *seq) {
+	return seq->loop_start;
+}
+
+void sequence_set_loop_start(sequence *seq, int s) {
+	if (s < 0)
+		s = 0;
+
+	seq->loop_start = s;
+
+
+	if (seq->parent > -1 && seq->loop_active) {
+		midi_client *clt = (midi_client *)seq->clt;
+		module *mod = (module *)clt->mod_ref;
+		timestrip *strp = &mod->tline->strips[seq->index];
+
+		int tls = strp->start;
+		double mlt = sequence_get_relative_length(seq) / seq->length;
+		tls += round(s * mlt);
+
+		if (tls < strp->start)
+			tls = strp->start;
+
+		mod->tline->loop_start = tls;
+	}
+}
+
+int sequence_get_loop_end(sequence *seq) {
+	return seq->loop_end;
+}
+
+void sequence_set_loop_end(sequence *seq, int e) {
+	if (e >= seq->length)
+		e = seq->length - 1;
+
+	seq->loop_end = e;
+
+	if (seq->parent > -1 && seq->loop_active) {
+		midi_client *clt = (midi_client *)seq->clt;
+		module *mod = (module *)clt->mod_ref;
+		timestrip *strp = &mod->tline->strips[seq->index];
+
+		int tls = strp->start;
+		double mlt = sequence_get_relative_length(seq) / seq->length;
+		tls += round((e + 1) * mlt);
+
+		mod->tline->loop_end = tls;
+	}
+}

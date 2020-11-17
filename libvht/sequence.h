@@ -108,6 +108,13 @@ void sequence_set_extras(sequence *seq, char *extr);
 
 void sequence_rotate(sequence *seq, int n, int trknum); //trknum -1 = all
 
+int sequence_get_loop_active(sequence *seq);
+void sequence_set_loop_active(sequence *seq, int v);
+int sequence_get_loop_start(sequence *seq);
+void sequence_set_loop_start(sequence *seq, int s);
+int sequence_get_loop_end(sequence *seq);
+void sequence_set_loop_end(sequence *seq, int e);
+
 void seq_mod_excl_in(sequence *seq);
 void seq_mod_excl_out(sequence *seq);
 #endif //__SEQUENCE_H__

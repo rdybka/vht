@@ -839,6 +839,22 @@ void timeline_reset(timeline *tl) {
 	}
 }
 
+void timestrip_set_start(timestrip *tstr, int start) {
+	tstr->start = start;
+	tstr->seq->playing = 0;
+	module *mod = ((midi_client *)tstr->seq->clt)->mod_ref;
+	timeline *tl = mod->tline;
+	timeline_update_loops_in_strips(tl);
+}
+
+void timestrip_set_length(timestrip *tstr, int length) {
+	tstr->length = length;
+	tstr->seq->playing = 0;
+	module *mod = ((midi_client *)tstr->seq->clt)->mod_ref;
+	timeline *tl = mod->tline;
+	timeline_update_loops_in_strips(tl);
+}
+
 double timestrip_get_rpb(timestrip *strp, double offs) {
 	double ret = strp->rpb_start;
 
@@ -1064,6 +1080,7 @@ void timeline_set_loop_active(timeline *tl, int val) {
 	}
 
 	tl->loop_active = val;
+	timeline_update_loops_in_strips(tl);
 }
 
 long timeline_get_loop_start(timeline *tl) {
@@ -1074,12 +1091,43 @@ long timeline_get_loop_end(timeline *tl) {
 	return tl->loop_end;
 }
 
+void timeline_update_loops_in_strips(timeline *tl) {
+	for (int s = 0; s < tl->nstrips; s++) {
+		timestrip *strp = &tl->strips[s];
+		sequence *seq = strp->seq;
+		double mtl = sequence_get_relative_length(seq) / seq->length;
+		int strplen = ceil((seq->length) * mtl);
+
+		if ((strp->start <= tl->loop_end) && (strp->start + strplen > tl->loop_start) && (tl->loop_active)) {
+			int ls = (tl->loop_start - strp->start) * mtl;
+			int le = seq->length - (((strp->start + seq->length) - (tl->loop_end - 1)) / mtl);
+
+			if (ls <= 0 && le >= seq->length - 1) {
+				seq->loop_active = 0;
+				seq->loop_start = -1;
+				seq->loop_end = -1;
+			} else {
+				seq->loop_start = ls;
+				seq->loop_end = le;
+				seq->loop_active = 1;
+			}
+		} else {
+			seq->loop_active = 0;
+			seq->loop_start = -1;
+			seq->loop_end = -1;
+		}
+
+	}
+}
+
 void timeline_set_loop_start(timeline *tl, long val) {
 	tl->loop_start = val;
+	timeline_update_loops_in_strips(tl);
 }
 
 void timeline_set_loop_end(timeline *tl, long val) {
 	tl->loop_end = val;
+	timeline_update_loops_in_strips(tl);
 }
 
 void timeline_set_pos(timeline *tl, double npos, int let_ring) {

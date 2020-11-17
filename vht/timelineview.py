@@ -756,8 +756,6 @@ class TimelineView(Gtk.DrawingArea):
         return True
 
     def on_button_press(self, widget, event):
-        self.hint = None
-
         # filter double clicks
         if event.button == 2:
             if (
@@ -836,9 +834,10 @@ class TimelineView(Gtk.DrawingArea):
                 return True
 
             # playpos
-            self.moving_playhead = True
-            mod.timeline.pos = self.pointer_r
-            return
+            if not self.hint or not event.state & Gdk.ModifierType.CONTROL_MASK:
+                self.moving_playhead = True
+                mod.timeline.pos = self.pointer_r
+                return
 
         if not self.moving_bpm:
             self.curr_change = None
@@ -961,7 +960,7 @@ class TimelineView(Gtk.DrawingArea):
                 self.gest_start_r = self.pointer_r
                 return True
 
-            if self.clone_hold:
+            if self.zoom_hold:
                 src = mod.timeline.strips[self.curr_strip_id].seq
                 seq = mod.timeline.strips.insert_clone(self.curr_strip_id).seq
                 idx = seq.index
@@ -996,7 +995,7 @@ class TimelineView(Gtk.DrawingArea):
             if rm >= mod[self.curr_col].length or rm == -1:
                 rr = int(min(self.pointer_r, mod.timeline.nqb))
                 idx = None
-                if event.button == 2:  # empty
+                if self.zoom_hold:  # event.button == 1:  # empty
                     seq = mod.new_sequence(mod[self.curr_col].length)
                     strp = mod.timeline.strips.insert(
                         self.curr_col,

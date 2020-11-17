@@ -124,6 +124,8 @@ long timeline_get_loop_end(timeline *tl);
 void timeline_set_loop_start(timeline *tl, long val);
 void timeline_set_loop_end(timeline *tl, long val);
 
+void timeline_update_loops_in_strips(timeline *tl);
+
 void timeline_set_pos(timeline *tl, double npos, int let_ring);
 double timeline_get_pos(timeline *tl);
 

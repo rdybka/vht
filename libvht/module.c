@@ -483,6 +483,8 @@ sequence *module_sequence_replace(module *mod, int s, sequence *seq) {
 		return NULL;
 
 	module_excl_in(mod);
+	sequence_set_extras(seq, mod->seq[s]->extras);
+
 	sequence_free(mod->seq[s]);
 	mod->seq[s] = seq;
 	module_seqs_reindex(mod);

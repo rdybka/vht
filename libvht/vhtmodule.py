@@ -212,7 +212,6 @@ class VHTModule(Iterable):
         return VHTSequence(seq, self, self.cb_new_track)
 
     def replace_sequence(self, s):  # s: strip_id
-
         seq = libcvht.sequence_clone(
             libcvht.timeline_get_seq(self.timeline._tl_handle, s)
         )
@@ -462,10 +461,6 @@ class VHTModule(Iterable):
             self.timeline.clear()
 
             tl = jm["tl"]
-            self.timeline.loop_start = tl["loop_start"]
-            self.timeline.loop_end = tl["loop_end"]
-            self.timeline.loop_active = tl["loop_active"]
-
             for chng in tl["changes"]:
                 self.timeline.changes.insert(chng["bpm"], chng["row"], chng["lnk"])
 
@@ -483,6 +478,10 @@ class VHTModule(Iterable):
                 )
 
                 s.enabled = strp["enabled"]
+
+            self.timeline.loop_start = tl["loop_start"]
+            self.timeline.loop_end = tl["loop_end"]
+            self.timeline.loop_active = tl["loop_active"]
 
             self.curr_seq = jm["curr_seq"]
             self.midi_synch_ports()

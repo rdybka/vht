@@ -140,8 +140,8 @@ customs = {
     "Playback": [("Trigger (keypad)", "KP_0...KP_9")],
     "Timeline": [
         ("Snap", "<alt>"),
-        ("Zoom / Add bpm node", "<ctrl>"),
-        ("Shift time / Clone strip", "<shift>"),
+        ("Zoom / Add bpm node / Clone", "<ctrl>"),
+        ("Shift", "<shift>"),
     ],
 }
 

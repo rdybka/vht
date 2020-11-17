@@ -303,33 +303,6 @@ void track_set_playing(track *trk, int p) {
 	}
 }
 
-int sequence_get_loop_active(sequence *seq) {
-	if (seq->parent > -1)
-		return 0;
-
-	return seq->loop_active;
-}
-
-void sequence_set_loop_active(sequence *seq, int v) {
-	seq->loop_active = v;
-}
-
-int sequence_get_loop_start(sequence *seq) {
-	return seq->loop_start;
-}
-
-void sequence_set_loop_start(sequence *seq, int s) {
-	seq->loop_start = s;
-}
-
-int sequence_get_loop_end(sequence *seq) {
-	return seq->loop_end;
-}
-
-void sequence_set_loop_end(sequence *seq, int e) {
-	seq->loop_end = e;
-}
-
 double timeline_get_length(timeline *tl) {
 	return tl->time_length;
 }
@@ -358,15 +331,6 @@ int timestrip_get_rpb_end(timestrip *tstr) {
 	return tstr->rpb_end;
 }
 
-void timestrip_set_start(timestrip *tstr, int start) {
-	tstr->start = start;
-	tstr->seq->playing = 0;
-}
-
-void timestrip_set_length(timestrip *tstr, int length) {
-	tstr->length = length;
-	tstr->seq->playing = 0;
-}
 
 void timestrip_set_rpb_start(timestrip *tstr, int rpb_start) {
 	tstr->rpb_start = rpb_start;
