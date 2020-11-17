@@ -20,25 +20,30 @@ Module also has a timeline, made of strips, which themselves contain sequences. 
 either a main sequence (top right pane) or one in timeline (bottom right). There are two playing modes, looping or
 timeline. Current mode is indicated by the loop toggle button in right pane. Main sequences can be assigned
 triggers in their menu. The trigger assigned to the the right mouse button (denoted by **r**)
-will be activated with keypad number corresponding to sequences position.
+will be activated with keypad number corresponding to it's position.
 
 There are two recording modes. One, where all input goes into the active track, toggled by space,
 and one which will create tracks based on midi input (ctrl+space).
 
 ## Interface
-Throughout the program, right mouse button resets, exits or deletes depending on context. Current keyboard focus as well as track armed for midi recording is denoted by a bar under track name. As great care has been taken to display tooltips for every operation, this will only list non-trivial functions.
+Throughout the program, right mouse button resets, exits or deletes depending on context. Current keyboard focus
+as well as track armed for midi recording is denoted by a bar under track name. As great care has been taken to
+display tooltips for every operation, this will only list non-trivial functions.
 
 - Sequence
     - F1-F10 - mute/unmute tracks
     - ctrl-drag in leftmost column rotates active tracks
+- Track
     - ctrl-click + drag in time field will work on selection
     - ctrl-click + drag in velocity field will too
-
+    - ctrl-click - add controller node
+    - double click a node to link/unlink
+    - inner nodes can be smoothed with wouse wheel
 - Timeline
     - left-click on a hint - create a clone of main sequence
     - ctrl+left-click on a strip - place clone
     - ctrl+left-click on a hint - place empty
-    - shift+left-click - shift time
+    - shift+left-drag - shift time
     - mid-click - move play-head
     - mid-click on loop marker - on and off
     - mid-click strip - silence
