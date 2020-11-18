@@ -849,6 +849,7 @@ void timestrip_set_start(timestrip *tstr, int start) {
 	tstr->seq->playing = 0;
 	module *mod = ((midi_client *)tstr->seq->clt)->mod_ref;
 	timeline *tl = mod->tline;
+	timeline_update(tl);
 	timeline_update_loops_in_strips(tl);
 }
 
@@ -857,6 +858,7 @@ void timestrip_set_length(timestrip *tstr, int length) {
 	tstr->seq->playing = 0;
 	module *mod = ((midi_client *)tstr->seq->clt)->mod_ref;
 	timeline *tl = mod->tline;
+	timeline_update(tl);
 	timeline_update_loops_in_strips(tl);
 }
 
@@ -1121,7 +1123,6 @@ void timeline_update_loops_in_strips(timeline *tl) {
 			seq->loop_start = -1;
 			seq->loop_end = -1;
 		}
-
 	}
 }
 
