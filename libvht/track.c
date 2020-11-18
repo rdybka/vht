@@ -92,6 +92,7 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	trk->ctrl = 0;
 	trk->ctrlnum = 0;
 	trk->lctrlval = 0;
+	trk->lctrlrow = 0;
 	trk->env = 0;
 
 	trk->crows = 0;
@@ -328,6 +329,7 @@ void track_free(track *trk) {
 	free(trk->ctrl);
 	free(trk->ctrlnum);
 	free(trk->lctrlval);
+	free(trk->lctrlrow);
 	free(trk->env);
 
 	free(trk);
@@ -801,12 +803,14 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 				}
 
 				if ((delay >= 0) && (delay < tperiod)) {
-					if (trk->playing)
-						if (data != trk->lctrlval[c]) {
+					if (trk->playing) {
+						if (data != trk->lctrlval[c] || rr != trk->lctrlrow[c]) {
 							trk->lctrlval[c] = data;
+							trk->lctrlrow[c] = rr;
 							midi_buffer_add(clt, trk->port, evt);
 							trk->indicators |= 8;
 						}
+					}
 				}
 			}
 
@@ -896,10 +900,13 @@ void track_add_ctrl(track *trk, int c) {
 	trk->ctrlnum = realloc(trk->ctrlnum, sizeof(int) * trk->nctrl);
 	trk->ctrlnum[trk->nctrl -1] = c;
 	trk->lctrlval = realloc(trk->lctrlval, sizeof(int) * trk->nctrl);
+	trk->lctrlrow = realloc(trk->lctrlrow, sizeof(int) * trk->nctrl);
+
 	if (c == 0) {
 		trk->lctrlval[trk->nctrl -1] = 64 * 127;
 	} else {
 		trk->lctrlval[trk->nctrl -1] = -1;
+		trk->lctrlrow[trk->nctrl -1] = -1;
 	}
 	trk->env = realloc(trk->env, sizeof(envelope *) * trk->nctrl);
 	trk->env[trk->nctrl -1] = envelope_new(trk->nrows, trk->ctrlpr);
@@ -962,6 +969,8 @@ void track_del_ctrl(track *trk, int c) {
 	trk->crows = realloc(trk->crows, sizeof(ctrlrow *) * trk->nctrl);
 	trk->ctrl = realloc(trk->ctrl, sizeof(int*) * trk->nctrl * trk->ctrlpr);
 	trk->env = realloc(trk->env, sizeof(envelope *) * trk->nctrl);
+	trk->lctrlval = realloc(trk->lctrlval, sizeof(int) * trk->nctrl);
+	trk->lctrlrow = realloc(trk->lctrlrow, sizeof(int) * trk->nctrl);
 
 	pthread_mutex_unlock(&trk->exclctrl);
 }
@@ -1067,7 +1076,7 @@ void track_resize(track *trk, int size) {
 			}
 		}
 
-		envelope_resize(trk->env[c], trk->nrows, trk->ctrlpr);
+		envelope_resize(trk->env[c], size, trk->ctrlpr);
 		track_ctrl_refresh_envelope(trk, c);
 	}
 
@@ -1100,8 +1109,8 @@ void track_set_nsrows(track *trk, int n) {
 
 void track_double(track *trk) {
 	int offs = trk->nrows;
-	track_resize(trk, trk->nrows * 2);
 	trk->nsrows *= 2;
+	track_resize(trk, trk->nrows * 2);
 
 	trk_mod_excl_in(trk);
 

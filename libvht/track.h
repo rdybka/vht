@@ -53,6 +53,7 @@ typedef struct track_t {
 	int nctrl;
 	int *ctrlnum;
 	int *lctrlval;
+	int *lctrlrow;
 	int **ctrl;
 
 	int prog;
