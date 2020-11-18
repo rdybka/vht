@@ -691,7 +691,7 @@ class ControllerEditor:
                         self.trk.ctrl[self.ctrlnum][self.edit].smooth = 0
 
                     self.trk.ctrl[self.ctrlnum][self.edit].velocity = val
-                    self.edit += cfg.skip
+                    # self.edit += cfg.skip
                     if self.edit > self.trk.nrows - 1:
                         self.edit -= self.trk.nrows
                     if self.edit < 0:
@@ -978,6 +978,7 @@ class ControllerEditor:
         return handled
 
     def on_button_press(self, widget, event):
+        self.tv.parent.autoscroll_req = False
         if event.x < self.x_from or event.x > self.x_to:
             return
 
@@ -1035,7 +1036,6 @@ class ControllerEditor:
                 if self.edit != r:
                     self.tv.leave_all()
                     self.tv.set_opacity(1)
-                    self.tv.parent.autoscroll_req = True
                     self.edit = r
                     self.selection = None
                     self.last_keyboard_edit = -1
@@ -1123,7 +1123,7 @@ class ControllerEditor:
                 else:
                     self.tv.leave_all()
                     self.moving = True
-
+                    self.tv.autoscroll_req = False
                 return
 
         if event.button == cfg.delete_button:
