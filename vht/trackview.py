@@ -720,7 +720,7 @@ class TrackView(Gtk.DrawingArea):
 
                 (x, y, width, height, dx, dy) = cr.text_extents("0")
 
-                if veled and rw.type == 1:
+                if veled and (rw.type == 1 or self.velocity_editor.line > -1):
                     self.velocity_editor.draw(cr, c, r, rw)
 
                 if tsed and 0 < rw.type < 3:
@@ -825,11 +825,15 @@ class TrackView(Gtk.DrawingArea):
         new_hover_row = max(new_hover_row, 0)
         new_hover_column = max(new_hover_column, 0)
 
-        if self.velocity_editor and not (
-            (event.state & Gdk.ModifierType.SHIFT_MASK)
-            and (event.state & Gdk.ModifierType.BUTTON1_MASK)
-        ):
-            return self.velocity_editor.on_motion(widget, event)
+        if self.velocity_editor:
+            if self.velocity_editor.hover_row == -1 and not (
+                (event.state & Gdk.ModifierType.SHIFT_MASK)
+                and (event.state & Gdk.ModifierType.BUTTON1_MASK)
+            ):
+                return self.velocity_editor.on_motion(widget, event)
+
+            if self.velocity_editor.hover_row > -1:
+                return self.velocity_editor.on_motion(widget, event)
 
         if self.timeshift_editor and not (
             (event.state & Gdk.ModifierType.CONTROL_MASK)

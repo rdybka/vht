@@ -217,6 +217,7 @@ class Configuration:
             "port_down": cfgkey("KP_Divide", True, False, True),
             "hold_editor": cfgkey("Control_L", False, False, False),
             "node_snap": cfgkey("Control_L", False, False, False),
+            "velocity_line": cfgkey("Shift_L", False, False, False),
             "toggle_notes": cfgkey("1", False, True, False),
             "toggle_time": cfgkey("2", False, True, False),
             "toggle_pitch": cfgkey("3", False, True, False),

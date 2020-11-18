@@ -17,6 +17,11 @@
 
 from vht import cfg
 
+import gi
+
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gdk, Gtk
+
 
 class VelocityEditor:
     def __init__(self, tv, col, row, event):
@@ -32,6 +37,9 @@ class VelocityEditor:
         self.lock = False
         self.locked = self.trk[col][row].velocity
         self.start_value = self.locked
+        self.line = -1
+        self.hover_row = -1
+        self.hover_vel = -1
 
         self.x_from = 0
         self.x_to = 0
@@ -56,19 +64,33 @@ class VelocityEditor:
         yh = cfg.editor_row_height * self.tv.txt_height
         yp = (self.tv.txt_height - yh) / 2.0
 
-        cr.set_line_width(1.0)
-        cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), 1)
-        cr.rectangle(
-            self.x_from,
-            r * self.tv.txt_height + yp,
-            (self.x_to / 127.0) * rw.velocity,
-            yh,
-        )
-        cr.fill()
+        if rw.type == 1:
+            cr.set_line_width(1.0)
+            cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), 1)
+            cr.rectangle(
+                self.x_from,
+                r * self.tv.txt_height + yp,
+                (self.x_to / 127.0) * rw.velocity,
+                yh,
+            )
+            cr.fill()
 
-        cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), 1)
-        cr.rectangle(self.x_from, r * self.tv.txt_height + yp, self.x_to, yh)
-        cr.stroke()
+            cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), 1)
+            cr.rectangle(self.x_from, r * self.tv.txt_height + yp, self.x_to, yh)
+            cr.stroke()
+
+        if self.line > -1:
+            cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), 1)
+            cr.move_to(
+                self.x_from
+                + (self.x_to / 127.0) * self.tv.trk[self.col][self.line].velocity,
+                self.line * self.tv.txt_height + yp,
+            )
+            cr.line_to(
+                self.x_from + (self.x_to / 127.0) * self.hover_vel,
+                self.hover_row * self.tv.txt_height + yp,
+            )
+            cr.stroke()
 
     def on_key_press(self, widget, event):
         if cfg.key["hold_editor"].matches(event):
@@ -78,7 +100,15 @@ class VelocityEditor:
                     if not self.confirmed:
                         self.locked = self.tv.trk[self.col][self.row].velocity
 
+        if 65505 <= event.keyval <= 65506:  # shift
+            if self.hover_row > -1 and self.confirmed:
+                self.line = self.hover_row
+
     def on_key_release(self, widget, event):
+        if self.line > -1:
+            self.line = -1
+            self.tv.redraw()
+
         if self.clearing:
             return False
 
@@ -93,7 +123,12 @@ class VelocityEditor:
 
     def on_motion(self, widget, event):
         # edit single velocity in place
-        if not self.clearing and not self.confirmed and not self.lock:
+        if (
+            not self.clearing
+            and not self.confirmed
+            and not self.lock
+            and self.line == -1
+        ):
             if event.x < self.x_from:
                 vel = self.trk[self.col][self.row].velocity
 
@@ -116,7 +151,10 @@ class VelocityEditor:
             if not self.confirmed and not self.clearing:
                 return False
 
-        new_hover_row = min(int(event.y / self.tv.txt_height), self.tv.trk.nrows - 1)
+        new_hover_row = max(
+            0, min(int(event.y / self.tv.txt_height), self.tv.trk.nrows - 1)
+        )
+        self.hover_row = new_hover_row
 
         if self.tv.trk[self.col][self.row].type != 1:
             return False
@@ -132,6 +170,30 @@ class VelocityEditor:
             or new_hover_row == 0
         ):
             vel = min(max(((event.x - self.x_from) / self.x_to) * 127.0, 0), 127)
+
+        if self.line > -1:
+            rs = self.line
+            re = self.hover_row
+            vs = self.tv.trk[self.col][self.line].velocity
+            self.hover_vel = vel
+
+            if rs > re:
+                rs, re = re, rs
+                vs, vel = vel, vs
+
+            if rs < 0:
+                self.tv.redraw()
+                return
+
+            if re - rs > 1:
+                d = (vel - vs) / (re - rs)
+                vv = vs
+                for r in range(rs + 1, re):
+                    vv += d
+                    if self.tv.trk[self.col][r].type == 1:
+                        self.tv.trk[self.col][r].velocity = vv
+
+            self.tv.redraw()
 
         if self.lock:
             vel = self.locked
