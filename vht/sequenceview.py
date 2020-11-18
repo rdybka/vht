@@ -126,7 +126,7 @@ class SequenceView(Gtk.Box):
         self._sv_hadj.connect("value-changed", self.on_sv_hadj_changed)
         self.prop_view_hadj.connect("value-changed", self.on_sv_hadj_changed)
 
-        self.autoscroll_req = False
+        self._autoscroll_req = False
         self.last_autoscroll_r = -1
         self.trk_cache = {}
         self.active_tracks = {}
@@ -135,6 +135,14 @@ class SequenceView(Gtk.Box):
         self.highlight = seq.rpb
 
         self.show_all()
+
+    @property
+    def autoscroll_req(self):
+        return self._autoscroll_req
+
+    @autoscroll_req.setter
+    def autoscroll_req(self, v):
+        self._autoscroll_req = v
 
     def on_button_press(self, widget, event):
         if event.button == cfg.delete_button:
@@ -931,6 +939,9 @@ class SequenceView(Gtk.Box):
         r = trk.edit[1]
         if trk.keyboard_focus:
             r = trk.keyboard_focus.edit
+
+        if r == -1:
+            return
 
         vtarget = (r * trk.txt_height) + trk.txt_height / 2.0
         trk_height = trk.txt_height * trk.trk.nrows

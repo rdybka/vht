@@ -1182,6 +1182,7 @@ class ControllerEditor:
         return
 
     def on_button_release(self, widget, event):
+        self.tv.parent.autoscroll_req = True
         if event.button == cfg.delete_button:
             self.deleting = False
 
@@ -1396,7 +1397,8 @@ class ControllerEditor:
             r = min(int(event.y / self.tv.txt_height), self.trk.nrows - 1)
             l = self.selection[1] - self.selection[0]
             s = r - self.drag_selection_offset
-            self.edit = -1
+            self.edit = self.selection[1]
+            self.tv.parent.autoscroll_req = True
 
             if s != 0:
                 self.dragged = True

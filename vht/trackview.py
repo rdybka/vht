@@ -977,6 +977,7 @@ class TrackView(Gtk.DrawingArea):
             return True
 
         if self.drag:
+            self.parent.autoscroll_req = True
             if (
                 self.trk[new_hover_column][new_hover_row].type == 0
             ):  # dragging single cell
@@ -991,6 +992,7 @@ class TrackView(Gtk.DrawingArea):
                     self.redraw(old_row)
 
         if self.sel_drag:  # dragging selection
+            self.parent.autoscroll_req = True
             dx = new_hover_column - self.sel_drag_prev[0]
             dy = new_hover_row - self.sel_drag_prev[1]
             sw = self.select_end[0] - self.select_start[0]
@@ -1081,6 +1083,8 @@ class TrackView(Gtk.DrawingArea):
                 self.redraw(*(old))
                 self.redraw(self.select_start[1], self.select_end[1])
 
+            self.edit = self.select_end
+
         oh = self.hover
         self.hover = new_hover_column, new_hover_row
 
@@ -1108,6 +1112,8 @@ class TrackView(Gtk.DrawingArea):
     def on_button_press(self, widget, event):
         if not self.trk:
             return False
+
+        # self.parent.autoscroll_req = False
 
         mod.clear_popups()
 
@@ -1318,6 +1324,8 @@ class TrackView(Gtk.DrawingArea):
         if self.show_controllers:
             for ctrl in self.controller_editors:
                 ctrl.on_button_release(widget, event)
+
+        self.parent.autoscroll_req = True
 
         if self.sel_drag and event.button == cfg.select_button:
             if self.sel_dragged:
