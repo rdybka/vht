@@ -1025,6 +1025,7 @@ class TimelineView(Gtk.DrawingArea):
 
                 self.curr_strip_id = idx[1]
                 self.moving = True
+                self.hint = False
                 self.move_start_r = mod.timeline.strips[self.curr_strip_id].start
                 self.gest_start_r = self.move_start_r
 
@@ -1418,7 +1419,7 @@ class TimelineView(Gtk.DrawingArea):
         if self.moving or self.resizing or self.expanding:
             return
 
-        if self.clone_hold and self.curr_strip_id > -1:
+        if self.zoom_hold and self.curr_strip_id > -1:
             strp = mod.timeline.strips[self.curr_strip_id]
             rm = mod.timeline.place_clone(self.curr_strip_id)
             hint = (rm, strp.length)
