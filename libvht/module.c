@@ -90,6 +90,13 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 			for (int s = 0; s < mod->nseq; s++)
 				for (int t = 0; t < mod->seq[s]->ntrk; t++)
 					track_kill_notes(mod->seq[s]->trk[t]);
+
+			for (int s = 0; s < mod->tline->nstrips; s++) {
+				timestrip *strp = &mod->tline->strips[s];
+				for (int t = 0; t < strp->seq->ntrk; t++) {
+					track_kill_notes(strp->seq->trk[t]);
+				}
+			}
 			mod->mute = 0;
 		}
 		if (mod->zero_time)
@@ -338,8 +345,10 @@ void module_reset(module *mod) {
 	for (int s = 0; s < mod->nseq; s++) {
 		mod->seq[s]->pos = 0;
 		//mod->seq[s]->lost = 1;
-		for (int t = 0; t < mod->seq[s]->ntrk; t++)
+		for (int t = 0; t < mod->seq[s]->ntrk; t++) {
+			track_kill_notes(mod->seq[s]->trk[t]);
 			track_reset(mod->seq[s]->trk[t]);
+		}
 	}
 
 	timeline_reset(mod->tline);
