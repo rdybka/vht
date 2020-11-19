@@ -79,7 +79,7 @@ class TrackPropViewPopover(Gtk.Popover):
         button.add(image)
         button.connect("clicked", self.on_retract_button_clicked)
         button.set_tooltip_markup(
-            cfg.tooltip_markup2 % ("rem col", cfg.key["track_shrink"])
+            cfg.tooltip_markup2 % ("remove column", cfg.key["track_shrink"])
         )
         self.grid.attach(button, 0, 0, 1, 1)
 
@@ -89,7 +89,7 @@ class TrackPropViewPopover(Gtk.Popover):
         button.add(image)
         button.connect("clicked", self.on_expand_button_clicked)
         button.set_tooltip_markup(
-            cfg.tooltip_markup2 % ("add col", cfg.key["track_expand"])
+            cfg.tooltip_markup2 % ("add column", cfg.key["track_expand"])
         )
         self.grid.attach(button, 1, 0, 1, 1)
 
@@ -99,7 +99,7 @@ class TrackPropViewPopover(Gtk.Popover):
         button.add(image)
         button.connect("clicked", self.on_move_left_button_clicked)
         button.set_tooltip_markup(
-            cfg.tooltip_markup2 % ("track left", cfg.key["track_move_left"])
+            cfg.tooltip_markup2 % ("move left", cfg.key["track_move_left"])
         )
         self.grid.attach(button, 1, 1, 1, 1)
 
@@ -109,7 +109,7 @@ class TrackPropViewPopover(Gtk.Popover):
         button.add(image)
         button.connect("clicked", self.on_move_right_button_clicked)
         button.set_tooltip_markup(
-            cfg.tooltip_markup2 % ("track_right", cfg.key["track_move_right"])
+            cfg.tooltip_markup2 % ("move right", cfg.key["track_move_right"])
         )
         self.grid.attach(button, 2, 1, 1, 1)
 
@@ -119,7 +119,7 @@ class TrackPropViewPopover(Gtk.Popover):
         button.add(image)
         button.connect("clicked", self.on_move_first_button_clicked)
         button.set_tooltip_markup(
-            cfg.tooltip_markup2 % ("track first", cfg.key["track_move_first"])
+            cfg.tooltip_markup2 % ("move to first", cfg.key["track_move_first"])
         )
         self.grid.attach(button, 0, 1, 1, 1)
 
@@ -129,7 +129,7 @@ class TrackPropViewPopover(Gtk.Popover):
         button.add(image)
         button.connect("clicked", self.on_move_last_button_clicked)
         button.set_tooltip_markup(
-            cfg.tooltip_markup2 % ("track last", cfg.key["track_move_last"])
+            cfg.tooltip_markup2 % ("move to last", cfg.key["track_move_last"])
         )
         self.grid.attach(button, 3, 1, 1, 1)
 
@@ -215,6 +215,9 @@ class TrackPropViewPopover(Gtk.Popover):
         self.name_entry.set_activates_default(False)
 
         self.name_lab = Gtk.ToggleButton.new_with_label("name:")
+        self.name_lab.set_tooltip_markup(
+            cfg.tooltip_markup % "hold name when switching patch"
+        )
         self.name_lab.set_vexpand(True)
 
         self.name_lab.set_active(self.extras["track_keep_name"])
