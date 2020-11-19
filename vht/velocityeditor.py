@@ -173,27 +173,33 @@ class VelocityEditor:
 
         if self.line > -1:
             rs = self.line
-            re = self.hover_row
+            re = int(event.y / self.tv.txt_height)
             vs = self.tv.trk[self.col][self.line].velocity
             self.hover_vel = vel
 
-            if rs > re:
-                rs, re = re, rs
-                vs, vel = vel, vs
-
-            if rs < 0:
-                self.tv.redraw()
-                return
-
-            if re - rs > 1:
+            if abs(re - rs) > 0:
                 d = (vel - vs) / (re - rs)
                 vv = vs
-                for r in range(rs + 1, re):
+
+                if re > rs:
+                    rs += 1
                     vv += d
-                    if self.tv.trk[self.col][r].type == 1:
-                        self.tv.trk[self.col][r].velocity = vv
+                    re += 1
+                else:
+                    rs, re = re, rs
+                    vel, vs = vs, vel
+
+                    d = (vel - vs) / (re - rs)
+                    vv = vs
+
+                for r in range(rs, re):
+                    if r > -1 and r <= self.tv.trk.nrows:
+                        if self.tv.trk[self.col][r].type == 1:
+                            self.tv.trk[self.col][r].velocity = vv
+                    vv += d
 
             self.tv.redraw()
+            return
 
         if self.lock:
             vel = self.locked
