@@ -588,7 +588,8 @@ class StatusBar(Gtk.DrawingArea):
                     mod.mainwin.sequence_view.redraw_track()
 
             if middle:
-                mod[mod.curr_seq].ketchup()
+                for seq in mod:
+                    seq.ketchup()
 
     def on_tooltip(self, wdg, x, y, kbd, tt):
         if not self.active_field:
