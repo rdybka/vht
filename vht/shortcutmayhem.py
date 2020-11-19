@@ -73,7 +73,6 @@ shorts = {
         ("Previous", "sequence_prev"),
         ("Move left", "sequence_move_left"),
         ("Move right", "sequence_move_right"),
-        ("Loop", "sequence_loop"),
     ],
     "Track": [
         ("Toggle notes", "toggle_notes"),
@@ -131,12 +130,13 @@ shorts = {
         ("Replace top", "sequence_replace"),
         ("Double", "strip_double"),
         ("Halve", "strip_halve"),
+        ("Loop", "sequence_loop"),
     ],
 }
 
 customs = {
     "General": [("Mute/Unmute", "F1...F12"), ("Piano", "z...m q...u")],
-    "Controllers": [("0-127", "z...m"), ("Snap / Hold / Add node", "<ctrl>"),],
+    "Controllers": [("0-127", "z...m"), ("Add node / Snap", "<ctrl>"),],
     "Playback": [("Trigger (keypad)", "KP_0...KP_9")],
     "Timeline": [
         ("Snap", "<alt>"),
