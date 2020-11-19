@@ -1346,6 +1346,8 @@ class TimelineView(Gtk.DrawingArea):
         return mod.mainwin.sequence_view.on_key_release(widget, event)
 
     def animate(self):
+        self.curr_col = min(len(mod) - 1, self.curr_col)
+
         self.qb_start = max(0, min(self.qb_start, self.max_qb_start))
         self.qb_start_dest = max(0, min(self.qb_start_dest, self.max_qb_start))
 
