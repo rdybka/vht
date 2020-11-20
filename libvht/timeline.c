@@ -1164,18 +1164,20 @@ void timeline_set_pos(timeline *tl, double npos, int let_ring) {
 	double remts = tl->slices[npsl].length * (npos - npsl);
 	ts += remts;
 
-	for (int s = 0; s < mod->nseq; s++) {
-		sequence *seq = mod->seq[s];
-		if (seq->playing)
-			continue;
+	if (mod->play_mode == 1) {
+		for (int s = 0; s < mod->nseq; s++) {
+			sequence *seq = mod->seq[s];
+			if (seq->playing)
+				continue;
 
-		seq->pos = ts * seq->rpb * 2;
-		for (int t = 0; t < seq->ntrk; t++) {
-			track_wind(seq->trk[t], seq->pos);
+			seq->pos = ts * seq->rpb * 2;
+			for (int t = 0; t < seq->ntrk; t++) {
+				track_wind(seq->trk[t], seq->pos);
+			}
+
+			while(seq->pos > seq->length)
+				seq->pos -= seq->length;
 		}
-
-		while(seq->pos > seq->length)
-			seq->pos -= seq->length;
 	}
 
 	if (mod->transp) {
