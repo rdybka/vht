@@ -305,7 +305,7 @@ class PreferencesWin(Gtk.Window):
 
         sw = Gtk.Switch()
         sw.set_active(self.cfg.new_tracks_left)
-        sw.connect("state-set", self.on_dark_mode_switch)
+        sw.connect("state-set", self.on_new_tracks_left_switch)
         bx.pack_start(lab, False, False, 0)
         bx.pack_end(sw, False, False, 0)
         grid.attach(bx, 0, 0, 1, 1)
@@ -545,6 +545,9 @@ class PreferencesWin(Gtk.Window):
 
     def on_new_seqs_tracks_switch(self, wdg, prm):
         self.cfg.new_seqs_with_tracks = prm
+
+    def on_new_tracks_left_switch(self, wdg, prm):
+        self.cfg.new_tracks_left = prm
 
     def on_key_press(self, widget, event):
         if event.keyval == Gdk.KEY_Escape:
