@@ -865,6 +865,11 @@ void track_kill_notes(track *trk) {
 		}
 	}
 
+	for (int c = 0; c < trk->nctrl; c++) {
+		trk->lctrlrow[c] = -1;
+		trk->lctrlval[c] = -1;
+	}
+
 	trk->indicators = 0;
 
 	pthread_mutex_unlock(&trk->excl);
