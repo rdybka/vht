@@ -919,6 +919,7 @@ class TimelineView(Gtk.DrawingArea):
         if self.resizing or self.moving:
             return
 
+        # del strip
         currs = mod.curr_seq[1] if type(mod.curr_seq) is tuple else -1
         if (
             event.button == cfg.delete_button
@@ -1008,6 +1009,10 @@ class TimelineView(Gtk.DrawingArea):
                         seq.rpb,
                     )
                     strp.noteoffise()
+                    if len(strp.seq) == 0:
+                        if cfg.new_seqs_with_tracks:
+                            strp.seq.add_track()
+
                     idx = strp.seq.index
                 else:
                     seq = mod[self.curr_col]

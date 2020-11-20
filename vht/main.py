@@ -32,6 +32,7 @@ from vht.portconfig import refresh_connections
 from vht import mod, cfg, ctrlcfg, autoexec, bankcfg, randomcomposer
 from gi.repository import GLib, Gtk, Gio, GdkPixbuf
 import vht.extras
+import vht.filerotator
 import sys
 import os
 import time
@@ -226,13 +227,14 @@ class VHTApp(Gtk.Application):
                 cfg.last_save_path = dialog.get_current_folder_uri()
                 self.main_win.last_filename = dialog.get_filename()
 
+                vht.filerotator.rotate(self.main_win.last_filename, cfg.n_backups)
                 mod.save(self.main_win.last_filename)
                 mod.saving = True
                 self.main_win.set_header_from_filename(self.main_win.last_filename)
-
             return
 
         if self.main_win.last_filename:
+            vht.filerotator.rotate(self.main_win.last_filename, cfg.n_backups)
             mod.save(self.main_win.last_filename)
             mod.saving = True
             cfg.last_save_path = cfg.last_load_path

@@ -252,6 +252,7 @@ class Configuration:
         self.velocity_keys = "zxcvbnm"
         self.piano_white_keys = "zxcvbnmqwertyu"
         self.piano_black_keys = "sdghj23567"
+        self.n_backups = 0
 
         self.cfg_parser = self.build_parser()
 
@@ -285,6 +286,7 @@ class Configuration:
             "piano_white_keys": self.piano_white_keys,
             "piano_black_keys": self.piano_black_keys,
             "velocity_keys": self.velocity_keys,
+            "n_backups": str(self.n_backups),
         }
 
         cfg["midi"] = {
@@ -333,6 +335,7 @@ class Configuration:
         adv["piano_white_keys"] = self.piano_white_keys
         adv["piano_black_keys"] = self.piano_black_keys
         adv["velocity_keys"] = self.velocity_keys
+        adv["n_backups"] = str(self.n_backups)
 
         mid = self.cfg_parser["midi"]
 
@@ -415,6 +418,7 @@ class Configuration:
             self.piano_white_keys = adv["piano_white_keys"]
             self.piano_black_keys = adv["piano_black_keys"]
             self.velocity_keys = adv["velocity_keys"]
+            self.n_backups = adv.getint("n_backups")
 
             mid = self.cfg_parser["midi"]
 

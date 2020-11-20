@@ -54,10 +54,12 @@ class PreferencesWin(Gtk.Window):
         self.box1 = self.create_box1()
         self.box2 = self.create_box2()
         self.box3 = self.create_box3()
+        self.box4 = self.create_box4()
 
         self.st.add_titled(self.box1, "lnf", "Look & Feel")
         self.st.add_titled(self.box2, "mid", "MIDI")
         self.st.add_titled(self.box3, "adv", "Advanced")
+        self.st.add_titled(self.box4, "oth", "Other")
 
         self.sbar = Gtk.StackSidebar()
         self.sbar.set_stack(self.st)
@@ -71,7 +73,7 @@ class PreferencesWin(Gtk.Window):
 
         self.midi_in_cmb.connect("changed", self.on_combo_midi_input_changed)
         self.midi_out_cmb.connect("changed", self.on_combo_midi_output_changed)
-        # self.st.set_visible_child_name("mid")
+        self.st.set_visible_child_name("lnf")
 
     def on_destroy(self, wdg):
         self.mod.gui_midi_capture = False
@@ -130,7 +132,7 @@ class PreferencesWin(Gtk.Window):
         grid.set_margin_right(mrg)
 
         bx = Gtk.Box()
-        lab = Gtk.Label.new("prefer dark theme:")
+        lab = Gtk.Label.new("Prefer dark theme:")
 
         sw = Gtk.Switch()
         sw.set_active(self.cfg.dark_theme)
@@ -156,7 +158,7 @@ class PreferencesWin(Gtk.Window):
         cmb.connect("changed", self.on_combo_mouseover_changed)
         # gr.attach(cmb, 0, 0, 1, 1)
         bx = Gtk.Box()
-        lab = Gtk.Label.new("mouse-over:")
+        lab = Gtk.Label.new("Mouse-over:")
         bx.pack_start(lab, False, False, 0)
         bx.pack_end(cmb, False, True, 0)
         grid.attach(bx, 0, 6, 1, 1)
@@ -299,7 +301,7 @@ class PreferencesWin(Gtk.Window):
         grid.set_margin_right(mrg)
 
         bx = Gtk.Box()
-        lab = Gtk.Label.new("new tracks on left:")
+        lab = Gtk.Label.new("New tracks on left:")
 
         sw = Gtk.Switch()
         sw.set_active(self.cfg.new_tracks_left)
@@ -309,11 +311,11 @@ class PreferencesWin(Gtk.Window):
         grid.attach(bx, 0, 0, 1, 1)
 
         bx = Gtk.Box()
-        lab = Gtk.Label.new("empty track in new seq:")
+        lab = Gtk.Label.new("Empty track in new seq:")
 
         sw = Gtk.Switch()
         sw.set_active(self.cfg.new_seqs_with_tracks)
-        sw.connect("state-set", self.on_dark_mode_switch)
+        sw.connect("state-set", self.on_new_seqs_tracks_switch)
         bx.pack_start(lab, False, False, 0)
         bx.pack_end(sw, False, False, 0)
         grid.attach(bx, 0, 1, 1, 1)
@@ -389,6 +391,30 @@ class PreferencesWin(Gtk.Window):
         grid.attach(fr, 0, 5, 1, 1)
 
         return grid
+
+    def create_box4(self):
+        grid = Gtk.Grid()
+        mrg = 5
+        grid.set_margin_top(mrg)
+        grid.set_margin_bottom(mrg)
+        grid.set_margin_left(mrg)
+        grid.set_margin_right(mrg)
+
+        fr, gr = self.create_frame("Keep backups", mrg)
+        nbck_adj = Gtk.Adjustment(1, 0, 99, 1.0, 1.0)
+        nbck_button = Gtk.SpinButton()
+        nbck_button.set_adjustment(nbck_adj)
+        nbck_adj.set_value(self.cfg.n_backups)
+
+        nbck_adj.connect("value-changed", self.on_nbck_value_changed)
+
+        gr.attach(nbck_button, 0, 0, 1, 1)
+
+        grid.attach(fr, 0, 0, 1, 1)
+        return grid
+
+    def on_nbck_value_changed(self, adj):
+        self.cfg.n_backups = int(adj.get_value())
 
     def font_filter(self, family, face, data):
         if not family.is_monospace():
@@ -516,6 +542,9 @@ class PreferencesWin(Gtk.Window):
         self.cfg.dark_theme = prm
         st = self.parent.get_settings()
         st.set_property("gtk-application-prefer-dark-theme", self.cfg.dark_theme)
+
+    def on_new_seqs_tracks_switch(self, wdg, prm):
+        self.cfg.new_seqs_with_tracks = prm
 
     def on_key_press(self, widget, event):
         if event.keyval == Gdk.KEY_Escape:
