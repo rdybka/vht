@@ -115,6 +115,11 @@ void track_reset(track *trk) {
 	for (int c = 0; c < trk->ncols; c++) {
 		trk->lplayed[c] = -1;
 	}
+
+	for (int c = 0; c < trk->nctrl; c++) {
+		trk->lctrlrow[c] = -1;
+		trk->lctrlval[c] = -1;
+	}
 }
 
 void track_set_row(track *trk, int c, int n, int type, int note, int velocity, int delay) {
@@ -684,8 +689,9 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 	}
 
 	int row_start = floorf(trk->pos);
-	if (row_start == trk->nrows)
+	if (row_start == trk->nrows) {
 		row_start = 0;
+	}
 
 	int row_end = floorf(trk->pos + tperiod) + 1;
 	if (row_end > trk->nrows)
@@ -770,8 +776,11 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 		for (int r = ctrlfrom; r <= ctrlto; r++) {
 			int rr = r;
 
-			while(rr >= trk->nrows * trk->ctrlpr)
+			while(rr >= trk->nrows * trk->ctrlpr) {
+				trk->lctrlrow[c] = -1;
+				trk->lctrlval[c] = -1;
 				rr -= trk->nrows * trk->ctrlpr;
+			}
 
 			double delay = ((double)r / trk->ctrlpr) - trk->pos;
 
@@ -790,7 +799,7 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 			if (data > -1) {
 				midi_event evt;
 
-				evt.time = delay * tmul;
+				evt.time = (clt->jack_buffer_size - nframes) + delay * tmul;
 				evt.channel = trk->channel;
 				evt.type = control_change;
 				evt.control = ctrl;
