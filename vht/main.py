@@ -98,6 +98,7 @@ class VHTApp(Gtk.Application):
             if not mod.load(self.start_load_file):
                 self.quit()
         else:
+            mod.reset()
             mod.play = cfg.start_playing
 
         self.main_win = MainWin(self)
@@ -113,8 +114,6 @@ class VHTApp(Gtk.Application):
                 "file:///" + os.path.split(self.main_win.last_filename)[0]
             )
             self.main_win.set_header_from_filename(self.main_win.last_filename)
-
-        mod.reset()
 
         if not "portconfig" in mod.extras:
             pc = {}
@@ -134,7 +133,7 @@ class VHTApp(Gtk.Application):
 
         refresh_connections(mod, cfg)
         mod.transport = cfg.start_transport
-
+        PreferencesWin(self.main_win, mod, cfg).show()
         # RenderWin(self.main_win, mod, cfg).show()
 
     def on_prefs(self, action, param):
