@@ -270,7 +270,7 @@ class SequenceView(Gtk.Box):
 
         if cfg.key["reset"].matches(event):
             if not mod.play:
-                mod.reset()
+                mod.mainwin.on_stop_button_activate(1)
             return True
 
         if cfg.key["sequence_add"].matches(event):

@@ -275,9 +275,18 @@ class MainWin(Gtk.ApplicationWindow):
 
     def on_stop_button_activate(self, switch):
         if not mod.play:
+            npos = 0
+            tl = mod.timeline
+
+            if tl.loop_active:
+                if tl.pos == 0:
+                    npos = tl.loop_start
+                if tl.pos > tl.loop_start:
+                    npos = tl.loop_start
+
             mod.reset()
-        else:
-            pass
+            if npos:
+                tl.pos = npos
 
         mod.play = False
 
