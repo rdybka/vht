@@ -75,7 +75,11 @@ class PropView(Gtk.ScrolledWindow):
             self._track_box.pack_start(t, False, True, 0)
 
     def move_track(self, trk, offs):
-        wdg = self._track_box.get_children()[trk.index]
+        chld = self._track_box.get_children()
+        if trk.index >= len(chld):
+            print("gotcha!")
+            return
+        wdg = chld[trk.index]
         self._track_box.reorder_child(wdg, (trk.index) + offs)
         wdg = self.seqview._track_box.get_children()[trk.index]
         self.seqview._track_box.reorder_child(wdg, (trk.index) + offs)

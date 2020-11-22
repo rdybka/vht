@@ -442,6 +442,13 @@ int sequence_get_playing(sequence *seq) {
 	return seq->playing;
 }
 
+int sequence_get_ntrk(sequence *seq) {
+	seq_mod_excl_in(seq);
+	int ret = seq->ntrk;
+	seq_mod_excl_out(seq);
+	return ret;
+}
+
 double sequence_get_relative_length(sequence *seq) {
 	double l = seq->length;
 	double rpb = seq->rpb;

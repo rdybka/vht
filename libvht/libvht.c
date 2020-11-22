@@ -98,10 +98,6 @@ void module_set_ctrlpr(module *mod, int ctrlpr) {
 	mod->ctrlpr = ctrlpr;
 }
 
-int sequence_get_ntrk(sequence *seq) {
-	return seq->ntrk;
-}
-
 int sequence_get_length(sequence *seq) {
 	return seq->length;
 }

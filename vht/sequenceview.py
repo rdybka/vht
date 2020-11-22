@@ -1092,11 +1092,12 @@ class SequenceView(Gtk.Box):
                     trk.tick()
                     # trk.undo_buff.add_state()
 
-            if len(self.get_tracks()) != len(self.seq):
+            new_trks = 0
+            while len(self.get_tracks()) != len(self.seq):
                 for trk in self.seq:
                     found = False
                     for t in self.get_tracks():
-                        if trk.index == t.trk.index:
+                        if int(trk) == int(t.trk):
                             found = True
 
                     if not found:
@@ -1105,7 +1106,6 @@ class SequenceView(Gtk.Box):
                             cb(self.seq.index, trk.index)
 
                         t = self.add_track(trk)
-
                         empty = True
                         for c in trk:
                             for r in c:
@@ -1119,8 +1119,15 @@ class SequenceView(Gtk.Box):
 
                             self.prop_view.redraw()
 
-                        if cfg.new_tracks_left:
-                            self.prop_view.move_first(self.seq[-1])
+                        new_trks += 1
+
+            if cfg.new_tracks_left and new_trks:
+                self.clear()
+                self.build()
+                while new_trks:
+                    self.prop_view.move_first(self.seq[-1])
+                    new_trks -= 1
+
         else:  # not recording
             for trk in self.get_tracks():
                 if trk.trk.dirty:
