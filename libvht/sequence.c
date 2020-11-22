@@ -119,6 +119,7 @@ sequence *sequence_clone(sequence *seq) {
 	ns->thumb_repr = NULL;
 	ns->thumb_dirty = 1;
 	ns->parent = seq->parent;
+	ns->lost = 1;
 	sequence_set_extras(ns, seq->extras);
 	return ns;
 }

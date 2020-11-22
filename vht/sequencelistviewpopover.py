@@ -204,8 +204,10 @@ class SequenceListViewPopover(Gtk.Popover):
         self._parent.redraw()
 
     def on_clone_button_clicked(self, wdg):
-        idx = mod.clone_sequence(self.curr).index
+        seq = mod.clone_sequence(self.curr)
 
-        mod[idx].extras["sequence_name"] = extras.get_name(
+        seq.extras["sequence_name"] = extras.get_name(
             mod[self.curr].extras["sequence_name"]
         )
+
+        seq.ketchup()
