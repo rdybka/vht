@@ -189,6 +189,17 @@ class TimelineView(Gtk.DrawingArea):
         cr.show_text(t)
         cr.restore()
 
+    def highlight_alignment(self, y):
+        colour = cfg.timeline_colour
+        w = self.get_allocated_width()
+        cr = self._context
+
+        cr.set_line_width(3.0)
+        cr.set_source_rgb(*(col * 0.7 for col in colour))
+        cr.move_to(0, y)
+        cr.line_to(w, y)
+        cr.stroke()
+
     def redraw(self):
         cr = self._context
 
@@ -477,6 +488,7 @@ class TimelineView(Gtk.DrawingArea):
                 continue
 
             ystart = (mod.timeline.qb2t(st.start) - tstart) / self.spl
+
             yend = (mod.timeline.qb2t(st.start + st.length) - tstart) / self.spl
             lend = (
                 mod.timeline.qb2t(st.start + math.ceil(st.seq.relative_length))
@@ -592,23 +604,37 @@ class TimelineView(Gtk.DrawingArea):
                 if st.start + st.length == cstr.start:
                     line = ystart + yend
 
-                if line:
-                    cr.set_line_width(3.0)
-                    cr.set_source_rgb(*(col * 0.7 for col in colour))
-                    cr.move_to(0, line)
-                    cr.line_to(w, line)
-                    cr.stroke()
-
-                line = -1
                 if st.start == cstr.start + cstr.length:
                     line = ystart
 
+                if st.start + st.length == cstr.start + cstr.length:
+                    line = ystart + yend
+
                 if line:
-                    cr.set_line_width(3.0)
-                    cr.set_source_rgb(*(col * 0.7 for col in colour))
-                    cr.move_to(0, line)
-                    cr.line_to(w, line)
-                    cr.stroke()
+                    self.highlight_alignment(line)
+
+            if self.hint:
+                if self.hint[0] == st.start:
+                    self.highlight_alignment(ystart)
+                if self.hint[0] == st.start + st.length:
+                    self.highlight_alignment(ystart + yend)
+                if self.hint[0] + self.hint[1] == st.start:
+                    self.highlight_alignment(ystart)
+                if self.hint[0] + self.hint[1] == st.start + st.length:
+                    self.highlight_alignment(ystart + yend)
+
+            if self.drawing_loop:
+                ls = mod.timeline.loop_start
+                le = mod.timeline.loop_end
+
+                if ls == st.start:
+                    self.highlight_alignment(ystart)
+                if ls == st.start + st.length:
+                    self.highlight_alignment(ystart + yend)
+                if le == st.start:
+                    self.highlight_alignment(ystart)
+                if le == st.start + st.length:
+                    self.highlight_alignment(ystart + yend)
 
         cr.restore()
 
@@ -995,7 +1021,7 @@ class TimelineView(Gtk.DrawingArea):
 
         if self.curr_strip_id == -1 and self.curr_col > -1 and self.pointer_r > -1:
             rm = mod.timeline.room_at(self.curr_col, self.pointer_r)
-            if rm >= mod[self.curr_col].length or rm == -1:
+            if rm >= mod[self.curr_col].relative_length or rm == -1:
                 rr = int(min(self.pointer_r, mod.timeline.nqb))
                 idx = None
                 if self.zoom_hold:  # event.button == 1:  # empty
@@ -1144,10 +1170,12 @@ class TimelineView(Gtk.DrawingArea):
                 self.move_last_delta = delta
 
             if col != self.move_start_x and col < len(mod):
+                cl = max(int(col), 0)
                 strp = mod.timeline.strips[self.curr_strip_id]
-                rm = mod.timeline.room_at(int(col), strp.start)
+                rm = mod.timeline.room_at(cl, strp.start)
                 if rm >= strp.length or rm == -1:
-                    strp.col = int(col)
+                    strp.col = cl
+
                     self.move_start_x = strp.col
 
         if self.moving_bpm:
@@ -1433,7 +1461,7 @@ class TimelineView(Gtk.DrawingArea):
         else:
             if self.curr_strip_id == -1 and self.curr_col > -1:
                 rm = mod.timeline.room_at(self.curr_col, self.pointer_r)
-                if rm >= mod[self.curr_col].length or rm == -1:
+                if rm >= mod[self.curr_col].relative_length or rm == -1:
                     hint = (
                         min(self.pointer_r, mod.timeline.nqb),
                         math.ceil(mod[self.curr_col].relative_length),
