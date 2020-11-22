@@ -1486,7 +1486,8 @@ class TimelineView(Gtk.DrawingArea):
                 did = self.del_id
                 self.del_id = -1
                 self.curr_strip_id = -1
-
+                if cfg.autosave_seq:
+                    mod.mainwin.app.autosave()
                 mod.mainwin.gui_del_seq(mod.timeline.strips[did].seq.index)
 
                 self.del_time_start = 0

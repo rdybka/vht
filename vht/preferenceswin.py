@@ -59,7 +59,7 @@ class PreferencesWin(Gtk.Window):
         self.st.add_titled(self.box1, "lnf", "Look & Feel")
         self.st.add_titled(self.box2, "mid", "MIDI")
         self.st.add_titled(self.box3, "adv", "Advanced")
-        self.st.add_titled(self.box4, "oth", "Other")
+        self.st.add_titled(self.box4, "bck", "Backup")
 
         self.sbar = Gtk.StackSidebar()
         self.sbar.set_stack(self.st)
@@ -411,6 +411,33 @@ class PreferencesWin(Gtk.Window):
         gr.attach(nbck_button, 0, 0, 1, 1)
 
         grid.attach(fr, 0, 0, 1, 1)
+
+        fr, gr = self.create_frame("Autosave", mrg)
+        bx = Gtk.Box()
+        bx.set_hexpand(True)
+        lab = Gtk.Label.new("when deleting sequence")
+
+        sw = Gtk.Switch()
+        sw.set_active(self.cfg.autosave_seq)
+        sw.connect("state-set", self.on_autosave_seq_switch)
+
+        bx.pack_start(lab, False, False, 0)
+        bx.pack_end(sw, False, False, 0)
+        gr.attach(bx, 0, 0, 1, 1)
+
+        bx = Gtk.Box()
+        bx.set_hexpand(True)
+        lab = Gtk.Label.new("when deleting track")
+
+        sw = Gtk.Switch()
+        sw.set_active(self.cfg.autosave_trk)
+        sw.connect("state-set", self.on_autosave_trk_switch)
+
+        bx.pack_start(lab, False, False, 0)
+        bx.pack_end(sw, False, False, 0)
+        gr.attach(bx, 0, 1, 1, 1)
+        grid.attach(fr, 0, 3, 1, 1)
+
         return grid
 
     def on_nbck_value_changed(self, adj):
@@ -542,6 +569,12 @@ class PreferencesWin(Gtk.Window):
         self.cfg.dark_theme = prm
         st = self.parent.get_settings()
         st.set_property("gtk-application-prefer-dark-theme", self.cfg.dark_theme)
+
+    def on_autosave_trk_switch(self, wdg, prm):
+        self.cfg.autosave_trk = prm
+
+    def on_autosave_seq_switch(self, wdg, prm):
+        self.cfg.autosave_seq = prm
 
     def on_new_seqs_tracks_switch(self, wdg, prm):
         self.cfg.new_seqs_with_tracks = prm

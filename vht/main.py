@@ -133,8 +133,6 @@ class VHTApp(Gtk.Application):
 
         refresh_connections(mod, cfg)
         mod.transport = cfg.start_transport
-        PreferencesWin(self.main_win, mod, cfg).show()
-        # RenderWin(self.main_win, mod, cfg).show()
 
     def on_prefs(self, action, param):
         PreferencesWin(self.main_win, mod, cfg).show()
@@ -191,6 +189,13 @@ class VHTApp(Gtk.Application):
     def on_shortcut_dialog(self, action, param):
         dlg = ShortcutMayhem()
         dlg.show()
+
+    def autosave(self):
+        if self.main_win.last_filename:
+            vht.filerotator.rotate(self.main_win.last_filename, cfg.n_backups)
+            mod.save(self.main_win.last_filename)
+            mod.saving = True
+            cfg.last_save_path = cfg.last_load_path
 
     def save_with_dialog(self):
         mod.extras["timeline_win_pos"] = (

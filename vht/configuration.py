@@ -253,6 +253,8 @@ class Configuration:
         self.piano_white_keys = "zxcvbnmqwertyu"
         self.piano_black_keys = "sdghj23567"
         self.n_backups = 0
+        self.autosave_seq = True
+        self.autosave_trk = False
 
         self.cfg_parser = self.build_parser()
 
@@ -286,7 +288,12 @@ class Configuration:
             "piano_white_keys": self.piano_white_keys,
             "piano_black_keys": self.piano_black_keys,
             "velocity_keys": self.velocity_keys,
+        }
+
+        cfg["backup"] = {
             "n_backups": str(self.n_backups),
+            "autosave_seq": self.autosave_seq,
+            "autosave_trk": self.autosave_trk,
         }
 
         cfg["midi"] = {
@@ -335,7 +342,11 @@ class Configuration:
         adv["piano_white_keys"] = self.piano_white_keys
         adv["piano_black_keys"] = self.piano_black_keys
         adv["velocity_keys"] = self.velocity_keys
-        adv["n_backups"] = str(self.n_backups)
+
+        bck = self.cfg_parser["backup"]
+        bck["n_backups"] = str(self.n_backups)
+        bck["autosave_seq"] = str(self.autosave_seq)
+        bck["autosave_trk"] = str(self.autosave_trk)
 
         mid = self.cfg_parser["midi"]
 
@@ -418,7 +429,11 @@ class Configuration:
             self.piano_white_keys = adv["piano_white_keys"]
             self.piano_black_keys = adv["piano_black_keys"]
             self.velocity_keys = adv["velocity_keys"]
-            self.n_backups = adv.getint("n_backups")
+
+            bck = self.cfg_parser["backup"]
+            self.n_backups = bck.getint("n_backups")
+            self.autosave_seq = bck.getboolean("autosave_seq")
+            self.autosave_trk = bck.getboolean("autosave_trk")
 
             mid = self.cfg_parser["midi"]
 

@@ -287,6 +287,8 @@ class SequenceView(Gtk.Box):
 
         if cfg.key["sequence_delete"].matches(event):
             ind = self.seq.index
+            if cfg.autosave_seq:
+                mod.mainwin.app.autosave()
             mod.mainwin.gui_del_seq(ind)
 
         if cfg.key["sequence_replace"].matches(event):
@@ -427,6 +429,8 @@ class SequenceView(Gtk.Box):
 
         if cfg.key["track_del"].matches(event):
             if mod.active_track:
+                if cfg.autosave_trk:
+                    mod.mainwin.app.autosave()
                 self.del_track(mod.active_track.trk)
             return True
 

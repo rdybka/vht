@@ -689,6 +689,8 @@ class TrackPropViewPopover(Gtk.Popover):
             self.parent.redraw()
 
     def on_remove_button_clicked(self, switch):
+        if cfg.autosave_trk:
+            mod.mainwin.app.autosave()
         self.parent.del_track()
 
     def on_retract_button_clicked(self, switch):
