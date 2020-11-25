@@ -190,7 +190,10 @@ class Renderer:
 
         self.mod.play = 0
         self.mod.reset()
+        self._seqs = []
         for s in self.mod:
+            if s.playing:
+                self._seqs.append(s.index)
             s.playing = False
 
         self.mod.play_mode = 1
