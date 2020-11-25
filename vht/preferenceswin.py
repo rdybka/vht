@@ -462,7 +462,6 @@ class PreferencesWin(Gtk.Window):
 
         if wdg == self.velocity_keys_ent:
             self.cfg.velocity_keys = txt
-            print(txt)
         elif wdg == self.piano_white_keys_ent:
             self.cfg.piano_white_keys = txt
         elif wdg == self.piano_black_keys_ent:
