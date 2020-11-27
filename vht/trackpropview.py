@@ -126,12 +126,23 @@ class TrackPropView(Gtk.DrawingArea):
     def add_track(self):
         port = 0
         channel = 1
-        if len(self.seq):
+        nrows = -1
+        nsrows = -1
+
+        if mod.active_track:
+            channel = mod.active_track.trk.channel
+            port = mod.active_track.trk.port
+            nrows = mod.active_track.trk.nrows
+            nsrows = mod.active_track.trk.nsrows
+        elif len(self.seq):
             port = self.seq[-1].port
             channel = self.seq[-1].channel
+            nrows = self.seq[-1].nrows
+            nsrows = self.seq[-1].nsrows
 
-        trk = self.seq.add_track(port, channel)
+        trk = self.seq.add_track(port, channel, nrows, nsrows)
         self.seqview.add_track(trk)
+        self.seqview.seq.ketchup()
 
     def clone_track(self, trk):
         ntrk = self.seq.clone_track(trk.trk)
