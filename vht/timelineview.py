@@ -604,6 +604,12 @@ class TimelineView(Gtk.DrawingArea):
                 if st.start + st.length == cstr.start:
                     line = ystart + yend
 
+                if st.start + st.seq.relative_length == cstr.start:
+                    line = ystart + lend
+
+                if st.start + st.seq.relative_length == cstr.start + cstr.length:
+                    line = ystart + lend
+
                 if st.start == cstr.start + cstr.length:
                     line = ystart
 
@@ -618,10 +624,14 @@ class TimelineView(Gtk.DrawingArea):
                     self.highlight_alignment(ystart)
                 if self.hint[0] == st.start + st.length:
                     self.highlight_alignment(ystart + yend)
+                if self.hint[0] == st.start + st.seq.relative_length:
+                    self.highlight_alignment(ystart + lend)
                 if self.hint[0] + self.hint[1] == st.start:
                     self.highlight_alignment(ystart)
                 if self.hint[0] + self.hint[1] == st.start + st.length:
                     self.highlight_alignment(ystart + yend)
+                if self.hint[0] + self.hint[1] == st.start + st.seq.relative_length:
+                    self.highlight_alignment(ystart + lend)
 
             if self.drawing_loop:
                 ls = mod.timeline.loop_start
