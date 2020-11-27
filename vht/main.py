@@ -98,8 +98,9 @@ class VHTApp(Gtk.Application):
         if fn[0] == "~":
             fn = fn[1 : fn.rfind(".")]
             fn = os.path.join(os.path.split(lfn)[0], fn)
+            return fn
 
-        return fn
+        return lfn
 
     def do_activate(self):
         if self.start_load_file:

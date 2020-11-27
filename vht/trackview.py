@@ -1775,8 +1775,9 @@ class TrackView(Gtk.DrawingArea):
         if m_type == 4 and mod.record == 0:
             for c in self.controller_editors:
                 if (
-                    c.edit
-                    > -1
+                    -1
+                    < c.edit
+                    < self.trk.nrows
                     # and self.trk.channel == m_channel
                     # and m_note == self.trk.ctrls[c.ctrlnum]
                 ):
