@@ -1045,12 +1045,18 @@ class SequenceView(Gtk.Box):
                                     self.on_key_press(self, kev)
 
                                     if k == "panic":
-                                        mod.panic(True)
+                                        if mod.is_panicking:
+                                            mod.unpanic(True)
+                                        else:
+                                            mod.panic(True)
 
                                     if k == "play_mode":
                                         mod.mainwin.seq_mode_butt.props.active = (
                                             not mod.mainwin.seq_mode_butt.props.active
                                         )
+                                else:
+                                    if k == "panic":
+                                        mod.unpanic()
 
                 midin = mod.get_midi_in_event()
 

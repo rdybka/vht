@@ -3461,6 +3461,51 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_module_unpanic(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_unpanic" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  module_unpanic(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_module_is_panicking(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_is_panicking" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (int)module_is_panicking(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_module_get_midi_client(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   module *arg1 = (module *) 0 ;
@@ -10513,6 +10558,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "module_free", _wrap_module_free, METH_O, NULL},
 	 { "module_reset", _wrap_module_reset, METH_O, NULL},
 	 { "module_panic", _wrap_module_panic, METH_VARARGS, NULL},
+	 { "module_unpanic", _wrap_module_unpanic, METH_O, NULL},
+	 { "module_is_panicking", _wrap_module_is_panicking, METH_O, NULL},
 	 { "module_get_midi_client", _wrap_module_get_midi_client, METH_O, NULL},
 	 { "midi_start", _wrap_midi_start, METH_VARARGS, NULL},
 	 { "midi_stop", _wrap_midi_stop, METH_O, NULL},

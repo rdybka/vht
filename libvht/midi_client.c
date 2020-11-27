@@ -226,6 +226,10 @@ void midi_buffer_add(midi_client *clt, int port, midi_event evt) {
 	if (clt->curr_midi_event[port] == MIDI_EVT_BUFFER_LENGTH)
 		return;
 
+	module *mod = (module *) clt->mod_ref;
+	if (mod->panic && evt.type == note_on)
+		return;
+
 	clt->midi_buffer[port][clt->curr_midi_event[port]++] = evt;
 }
 

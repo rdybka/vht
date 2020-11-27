@@ -101,6 +101,12 @@ def module_reset(mod):
 def module_panic(mod, brutal):
     return _libcvht.module_panic(mod, brutal)
 
+def module_unpanic(mod):
+    return _libcvht.module_unpanic(mod)
+
+def module_is_panicking(mod):
+    return _libcvht.module_is_panicking(mod)
+
 def module_get_midi_client(mod):
     return _libcvht.module_get_midi_client(mod)
 

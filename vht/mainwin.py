@@ -56,8 +56,9 @@ class MainWin(Gtk.ApplicationWindow):
         st = self.get_settings()
         st.set_property("gtk-application-prefer-dark-theme", cfg.dark_theme)
 
-        self.set_events(Gdk.EventMask.KEY_PRESS_MASK)
+        self.set_events(Gdk.EventMask.KEY_PRESS_MASK | Gdk.EventMask.KEY_RELEASE_MASK)
         self.connect("key-press-event", self.on_key_press)
+        self.connect("key-release-event", self.on_key_release)
 
         if "timeline_win_pos_y" in mod.extras:
             cfg.timeline_position_y = mod.extras["timeline_win_pos_y"]
@@ -149,7 +150,8 @@ class MainWin(Gtk.ApplicationWindow):
         icon = Gio.ThemedIcon(name="process-stop")
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
         self.butt_panic.add(image)
-        self.butt_panic.connect("clicked", self.on_butt_panic_clicked)
+        self.butt_panic.connect("pressed", self.on_butt_panic_pressed)
+        self.butt_panic.connect("released", self.on_butt_panic_released)
         self.butt_panic.set_tooltip_markup(
             cfg.tooltip_markup2 % ("panique", cfg.key["panic"])
         )
@@ -296,8 +298,11 @@ class MainWin(Gtk.ApplicationWindow):
     def on_transport_switch(self, wdg, state):
         mod.transport = state
 
-    def on_butt_panic_clicked(self, butt):
+    def on_butt_panic_pressed(self, butt):
         mod.panic(True)
+
+    def on_butt_panic_released(self, butt):
+        mod.unpanic()
 
     def on_playmode_toggled(self, butt):
         if self.seq_mode_butt_ignore_signal:
@@ -370,11 +375,19 @@ class MainWin(Gtk.ApplicationWindow):
             return True
 
         if cfg.key["panic"].matches(event):
-            mod.panic(True)
+            if not mod.is_panicking:
+                mod.panic(True)
             return True
 
         if cfg.key["play_mode"].matches(event):
             self.seq_mode_butt.props.active = not self.seq_mode_butt.props.active
+            return True
+
+        return False
+
+    def on_key_release(self, wdg, event):
+        if cfg.key["panic"].matches(event):
+            mod.unpanic()
             return True
 
         return False

@@ -395,6 +395,13 @@ class VHTModule(Iterable):
     def panic(self, brutal=False):
         libcvht.module_panic(self._mod_handle, 1 if brutal else 0)
 
+    def unpanic(self):
+        libcvht.module_unpanic(self._mod_handle)
+
+    @property
+    def is_panicking(self):
+        return libcvht.module_is_panicking(self._mod_handle)
+
     def save(self, filename):
         jm = {}
         jm["bpm"] = self.bpm

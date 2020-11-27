@@ -50,6 +50,11 @@ int trg_equal(trigger *trg, midi_event *mev) {
 
 // the god-function
 void module_advance(module *mod, jack_nframes_t curr_frames) {
+	if (mod->panic) {
+		for (int s = 0; s < mod->nseq; s++)
+			mod->seq[s]->thumb_panic = 2;
+	}
+
 	if (mod->playing < 0) {
 		mod->playing++;
 		if (mod->playing == 0) {
@@ -324,6 +329,7 @@ module *module_new() {
 	mod->switch_req = 0;
 	mod->render_mode = 0;
 	mod->render_lead_out = 0;
+	mod->panic = 0;
 	timechange *tc = timeline_get_change(mod->tline, 0);
 	tc->bpm = mod->bpm;
 	tc->row = 0;
@@ -374,6 +380,12 @@ void module_panic(module *mod, int brutal) {
 
 		mod->tline->strips[s].seq->thumb_panic = 9;
 	}
+
+	mod->panic = 1;
+}
+
+void module_unpanic(module *mod) {
+	mod->panic = 0;
 }
 
 void module_seqs_reindex(module *mod) {
