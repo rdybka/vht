@@ -173,7 +173,7 @@ class VelocityEditor:
 
         if self.line > -1:
             rs = self.line
-            re = int(event.y / self.tv.txt_height)
+            re = min(self.trk.nrows - 1, int(event.y / self.tv.txt_height))
             vs = self.tv.trk[self.col][self.line].velocity
             self.hover_vel = vel
 
