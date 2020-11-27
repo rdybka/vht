@@ -93,6 +93,14 @@ class VHTApp(Gtk.Application):
         self.start_load_file = files[0]
         self.activate()
 
+    def fixfn_backup(self, lfn):
+        fn = os.path.split(lfn)[1]
+        if fn[0] == "~":
+            fn = fn[1 : fn.rfind(".")]
+            fn = os.path.join(os.path.split(lfn)[0], fn)
+
+        return fn
+
     def do_activate(self):
         if self.start_load_file:
             if not mod.load(self.start_load_file):
@@ -109,7 +117,8 @@ class VHTApp(Gtk.Application):
             self.quit()
 
         if self.start_load_file:
-            self.main_win.last_filename = self.start_load_file.get_path()
+            lfn = self.fixfn_backup(self.start_load_file.get_path())
+            self.main_win.last_filename = lfn
             cfg.last_load_path = (
                 "file:///" + os.path.split(self.main_win.last_filename)[0]
             )

@@ -413,8 +413,9 @@ class MainWin(Gtk.ApplicationWindow):
         if not self.sequence_view.load(filename):
             return False
 
-        self.last_filename = filename
-        self.set_header_from_filename(filename)
+        lfn = self.app.fixfn_backup(filename)
+        self.last_filename = lfn
+        self.set_header_from_filename(lfn)
         return True
 
     def gui_next_seq(self):
