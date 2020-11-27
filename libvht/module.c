@@ -53,6 +53,10 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 	if (mod->panic) {
 		for (int s = 0; s < mod->nseq; s++)
 			mod->seq[s]->thumb_panic = 2;
+
+		for (int s = 0; s < mod->tline->nstrips; s++) {
+			mod->tline->strips[s].seq->thumb_panic = 2;
+		}
 	}
 
 	if (mod->playing < 0) {
