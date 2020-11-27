@@ -109,6 +109,9 @@ class PoorMansPiano:
                 self.trk.indicators = self.trk.indicators | 8
             return True
 
+        if key in self.mnotes:
+            return True
+
         return False
 
     def key2note(self, key, note_off=False):
