@@ -115,8 +115,9 @@ class PropView(Gtk.ScrolledWindow):
                     wdg.popped = False
                     wdg.redraw()
 
-        mod.status_bar.portpopover.hide()
-        mod.status_bar.portpopover.pooped = False
+        if mod.status_bar.portpopover:
+            mod.status_bar.portpopover.hide()
+            mod.status_bar.portpopover.pooped = False
         mod.seqlist._popup.hide()
         mod.seqlist._popup.pooped = False
         mod.seqlist.redraw()

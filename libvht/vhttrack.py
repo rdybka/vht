@@ -20,6 +20,7 @@ from libvht.vhtcolumn import VHTColumn
 from libvht.vhtctrllist import VHTCtrlList
 from libvht.vhtquicklist import VHTQuickList
 from libvht.vhtextras import VHTExtras
+from libvht.vhtmandy import VHTMandy
 from libvht import libcvht
 
 
@@ -172,6 +173,20 @@ class VHTTrack(Iterable):
         if not self._extras:
             self._extras = VHTExtras(self._get_extras, self._set_extras)
         return self._extras
+
+    @property
+    def mandy(self):
+        ret = libcvht.track_get_mandy(self._trk_handle)
+        if ret:
+            return VHTMandy(ret, self._trk_handle)
+        else:
+            return None
+
+    def add_mandy(self):
+        return VHTMandy(libcvht.track_add_mandy(self._trk_handle), self._trk_handle)
+
+    def del_mandy(self):
+        libcvht.track_del_mandy(self._trk_handle)
 
     def _set_extras(self, value):
         libcvht.track_set_extras(self._trk_handle, value)

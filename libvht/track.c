@@ -103,6 +103,9 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	trk->clt = NULL;
 	trk->indicators = 0;
 	trk->dirty = 0;
+	trk->dirty_wheel = 0;
+
+	trk->mand = mandy_new(trk);
 	return trk;
 };
 
@@ -336,7 +339,7 @@ void track_free(track *trk) {
 	free(trk->lctrlval);
 	free(trk->lctrlrow);
 	free(trk->env);
-
+	mandy_free(trk->mand);
 	free(trk);
 }
 
@@ -413,6 +416,7 @@ track *track_clone(track *src) {
 		dst->indicators = src->indicators;
 		dst->playing = src->playing;
 		dst->resync = 1;
+		mandy_clone(src->mand, dst);
 
 		track_set_extras(dst, src->extras);
 	}
@@ -697,6 +701,9 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 	if (row_end > trk->nrows)
 		row_end = trk->nrows;
 
+	if (trk->mand && trk->mand->active)
+		mandy_advance(trk->mand, tperiod, nframes);
+
 	track_fix_program_change(trk);
 
 	// quick controls
@@ -789,8 +796,9 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 			float dt = env_get_v(trk->env[c],  trk->ctrlpr, (float)rr / (float)trk->ctrlpr);
 			int data = dt;
 
-			if ((data > -1) && (c == 0)) // pitchwheel
+			if ((data > -1) && (c == 0)) { // pitchwheel
 				data = dt * 128;
+			}
 
 			if (data == -1) {
 				data = trk->ctrl[c][rr];
@@ -809,6 +817,12 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 					evt.type = pitch_wheel;
 					evt.msb = data / 128;
 					evt.lsb = data - (evt.msb * 128);
+
+					if (evt.msb == 64 && evt.lsb == 0) {
+						trk->dirty_wheel = 0;
+					} else {
+						trk->dirty_wheel = 1;
+					}
 				}
 
 				if ((delay >= 0) && (delay < tperiod)) {
@@ -851,6 +865,18 @@ void track_wind(track *trk, double period) {
 
 void track_kill_notes(track *trk) {
 	pthread_mutex_lock(&trk->excl);
+
+	midi_event evtp;
+	evtp.type = pitch_wheel;
+	evtp.channel = trk->channel;
+	evtp.note = 0;
+	evtp.velocity = 64;
+	evtp.time = 0;
+
+	if (trk->dirty_wheel) {
+		midi_buffer_add(trk->clt, trk->port, evtp);
+		trk->dirty_wheel = 0;
+	}
 
 	for (int c = 0; c < trk->ncols; c++) {
 		if (trk->ring[c] != -1) {
@@ -1445,3 +1471,9 @@ void track_swap_rows(track *trk, int rw1, int rw2) {
 	}
 	free(curr_dood);
 }
+
+mandy *track_get_mandy(track *trk) {
+	return trk->mand;
+}
+
+

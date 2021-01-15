@@ -76,7 +76,7 @@ void envelope_sort_nodes(envelope *env) {
 	qsort(env->nodes, env->nnodes, sizeof(env_node), env_node_compare);
 }
 
-int y2bz(envelope *env, float y) {
+inline int y2bz(envelope *env, float y) {
 	return (int)y * env->res + (int)((y - floorf(y)) * env->res);
 }
 

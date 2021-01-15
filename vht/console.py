@@ -41,8 +41,6 @@ class VHTCons(InteractiveConsole):
         self.autoexec = """
 import sys
 from vht import mod, cfg
-seq = mod[0]
-trk = seq[0]
 tl = mod.timeline
 """
 

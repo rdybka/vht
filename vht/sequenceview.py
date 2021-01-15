@@ -1046,7 +1046,7 @@ class SequenceView(Gtk.Box):
 
                                     if k == "panic":
                                         if mod.is_panicking:
-                                            mod.unpanic(True)
+                                            mod.unpanic()
                                         else:
                                             mod.panic(True)
 

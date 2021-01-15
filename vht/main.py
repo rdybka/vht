@@ -19,9 +19,9 @@
 
 # I hereby testify,
 # on Setting Orange, the 8th day of The Aftermath in the YOLD 3186,
-# that everything in this program checks out with The Law of Fives.
+# that everything in this program checks out with The Law of Fives
 
-# [intentionally left blank]
+# [^^^intentionally left blank]
 
 from vht.mainwin import MainWin
 from vht.shortcutmayhem import ShortcutMayhem
@@ -143,6 +143,9 @@ class VHTApp(Gtk.Application):
 
         refresh_connections(mod, cfg)
         mod.transport = cfg.start_transport
+
+        if mod.autostart_win:
+            mod.autostart_win.pop()
 
     def on_prefs(self, action, param):
         PreferencesWin(self.main_win, mod, cfg).show()

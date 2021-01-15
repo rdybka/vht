@@ -597,3 +597,6 @@ class VHTModule(Iterable):
 
     def freewheel_on(self):
         libcvht.module_set_freewheel(self._mod_handle, 1)
+
+    def mand(self, x, y, sx=0, sy=0):
+        return libcvht.mand(float(x), float(y), float(sx), float(sy))

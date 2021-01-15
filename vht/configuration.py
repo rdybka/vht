@@ -65,6 +65,8 @@ class Configuration:
         self.timeline_colour = self.mixer_colour
 
         self.record_colour = (1.0, 0, 0)
+        self.mandy_colour = self.colour
+        self.mandy_crosshair_colour = self.record_colour
 
         self.popup_timeout = 0.2
 
@@ -229,6 +231,14 @@ class Configuration:
             "doodle_paste": cfgkey("v", True, True, False),
             "doodle_delete": cfgkey("Delete", True, True, False),
             "doodle_render": cfgkey("d", True, True, False),
+            # mandy
+            "mandy_show_info": cfgkey("i", False, False, False),
+            "mandy_show_crosshair": cfgkey("c", False, False, False),
+            "mandy_reset_translation": cfgkey("t", False, False, False),
+            "mandy_reset_rotation": cfgkey("r", False, False, False),
+            "mandy_reset_zoom": cfgkey("z", False, False, False),
+            "mandy_reset": cfgkey("x", False, False, False),
+            "mandy_pause": cfgkey("p", False, False, False),
         }
 
         self.mappable_keys = [
@@ -294,6 +304,8 @@ class Configuration:
             "n_backups": str(self.n_backups),
             "autosave_seq": self.autosave_seq,
             "autosave_trk": self.autosave_trk,
+            "last_load_path": self.last_load_path,
+            "last_save_path": self.last_save_path,
         }
 
         cfg["midi"] = {
@@ -347,6 +359,8 @@ class Configuration:
         bck["n_backups"] = str(self.n_backups)
         bck["autosave_seq"] = str(self.autosave_seq)
         bck["autosave_trk"] = str(self.autosave_trk)
+        bck["last_load_path"] = str(self.last_load_path)
+        bck["last_save_path"] = str(self.last_save_path)
 
         mid = self.cfg_parser["midi"]
 
@@ -434,6 +448,8 @@ class Configuration:
             self.n_backups = bck.getint("n_backups")
             self.autosave_seq = bck.getboolean("autosave_seq")
             self.autosave_trk = bck.getboolean("autosave_trk")
+            self.last_load_path = bck["last_load_path"]
+            self.last_save_path = bck["last_save_path"]
 
             mid = self.cfg_parser["midi"]
 

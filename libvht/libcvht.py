@@ -88,6 +88,33 @@ _libcvht.int_array_swigregister(int_array)
 def int_array_frompointer(t):
     return _libcvht.int_array_frompointer(t)
 
+class double_array(object):
+    thisown = property(lambda x: x.this.own(), lambda x, v: x.this.own(v), doc="The membership flag")
+    __repr__ = _swig_repr
+
+    def __init__(self, nelements):
+        _libcvht.double_array_swiginit(self, _libcvht.new_double_array(nelements))
+    __swig_destroy__ = _libcvht.delete_double_array
+
+    def __getitem__(self, index):
+        return _libcvht.double_array___getitem__(self, index)
+
+    def __setitem__(self, index, value):
+        return _libcvht.double_array___setitem__(self, index, value)
+
+    def cast(self):
+        return _libcvht.double_array_cast(self)
+
+    @staticmethod
+    def frompointer(t):
+        return _libcvht.double_array_frompointer(t)
+
+# Register double_array in _libcvht:
+_libcvht.double_array_swigregister(double_array)
+
+def double_array_frompointer(t):
+    return _libcvht.double_array_frompointer(t)
+
 
 def module_new():
     return _libcvht.module_new()
@@ -611,6 +638,9 @@ def track_get_extras(trk):
 def track_set_extras(trk, extr):
     return _libcvht.track_set_extras(trk, extr)
 
+def track_get_mandy(trk):
+    return _libcvht.track_get_mandy(trk)
+
 def row_get_type(rw):
     return _libcvht.row_get_type(rw)
 
@@ -841,5 +871,74 @@ def timestrip_set_rpb_end(tstr, rpb_end):
 
 def parse_note(arg1):
     return _libcvht.parse_note(arg1)
+
+def mandy_get_pixels(mand, width, height, stride):
+    return _libcvht.mandy_get_pixels(mand, width, height, stride)
+
+def mandy_render(mand, width, height):
+    return _libcvht.mandy_render(mand, width, height)
+
+def mandy_get_points(mand, ret_arr, l):
+    return _libcvht.mandy_get_points(mand, ret_arr, l)
+
+def mandy_set_rgb(mand, r, g, b):
+    return _libcvht.mandy_set_rgb(mand, r, g, b)
+
+def mandy_set_xy(mand, x, y):
+    return _libcvht.mandy_set_xy(mand, x, y)
+
+def mandy_set_cxy(mand, x, y):
+    return _libcvht.mandy_set_cxy(mand, x, y)
+
+def mandy_set_pause(mand, p):
+    return _libcvht.mandy_set_pause(mand, p)
+
+def mandy_get_pause(mand):
+    return _libcvht.mandy_get_pause(mand)
+
+def mandy_translate(mand, x, y, w, h):
+    return _libcvht.mandy_translate(mand, x, y, w, h)
+
+def mandy_rotate(mand, x, y, w, h):
+    return _libcvht.mandy_rotate(mand, x, y, w, h)
+
+def mandy_zoom(mand, x, y, w, h):
+    return _libcvht.mandy_zoom(mand, x, y, w, h)
+
+def mandy_set_active(mand, active):
+    return _libcvht.mandy_set_active(mand, active)
+
+def mandy_get_active(mand):
+    return _libcvht.mandy_get_active(mand)
+
+def mandy_get_info(mand):
+    return _libcvht.mandy_get_info(mand)
+
+def mandy_set_info(mand, info):
+    return _libcvht.mandy_set_info(mand, info)
+
+def mandy_get_zoom(mand):
+    return _libcvht.mandy_get_zoom(mand)
+
+def mandy_set_zoom(mand, zoom):
+    return _libcvht.mandy_set_zoom(mand, zoom)
+
+def mandy_get_rot(mand):
+    return _libcvht.mandy_get_rot(mand)
+
+def mandy_set_rot(mand, rot):
+    return _libcvht.mandy_set_rot(mand, rot)
+
+def mandy_get_bail(mand):
+    return _libcvht.mandy_get_bail(mand)
+
+def mandy_set_bail(mand, bail):
+    return _libcvht.mandy_set_bail(mand, bail)
+
+def mandy_get_miter(mand):
+    return _libcvht.mandy_get_miter(mand)
+
+def mandy_set_miter(mand, miter):
+    return _libcvht.mandy_set_miter(mand, miter)
 
 

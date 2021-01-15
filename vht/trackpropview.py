@@ -67,7 +67,7 @@ class TrackPropView(Gtk.DrawingArea):
         self._context = None
 
         self.popped = False
-
+        self.unclicked = False
         self.time_to_wiggle = None
 
         if trk:
@@ -190,7 +190,7 @@ class TrackPropView(Gtk.DrawingArea):
                         if data.y <= self.button_rect.y + self.button_rect.height:
                             if not self.popped:
                                 self.button_highlight = True
-                                if cfg.track_prop_mouseover:
+                                if cfg.track_prop_mouseover and not self.unclicked:
                                     self.popover.pop()
                                     self.popped = True
 
@@ -215,6 +215,7 @@ class TrackPropView(Gtk.DrawingArea):
                         if self.popped:
                             self.popover.unpop()
                             self.popped = False
+                            self.unclicked = True
                             return
                         else:
                             mod.clear_popups()
@@ -580,6 +581,7 @@ class TrackPropView(Gtk.DrawingArea):
             mod.clear_popups()
 
         self.button_highlight = False
+        self.unclicked = False
         self.redraw()
 
     def on_draw(self, widget, cr):

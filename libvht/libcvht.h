@@ -23,6 +23,7 @@
 %module libcvht
 %include "carrays.i"
 %array_class(int, int_array);
+%array_class(double, double_array);
 %{
 #include "libcvht.h"
 %}
@@ -233,6 +234,9 @@ extern track *track_new(int port, int channel, int len, int songlen, int ctrlpr)
 
 extern char *track_get_extras(track *trk);
 extern void track_set_extras(track *trk, char *extr);
+
+extern mandy *track_get_mandy(track *trk);
+
 // row
 extern int row_get_type(row *rw);
 extern int row_get_note(row *rw);
@@ -332,5 +336,36 @@ extern void timestrip_set_rpb_start(timestrip *tstr, int rpb_start);
 extern void timestrip_set_rpb_end(timestrip *tstr, int rpb_end);
 
 extern int parse_note(char *);
+
+extern PyObject *mandy_get_pixels(mandy *mand, int width, int height, int stride);
+extern unsigned long mandy_render(mandy *mand, int width, int height);
+extern unsigned long mandy_get_points(mandy *mand, double *ret_arr, unsigned long l);
+
+extern void mandy_set_rgb(mandy *mand, int r, int g, int b);
+extern void mandy_set_xy(mandy *mand, double x, double y);
+
+extern void mandy_set_cxy(mandy *mand, float x, float y);
+
+extern void mandy_set_pause(mandy *mand, int p);
+extern int mandy_get_pause(mandy *mand);
+
+extern void mandy_translate(mandy *mand, float x, float y, float w, float h);
+extern void mandy_rotate(mandy *mand, float x, float y, float w, float h);
+extern void mandy_zoom(mandy *mand, float x, float y, float w, float h);
+
+extern void mandy_set_active(mandy *mand, int active);
+extern int mandy_get_active(mandy *mand);
+
+extern char *mandy_get_info(mandy *mand);
+extern void mandy_set_info(mandy *mand, char *info);
+
+extern double mandy_get_zoom(mandy *mand);
+extern void mandy_set_zoom(mandy *mand, double zoom);
+extern double mandy_get_rot(mandy *mand);
+extern void mandy_set_rot(mandy *mand, double rot);
+extern double mandy_get_bail(mandy *mand);
+extern void mandy_set_bail(mandy *mand, double bail);
+extern int mandy_get_miter(mandy *mand);
+extern void mandy_set_miter(mandy *mand, int miter);
 
 #endif //__LIBCVHT_H__

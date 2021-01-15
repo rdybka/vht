@@ -583,11 +583,27 @@ void module_set_play_mode(module *mod, int m) {
 				mod->switch_req = 1;
 			}
 
-			if (mod->tline->pos > 0.0) {
-				double rl = sequence_get_relative_length(mod->seq[0]);
-				double rat = mod->seq[0]->length / rl;
-				mod->switch_delay = (fmod(mod->tline->pos, rl) * rat) + mod->seq[0]->length - (mod->seq[0]->pos);
+			int imm = 1;
+
+			for (int s = 0; s < mod->nseq; s++) {
+				if (mod->seq[s]->playing)
+					imm = 0;
+			}
+
+			if (imm) {
+				// if no seqs play
+				mod->play_mode = 1;
+				timeline_set_pos(mod->tline, mod->tline->pos, 0);
 				mod->switch_req = 1;
+				mod->switch_delay = 0;
+
+			} else {
+				if (mod->tline->pos > 0.0) {
+					double rl = sequence_get_relative_length(mod->seq[0]);
+					double rat = mod->seq[0]->length / rl;
+					mod->switch_delay = (fmod(mod->tline->pos, rl) * rat) + mod->seq[0]->length - (mod->seq[0]->pos);
+					mod->switch_req = 1;
+				}
 			}
 		}
 

@@ -24,6 +24,7 @@
 #include "row.h"
 #include "ctrlrow.h"
 #include "envelope.h"
+#include "mandy.h"
 
 #define TRACK_DEF_CTRLPR 16
 
@@ -91,6 +92,9 @@ typedef struct track_t {
 	char *extras; // for gui settings
 	int indicators;
 	int dirty; // for thumbnail
+	int dirty_wheel; // is the pitch_weel active
+
+	mandy *mand;
 } track;
 
 track *track_new(int port, int channel, int len, int songlen, int ctrlpr);
@@ -146,5 +150,10 @@ void track_set_qc2(track *trk, int ctrl, int val);
 
 char *track_get_extras(track *trk);
 void track_set_extras(track *trk, char *extr);
+
+mandy *track_get_mandy(track *trk);
+mandy *track_add_mandy(track *trk);
+void track_del_mandy(track *trk);
+
 
 #endif //__TRACK_H__

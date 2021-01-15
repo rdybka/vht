@@ -240,7 +240,10 @@ class MainWin(Gtk.ApplicationWindow):
                         show_pop = False
 
             if show_pop:
-                self._status_bar.portpopover.pop()
+                if mod.autostart_win:
+                    pass
+                else:
+                    self._status_bar.portpopover.pop()
 
         if mod.ports_changed:
             refresh_connections(mod, cfg)

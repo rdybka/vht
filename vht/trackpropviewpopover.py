@@ -17,6 +17,7 @@
 
 from vht.notebooklabel import NotebookLabel
 from vht.controllersview import ControllersView
+from vht.mandyview import MandyView
 from vht import cfg, mod
 from gi.repository import Gdk, Gtk, Gio
 from datetime import datetime
@@ -422,11 +423,25 @@ class TrackPropViewPopover(Gtk.Popover):
             self.ctrlsview, NotebookLabel("controllers", self.extend_notebook, 1)
         )
 
+        self.codeview = Gtk.Box()
+        self.extend_notebook.append_page(
+            self.codeview, NotebookLabel("code", self.extend_notebook, 2)
+        )
+
+        self.mandypage = Gtk.Box()
+
+        self.mandyview = MandyView(self.trk, self, False)
+
+        self.extend_notebook.append_page(
+            self.mandyview, NotebookLabel("mandy", self.extend_notebook, 3)
+        )
+
         self.grid.show_all()
         self.add(self.grid)
+        self.set_modal(False)
 
         self.extend_notebook.set_current_page(0)
-        self.set_modal(False)
+        mod.autostart_win = None  # self
 
     def on_resend_patch_clicked(self, wdg, evt, data):
         msb = -1
@@ -447,6 +462,8 @@ class TrackPropViewPopover(Gtk.Popover):
             self.hide()
             self.unpop()
             return True
+
+        return False
 
     def build_clone_menu(self):
         m = self.clone_button.get_popup()
@@ -559,10 +576,19 @@ class TrackPropViewPopover(Gtk.Popover):
         self.time_want_to_leave = 0
         self.add_tick_callback(self.tick)
         self.set_opacity(1)
+        self.mandyview.entered = False
+
         self.show()
         # self.popup()
 
     def tick(self, wdg, param):
+        if self.extend_notebook.get_current_page() == 3:
+            self.mandyview.tick(wdg, param)
+
+            if self.mandyview.entered and self.mandyview.mandy.active:
+                self.time_want_to_leave = 0
+                return True
+
         if self.time_want_to_leave == 0:  # normal
             op = self.get_opacity()
             if op < 1.0:
