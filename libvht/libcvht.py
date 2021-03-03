@@ -377,6 +377,9 @@ def sequence_swap_track(seq, t1, t2):
 def sequence_get_pos(seq):
     return _libcvht.sequence_get_pos(seq)
 
+def sequence_set_pos(seq, pos):
+    return _libcvht.sequence_set_pos(seq, pos)
+
 def sequence_set_midi_focus(seq, foc):
     return _libcvht.sequence_set_midi_focus(seq, foc)
 

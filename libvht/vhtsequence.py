@@ -171,6 +171,10 @@ class VHTSequence(Iterable):
     def pos(self):
         return libcvht.sequence_get_pos(self._seq_handle)
 
+    @pos.setter
+    def pos(self, p):
+        libcvht.sequence_set_pos(self._seq_handle, float(p))
+
     @property
     def rpb(self):
         return libcvht.sequence_get_rpb(self._seq_handle)

@@ -132,6 +132,7 @@ extern track *sequence_clone_track(sequence *seq, track *trk);
 extern void sequence_del_track(sequence *seq, int t);
 extern void sequence_swap_track(sequence *seq, int t1, int t2);
 extern double sequence_get_pos(sequence *seq);
+extern void sequence_set_pos(sequence *seq, double pos);
 extern void sequence_set_midi_focus(sequence *seq, int foc);
 extern void sequence_double(sequence *seq);
 extern void sequence_halve(sequence *seq);

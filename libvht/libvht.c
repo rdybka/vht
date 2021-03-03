@@ -282,6 +282,15 @@ double sequence_get_pos(sequence *seq) {
 	return seq->pos;
 }
 
+void sequence_set_pos(sequence *seq, double pos) {
+	seq->pos = pos;
+
+	for (int t = 0; t < seq->ntrk; t++) {
+		seq->trk[t]->resync = 1;
+	}
+}
+
+
 int sequence_get_rpb(sequence *seq) {
 	return seq->rpb;
 }

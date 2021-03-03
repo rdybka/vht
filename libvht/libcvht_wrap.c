@@ -5968,6 +5968,35 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_sequence_set_pos(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "sequence_set_pos", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_set_pos" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_set_pos" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = (double)(val2);
+  sequence_set_pos(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_sequence_set_midi_focus(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   sequence *arg1 = (sequence *) 0 ;
@@ -12069,6 +12098,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "sequence_del_track", _wrap_sequence_del_track, METH_VARARGS, NULL},
 	 { "sequence_swap_track", _wrap_sequence_swap_track, METH_VARARGS, NULL},
 	 { "sequence_get_pos", _wrap_sequence_get_pos, METH_O, NULL},
+	 { "sequence_set_pos", _wrap_sequence_set_pos, METH_VARARGS, NULL},
 	 { "sequence_set_midi_focus", _wrap_sequence_set_midi_focus, METH_VARARGS, NULL},
 	 { "sequence_double", _wrap_sequence_double, METH_O, NULL},
 	 { "sequence_halve", _wrap_sequence_halve, METH_O, NULL},

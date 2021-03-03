@@ -122,6 +122,15 @@ class SideTrackView(Gtk.DrawingArea):
             self.redraw()
             return True
 
+        if event.button == 2:
+            if type(self.seq.index) is not tuple:
+                self.seq.pos = self.hover
+                return True
+
+            pos = mod.timeline.strips[self.seq.index[1]].start
+            mod.timeline.pos = pos + self.hover
+            return True
+
         return False
 
     def on_button_release(self, widget, event):
