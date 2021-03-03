@@ -167,9 +167,10 @@ class ControllerEditor:
 
             self.zero_pattern_surface = self.tv._back_surface.create_similar(
                 cairo.CONTENT_COLOR_ALPHA,
-                int(self.x_to - self.x_from),
+                round(self.x_to - self.x_from),
                 round(self.tv.txt_height * 2),
             )
+
             cr = cairo.Context(self.zero_pattern_surface)
 
             cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
@@ -197,8 +198,8 @@ class ControllerEditor:
 
             self.empty_pattern_surface = self.tv._back_surface.create_similar(
                 cairo.CONTENT_COLOR_ALPHA,
-                int(self.x_to - self.x_from),
-                round(self.tv.txt_height * empl),
+                round(self.x_to - self.x_from),
+                math.ceil(self.tv.txt_height * empl),
             )
             cr = cairo.Context(self.empty_pattern_surface)
 
@@ -246,8 +247,7 @@ class ControllerEditor:
             # because rowheight is float
             matrix.scale(
                 1.0,
-                round(self.tv.txt_height * self.zero_pattern_highlight)
-                / (self.tv.txt_height * self.zero_pattern_highlight),
+                math.ceil(self.tv.txt_height * empl) / (self.tv.txt_height * empl),
             )
             self.empty_pattern.set_matrix(matrix)
 
@@ -1280,24 +1280,34 @@ class ControllerEditor:
             x = event.x
             delta = delta * -1
 
+        upd_doodles = False
+
         for rr in range(l):
             if self.deleting:
+                upd_doodles = True
                 if self.ctrlnum == 0:
                     self.trk.set_ctrl(self.ctrlnum, rr + sr, 64 * 128)
                 else:
                     self.trk.set_ctrl(self.ctrlnum, rr + sr, -1)
 
             if self.drawing:
+                upd_doodles = True
                 v = max(
                     min(round(((x - (self.x_from + self.txt_width)) / xw) * 127), 127),
                     0,
                 )
+
                 if self.ctrlnum == 0:
                     self.trk.set_ctrl(self.ctrlnum, rr + sr, round(v * 128))
                 else:
                     self.trk.set_ctrl(self.ctrlnum, rr + sr, round(v))
 
                 x = x + delta
+
+        if upd_doodles:
+            r1 = self.last_r // self.trk.ctrlpr
+            r2 = r // self.trk.ctrlpr
+            self.tv.redraw(r1 - 1, r2 + 1, ctrl=self)
 
         self.last_r = r
         if going_down:
@@ -1468,6 +1478,8 @@ class ControllerEditor:
                 self.active_row = l_act_row
                 self.active_node = l_act_node
 
+            # print(sr // self.trk.ctrlpr, er // self.trk.ctrlpr)
+
             if l_act_node != self.active_node:
                 self.redraw_env()
                 if l_act_node != -1:
@@ -1497,6 +1509,7 @@ class ControllerEditor:
             self.doodle_hint_row = r
             self.doodle_hint_offs = rr
             self.doodle_hint = v / 129 if self.ctrlnum == 0 else v
+
             self.tv.redraw(r, ctrl=self)
         else:
             if self.doodle_hint_row != -1 and self.doodle_hint_row != r:

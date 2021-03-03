@@ -118,6 +118,7 @@ void track_trigger(track *trk);
 
 void track_add_ctrl(track *trk, int ctl);
 void track_del_ctrl(track *trk, int c);
+void track_clear_ctrl(track *trk, int c);
 void track_swap_ctrl(track *trk, int c, int c2);
 void track_ctrl_refresh_envelope(track *trk, int c);
 

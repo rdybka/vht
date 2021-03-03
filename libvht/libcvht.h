@@ -193,6 +193,7 @@ extern void track_set_playing(track *trk, int p);
 
 extern void track_add_ctrl(track *trk, int ctl);
 extern void track_del_ctrl(track *trk, int c);
+extern void track_clear_ctrl(track *trk, int c);
 extern void track_swap_ctrl(track *trk, int c, int c2);
 extern void track_set_ctrl(track *trk, int c, int n, int val);
 
@@ -343,8 +344,8 @@ extern unsigned long mandy_get_points(mandy *mand, double *ret_arr, unsigned lon
 
 extern void mandy_set_rgb(mandy *mand, int r, int g, int b);
 extern void mandy_set_xy(mandy *mand, double x, double y);
-
 extern void mandy_set_cxy(mandy *mand, float x, float y);
+extern void mandy_set_jxy(mandy *mand, double jx, double jy);
 
 extern void mandy_set_pause(mandy *mand, int p);
 extern int mandy_get_pause(mandy *mand);
@@ -367,5 +368,21 @@ extern double mandy_get_bail(mandy *mand);
 extern void mandy_set_bail(mandy *mand, double bail);
 extern int mandy_get_miter(mandy *mand);
 extern void mandy_set_miter(mandy *mand, int miter);
+
+extern void mandy_set_julia(mandy *mand, int v);
+extern int mandy_get_julia(mandy *mand);
+
+// tracy
+extern int mandy_get_ntracies(mandy *mand);
+extern tracy *mandy_add_tracy(mandy *mand, double ix1, double iy1, double ix2, double iy2);
+extern tracy *mandy_get_tracy(mandy *mand, int trc_id);
+extern void mandy_del_tracy(mandy *mand, int trc_id);
+extern void mandy_set_follow(mandy *mand, int trc_id);
+extern int mandy_get_follow(mandy *mand);
+
+extern void tracy_set_init(tracy *trc, double ix1, double iy1, double ix2, double iy2);
+extern PyObject *tracy_get_init(tracy *trc);
+extern PyObject *tracy_get_pos(tracy *trc);
+extern PyObject *tracy_get_disp(tracy *trc);
 
 #endif //__LIBCVHT_H__

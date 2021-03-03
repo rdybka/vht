@@ -1086,6 +1086,11 @@ void timeline_set_loop_active(timeline *tl, int val) {
 		timeline_set_pos(tl, tl->loop_start, 0);
 	}
 
+	if (val && tl->pos >= tl->loop_end) {
+		if (tl->pos > tl->loop_end)
+			tl->pos = tl->loop_start;
+	}
+
 	tl->loop_active = val;
 	timeline_update_loops_in_strips(tl);
 }
@@ -1155,7 +1160,10 @@ void timeline_set_pos(timeline *tl, double npos, int let_ring) {
 		}
 
 	if (mod->play_mode == 0 || mod->playing == 0) {
-		timeline_advance(tl, 0, 0);
+		if (tl->loop_active) {
+			if (tl->pos > tl->loop_end)
+				tl->pos = tl->loop_start;
+		}
 	}
 
 	// do magic to non-playing seqs in matrix

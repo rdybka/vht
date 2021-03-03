@@ -2650,8 +2650,9 @@ SWIGINTERN PyObject *SWIG_PyStaticMethod_New(PyObject *SWIGUNUSEDPARM(self), PyO
 #define SWIGTYPE_p_timeline swig_types[14]
 #define SWIGTYPE_p_timestrip swig_types[15]
 #define SWIGTYPE_p_track swig_types[16]
-static swig_type_info *swig_types[18];
-static swig_module_info swig_module = {swig_types, 17, 0, 0, 0, 0};
+#define SWIGTYPE_p_tracy swig_types[17]
+static swig_type_info *swig_types[19];
+static swig_module_info swig_module = {swig_types, 18, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -7371,6 +7372,35 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_track_clear_ctrl(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  track *arg1 = (track *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "track_clear_ctrl", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_track, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_clear_ctrl" "', argument " "1"" of type '" "track *""'"); 
+  }
+  arg1 = (track *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "track_clear_ctrl" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  track_clear_ctrl(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_track_swap_ctrl(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   track *arg1 = (track *) 0 ;
@@ -11009,6 +11039,43 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_mandy_set_jxy(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  mandy *arg1 = (mandy *) 0 ;
+  double arg2 ;
+  double arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  double val3 ;
+  int ecode3 = 0 ;
+  PyObject *swig_obj[3] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "mandy_set_jxy", 3, 3, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_mandy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "mandy_set_jxy" "', argument " "1"" of type '" "mandy *""'"); 
+  }
+  arg1 = (mandy *)(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "mandy_set_jxy" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = (double)(val2);
+  ecode3 = SWIG_AsVal_double(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "mandy_set_jxy" "', argument " "3"" of type '" "double""'");
+  } 
+  arg3 = (double)(val3);
+  mandy_set_jxy(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_mandy_set_pause(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   mandy *arg1 = (mandy *) 0 ;
@@ -11535,6 +11602,368 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_mandy_set_julia(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  mandy *arg1 = (mandy *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "mandy_set_julia", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_mandy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "mandy_set_julia" "', argument " "1"" of type '" "mandy *""'"); 
+  }
+  arg1 = (mandy *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "mandy_set_julia" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  mandy_set_julia(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_mandy_get_julia(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  mandy *arg1 = (mandy *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_mandy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "mandy_get_julia" "', argument " "1"" of type '" "mandy *""'"); 
+  }
+  arg1 = (mandy *)(argp1);
+  result = (int)mandy_get_julia(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_mandy_get_ntracies(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  mandy *arg1 = (mandy *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_mandy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "mandy_get_ntracies" "', argument " "1"" of type '" "mandy *""'"); 
+  }
+  arg1 = (mandy *)(argp1);
+  result = (int)mandy_get_ntracies(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_mandy_add_tracy(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  mandy *arg1 = (mandy *) 0 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  double arg5 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  double val3 ;
+  int ecode3 = 0 ;
+  double val4 ;
+  int ecode4 = 0 ;
+  double val5 ;
+  int ecode5 = 0 ;
+  PyObject *swig_obj[5] ;
+  tracy *result = 0 ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "mandy_add_tracy", 5, 5, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_mandy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "mandy_add_tracy" "', argument " "1"" of type '" "mandy *""'"); 
+  }
+  arg1 = (mandy *)(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "mandy_add_tracy" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = (double)(val2);
+  ecode3 = SWIG_AsVal_double(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "mandy_add_tracy" "', argument " "3"" of type '" "double""'");
+  } 
+  arg3 = (double)(val3);
+  ecode4 = SWIG_AsVal_double(swig_obj[3], &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "mandy_add_tracy" "', argument " "4"" of type '" "double""'");
+  } 
+  arg4 = (double)(val4);
+  ecode5 = SWIG_AsVal_double(swig_obj[4], &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "mandy_add_tracy" "', argument " "5"" of type '" "double""'");
+  } 
+  arg5 = (double)(val5);
+  result = (tracy *)mandy_add_tracy(arg1,arg2,arg3,arg4,arg5);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_tracy, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_mandy_get_tracy(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  mandy *arg1 = (mandy *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  tracy *result = 0 ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "mandy_get_tracy", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_mandy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "mandy_get_tracy" "', argument " "1"" of type '" "mandy *""'"); 
+  }
+  arg1 = (mandy *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "mandy_get_tracy" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  result = (tracy *)mandy_get_tracy(arg1,arg2);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_tracy, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_mandy_del_tracy(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  mandy *arg1 = (mandy *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "mandy_del_tracy", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_mandy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "mandy_del_tracy" "', argument " "1"" of type '" "mandy *""'"); 
+  }
+  arg1 = (mandy *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "mandy_del_tracy" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  mandy_del_tracy(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_mandy_set_follow(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  mandy *arg1 = (mandy *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "mandy_set_follow", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_mandy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "mandy_set_follow" "', argument " "1"" of type '" "mandy *""'"); 
+  }
+  arg1 = (mandy *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "mandy_set_follow" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  mandy_set_follow(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_mandy_get_follow(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  mandy *arg1 = (mandy *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_mandy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "mandy_get_follow" "', argument " "1"" of type '" "mandy *""'"); 
+  }
+  arg1 = (mandy *)(argp1);
+  result = (int)mandy_get_follow(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_tracy_set_init(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  tracy *arg1 = (tracy *) 0 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  double arg5 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  double val3 ;
+  int ecode3 = 0 ;
+  double val4 ;
+  int ecode4 = 0 ;
+  double val5 ;
+  int ecode5 = 0 ;
+  PyObject *swig_obj[5] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "tracy_set_init", 5, 5, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_tracy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "tracy_set_init" "', argument " "1"" of type '" "tracy *""'"); 
+  }
+  arg1 = (tracy *)(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "tracy_set_init" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = (double)(val2);
+  ecode3 = SWIG_AsVal_double(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "tracy_set_init" "', argument " "3"" of type '" "double""'");
+  } 
+  arg3 = (double)(val3);
+  ecode4 = SWIG_AsVal_double(swig_obj[3], &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "tracy_set_init" "', argument " "4"" of type '" "double""'");
+  } 
+  arg4 = (double)(val4);
+  ecode5 = SWIG_AsVal_double(swig_obj[4], &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "tracy_set_init" "', argument " "5"" of type '" "double""'");
+  } 
+  arg5 = (double)(val5);
+  tracy_set_init(arg1,arg2,arg3,arg4,arg5);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_tracy_get_init(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  tracy *arg1 = (tracy *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  PyObject *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_tracy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "tracy_get_init" "', argument " "1"" of type '" "tracy *""'"); 
+  }
+  arg1 = (tracy *)(argp1);
+  result = (PyObject *)tracy_get_init(arg1);
+  resultobj = result;
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_tracy_get_pos(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  tracy *arg1 = (tracy *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  PyObject *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_tracy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "tracy_get_pos" "', argument " "1"" of type '" "tracy *""'"); 
+  }
+  arg1 = (tracy *)(argp1);
+  result = (PyObject *)tracy_get_pos(arg1);
+  resultobj = result;
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_tracy_get_disp(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  tracy *arg1 = (tracy *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  PyObject *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_tracy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "tracy_get_disp" "', argument " "1"" of type '" "tracy *""'"); 
+  }
+  arg1 = (tracy *)(argp1);
+  result = (PyObject *)tracy_get_disp(arg1);
+  resultobj = result;
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 static PyMethodDef SwigMethods[] = {
 	 { "SWIG_PyInstanceMethod_New", SWIG_PyInstanceMethod_New, METH_O, NULL},
 	 { "new_int_array", _wrap_new_int_array, METH_O, NULL},
@@ -11692,6 +12121,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "track_set_playing", _wrap_track_set_playing, METH_VARARGS, NULL},
 	 { "track_add_ctrl", _wrap_track_add_ctrl, METH_VARARGS, NULL},
 	 { "track_del_ctrl", _wrap_track_del_ctrl, METH_VARARGS, NULL},
+	 { "track_clear_ctrl", _wrap_track_clear_ctrl, METH_VARARGS, NULL},
 	 { "track_swap_ctrl", _wrap_track_swap_ctrl, METH_VARARGS, NULL},
 	 { "track_set_ctrl", _wrap_track_set_ctrl, METH_VARARGS, NULL},
 	 { "track_get_ctrl", _wrap_track_get_ctrl, METH_VARARGS, NULL},
@@ -11811,6 +12241,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "mandy_set_rgb", _wrap_mandy_set_rgb, METH_VARARGS, NULL},
 	 { "mandy_set_xy", _wrap_mandy_set_xy, METH_VARARGS, NULL},
 	 { "mandy_set_cxy", _wrap_mandy_set_cxy, METH_VARARGS, NULL},
+	 { "mandy_set_jxy", _wrap_mandy_set_jxy, METH_VARARGS, NULL},
 	 { "mandy_set_pause", _wrap_mandy_set_pause, METH_VARARGS, NULL},
 	 { "mandy_get_pause", _wrap_mandy_get_pause, METH_O, NULL},
 	 { "mandy_translate", _wrap_mandy_translate, METH_VARARGS, NULL},
@@ -11828,6 +12259,18 @@ static PyMethodDef SwigMethods[] = {
 	 { "mandy_set_bail", _wrap_mandy_set_bail, METH_VARARGS, NULL},
 	 { "mandy_get_miter", _wrap_mandy_get_miter, METH_O, NULL},
 	 { "mandy_set_miter", _wrap_mandy_set_miter, METH_VARARGS, NULL},
+	 { "mandy_set_julia", _wrap_mandy_set_julia, METH_VARARGS, NULL},
+	 { "mandy_get_julia", _wrap_mandy_get_julia, METH_O, NULL},
+	 { "mandy_get_ntracies", _wrap_mandy_get_ntracies, METH_O, NULL},
+	 { "mandy_add_tracy", _wrap_mandy_add_tracy, METH_VARARGS, NULL},
+	 { "mandy_get_tracy", _wrap_mandy_get_tracy, METH_VARARGS, NULL},
+	 { "mandy_del_tracy", _wrap_mandy_del_tracy, METH_VARARGS, NULL},
+	 { "mandy_set_follow", _wrap_mandy_set_follow, METH_VARARGS, NULL},
+	 { "mandy_get_follow", _wrap_mandy_get_follow, METH_O, NULL},
+	 { "tracy_set_init", _wrap_tracy_set_init, METH_VARARGS, NULL},
+	 { "tracy_get_init", _wrap_tracy_get_init, METH_O, NULL},
+	 { "tracy_get_pos", _wrap_tracy_get_pos, METH_O, NULL},
+	 { "tracy_get_disp", _wrap_tracy_get_disp, METH_O, NULL},
 	 { NULL, NULL, 0, NULL }
 };
 
@@ -11861,6 +12304,7 @@ static swig_type_info _swigt__p_timechange = {"_p_timechange", "timechange *", 0
 static swig_type_info _swigt__p_timeline = {"_p_timeline", "timeline *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_timestrip = {"_p_timestrip", "timestrip *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_track = {"_p_track", "track *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_tracy = {"_p_tracy", "tracy *", 0, 0, (void*)0, 0};
 
 static swig_type_info *swig_type_initial[] = {
   &_swigt__p_char,
@@ -11880,6 +12324,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_timeline,
   &_swigt__p_timestrip,
   &_swigt__p_track,
+  &_swigt__p_tracy,
 };
 
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
@@ -11899,6 +12344,7 @@ static swig_cast_info _swigc__p_timechange[] = {  {&_swigt__p_timechange, 0, 0, 
 static swig_cast_info _swigc__p_timeline[] = {  {&_swigt__p_timeline, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_timestrip[] = {  {&_swigt__p_timestrip, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_track[] = {  {&_swigt__p_track, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_tracy[] = {  {&_swigt__p_tracy, 0, 0, 0},{0, 0, 0, 0}};
 
 static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_char,
@@ -11918,6 +12364,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_timeline,
   _swigc__p_timestrip,
   _swigc__p_track,
+  _swigc__p_tracy,
 };
 
 

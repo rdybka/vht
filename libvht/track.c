@@ -370,6 +370,24 @@ void track_clear_crows(track *trk, int c) {
 	pthread_mutex_unlock(&trk->exclctrl);
 }
 
+void track_clear_ctrl(track *trk, int c) {
+	pthread_mutex_lock(&trk->exclctrl);
+
+	for (int t = 0; t < trk->nrows; t++) {
+		trk->crows[c][t].velocity = -1;
+		trk->crows[c][t].linked = 0;
+		trk->crows[c][t].smooth = 0;
+		trk->crows[c][t].anchor = 0;
+	}
+
+	for (int r = 0; r < trk->nrows * trk->ctrlpr; r++) {
+		trk->ctrl[c][r] = -1;
+	}
+
+	pthread_mutex_unlock(&trk->exclctrl);
+}
+
+
 track *track_clone(track *src) {
 	track *dst = track_new(src->port, src->channel, src->nrows, src->nsrows, src->ctrlpr);
 

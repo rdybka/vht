@@ -573,11 +573,19 @@ class TimelineView(Gtk.DrawingArea):
                         cr.stroke()
 
                         cr.arc(
-                            thx + (thxx * 0.3), ystart + yend - 10, 2, 0, 2 * math.pi,
+                            thx + (thxx * 0.3),
+                            ystart + yend - 10,
+                            2,
+                            0,
+                            2 * math.pi,
                         )
                         cr.fill()
                         cr.arc(
-                            thx + (thxx * 0.7), ystart + yend - 10, 2, 0, 2 * math.pi,
+                            thx + (thxx * 0.7),
+                            ystart + yend - 10,
+                            2,
+                            0,
+                            2 * math.pi,
                         )
                         cr.fill()
 
@@ -976,7 +984,7 @@ class TimelineView(Gtk.DrawingArea):
         ):
             if self.curr_strip_id > -1:
                 strp = mod.timeline.strips[self.curr_strip_id]
-                strp.length = strp.seq.length
+                strp.length = strp.seq.relative_length
                 self.show_resize_handle = False
                 self.get_window().set_cursor(None)
 

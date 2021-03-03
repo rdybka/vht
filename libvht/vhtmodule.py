@@ -443,7 +443,7 @@ class VHTModule(Iterable):
         with open(filename, "wb") as f:
             pickle.dump(jm, f)
 
-    def load(self, filename):
+    def load(self, filename, append=False):
         if not isinstance(filename, str):
             filename = filename.get_path()
 
@@ -456,16 +456,19 @@ class VHTModule(Iterable):
 
             self.play = 0
 
-            self.new()
+            if not append:
+                self.new()
+                self.timeline.clear()
 
-            self.bpm = jm["bpm"]
-            self.ctrlpr = jm["ctrlpr"]
-            self.extras = jm["extras"]
-            self.play_mode = jm["play_mode"]
+                self.bpm = jm["bpm"]
+                self.ctrlpr = jm["ctrlpr"]
+                self.extras = jm["extras"]
+                self.play_mode = jm["play_mode"]
+
+            strp_offset = len(self)
+
             for seq in jm["seq"]:
-                self.unpack_seq(seq, True)
-
-            self.timeline.clear()
+                self.unpack_seq(seq, True, append)
 
             tl = jm["tl"]
             for chng in tl["changes"]:
@@ -476,7 +479,7 @@ class VHTModule(Iterable):
 
             for strp in tl["strips"]:
                 s = self.timeline.strips.insert(
-                    strp["col"],
+                    strp["col"] + strp_offset,
                     self.unpack_seq(strp["seq"]),
                     strp["start"],
                     strp["length"],
@@ -513,7 +516,7 @@ class VHTModule(Iterable):
 
         return True
 
-    def unpack_seq(self, seq, matrix=False):
+    def unpack_seq(self, seq, matrix=False, append=False):
         sq = None
         par = -1
 
@@ -530,7 +533,7 @@ class VHTModule(Iterable):
         s.parent = par
         s.extras.jsn = seq["extras"]
 
-        if "playing" in seq:
+        if "playing" in seq and not append:
             s.playing = seq["playing"]
 
         if "trg_playmode" in seq:
@@ -543,7 +546,11 @@ class VHTModule(Iterable):
 
         for trk in seq["trk"]:
             t = s.add_track(
-                trk["port"], trk["channel"], trk["nrows"], trk["nsrows"], trk["ctrlpr"],
+                trk["port"],
+                trk["channel"],
+                trk["nrows"],
+                trk["nsrows"],
+                trk["ctrlpr"],
             )
             t.playing = trk["playing"]
             t.set_bank(trk["program"][0], trk["program"][1])

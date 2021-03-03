@@ -533,6 +533,9 @@ def track_add_ctrl(trk, ctl):
 def track_del_ctrl(trk, c):
     return _libcvht.track_del_ctrl(trk, c)
 
+def track_clear_ctrl(trk, c):
+    return _libcvht.track_clear_ctrl(trk, c)
+
 def track_swap_ctrl(trk, c, c2):
     return _libcvht.track_swap_ctrl(trk, c, c2)
 
@@ -890,6 +893,9 @@ def mandy_set_xy(mand, x, y):
 def mandy_set_cxy(mand, x, y):
     return _libcvht.mandy_set_cxy(mand, x, y)
 
+def mandy_set_jxy(mand, jx, jy):
+    return _libcvht.mandy_set_jxy(mand, jx, jy)
+
 def mandy_set_pause(mand, p):
     return _libcvht.mandy_set_pause(mand, p)
 
@@ -940,5 +946,41 @@ def mandy_get_miter(mand):
 
 def mandy_set_miter(mand, miter):
     return _libcvht.mandy_set_miter(mand, miter)
+
+def mandy_set_julia(mand, v):
+    return _libcvht.mandy_set_julia(mand, v)
+
+def mandy_get_julia(mand):
+    return _libcvht.mandy_get_julia(mand)
+
+def mandy_get_ntracies(mand):
+    return _libcvht.mandy_get_ntracies(mand)
+
+def mandy_add_tracy(mand, ix1, iy1, ix2, iy2):
+    return _libcvht.mandy_add_tracy(mand, ix1, iy1, ix2, iy2)
+
+def mandy_get_tracy(mand, trc_id):
+    return _libcvht.mandy_get_tracy(mand, trc_id)
+
+def mandy_del_tracy(mand, trc_id):
+    return _libcvht.mandy_del_tracy(mand, trc_id)
+
+def mandy_set_follow(mand, trc_id):
+    return _libcvht.mandy_set_follow(mand, trc_id)
+
+def mandy_get_follow(mand):
+    return _libcvht.mandy_get_follow(mand)
+
+def tracy_set_init(trc, ix1, iy1, ix2, iy2):
+    return _libcvht.tracy_set_init(trc, ix1, iy1, ix2, iy2)
+
+def tracy_get_init(trc):
+    return _libcvht.tracy_get_init(trc)
+
+def tracy_get_pos(trc):
+    return _libcvht.tracy_get_pos(trc)
+
+def tracy_get_disp(trc):
+    return _libcvht.tracy_get_disp(trc)
 
 

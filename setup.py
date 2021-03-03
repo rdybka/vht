@@ -26,7 +26,8 @@ setup(name = "vht",
 			"libvht/track.c",
 			"libvht/envelope.c",
 			"libvht/timeline.c",
-			"libvht/mandy.c"], 
+			"libvht/mandy.c",
+			"libvht/tracy.c"], 
 			libraries = ["jack"])],
 
 	packages = ["vht", "libvht"],
@@ -36,7 +37,7 @@ setup(name = "vht",
         ]},
 	
 	data_files = [
-		('share/vht', ['data/vht.svg', 'data/vht.png', 'data/menu.ui']),
+		('share/vht', ['data/mandy.png', 'data/vht.svg', 'data/vht.png', 'data/menu.ui']),
 		('share/vht/ctrl', ['data/ctrl/10-gm', 'data/ctrl/20-zyn']),
 		('share/vht/bank', ['data/bank/10-gm1', 'data/bank/20-gm2']),
 		('share/icons', ['data/vht.svg']),

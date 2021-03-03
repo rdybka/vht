@@ -2,9 +2,13 @@
 <interface>
   <menu id="app-menu">
     <section>
-	<item>
+    <item>
         <attribute name="action">app.load</attribute>
         <attribute name="label">_Load</attribute>
+      </item>
+    <item>
+        <attribute name="action">app.append</attribute>
+        <attribute name="label">_Append</attribute>
       </item>
       <item>
         <attribute name="action">app.save</attribute>

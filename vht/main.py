@@ -61,6 +61,10 @@ class VHTApp(Gtk.Application):
         action.connect("activate", self.on_load)
         self.add_action(action)
 
+        action = Gio.SimpleAction.new("append", None)
+        action.connect("activate", self.on_append)
+        self.add_action(action)
+
         action = Gio.SimpleAction.new("save", None)
         action.connect("activate", self.on_save)
         self.add_action(action)
@@ -154,7 +158,7 @@ class VHTApp(Gtk.Application):
         if not mod.render_win_showing:
             RenderWin(self.main_win, mod, cfg).show()
 
-    def on_load(self, action, param):
+    def load(self, append=False):
         dialog = Gtk.FileChooserDialog(
             title="Please choose a file",
             parent=self.get_active_window(),
@@ -178,8 +182,14 @@ class VHTApp(Gtk.Application):
         response = dialog.run()
         dialog.close()
         if response == Gtk.ResponseType.OK:
-            if self.main_win.load(dialog.get_filename()):
+            if self.main_win.load(dialog.get_filename(), append):
                 cfg.last_load_path = dialog.get_current_folder_uri()
+
+    def on_load(self, action, param):
+        self.load()
+
+    def on_append(self, action, param):
+        self.load(True)
 
     def on_about_dialog(self, action, param):
         ab = Gtk.AboutDialog(self.main_win)
@@ -196,6 +206,7 @@ class VHTApp(Gtk.Application):
                 mod.data_path + os.sep + "vht.svg", 160, 160
             )
         )
+
         ab.run()
         ab.close()
 
@@ -242,8 +253,12 @@ class VHTApp(Gtk.Application):
             dialog.close()
             if response == Gtk.ResponseType.OK:
                 cfg.last_save_path = dialog.get_current_folder_uri()
-                self.main_win.last_filename = dialog.get_filename()
+                fname = dialog.get_filename()
 
+                if not fname.lower().endswith(".vht"):
+                    fname += ".vht"
+
+                self.main_win.last_filename = fname
                 vht.filerotator.rotate(self.main_win.last_filename, cfg.n_backups)
                 mod.save(self.main_win.last_filename)
                 mod.saving = True

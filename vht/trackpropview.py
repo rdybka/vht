@@ -409,7 +409,12 @@ class TrackPropView(Gtk.DrawingArea):
 
             cr.line_to(xto - (width * 1.8), txth * yy)
             cr.curve_to(
-                xto - width, txth * yy, xto - width, txth * 1.8, xto, txth * 2.5,
+                xto - width,
+                txth * yy,
+                xto - width,
+                txth * 1.8,
+                xto,
+                txth * 2.5,
             )
 
             cr.line_to(self.width - width, txth * yy * 10)

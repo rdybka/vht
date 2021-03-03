@@ -1,6 +1,6 @@
 # mandyview.py - Valhalla Tracker
 #
-# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,9 +18,10 @@
 import math
 import cairo
 import gi
+import os
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, GdkPixbuf
 
 from vht import cfg, mod
 
@@ -34,10 +35,14 @@ class MandyView(Gtk.DrawingArea):
         self.trk = trk
 
         self.mandy = trk.mandy
-        # self.mandy.active = 1
+
         self.entered = False
         self.show_info = False
         self.show_crosshair = True
+
+        self.turtle_gfx = GdkPixbuf.Pixbuf.new_from_file(
+            mod.data_path + os.sep + "vht.svg"
+        )
 
         self.set_events(
             Gdk.EventMask.POINTER_MOTION_MASK
@@ -110,9 +115,47 @@ class MandyView(Gtk.DrawingArea):
             cr.rectangle(0, 0, w, h)
             cr.fill()
 
-        pts = self.mandy.render(w, h)
+        npts = self.mandy.render(w, h)
+        if npts:
+            tp = 0
+            pts = self.mandy.get_points()
+            pt = 0
+            while pt < npts:
+                p = pts[pt]
+                if int(p) == 0:  # type change
+                    pt += 1
+                    tp = int(pts[pt])
+                elif int(p) == 1:  # vect start
+                    pt += 1
+                    x = pts[pt]
+                    pt += 1
+                    y = pts[pt]
+                    cr.move_to(x, y)
+                elif int(p) == 2:  # vect point
+                    pt += 1
+                    x = pts[pt]
+                    pt += 1
+                    y = pts[pt]
+                    cr.line_to(x, y)
+                elif int(p) == 3:  # vect end
+                    if tp == 0:
+                        cr.stroke()
+                    elif tp == 1:
+                        cr.fill()
+                elif int(p) == 4:  # vect col
+                    pt += 1
+                    col = pts[pt]
+                    if col == 0:
+                        cr.set_source_rgb(*(cfg.mandy_crosshair_colour))
+                        cr.set_line_width(2)
+                    if col == 1:
+                        cr.set_source_rgb(*(cfg.star_colour))
+                        cr.set_line_width(1)
 
-        if self.show_crosshair:
+                pt += 1
+
+        fol = self.mandy.follow
+        if self.show_crosshair and fol == -1:
             cr.set_source_rgb(*(cfg.mandy_crosshair_colour))
             cx = w / 2
             cy = h / 2
@@ -127,6 +170,18 @@ class MandyView(Gtk.DrawingArea):
             sn = math.sin(-r + math.pi / 2)
             cr.move_to(cx + sz / 2 * cs, cy - sz / 2 * sn)
             cr.line_to(cx + sz * cs, cy - sz * sn)
+            cr.stroke()
+
+        for trcid, trc in enumerate(self.mandy):
+            d = trc.disp
+            if trcid == fol:
+                cr.set_source_rgb(*(cfg.mandy_crosshair_colour))
+            else:
+                cr.set_source_rgb(*(cfg.mandy_colour))
+
+            cr.move_to(d["x"], d["y"])
+            cr.line_to(d["x"] + 10 * math.cos(d["r"]), d["y"] + 10 * math.sin(d["r"]))
+
             cr.stroke()
 
         info = self.mandy.info if self.show_info else None
@@ -253,6 +308,26 @@ class MandyView(Gtk.DrawingArea):
         if cfg.key["mandy_pause"].matches(event):
             self.mandy.pause = not self.mandy.pause
             return True
+
+        if cfg.key["mandy_next"].matches(event):
+            if self.mandy.follow < len(self.mandy) - 1:
+                self.mandy.follow += 1
+            else:
+                self.mandy.follow = -1
+            return True
+
+        if cfg.key["mandy_prev"].matches(event):
+            if self.mandy.follow > -1:
+                self.mandy.follow -= 1
+            else:
+                self.mandy.follow = len(self.mandy) - 1
+            return True
+
+        if cfg.key["mandy_pick_julia"].matches(event):
+            self.mandy.julia = not self.mandy.julia
+
+        if cfg.key["mandy_zero_julia"].matches(event):
+            self.mandy.set_jxy(0, 0)
 
         return False
 

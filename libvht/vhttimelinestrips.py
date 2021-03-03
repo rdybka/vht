@@ -59,7 +59,13 @@ class VHTTimelineStrips(Iterable):
 
         strp = VHTTimelineStrip(
             libcvht.timeline_add_strip(
-                self._tl_handle, col, sq, start, length, rpb_start, rpb_end,
+                self._tl_handle,
+                col,
+                sq,
+                start,
+                length,
+                rpb_start,
+                rpb_end,
             ),
             self._mod,
         )
@@ -76,7 +82,13 @@ class VHTTimelineStrips(Iterable):
 
         return VHTTimelineStrip(
             libcvht.timeline_add_strip(
-                self._tl_handle, seq_id, ns, start, length, rpb_start, rpb_end,
+                self._tl_handle,
+                seq_id,
+                ns,
+                start,
+                length,
+                rpb_start,
+                rpb_end,
             ),
             self._mod,
         )

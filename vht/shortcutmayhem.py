@@ -60,9 +60,15 @@ shorts = {
         (".01 Up", "bpm_frac_up"),
         (".01 Down", "bpm_frac_down"),
     ],
-    "Rows per beat": [("Up", "rpb_up"), ("Down", "rpb_down"),],
+    "Rows per beat": [
+        ("Up", "rpb_up"),
+        ("Down", "rpb_down"),
+    ],
     "Octave": [("Up", "octave_up"), ("Down", "octave_down")],
-    "Skip": [("Up", "skip_up"), ("Down", "skip_down"),],
+    "Skip": [
+        ("Up", "skip_up"),
+        ("Down", "skip_down"),
+    ],
     "Sequence": [
         ("Add", "sequence_add"),
         ("Double", "sequence_double"),
@@ -117,7 +123,9 @@ shorts = {
         ("Transpose 12 up", "transp_12_up"),
         ("Transpose 12 down", "transp_12_down"),
     ],
-    "Controllers": [("Link", "link"),],
+    "Controllers": [
+        ("Link", "link"),
+    ],
     "Doodles": [
         ("Copy", "doodle_copy"),
         ("Cut", "doodle_cut"),
@@ -136,7 +144,10 @@ shorts = {
 
 customs = {
     "General": [("Mute/Unmute", "F1...F12"), ("Piano", "z...m q...u")],
-    "Controllers": [("0-127", "z...m"), ("Add node / Snap", "<ctrl>"),],
+    "Controllers": [
+        ("0-127", "z...m"),
+        ("Add node / Snap", "<ctrl>"),
+    ],
     "Playback": [("Trigger (keypad)", "KP_0...KP_9")],
     "Timeline": [
         ("Snap", "<alt>"),

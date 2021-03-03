@@ -31,7 +31,7 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gdk, Gtk
 
-# import inspect
+import inspect
 
 
 class TrackView(Gtk.DrawingArea):
@@ -501,6 +501,12 @@ class TrackView(Gtk.DrawingArea):
 
         if from_row > to_row:
             from_row, to_row = to_row, from_row
+
+        # ~ if not complete and ctrl:
+        # ~ cf = inspect.currentframe()
+        # ~ of = inspect.getouterframes(cf, 2)
+        # ~ for f in of:
+        # ~ print("redraw full", f[3], f[2], f[1])
 
         # normal view
         rows_to_draw = []
@@ -1515,9 +1521,9 @@ class TrackView(Gtk.DrawingArea):
                     mod.active_track.controller_editors[c].edit = mod.active_track.edit[
                         1
                     ]
-                    mod.active_track.keyboard_focus = mod.active_track.controller_editors[
-                        c
-                    ]
+                    mod.active_track.keyboard_focus = (
+                        mod.active_track.controller_editors[c]
+                    )
                     self.recalc_edit(mod.active_track)
                     self.parent.prop_view.redraw()
                     mod.active_track.redraw()
@@ -1917,11 +1923,19 @@ class TrackView(Gtk.DrawingArea):
                 return True
 
         if cfg.key["track_clear"].matches(event):
+            if self.pitchwheel_editor:
+                self.pitchwheel_editor.undo_buff.add_state()
+
             self.undo_buff.add_state()
+
             self.trk.clear()
+
+            if self.pitchwheel_editor:
+                self.pitchwheel_editor.undo_buff.add_state()
+
             self.undo_buff.add_state()
             self.trk.kill_notes()
-            self.redraw()
+            self.redraw_full()
             return True
 
         if cfg.key["undo"].matches(event):

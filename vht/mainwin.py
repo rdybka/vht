@@ -410,10 +410,10 @@ class MainWin(Gtk.ApplicationWindow):
             os.path.split(os.path.normpath(filename))[0].replace("//", "/")
         )
 
-    def load(self, filename):
+    def load(self, filename, append=False):
         self.set_header_from_filename(None)
 
-        if not self.sequence_view.load(filename):
+        if not self.sequence_view.load(filename, append):
             return False
 
         lfn = self.app.fixfn_backup(filename)

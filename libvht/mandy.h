@@ -23,21 +23,13 @@
 #include <time.h>
 #include <Python.h>
 #include <jack/jack.h>
+#include "tracy.h"
 
-#define MANDY_DEF_MITER  3
-#define MANDY_MAX_ITER  64
+#define MANDY_DEF_MITER  4
+#define MANDY_MAX_ITER  32
 #define MANDY_DEF_BAIL   4
-#define MANDY_MAX_MULTS 33
 
-typedef struct tracey_t {
-	long double x, y, r, sx, sy, b;
-	long double lx, ly, lr, lsx, lsy, lb; // previous state
-	int i, li;
-	long double i2zr;  	// iterations to zoom ratio
-	long double unit;  	// "pixel" size
-	int forward;	// 0 - left, 1 - right
-	int homed;
-} tracey;
+#define HALFPI M_PI / 2.0
 
 typedef struct mandy_t {
 	int miter;
@@ -57,7 +49,8 @@ typedef struct mandy_t {
 	long double x, y;
 	long double dx, dy;
 
-	long double sx, sy;		// "julia noise"
+	long double jx, jy;	// "julia noise"
+	long double sx, sy;
 	long double sxr, syr;
 	long double sxv, syv;
 	long double sxs, sys;
@@ -76,7 +69,7 @@ typedef struct mandy_t {
 	long double delta_xy;
 	long double delta_yy;
 	long double delta_yx;
-	long double x0, y0;	// top-left corner untotated
+	long double x0, y0;	// top-left corner unrotated
 	long double delta_x;	// unrotated
 	long double delta_y;
 
@@ -96,6 +89,13 @@ typedef struct mandy_t {
 	int fps;
 	time_t last_t;
 	int nframes;
+	int julia;
+
+	long double unit0;  // lowest resolution for tracing
+
+	unsigned int ntracies;
+	tracy **tracies;
+	int follow;
 } mandy;
 
 
@@ -107,14 +107,27 @@ void mandy_excl_vect_out(mandy *mand);
 void mandy_advance(mandy *mand, double tperiod, jack_nframes_t nframes);
 void mandy_set_display(mandy *mand, int width, int height);
 void mandy_set_info(mandy *mand, char *info);
+void mandy_vect_clear(mandy *mand);
+void mandy_vect_append(mandy *mand, double val);
+void mandy_trc_home(mandy *mand, tracy *trc); // zeroes in on the line
+void mandy_trc_move(mandy *mand, tracy *trc, long double l); // in units
 
 // public
 mandy *mandy_new(void *trk);
 void mandy_free(mandy *mand);
 void mandy_reset(mandy *mand);
 mandy *mandy_clone(mandy *mand, void *trk);
-
 char *mandy_get_info(mandy *mand);
+
+int mandy_get_ntracies(mandy *mand);
+tracy *mandy_add_tracy(mandy *mand, double ix1, double iy1, double ix2, double iy2);
+tracy *mandy_get_tracy(mandy *mand, int trc_id);
+void mandy_del_tracy(mandy *mand, int trc_id);
+void mandy_set_follow(mandy *mand, int trc_id);
+int mandy_get_follow(mandy *mand);
+void mandy_set_julia(mandy *mand, int v);
+int mandy_get_julia(mandy *mand);
+
 
 double mandy_get_zoom(mandy *mand);
 void mandy_set_zoom(mandy *mand, double zoom);
@@ -136,15 +149,10 @@ int mandy_get_pause(mandy *mand);
 
 unsigned long mandy_render(mandy *mand, int width, int height);
 unsigned long mandy_get_points(mandy *mand, double *ret_arr, unsigned long l);
-void mandy_vect_clear(mandy *mand);
-void mandy_vect_append(mandy *mand, double val);
 
 void mandy_set_xy(mandy *mand, double x, double y);
+void mandy_set_jxy(mandy *mand, double jx, double jy);
 void mandy_set_rgb(mandy *mand, int r, int g, int b);
-
-// rotations
-void mandy_set_cxy(mandy *mand, float x, float y);
-void mandy_set_nrots(mandy *mand, int n);
 
 // returns an RGB24 ByteArray
 PyObject *mandy_get_pixels(mandy *mand, int width, int height, int stride);
@@ -156,10 +164,18 @@ void mandy_rotate(mandy *mand, float x, float y, float w, float h);
 void mandy_zoom(mandy *mand, float x, float y, float w, float h);
 
 // drawing macros
+#define VECT_CLEAR(m) mandy_vect_clear(m);
+
 #define VECT_SET_TYPE(m, t) {\
     mandy_vect_append(m, 0);\
     mandy_vect_append(m, t);\
     };
+
+#define VECT_SET_COL(m, c) {\
+    mandy_vect_append(m, 4);\
+    mandy_vect_append(m, c);\
+    };
+
 
 #define VECT_START(m, x, y) {\
     mandy_vect_append(m, 1);\

@@ -15,16 +15,49 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections.abc import Iterable
+
 from libvht import libcvht
+from libvht.vhttracy import VHTTracy
 
 
-class VHTMandy:
+class VHTMandy(Iterable):
     def __init__(self, mnd, trk):
+        super(VHTMandy, self).__init__()
         self._trk_handle = trk
         self._mnd_handle = mnd
+        self._npoints = 0
+
+    def __len__(self):
+        return libcvht.mandy_get_ntracies(self._mnd_handle)
+
+    def __iter__(self):
+        for itm in range(self.__len__()):
+            yield VHTTracy(libcvht.mandy_get_tracy(self._mnd_handle, itm))
+
+    def __getitem__(self, itm):
+        if itm >= self.__len__():
+            return None
+
+        if itm < 0:
+            if not len(self) >= -itm:
+                raise IndexError()
+
+            return VHTTracy(libcvht.mandy_get_tracy(self._mnd_handle, itm))
+
+    def add_tracy(self, x1, y1, x2, y2):
+        return VHTTracy(libcvht.mandy_add_tracy(self._mnd_handle, x1, y1, x2, y2))
+
+    def del_tracy(self, trid):
+        libcvht.mandy_del_tracy(self._mnd_handle, trid)
 
     def get_pixels(self, w, h, stride):
         return libcvht.mandy_get_pixels(self._mnd_handle, int(w), int(h), stride)
+
+    def get_points(self):
+        pts = libcvht.double_array(self._npoints)
+        libcvht.mandy_get_points(self._mnd_handle, pts, self._npoints)
+        return pts
 
     def set_rgb(self, r, g, b):
         libcvht.mandy_set_rgb(self._mnd_handle, int(r), int(g), int(b))
@@ -32,8 +65,12 @@ class VHTMandy:
     def set_xy(self, x, y):
         libcvht.mandy_set_xy(self._mnd_handle, float(x), float(y))
 
+    def set_jxy(self, jx, jy):
+        libcvht.mandy_set_jxy(self._mnd_handle, float(jx), float(jy))
+
     def render(self, w, h):  # to return pointlist (length)
-        return libcvht.mandy_render(self._mnd_handle, int(w), int(h))
+        self._npoints = libcvht.mandy_render(self._mnd_handle, int(w), int(h))
+        return self._npoints
 
     # remove this
     def set_cxy(self, x, y):
@@ -103,3 +140,19 @@ class VHTMandy:
     def info(self):
         ret = libcvht.mandy_get_info(self._mnd_handle)
         return ret if len(ret) else None
+
+    @property
+    def follow(self):
+        return libcvht.mandy_get_follow(self._mnd_handle)
+
+    @follow.setter
+    def follow(self, trc_id):
+        libcvht.mandy_set_follow(self._mnd_handle, trc_id)
+
+    @property
+    def julia(self):
+        return True if libcvht.mandy_get_julia(self._mnd_handle) else False
+
+    @julia.setter
+    def julia(self, v):
+        libcvht.mandy_set_julia(self._mnd_handle, 1 if v else 0)

@@ -41,6 +41,7 @@ class VHTTrack(Iterable):
         return int(self._trk_handle)
 
     def clear(self):
+        self.ctrl[0].clear()
         for col in self:
             col.clear()
 

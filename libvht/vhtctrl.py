@@ -32,8 +32,8 @@ class VHTCtrl(Iterable):
         return libcvht.track_get_length(self._trk_handle)
 
     def clear(self):
-        for r in self:
-            r.clear()
+        libcvht.track_clear_ctrl(self._trk_handle, self._ctrl)
+        self.refresh()
 
     def __iter__(self):
         for i in range(self.__len__()):

@@ -150,6 +150,8 @@ class SequenceView(Gtk.Box):
             mod.record = 0
             mod.timeline_view.curr_change = mod.timeline_view.highlight_change = None
 
+        mod.clear_popups()
+
     def on_sv_vadj_changed(self, adj):
         dest_adj = None
         if adj is self._sv_vadj:
@@ -819,9 +821,10 @@ class SequenceView(Gtk.Box):
 
         self._side_box.remove(self._side_box.get_children()[0])
 
-    def load(self, filename):
+    def load(self, filename, append=False):
         close_connections(mod)
         TrackView.leave_all()
+
         self.clear()
         for i in self.trk_cache:
             self.trk_cache[i].destroy()
@@ -833,7 +836,7 @@ class SequenceView(Gtk.Box):
         self.prop_view.trk_prop_cache.clear()
         self.active_tracks.clear()
 
-        if mod.load(filename):
+        if mod.load(filename, append):
             self.seq = mod[mod.curr_seq]
             self.font_size = self.seq.extras["font_size"]
 

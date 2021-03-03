@@ -424,24 +424,29 @@ class TrackPropViewPopover(Gtk.Popover):
         )
 
         self.codeview = Gtk.Box()
-        self.extend_notebook.append_page(
-            self.codeview, NotebookLabel("code", self.extend_notebook, 2)
-        )
-
-        self.mandypage = Gtk.Box()
-
         self.mandyview = MandyView(self.trk, self, False)
 
-        self.extend_notebook.append_page(
-            self.mandyview, NotebookLabel("mandy", self.extend_notebook, 3)
-        )
+        if cfg.with_mandy:
+            self.extend_notebook.append_page(
+                self.codeview, NotebookLabel("code", self.extend_notebook, 2)
+            )
+
+            self.mandypage = Gtk.Box()
+            self.extend_notebook.append_page(
+                self.mandyview, NotebookLabel("mandy", self.extend_notebook, 3)
+            )
 
         self.grid.show_all()
         self.add(self.grid)
         self.set_modal(False)
 
-        self.extend_notebook.set_current_page(0)
-        mod.autostart_win = None  # self
+        if cfg.with_mandy:
+            self.extend_notebook.set_current_page(3)
+            mod.autostart_win = self  # None
+            self.trk.mandy.active = True
+        else:
+            self.extend_notebook.set_current_page(0)
+            mod.autostart_win = None
 
     def on_resend_patch_clicked(self, wdg, evt, data):
         msb = -1

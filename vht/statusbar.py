@@ -279,7 +279,12 @@ class StatusBar(Gtk.DrawingArea):
         else:
             r = mod.timeline.pos
             t = mod.timeline.qb2t(r)
-            txt = "%.3f %d:%02d:%02d" % (r, t // 60, t % 60, (t * 100) % 100,)
+            txt = "%.3f %d:%02d:%02d" % (
+                r,
+                t // 60,
+                t % 60,
+                (t * 100) % 100,
+            )
 
             *_, dx, _ = cr.text_extents(txt)
             cr.move_to(w - dx, h)
@@ -391,16 +396,13 @@ class StatusBar(Gtk.DrawingArea):
                 )
 
             if self.active_field == 4:  # bpm
-                self.tt_txt = (
-                    "<big> ⇑</big> %s\n<big> ↑</big> %s\n<big>.↑</big> %s\n<big>.↓</big> %s\n<big> ↓</big> %s\n<big> ⇓</big> %s"
-                    % (
-                        cfg.key["bpm_10_up"],
-                        cfg.key["bpm_up"],
-                        cfg.key["bpm_frac_up"],
-                        cfg.key["bpm_frac_down"],
-                        cfg.key["bpm_down"],
-                        cfg.key["bpm_10_down"],
-                    )
+                self.tt_txt = "<big> ⇑</big> %s\n<big> ↑</big> %s\n<big>.↑</big> %s\n<big>.↓</big> %s\n<big> ↓</big> %s\n<big> ⇓</big> %s" % (
+                    cfg.key["bpm_10_up"],
+                    cfg.key["bpm_up"],
+                    cfg.key["bpm_frac_up"],
+                    cfg.key["bpm_frac_down"],
+                    cfg.key["bpm_down"],
+                    cfg.key["bpm_10_down"],
                 )
 
             if self.active_field == 5:  # rpb

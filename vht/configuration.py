@@ -28,6 +28,8 @@ class Configuration:
     def __init__(self):
         self.filename = None
 
+        self.with_mandy = False
+
         self.seq_font = "Monospace"
         self.console_font = "Monospace"
         self.mixer_font = "Monospace"
@@ -234,11 +236,15 @@ class Configuration:
             # mandy
             "mandy_show_info": cfgkey("i", False, False, False),
             "mandy_show_crosshair": cfgkey("c", False, False, False),
+            "mandy_pick_julia": cfgkey("j", False, False, False),
+            "mandy_zero_julia": cfgkey("j", False, True, False),
             "mandy_reset_translation": cfgkey("t", False, False, False),
             "mandy_reset_rotation": cfgkey("r", False, False, False),
             "mandy_reset_zoom": cfgkey("z", False, False, False),
             "mandy_reset": cfgkey("x", False, False, False),
             "mandy_pause": cfgkey("p", False, False, False),
+            "mandy_next": cfgkey("period", False, False, False),
+            "mandy_prev": cfgkey("comma", False, False, False),
         }
 
         self.mappable_keys = [
