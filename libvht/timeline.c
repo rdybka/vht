@@ -316,14 +316,17 @@ int tick_cmp(const void *t1, const void *t2) {
 	double tt1 = *(double* )t1;
 	double tt2 = *(double* )t2;
 
-	if ((tt2 - tt1 > 0) && (tt2 - tt1 < 5))
+	if ((tt2 - tt1 > 0) && (tt2 - tt1 < 1)) {
 		return 0;
+	}
 
-	if (tt1 < tt2)
+	if (tt1 < tt2) {
 		return -1;
+	}
 
-	if (tt1 > tt2)
+	if (tt1 > tt2) {
 		return 1;
+	}
 
 	return 0;
 }
@@ -344,7 +347,7 @@ long timeline_get_qb(timeline *tl, double t) {
 
 	long tstart = tl->nticks - 1;
 
-	void *rt = bsearch(&t, tl->ticks, sizeof(double), tl->nticks, &tick_cmp);
+	void *rt = bsearch(&t, tl->ticks, tl->nticks, sizeof(double), &tick_cmp);
 	if (rt) {
 		tstart = (rt - (void *) tl->ticks) / sizeof(double);
 	}
