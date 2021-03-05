@@ -81,10 +81,23 @@ timechange *timeline_get_change(timeline *tl, int id) {
 	return &tl->changes[id];
 }
 
-timechange *timeline_change_get_at(timeline *tl, long row) {
-	for (int tc = 0; tc < tl->nchanges; tc++)
+timechange *timeline_change_get_at(timeline *tl, long row, int tol) {
+	int fc = -1;
+
+	for (int tc = 0; tc < tl->nchanges; tc++) {
 		if (tl->changes[tc].row == row)
 			return &tl->changes[tc];
+
+		int fuzz = abs(tl->changes[tc].row - row);
+		if (fuzz < tol) {
+			fc = tc;
+			tol = fuzz;
+		}
+	}
+
+	if (fc >= 0) {
+		return &tl->changes[fc];
+	}
 
 	return NULL;
 }

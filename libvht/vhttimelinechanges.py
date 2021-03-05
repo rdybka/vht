@@ -62,6 +62,6 @@ class VHTTimelineChanges(Iterable):
 
         libcvht.timechange_del(self._tl_handle, itm)
 
-    def get_at_qb(self, qb):
-        tc = libcvht.timeline_change_get_at(self._tl_handle, int(qb))
+    def get_at_qb(self, qb, tol=0):
+        tc = libcvht.timeline_change_get_at(self._tl_handle, int(qb), int(tol))
         return VHTTimelineChange(self._tl_handle, tc) if tc else None

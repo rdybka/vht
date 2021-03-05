@@ -9370,14 +9370,17 @@ SWIGINTERN PyObject *_wrap_timeline_change_get_at(PyObject *SWIGUNUSEDPARM(self)
   PyObject *resultobj = 0;
   timeline *arg1 = (timeline *) 0 ;
   long arg2 ;
+  int arg3 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   long val2 ;
   int ecode2 = 0 ;
-  PyObject *swig_obj[2] ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject *swig_obj[3] ;
   timechange *result = 0 ;
   
-  if (!SWIG_Python_UnpackTuple(args, "timeline_change_get_at", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "timeline_change_get_at", 3, 3, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_timeline, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "timeline_change_get_at" "', argument " "1"" of type '" "timeline *""'"); 
@@ -9388,7 +9391,12 @@ SWIGINTERN PyObject *_wrap_timeline_change_get_at(PyObject *SWIGUNUSEDPARM(self)
     SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "timeline_change_get_at" "', argument " "2"" of type '" "long""'");
   } 
   arg2 = (long)(val2);
-  result = (timechange *)timeline_change_get_at(arg1,arg2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "timeline_change_get_at" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  result = (timechange *)timeline_change_get_at(arg1,arg2,arg3);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_timechange, 0 |  0 );
   return resultobj;
 fail:

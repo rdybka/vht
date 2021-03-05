@@ -1423,7 +1423,9 @@ class TimelineView(Gtk.DrawingArea):
                 self.pointer_r = math.floor((self.pointer_r / self.snap)) * self.snap
 
             if self.mouse_in_changes and not self.moving_bpm:
-                self.highlight_change = mod.timeline.changes.get_at_qb(self.pointer_r)
+                self.highlight_change = mod.timeline.changes.get_at_qb(
+                    self.pointer_r, 3
+                )
 
         rr = self.pointer_r
 

@@ -731,8 +731,8 @@ def timechange_del(tl, id):
 def timeline_get_change(tl, id):
     return _libcvht.timeline_get_change(tl, id)
 
-def timeline_change_get_at(tl, row):
-    return _libcvht.timeline_change_get_at(tl, row)
+def timeline_change_get_at(tl, row, tol):
+    return _libcvht.timeline_change_get_at(tl, row, tol)
 
 def timeline_add_change(tl, bpm, row, linked):
     return _libcvht.timeline_add_change(tl, bpm, row, linked)
