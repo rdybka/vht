@@ -125,6 +125,8 @@ shorts = {
     ],
     "Controllers": [
         ("Link", "link"),
+        ("Shift up", "ctrl_one_up"),
+        ("Shift down", "ctrl_one_down"),
     ],
     "Doodles": [
         ("Copy", "doodle_copy"),

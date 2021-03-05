@@ -607,10 +607,28 @@ class ControllerEditor:
             if event.state & Gdk.ModifierType.MOD1_MASK:
                 alt = True
 
+        handled = False
+
+        if cfg.key["ctrl_one_up"].matches(event):
+            if (
+                self.edit > -1
+                and self.trk.ctrl[self.ctrlnum][self.edit].velocity > -1
+                and self.trk.ctrl[self.ctrlnum][self.edit].velocity < 127
+            ):
+                self.trk.ctrl[self.ctrlnum][self.edit].velocity += 1
+                handled = True
+            else:
+                return True
+
+        if cfg.key["ctrl_one_down"].matches(event):
+            if self.edit > -1 and self.trk.ctrl[self.ctrlnum][self.edit].velocity > 0:
+                self.trk.ctrl[self.ctrlnum][self.edit].velocity -= 1
+                handled = True
+            else:
+                return True
+
         if shift and self.selection:
             self.selecting = True
-
-        handled = False
 
         if not shift and not ctrl and not alt:
             if self.tv.pmp.key2ctrl(

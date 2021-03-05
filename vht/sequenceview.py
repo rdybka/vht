@@ -173,7 +173,6 @@ class SequenceView(Gtk.Box):
         dest_adj.set_value(adj.get_value())
 
     def on_key_press(self, widget, event):
-        # print(Gdk.keyval_name(Gdk.keyval_to_lower(event.keyval)), event.keyval)
         mod.status_bar.on_key_press(widget, event)
 
         if event.keyval >= 65470 and event.keyval <= 65481:
