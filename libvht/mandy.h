@@ -26,8 +26,10 @@
 #include "tracy.h"
 
 #define MANDY_DEF_MITER  4
-#define MANDY_MAX_ITER  32
+#define MANDY_MAX_ITER  100
 #define MANDY_DEF_BAIL   4
+
+#define MANDY_REND_RES	9
 
 #define HALFPI M_PI / 2.0
 
@@ -96,6 +98,15 @@ typedef struct mandy_t {
 	unsigned int ntracies;
 	tracy **tracies;
 	int follow;
+	// adaptive renderer
+	char *pixmap;
+	int last_res_x;
+	int last_res_y;
+	int last_rend_res;
+	unsigned long last_rend_sq;
+	int render;
+	int nframes_adapt;
+	int nframes_full;
 } mandy;
 
 
@@ -105,7 +116,7 @@ void mandy_excl_out(mandy *mand);
 void mandy_excl_vect_in(mandy *mand);
 void mandy_excl_vect_out(mandy *mand);
 void mandy_advance(mandy *mand, double tperiod, jack_nframes_t nframes);
-void mandy_set_display(mandy *mand, int width, int height);
+void mandy_set_display(mandy *mand, int width, int height, int stride);
 void mandy_set_info(mandy *mand, char *info);
 void mandy_vect_clear(mandy *mand);
 void mandy_vect_append(mandy *mand, double val);

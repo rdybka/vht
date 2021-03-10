@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 #include <Python.h>
 #include "midi_client.h"
 #include "track.h"
@@ -66,7 +67,15 @@ mandy *mandy_new(void *vtrk) {
 
 	mand->unit0 = 1.0 / pow(2.0, 32.0);
 
-	mandy_set_display(mand, 32, 32);
+	mand->pixmap = NULL;
+	mand->last_res_x = 0;
+	mand->last_res_y = 0;
+	mand->last_rend_res = MANDY_REND_RES;
+	mand->last_rend_sq = 0;
+	mand->render = 0;
+	mand->nframes_full = 0;
+	mand->nframes_adapt = 0;
+	mandy_set_display(mand, 32, 32, 32);
 
 	mandy_reset(mand);
 	return mand;
@@ -75,6 +84,7 @@ mandy *mandy_new(void *vtrk) {
 void mandy_free(mandy *mand) {
 	track *trk = (track *)mand->trk;
 	trk->mand = NULL;
+	free(mand->pixmap);
 	free(mand->vect);
 	free(mand->tracies);
 	pthread_mutex_destroy(&mand->excl);
@@ -112,15 +122,18 @@ void mandy_translate(mandy *mand, float x, float y, float w, float h) {
 	rotate(0, 0, mand->rot, &dx, &dy);
 	mand->dx -= dx;
 	mand->dy -= dy;
+	mand->render = 1;
 }
 
 void mandy_rotate(mandy *mand, float x, float y, float w, float h) {
 	mand->drot += x / w * M_PI;
+	mand->render = 1;
 }
 
 void mandy_zoom(mandy *mand, float x, float y, float w, float h) {
-	double mlt = 1.05;
+	double mlt = 1.01;
 	int n = abs(ceil(y));
+	mand->render = 1;
 
 	if (mand->follow > -1) {
 		tracy *trc = mand->tracies[mand->follow];
@@ -176,8 +189,8 @@ mandy *mandy_clone(mandy *mand, void *vtrk) {
 
 void mandy_gen_info(mandy *mand) {
 	char inf[256];
-	sprintf(inf, "fps: %d\niter: %d\nbail: %.7Lf\nzoom: %.7Lf\nx, y, r = [%.7Lf, %.7Lf, %.3f]\njx, jy = [%.7Lf, %.7Lf]\nsx, sy = [%.7Lf, %.7Lf]\nrgb = [%d, %d, %d]", \
-	        mand->fps, mand->miter, mand->bail, mand->zoom, mand->x, mand->y, rad2deg(mand->rot), mand->jx, mand->jy, mand->sx, mand->sy, mand->fr, mand->fg, mand->fb);
+	sprintf(inf, "fps: %d fpfi: %d\niter: %d\nbail: %.7Lf\nzoom: %.7Lf\nx, y, r = [%.7Lf, %.7Lf, %.3f]\njx, jy = [%.7Lf, %.7Lf]\nsx, sy = [%.7Lf, %.7Lf]\nrgb = [%d, %d, %d]", \
+	        mand->fps, mand->nframes_full, mand->miter, mand->bail, mand->zoom, mand->x, mand->y, rad2deg(mand->rot), mand->jx, mand->jy, mand->sx, mand->sy, mand->fr, mand->fg, mand->fb);
 
 	mandy_set_info(mand, inf);
 }
@@ -269,7 +282,6 @@ void mandy_advance(mandy *mand, double tperiod, jack_nframes_t nframes) {
 
 // this runs in gui thread
 void mandy_animate(mandy *mand) {
-	double sm = 5;
 	time_t t = time(NULL);
 	if (t != mand->last_t) {
 		mand->last_t = t;
@@ -288,12 +300,17 @@ void mandy_animate(mandy *mand) {
 		dy = mand->tracies[mand->follow]->y;
 		dzoom = mand->tracies[mand->follow]->zoom * mand->tracies[mand->follow]->unit * 1000;
 		drot = mand->tracies[mand->follow]->r - HALFPI;
+		// gay movement because it updates all the time anyway
+
+
+
+		mand->render = 1;
 	}
 
-	mand->x += (dx - mand->x) / sm;
-	mand->y += (dy - mand->y) / sm;
-	mand->rot += atan2(sin(drot - mand->rot), cos(drot - mand->rot)) / sm;
-	mand->zoom += (dzoom - mand->zoom) / (sm * 3);
+	mand->x = dx;
+	mand->y = dy;
+	mand->rot = drot;
+	mand->zoom = dzoom;
 }
 
 // the algo for drawing
@@ -454,7 +471,7 @@ long double mandy_isect(int miter, long double bail,\
 	}
 
 	// let's go deeper to find the angle
-	unit /= 1000.420;
+	unit /= 10;
 	mandy_isect(miter, bail, x1, y1, x2, y2, jx, jy, unit, ix, iy, 1);
 	x3 = *ix;
 	y3 = *iy;
@@ -469,10 +486,10 @@ long double mandy_isect(int miter, long double bail,\
 	for (int d = 0; d < div * 2 && been_out != 2; d++) {
 		double r = rr * d;
 
-		double lx1 = x3 + unit * 123 * cos(r);
-		double ly1 = y3 + unit * 123 * sin(r);
-		double lx2 = x3 + unit * 123 * cos(r - rr);
-		double ly2 = y3 + unit * 123 * sin(r - rr);
+		double lx1 = x3 + unit * 100 * cos(r);
+		double ly1 = y3 + unit * 100 * sin(r);
+		double lx2 = x3 + unit * 100 * cos(r - rr);
+		double ly2 = y3 + unit * 100 * sin(r - rr);
 
 		long double lix = 0;
 		long double liy = 0;
@@ -492,7 +509,7 @@ long double mandy_isect(int miter, long double bail,\
 	return r0;
 }
 
-void mandy_set_display(mandy *mand, int width, int height) {
+void mandy_set_display(mandy *mand, int width, int height, int stride) {
 	double dw = (double)width;
 	double dh = (double)height;
 
@@ -525,56 +542,160 @@ void mandy_set_display(mandy *mand, int width, int height) {
 	mand->delta_xy = (y2 - y1) / dw;
 	mand->delta_yx = (x4 - x1) / dh;
 	mand->delta_yy = (y4 - y1) / dh;
+
+
+	if ((mand->last_res_x != width) || (mand->last_res_y != height)) {
+		mand->pixmap = realloc(mand->pixmap, stride * height * 4);
+		//memset(mand->pixmap, 0, stride * height * 4);
+		mand->last_res_x = width;
+		mand->last_res_y = height;
+		mand->last_rend_res = MANDY_REND_RES;
+		mand->last_rend_sq = 0;
+		mand->nframes_adapt = 0;
+		mand->nframes_full = 0;
+	}
+
+	if (mand->render) {
+		mand->last_rend_res = MANDY_REND_RES;
+		mand->last_rend_sq = 0;
+		mand->render = 0;
+		mand->nframes_adapt = 0;
+	}
+}
+
+void px_blit(mandy *mand, int x, int y, int size, int stride, unsigned int val) {
+	unsigned int *ipx = (unsigned int *)mand->pixmap;
+	int str = stride / 4;
+
+	int sx = size;
+	int sy = size;
+
+	ipx[y * str + x] = val;
+
+	if (x + sx > str) {
+		sx = str - x;
+	}
+
+	if (y + sy > mand->last_res_y) {
+		sy = mand->last_res_y - y;
+	}
+
+	for (int yy = y; yy < y + sy; yy++) {
+		for (int xx = x; xx < x + sx; xx++) {
+			ipx[yy * str + xx] = val;
+		}
+	}
 }
 
 PyObject *mandy_get_pixels(mandy *mand, int width, int height, int stride) {
 	mandy_excl_in(mand);
 	mandy_animate(mand);
-	mandy_set_display(mand, width, height);
+	mandy_set_display(mand, width, height, stride);
 	mandy mnd = *mand;
 	mandy_excl_out(mand);
 
-	char *arr = malloc(stride * height * 4);
-	memset(arr, 0, stride * height * 4);
+	struct timespec t_start, t_now;
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t_start);
+	char *arr = mand->pixmap;
+	int bail = 0;
 
-	for (int y = 0; y < height; y++)
-		for (int x = 0; x < width; x++) {
+	if (mand->last_rend_res)
+		mand->nframes_adapt++;
 
-			long double fx = 0;
-			long double fy = 0;
+	while(mand->last_rend_res && !bail) {
+		int sq_size = 1;
+		for (int r = 1; r < mand->last_rend_res; r++)
+			sq_size *= 2;
 
-			mandy_d2f(&mnd, x, y, &fx, &fy);
+		int w = 1 + (width / sq_size);
+		int h = 1 + (height / sq_size);
+		unsigned long mx = h * w;
+		int sq_size2 = sq_size * 2;
 
-			unsigned char v = mandy_v(&mnd, fx, fy);
+		int chk_time = 256;
+		while(mand->last_rend_sq < mx && !bail) {
+			int x = (mand->last_rend_sq % w) * sq_size;
+			int y = (mand->last_rend_sq / w) * sq_size;
 
-			int fr = 0;
-			int fg = 0;
-			int fb = 0;
+			int rend = 1;
 
-			if (v > 0) {
-				double vv = ((double)v / (double)mnd.miter);
-				fr = vv * mnd.fr;
-				fg = vv * mnd.fg;
-				fb = vv * mnd.fb;
+			if ((x % sq_size2 == 0) && (y % sq_size2 == 0))
+				rend = 0;
+
+			if ((mand->last_rend_sq == 0) && (mand->last_rend_res == MANDY_REND_RES)) {
+				rend = 1;
 			}
 
-			unsigned int p = y * stride + (x * 4);
+			if (rend) {
+				long double fx = 0;
+				long double fy = 0;
 
-			if (v == 0) {
-				arr[p] = 0;
-				arr[p + 1] = 0;
-				arr[p + 2] = 0;
-				arr[p + 3] = 0;
-			} else {
-				arr[p] = fb;
-				arr[p + 1] = fg;
-				arr[p + 2] = fr;
-				arr[p + 3] = 0;
+				mandy_d2f(&mnd, x, y, &fx, &fy);
+
+				unsigned char v = mandy_v(&mnd, fx, fy);
+				unsigned int v_blit = 0;
+				unsigned char* v_bl = (unsigned char *) &v_blit;
+				int fr = 0;
+				int fg = 0;
+				int fb = 0;
+
+				if (v > 0) {
+					double vv = ((double)v / (double)mnd.miter);
+					fr = vv * mnd.fr;
+					fg = vv * mnd.fg;
+					fb = vv * mnd.fb;
+				}
+
+				unsigned int p = y * stride + (x * 4);
+
+				if (sq_size == 1) {
+					if (v == 0) {
+						arr[p] = 0;
+						arr[p + 1] = 0;
+						arr[p + 2] = 0;
+						arr[p + 3] = 0;
+					} else {
+						arr[p] = fb;
+						arr[p + 1] = fg;
+						arr[p + 2] = fr;
+						arr[p + 3] = 0;
+					}
+				} else {
+					if (v) {
+						v_bl[0] = fb;
+						v_bl[1] = fg;
+						v_bl[2] = fr;
+						v_bl[3] = 0;
+					}
+
+					px_blit(mand, x, y, sq_size, stride, v_blit);
+				}
+			}
+
+			mand->last_rend_sq++;
+			chk_time--;
+			if (!chk_time) {
+				clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t_now);
+				int millis = (t_now.tv_nsec - t_start.tv_nsec) / 1000000;
+
+				if (millis > 15)
+					bail = 1;
+
+				chk_time = 256;
 			}
 		}
 
+		if (!bail) {
+			mand->last_rend_res--;
+			mand->last_rend_sq = 0;
+		}
+	}
+
+	if (!mand->last_rend_res) {
+		mand->nframes_full = mand->nframes_adapt;
+	}
+
 	PyObject* ret = PyByteArray_FromStringAndSize(arr, stride * height * 4);
-	free(arr);
 	return ret;
 }
 
@@ -683,6 +804,7 @@ double mandy_get_zoom(mandy *mand) {
 
 void mandy_set_zoom(mandy *mand, double zoom) {
 	mand->dzoom = zoom;
+	mand->render = 1;
 }
 
 double mandy_get_rot(mandy *mand) {
@@ -729,6 +851,9 @@ void mandy_set_miter(mandy *mand, int miter) {
 		mand->tracies[mand->follow]->zoom = 1;
 	}
 
+	mand->last_rend_res = MANDY_REND_RES;
+	mand->last_rend_sq = 0;
+	mand->nframes_adapt = 0;
 	mand->miter = miter;
 }
 
@@ -795,6 +920,7 @@ void mandy_set_cxy(mandy *mand, float x, float y) {
 	if (mand->julia) {
 		mand->jx = fx;
 		mand->jy = fy;
+		mand->render = 1;
 	} else {
 		mand->px = fx;
 		mand->py = fy;
@@ -883,7 +1009,7 @@ void mandy_trc_home(mandy *mand, tracy *trc) {
 			trc->rd = isr + HALFPI;
 		} else {
 			unit *= 2;
-			printf("unit: %.7Lf\n", unit);
+			//printf("unit: %.7Lf\n", unit);
 		}
 
 
@@ -913,6 +1039,7 @@ void mandy_set_follow(mandy *mand, int trc_id) {
 	if (trc_id < (int)mand->ntracies)
 		mand->follow = trc_id;
 
+	mand->render = 1;
 	printf("follow %d\n", mand->follow);
 }
 
@@ -922,6 +1049,7 @@ int mandy_get_follow(mandy *mand) {
 
 void mandy_set_julia(mandy *mand, int v) {
 	mand->julia = v;
+	mand->render = 1;
 }
 
 int mandy_get_julia(mandy *mand) {
@@ -932,6 +1060,7 @@ void mandy_set_jxy(mandy *mand, double jx, double jy) {
 	mandy_excl_in(mand);
 	mand->jx = jx;
 	mand->jy = jy;
+	mand->render = 1;
 	mandy_excl_out(mand);
 }
 

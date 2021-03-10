@@ -44,6 +44,8 @@ class MandyView(Gtk.DrawingArea):
             mod.data_path + os.sep + "vht.svg"
         )
 
+        self.blank_curs = Gdk.Cursor.new(Gdk.CursorType.BLANK_CURSOR)
+
         self.set_events(
             Gdk.EventMask.POINTER_MOTION_MASK
             | Gdk.EventMask.SCROLL_MASK
@@ -243,6 +245,50 @@ class MandyView(Gtk.DrawingArea):
         w = self.get_allocated_width()
         h = self.get_allocated_height()
 
+        ptr = event.get_seat().get_pointer()
+        wnd = self.get_window()
+        wndx, wndy = wnd.get_position()
+
+        if event.x > w:
+            scrn, ptrx, ptry = ptr.get_position()
+            ptr.warp(scrn, ptrx - w, ptry)
+            if self.translate_start:
+                self.translate_start = [
+                    self.translate_start[0] - w,
+                    self.translate_start[1],
+                ]
+            return
+
+        if event.x < 0:
+            scrn, ptrx, ptry = ptr.get_position()
+            ptr.warp(scrn, ptrx + w, ptry)
+            if self.translate_start:
+                self.translate_start = [
+                    self.translate_start[0] + w,
+                    self.translate_start[1],
+                ]
+            return
+
+        if event.y > h:
+            scrn, ptrx, ptry = ptr.get_position()
+            ptr.warp(scrn, ptrx, ptry - h)
+            if self.translate_start:
+                self.translate_start = [
+                    self.translate_start[0],
+                    self.translate_start[1] - h,
+                ]
+            return
+
+        if event.y < 0:
+            scrn, ptrx, ptry = ptr.get_position()
+            ptr.warp(scrn, ptrx, ptry + h)
+            if self.translate_start:
+                self.translate_start = [
+                    self.translate_start[0],
+                    self.translate_start[1] + h,
+                ]
+            return
+
         if self.translate_start:
             x = event.x - self.translate_start[0]
             y = event.y - self.translate_start[1]
@@ -274,9 +320,20 @@ class MandyView(Gtk.DrawingArea):
 
         if event.button == 2:
             self.translate_start = [event.x, event.y]
+            w = self.get_window()
+            m = (
+                Gdk.EventMask.BUTTON_MOTION_MASK
+                | Gdk.EventMask.BUTTON_PRESS_MASK
+                | Gdk.EventMask.BUTTON_RELEASE_MASK
+            )
+
+            Gdk.pointer_grab(w, False, m, w, self.blank_curs, Gdk.CURRENT_TIME)
 
     def on_button_release(self, widget, event):
-        self.translate_start = None
+        Gdk.pointer_ungrab(Gdk.CURRENT_TIME)
+        if self.translate_start:
+            Gdk.pointer_ungrab(Gdk.CURRENT_TIME)
+            self.translate_start = None
 
     def on_key_press(self, widget, event):
         if cfg.key["mandy_show_info"].matches(event):
