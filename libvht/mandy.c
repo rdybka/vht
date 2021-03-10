@@ -264,9 +264,9 @@ void mandy_advance(mandy *mand, double tperiod, jack_nframes_t nframes) {
 		tracy *trc = mand->tracies[t];
 		tracy_excl_in(trc);
 
-		trc->unit = 1.0 / pow(1.333, mand->miter);
+		trc->unit = 0.1 / pow(1.333, mand->miter);
 		mandy_trc_home(mand, trc);
-		mandy_trc_move(mand, trc, tperiod);
+		mandy_trc_move(mand, trc, 1.0);
 		trc->r += atan2(sin(trc->rd - trc->r), cos(trc->rd - trc->r)) * trc->r_sm;
 		tracy_excl_out(trc);
 
@@ -282,6 +282,7 @@ void mandy_advance(mandy *mand, double tperiod, jack_nframes_t nframes) {
 
 // this runs in gui thread
 void mandy_animate(mandy *mand) {
+	double sm = 5;
 	time_t t = time(NULL);
 	if (t != mand->last_t) {
 		mand->last_t = t;
@@ -296,21 +297,24 @@ void mandy_animate(mandy *mand) {
 	long double dzoom = mand->dzoom;
 
 	if (mand->follow > -1) {
-		dx = mand->tracies[mand->follow]->x;
-		dy = mand->tracies[mand->follow]->y;
-		dzoom = mand->tracies[mand->follow]->zoom * mand->tracies[mand->follow]->unit * 1000;
-		drot = mand->tracies[mand->follow]->r - HALFPI;
-		// gay movement because it updates all the time anyway
+		mand->dx = mand->tracies[mand->follow]->x;
+		mand->dy = mand->tracies[mand->follow]->y;
+		mand->dzoom = mand->tracies[mand->follow]->zoom * mand->tracies[mand->follow]->unit * 1000;
+		mand->drot = mand->tracies[mand->follow]->r - HALFPI;
 
+		mand->x += (mand->dx - mand->x) / sm;
+		mand->y += (mand->dy - mand->y) / sm;
 
+		mand->rot += (mand->drot - mand->rot) / sm;
+		mand->zoom += (mand->dzoom - mand->zoom) / sm;
 
 		mand->render = 1;
+	} else {
+		mand->x = dx;
+		mand->y = dy;
+		mand->rot = drot;
+		mand->zoom = dzoom;
 	}
-
-	mand->x = dx;
-	mand->y = dy;
-	mand->rot = drot;
-	mand->zoom = dzoom;
 }
 
 // the algo for drawing

@@ -41,7 +41,7 @@ tracy *tracy_new(double ix1, double iy1, double ix2, double iy2) {
 	trc->rd = 0;
 
 	trc->zoom = 1;
-	trc->speed = .1;
+	trc->speed = 1;
 	trc->r_sm = .05;
 
 	trc->homed = 0;
