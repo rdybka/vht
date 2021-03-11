@@ -296,16 +296,26 @@ void mandy_animate(mandy *mand) {
 	long double drot = mand->drot;
 	long double dzoom = mand->dzoom;
 
+	/*for (unsigned int tr = 0; tr < mand->ntracies; tr++) {
+		tracy *trc = mand->tracies[tr];
+		for (int t = 0; t < trc->tail_length; t++) {
+			trc->tail[t].x = trc->tail[t].x + (trc->unit / 100) * cos(trc->tail[t].r);
+			trc->tail[t].y = trc->tail[t].y + (trc->unit / 100) * sin(trc->tail[t].r);
+			trc->tail[t].r *= 1.01;
+		}
+	}
+	*/
 	if (mand->follow > -1) {
 		mand->dx = mand->tracies[mand->follow]->x;
 		mand->dy = mand->tracies[mand->follow]->y;
-		mand->dzoom = mand->tracies[mand->follow]->zoom * mand->tracies[mand->follow]->unit * 1000;
+
+		mand->dzoom = mand->tracies[mand->follow]->zoom * mand->tracies[mand->follow]->unit * 100;
 		mand->drot = mand->tracies[mand->follow]->r - HALFPI;
 
 		mand->x += (mand->dx - mand->x) / sm;
 		mand->y += (mand->dy - mand->y) / sm;
 
-		mand->rot += (mand->drot - mand->rot) / sm;
+		mand->rot += (mand->drot - mand->rot) / 50;
 		mand->zoom += (mand->dzoom - mand->zoom) / sm;
 
 		mand->render = 1;
@@ -726,6 +736,15 @@ unsigned long mandy_render(mandy *mand, int width, int height) {
 	// update disp-pos
 	for (unsigned int t = 0; t < mand->ntracies; t++) {
 		tracy *trc = mand->tracies[t];
+
+		tracy_add_tail(trc, trc->x, trc->y, trc->r);
+
+		for (int t = 0; t < trc->tail_length; t++) {
+			mandy_f2d(mand, &trc->tail[t].dx, &trc->tail[t].dy, trc->tail[t].x, trc->tail[t].y);
+			trc->tail[t].dr = mand->rot - trc->tail[t].r;
+			trc->tail[t].dr += HALFPI;
+		}
+
 		mandy_f2d(mand, &trc->disp_x, &trc->disp_y, trc->x, trc->y);
 		trc->disp_r = mand->rot - trc->r;
 	}
@@ -736,53 +755,53 @@ unsigned long mandy_render(mandy *mand, int width, int height) {
 	mandy_excl_vect_in(mand);
 	VECT_CLEAR(mand);
 	/*
-		VECT_SET_TYPE(mand, 0);
-		VECT_SET_COL(mand, 1);
+			VECT_SET_TYPE(mand, 0);
+			VECT_SET_COL(mand, 1);
 
-		float xx = 0;
-		float yy = 0;
+			float xx = 0;
+			float yy = 0;
 
-		mandy_f2d(&mnd, &xx, &yy, mnd.px, mnd.py);
-		VECT_START(mand, xx, yy);
+			mandy_f2d(&mnd, &xx, &yy, mnd.px, mnd.py);
+			VECT_START(mand, xx, yy);
 
-		long double ix = mnd.x;
-		long double iy = mnd.y;
+			long double ix = mnd.x;
+			long double iy = mnd.y;
 
-		long double isr = mandy_isect(mand->miter, mand->bail,\
-		                              mand->px, mand->py,\
-		                              mand->x, mand->y,\
-		                              mand->sx, mand->sy,\
-		                              mand->zoom / (width),\
-		                              &ix, &iy, 0);
+			long double isr = mandy_isect(mand->miter, mand->bail,\
+			                              mand->px, mand->py,\
+			                              mand->x, mand->y,\
+			                              mand->sx, mand->sy,\
+			                              mand->zoom / (width),\
+			                              &ix, &iy, 0);
 
-		mandy_f2d(&mnd, &xx, &yy, ix, iy);
-		VECT_POINT(mand, xx, yy);
-		VECT_END(mand);
+			mandy_f2d(&mnd, &xx, &yy, ix, iy);
+			VECT_POINT(mand, xx, yy);
+			VECT_END(mand);
 
 
-		VECT_SET_COL(mand, 0);
+			VECT_SET_COL(mand, 0);
 
-		VECT_START(mand, xx, yy);
+			VECT_START(mand, xx, yy);
 
-		float xxx = 0;
-		float yyy = 0;
-		long double l = mand->zoom / 20;
+			float xxx = 0;
+			float yyy = 0;
+			long double l = mand->zoom / 20;
 
-		mandy_f2d(&mnd, &xxx, &yyy, ix + l * cos(isr), iy + l * sin(isr));
-		VECT_POINT(mand, xxx, yyy);
-		VECT_END(mand);
+			mandy_f2d(&mnd, &xxx, &yyy, ix + l * cos(isr), iy + l * sin(isr));
+			VECT_POINT(mand, xxx, yyy);
+			VECT_END(mand);
 
-		VECT_START(mand, xx, yy);
+			VECT_START(mand, xx, yy);
 
-		mandy_f2d(&mnd, &xxx, &yyy, ix + l * cos(isr + M_PI), iy + l * sin(isr + M_PI));
-		VECT_POINT(mand, xxx, yyy);
-		VECT_END(mand);
+			mandy_f2d(&mnd, &xxx, &yyy, ix + l * cos(isr + M_PI), iy + l * sin(isr + M_PI));
+			VECT_POINT(mand, xxx, yyy);
+			VECT_END(mand);
 
-		VECT_START(mand, xx, yy);
+			VECT_START(mand, xx, yy);
 
-		mandy_f2d(&mnd, &xxx, &yyy, ix + l / 2 * cos(isr + HALFPI), iy + l / 2 * sin(isr + HALFPI));
-		VECT_POINT(mand, xxx, yyy);
-		*/
+			mandy_f2d(&mnd, &xxx, &yyy, ix + l / 2 * cos(isr + HALFPI), iy + l / 2 * sin(isr + HALFPI));
+			VECT_POINT(mand, xxx, yyy);
+			*/
 	VECT_END(mand);
 
 	mandy_excl_vect_out(mand);
@@ -1013,6 +1032,8 @@ void mandy_trc_home(mandy *mand, tracy *trc) {
 			trc->rd = isr + HALFPI;
 		} else {
 			unit *= 2;
+			trc->tail_length = 0;
+
 			//printf("unit: %.7Lf\n", unit);
 		}
 

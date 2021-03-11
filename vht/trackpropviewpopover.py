@@ -513,7 +513,9 @@ class TrackPropViewPopover(Gtk.Popover):
             seq = mod.add_sequence(mod[mod.curr_seq].length)
             seq.rpb = mod[mod.curr_seq].rpb
             seq.extras["font_size"] = mod[self.parent.seq.index].extras["font_size"]
-
+            trknm = self.trk.extras["track_name"]
+            if trknm:
+                seq.extras["sequence_name"] = trknm
             seq.ketchup()
 
         trk = self.parent.seq.clone_track(self.trkview.trk, seq)

@@ -23,6 +23,13 @@
 
 enum tracy_type {two_point, turtle};
 
+#define TRACY_MAX_TAIL	64
+
+typedef struct tracy_tail_coord {
+	long double x, y, r;
+	float dx, dy, dr;
+} tail_xy;
+
 typedef struct tracy_t {
 	int type;
 	// initial values
@@ -41,6 +48,9 @@ typedef struct tracy_t {
 	float disp_x1, disp_y1;
 	float disp_x2, disp_y2;
 
+	tail_xy tail[TRACY_MAX_TAIL];
+	int tail_length;
+
 	int homed;
 	int bailed; // trace length overkill
 
@@ -51,11 +61,13 @@ tracy *tracy_new(double ix1, double iy1, double ix2, double iy2);
 void tracy_del(tracy *trc);
 void tracy_excl_in(tracy *trc);
 void tracy_excl_out(tracy *trc);
+void tracy_add_tail(tracy *trc, long double x, long double y, long double r);
 
 // public
 void tracy_set_init(tracy *trc, double ix1, double iy1, double ix2, double iy2);
 PyObject *tracy_get_init(tracy *trc);
 PyObject *tracy_get_pos(tracy *trc);
 PyObject *tracy_get_disp(tracy *trc);
+PyObject *tracy_get_tail(tracy *trc);
 
 #endif //__TRACY_H__

@@ -41,8 +41,9 @@ tracy *tracy_new(double ix1, double iy1, double ix2, double iy2) {
 	trc->rd = 0;
 
 	trc->zoom = 1;
-	trc->speed = 1;
-	trc->r_sm = .05;
+	trc->speed = .1;
+	trc->r_sm = .2;
+	trc->tail_length = 0;
 
 	trc->homed = 0;
 	trc->bailed = 0;
@@ -63,6 +64,32 @@ void tracy_set_init(tracy *trc, double ix1, double iy1, double ix2, double iy2) 
 	trc->ix2 = ix2;
 	trc->iy2 = iy2;
 	tracy_excl_out(trc);
+}
+
+void tracy_add_tail(tracy *trc, long double x, long double y, long double r) {
+	trc->tail_length++;
+	if (trc->tail_length >= TRACY_MAX_TAIL)
+		trc->tail_length = TRACY_MAX_TAIL - 1;
+
+	for (int t = TRACY_MAX_TAIL - 1; t > 0; t--) {
+		trc->tail[t] = trc->tail[t - 1];
+	}
+
+	trc->tail[0].x = x;
+	trc->tail[0].y = y;
+	trc->tail[0].r = r;
+}
+
+PyObject *tracy_get_tail(tracy *trc) {
+	PyObject *ret = PyList_New(0);
+	for (int t = 0; t < trc->tail_length; t++) {
+		PyObject *x = PyFloat_FromDouble(trc->tail[t].dx);
+		PyObject *y = PyFloat_FromDouble(trc->tail[t].dy);
+		PyObject *r = PyFloat_FromDouble(trc->tail[t].dr);
+		PyObject *tpl = PyTuple_Pack(3, x, y, r);
+		PyList_Append(ret, tpl);
+	}
+	return ret;
 }
 
 PyObject *tracy_get_init(tracy *trc) {
@@ -92,6 +119,7 @@ PyObject *tracy_get_disp(tracy *trc) {
 	PyDict_SetItemString(r, "x", PyFloat_FromDouble(trc->disp_x));
 	PyDict_SetItemString(r, "y", PyFloat_FromDouble(trc->disp_y));
 	PyDict_SetItemString(r, "r", PyFloat_FromDouble(trc->disp_r));
+	PyDict_SetItemString(r, "zoom", PyFloat_FromDouble(trc->zoom));
 	PyDict_SetItemString(r, "bailed", PyLong_FromLong(trc->bailed));
 	PyDict_SetItemString(r, "x1", PyFloat_FromDouble(trc->disp_x1));
 	PyDict_SetItemString(r, "y1", PyFloat_FromDouble(trc->disp_y1));

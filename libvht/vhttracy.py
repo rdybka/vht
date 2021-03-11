@@ -36,3 +36,7 @@ class VHTTracy:
     @property
     def disp(self):
         return libcvht.tracy_get_disp(self._trc_handle)
+
+    @property
+    def tail(self):
+        return libcvht.tracy_get_tail(self._trc_handle)

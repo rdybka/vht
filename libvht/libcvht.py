@@ -986,4 +986,7 @@ def tracy_get_pos(trc):
 def tracy_get_disp(trc):
     return _libcvht.tracy_get_disp(trc)
 
+def tracy_get_tail(trc):
+    return _libcvht.tracy_get_tail(trc)
+
 

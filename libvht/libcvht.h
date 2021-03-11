@@ -385,5 +385,6 @@ extern void tracy_set_init(tracy *trc, double ix1, double iy1, double ix2, doubl
 extern PyObject *tracy_get_init(tracy *trc);
 extern PyObject *tracy_get_pos(tracy *trc);
 extern PyObject *tracy_get_disp(tracy *trc);
+extern PyObject *tracy_get_tail(tracy *trc);
 
 #endif //__LIBCVHT_H__

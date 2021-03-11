@@ -12001,6 +12001,29 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_tracy_get_tail(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  tracy *arg1 = (tracy *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  PyObject *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_tracy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "tracy_get_tail" "', argument " "1"" of type '" "tracy *""'"); 
+  }
+  arg1 = (tracy *)(argp1);
+  result = (PyObject *)tracy_get_tail(arg1);
+  resultobj = result;
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 static PyMethodDef SwigMethods[] = {
 	 { "SWIG_PyInstanceMethod_New", SWIG_PyInstanceMethod_New, METH_O, NULL},
 	 { "new_int_array", _wrap_new_int_array, METH_O, NULL},
@@ -12309,6 +12332,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "tracy_get_init", _wrap_tracy_get_init, METH_O, NULL},
 	 { "tracy_get_pos", _wrap_tracy_get_pos, METH_O, NULL},
 	 { "tracy_get_disp", _wrap_tracy_get_disp, METH_O, NULL},
+	 { "tracy_get_tail", _wrap_tracy_get_tail, METH_O, NULL},
 	 { NULL, NULL, 0, NULL }
 };
 

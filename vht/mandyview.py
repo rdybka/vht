@@ -40,9 +40,11 @@ class MandyView(Gtk.DrawingArea):
         self.show_info = False
         self.show_crosshair = True
 
-        self.turtle_gfx = GdkPixbuf.Pixbuf.new_from_file(
-            mod.data_path + os.sep + "vht.svg"
+        self.turtle_img = cairo.ImageSurface.create_from_png(
+            mod.data_path + os.sep + "mandy.png"
         )
+        self.turtle_gfx = cairo.SurfacePattern(self.turtle_img)
+        self.turtle_gfx.set_filter(cairo.Filter.NEAREST)
 
         self.blank_curs = Gdk.Cursor.new(Gdk.CursorType.BLANK_CURSOR)
 
@@ -174,17 +176,35 @@ class MandyView(Gtk.DrawingArea):
             cr.line_to(cx + sz * cs, cy - sz * sn)
             cr.stroke()
 
+        trtl_img_width = self.turtle_img.get_width()
+        trtl_img_height = self.turtle_img.get_height()
+
         for trcid, trc in enumerate(self.mandy):
             d = trc.disp
-            if trcid == fol:
-                cr.set_source_rgb(*(cfg.mandy_crosshair_colour))
-            else:
-                cr.set_source_rgb(*(cfg.mandy_colour))
+
+            tail = trc.tail
+            tl = len(tail)
+
+            tw = 8 / (d["zoom"] * 2)
 
             cr.move_to(d["x"], d["y"])
-            cr.line_to(d["x"] + 10 * math.cos(d["r"]), d["y"] + 10 * math.sin(d["r"]))
+            for n, t in enumerate(tail):
+                cr.set_source_rgb(*(col * (1 - (n / tl)) for col in cfg.star_colour))
+                cr.set_line_width(tw * (1 - (n / tl)))
+                cr.line_to(t[0] + 10 * math.cos(t[2]), t[1] + 10 * math.sin(t[2]))
+                cr.stroke()
+                cr.move_to(t[0], t[1])
 
-            cr.stroke()
+            matrix = cairo.Matrix()
+            matrix.translate(trtl_img_width / 2.0, trtl_img_height / 2.0)
+            matrix.scale(d["zoom"] * 2.5, d["zoom"] * 2.5)
+            matrix.rotate(-d["r"])
+            matrix.translate(-d["x"], -d["y"])
+            self.turtle_gfx.set_matrix(matrix)
+
+            cr.set_source(self.turtle_gfx)
+            cr.rectangle(0, 0, w, h)
+            cr.fill()
 
         info = self.mandy.info if self.show_info else None
         if info:
