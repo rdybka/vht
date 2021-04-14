@@ -445,7 +445,7 @@ class TrackPropViewPopover(Gtk.Popover):
         self.add(self.grid)
         self.set_modal(False)
 
-        self.extend_notebook.set_current_page(2)
+        self.extend_notebook.set_current_page(0)
 
     def on_resend_patch_clicked(self, wdg, evt, data):
         msb = -1
