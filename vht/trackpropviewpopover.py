@@ -18,6 +18,7 @@
 from vht.notebooklabel import NotebookLabel
 from vht.controllersview import ControllersView
 from vht.mandyview import MandyView
+from vht.mandymenu import MandyMenu
 from vht import cfg, mod
 from gi.repository import Gdk, Gtk, Gio
 from datetime import datetime
@@ -351,6 +352,8 @@ class TrackPropViewPopover(Gtk.Popover):
         self.extend_notebook.set_hexpand(True)
         self.extend_notebook.set_vexpand(True)
 
+        self.extend_notebook.connect("switch-page", self.on_notebook_page_switch)
+
         self.extend_notebook.append_page(
             self.extend_track_grid, NotebookLabel("track", self.extend_notebook, 0)
         )
@@ -423,30 +426,26 @@ class TrackPropViewPopover(Gtk.Popover):
             self.ctrlsview, NotebookLabel("controllers", self.extend_notebook, 1)
         )
 
-        self.codeview = Gtk.Box()
+        # self.codeview = Gtk.Box()
+        self.mandypage = Gtk.Box()
+
+        # self.extend_notebook.append_page(
+        #    self.codeview, NotebookLabel("code", self.extend_notebook, 2)
+        # )
+
         self.mandyview = MandyView(self.trk, self, False)
-
-        if cfg.with_mandy:
-            self.extend_notebook.append_page(
-                self.codeview, NotebookLabel("code", self.extend_notebook, 2)
-            )
-
-            self.mandypage = Gtk.Box()
-            self.extend_notebook.append_page(
-                self.mandyview, NotebookLabel("mandy", self.extend_notebook, 3)
-            )
+        self.mandymenu = MandyMenu(self.trk.mandy)
+        self.mandypage.pack_start(self.mandyview, True, True, 0)
+        self.mandypage.pack_end(self.mandymenu, False, False, 0)
+        self.extend_notebook.append_page(
+            self.mandypage, NotebookLabel("mandy", self.extend_notebook, 2)
+        )
 
         self.grid.show_all()
         self.add(self.grid)
         self.set_modal(False)
 
-        if cfg.with_mandy:
-            self.extend_notebook.set_current_page(3)
-            mod.autostart_win = self  # None
-            self.trk.mandy.active = True
-        else:
-            self.extend_notebook.set_current_page(0)
-            mod.autostart_win = None
+        self.extend_notebook.set_current_page(2)
 
     def on_resend_patch_clicked(self, wdg, evt, data):
         msb = -1
@@ -584,17 +583,15 @@ class TrackPropViewPopover(Gtk.Popover):
         self.add_tick_callback(self.tick)
         self.set_opacity(1)
         self.mandyview.entered = False
-
+        self.trk.mandy.reset_anim()
         self.show()
         # self.popup()
 
     def tick(self, wdg, param):
-        if self.extend_notebook.get_current_page() == 3:
+        if self.extend_notebook.get_current_page() == 2:
             self.mandyview.tick(wdg, param)
-
-            if self.mandyview.entered and self.mandyview.mandy.active:
-                self.time_want_to_leave = 0
-                return True
+            self.time_want_to_leave = 0
+            return True
 
         if self.time_want_to_leave == 0:  # normal
             op = self.get_opacity()
@@ -667,6 +664,7 @@ class TrackPropViewPopover(Gtk.Popover):
         self.time_want_to_leave = -1
         self.parent.button_highlight = False
         self.ctrlsview.capturing = False
+        self.mandyview.entered = False
         self.parent.popped = False
         self.parent.redraw()
 
@@ -803,3 +801,7 @@ class TrackPropViewPopover(Gtk.Popover):
         self.trk.set_qc2(
             qc[2] if qc[2] > -1 else cfg.quick_control_2_ctrl, int(adj.get_value())
         )
+
+    def on_notebook_page_switch(self, wdg, opg, pg):
+        if pg == 2:
+            self.trk.mandy.reset_anim()

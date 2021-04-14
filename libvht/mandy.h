@@ -25,13 +25,17 @@
 #include <jack/jack.h>
 #include "tracy.h"
 
-#define MANDY_DEF_MITER  4
-#define MANDY_MAX_ITER  100
+#define MANDY_DEF_MITER  2
+#define MAGIC_MITER2UNIT_RATIO	1.666
+// this is waaaaay more than tracy can
+// work with. it becomes erratic pretty quickly
+#define MANDY_MAX_ITER 123
 #define MANDY_DEF_BAIL   4
 
 #define MANDY_REND_RES	9
 
 #define HALFPI M_PI / 2.0
+#define QPI	M_PI / 4.0
 
 typedef struct mandy_t {
 	int miter;
@@ -43,19 +47,18 @@ typedef struct mandy_t {
 	// *s - speed
 
 	long double bail;
-	long double bailc;
-	long double bailr;
-	long double bailv;
-	long double bails;
+	long double mn;	// multibrotness
+	int mubrot;
 
 	long double x, y;
 	long double dx, dy;
 
-	long double jx, jy;	// "julia noise"
-	long double sx, sy;
-	long double sxr, syr;
-	long double sxv, syv;
-	long double sxs, sys;
+	long double jcx, jcy;
+	double jvx, jvy;
+	double jsx, jsy;
+	double jrx, jry;
+
+	long double jx, jy;
 
 	long double zoom;
 	long double dzoom;
@@ -102,11 +105,15 @@ typedef struct mandy_t {
 	char *pixmap;
 	int last_res_x;
 	int last_res_y;
+	int last_stride;
 	int last_rend_res;
 	unsigned long last_rend_sq;
 	int render;
-	int nframes_adapt;
-	int nframes_full;
+
+	// pixel scanner
+	float *pix_mask;
+	tracy *scan_trc;
+	tracy *init_trc;
 } mandy;
 
 
@@ -130,15 +137,19 @@ void mandy_reset(mandy *mand);
 mandy *mandy_clone(mandy *mand, void *trk);
 char *mandy_get_info(mandy *mand);
 
+PyObject *mandy_save(mandy *mand);
+void mandy_restore(mandy *mand, PyObject *o);
+
 int mandy_get_ntracies(mandy *mand);
-tracy *mandy_add_tracy(mandy *mand, double ix1, double iy1, double ix2, double iy2);
 tracy *mandy_get_tracy(mandy *mand, int trc_id);
-void mandy_del_tracy(mandy *mand, int trc_id);
 void mandy_set_follow(mandy *mand, int trc_id);
 int mandy_get_follow(mandy *mand);
 void mandy_set_julia(mandy *mand, int v);
 int mandy_get_julia(mandy *mand);
 
+tracy *mandy_get_scan_tracy(mandy *mand);
+tracy *mandy_get_init_tracy(mandy *mand);
+void mandy_reinit_from_scan(mandy *mand);
 
 double mandy_get_zoom(mandy *mand);
 void mandy_set_zoom(mandy *mand, double zoom);
@@ -151,6 +162,7 @@ void mandy_set_bail(mandy *mand, double bail);
 
 int mandy_get_miter(mandy *mand);
 void mandy_set_miter(mandy *mand, int miter);
+int mandy_get_max_iter(mandy *mand);
 
 void mandy_set_active(mandy *mand, int active);
 int mandy_get_active(mandy *mand);
@@ -163,16 +175,30 @@ unsigned long mandy_get_points(mandy *mand, double *ret_arr, unsigned long l);
 
 void mandy_set_xy(mandy *mand, double x, double y);
 void mandy_set_jxy(mandy *mand, double jx, double jy);
+
+void mandy_set_jsx(mandy *mand, double jsx);
+void mandy_set_jsy(mandy *mand, double jsy);
+void mandy_set_jvx(mandy *mand, double jvx);
+void mandy_set_jvy(mandy *mand, double jvy);
+
+double mandy_get_jsx(mandy *mand);
+double mandy_get_jsy(mandy *mand);
+double mandy_get_jvx(mandy *mand);
+double mandy_get_jvy(mandy *mand);
+
 void mandy_set_rgb(mandy *mand, int r, int g, int b);
 
 // returns an RGB24 ByteArray
 PyObject *mandy_get_pixels(mandy *mand, int width, int height, int stride);
-
+void mandy_reset_anim(mandy *mand);
 // those take mouse vector and display size and try to make the best of it,
 // otherwise you can just modify the struct, it's a state machine
 void mandy_translate(mandy *mand, float x, float y, float w, float h);
+void mandy_translate_julia(mandy *mand, float x, float y, float w, float h);
 void mandy_rotate(mandy *mand, float x, float y, float w, float h);
 void mandy_zoom(mandy *mand, float x, float y, float w, float h);
+
+double mandy_get_max_speed();
 
 // drawing macros
 #define VECT_CLEAR(m) mandy_vect_clear(m);

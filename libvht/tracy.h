@@ -21,9 +21,8 @@
 
 #include <Python.h>
 
-enum tracy_type {two_point, turtle};
-
 #define TRACY_MAX_TAIL	64
+#define TRACY_MAX_SPEED	127
 
 typedef struct tracy_tail_coord {
 	long double x, y, r;
@@ -33,7 +32,7 @@ typedef struct tracy_tail_coord {
 typedef struct tracy_t {
 	int type;
 	// initial values
-	double ix1, iy1, ix2, iy2;
+	double ix, iy, ir;
 
 	long double x, y, r, rd;
 	long double lhx, lhy; // last homed pos
@@ -42,6 +41,9 @@ typedef struct tracy_t {
 	double zoom;
 	double speed;
 	double unit;
+	double phase;
+	double mult;
+	int amode;		// angle 2 pos mode: 0 - absolute, 1 - additive
 
 	// updated each render
 	float disp_x, disp_y, disp_r;
@@ -57,17 +59,23 @@ typedef struct tracy_t {
 	pthread_mutex_t excl;
 } tracy;
 
-tracy *tracy_new(double ix1, double iy1, double ix2, double iy2);
+tracy *tracy_new(double ix, double iy, double ir);
 void tracy_del(tracy *trc);
 void tracy_excl_in(tracy *trc);
 void tracy_excl_out(tracy *trc);
 void tracy_add_tail(tracy *trc, long double x, long double y, long double r);
 
 // public
-void tracy_set_init(tracy *trc, double ix1, double iy1, double ix2, double iy2);
-PyObject *tracy_get_init(tracy *trc);
 PyObject *tracy_get_pos(tracy *trc);
 PyObject *tracy_get_disp(tracy *trc);
 PyObject *tracy_get_tail(tracy *trc);
+double tracy_get_speed(tracy *trc);
+void tracy_set_speed(tracy *trc, double s);
+double tracy_get_phase(tracy *trc);
+void tracy_set_phase(tracy *trc, double p);
+double tracy_get_mult(tracy *trc);
+void tracy_set_mult(tracy *trc, double m);
+int tracy_get_amode(tracy *trc);
+void tracy_set_amode(tracy *trc, int m);
 
 #endif //__TRACY_H__

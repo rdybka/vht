@@ -310,10 +310,12 @@ class SequencePropViewPopover(Gtk.Popover):
             mod[idx].extras["sequence_name"] = extras.get_name(
                 mod[self.seq.index].extras["sequence_name"]
             )
+            self.unpop()
             return
 
         if itm.op == 2:
             mod.replace_sequence(self.strip.seq.index[1])
+            self.unpop()
             return
 
     def on_double_menu_item_activate(self, itm):

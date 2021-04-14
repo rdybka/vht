@@ -43,13 +43,7 @@ class VHTMandy(Iterable):
             if not len(self) >= -itm:
                 raise IndexError()
 
-            return VHTTracy(libcvht.mandy_get_tracy(self._mnd_handle, itm))
-
-    def add_tracy(self, x1, y1, x2, y2):
-        return VHTTracy(libcvht.mandy_add_tracy(self._mnd_handle, x1, y1, x2, y2))
-
-    def del_tracy(self, trid):
-        libcvht.mandy_del_tracy(self._mnd_handle, trid)
+        return VHTTracy(libcvht.mandy_get_tracy(self._mnd_handle, itm))
 
     def get_pixels(self, w, h, stride):
         return libcvht.mandy_get_pixels(self._mnd_handle, int(w), int(h), stride)
@@ -72,7 +66,6 @@ class VHTMandy(Iterable):
         self._npoints = libcvht.mandy_render(self._mnd_handle, int(w), int(h))
         return self._npoints
 
-    # remove this
     def set_cxy(self, x, y):
         libcvht.mandy_set_cxy(self._mnd_handle, float(x), float(y))
 
@@ -81,11 +74,41 @@ class VHTMandy(Iterable):
             self._mnd_handle, float(x), float(y), float(w), float(h)
         )
 
+    def julia_translate(self, x, y, w, h):
+        libcvht.mandy_translate_julia(
+            self._mnd_handle, float(x), float(y), float(w), float(h)
+        )
+
     def screen_rotate(self, x, y, w, h):
         libcvht.mandy_rotate(self._mnd_handle, float(x), float(y), float(w), float(h))
 
     def screen_zoom(self, x, y, w, h):
         libcvht.mandy_zoom(self._mnd_handle, float(x), float(y), float(w), float(h))
+
+    def reinit_from_scan(self):
+        libcvht.mandy_reinit_from_scan(self._mnd_handle)
+
+    def reset_anim(self):
+        libcvht.mandy_reset_anim(self._mnd_handle)
+
+    def reset(self):
+        libcvht.mandy_reset(self._mnd_handle)
+
+    @property
+    def scan_tracy(self):
+        trc_h = libcvht.mandy_get_scan_tracy(self._mnd_handle)
+        if trc_h:
+            return VHTTracy(trc_h)
+        else:
+            return None
+
+    @property
+    def init_tracy(self):
+        trc_h = libcvht.mandy_get_init_tracy(self._mnd_handle)
+        if trc_h:
+            return VHTTracy(trc_h)
+        else:
+            return None
 
     @property
     def pause(self):
@@ -121,6 +144,45 @@ class VHTMandy(Iterable):
         libcvht.mandy_set_rot(self._mnd_handle, float(rot))
 
     @property
+    def save_state(self):
+        return libcvht.mandy_save(self._mnd_handle)
+
+    def init_from(self, state):
+        libcvht.mandy_restore(self._mnd_handle, state)
+
+    @property
+    def jsx(self):
+        return libcvht.mandy_get_jsx(self._mnd_handle)
+
+    @jsx.setter
+    def jsx(self, jsx):
+        libcvht.mandy_set_jsx(self._mnd_handle, float(jsx))
+
+    @property
+    def jsy(self):
+        return libcvht.mandy_get_jsy(self._mnd_handle)
+
+    @jsy.setter
+    def jsy(self, jsy):
+        libcvht.mandy_set_jsy(self._mnd_handle, float(jsy))
+
+    @property
+    def jvx(self):
+        return libcvht.mandy_get_jvx(self._mnd_handle)
+
+    @jvx.setter
+    def jvx(self, jvx):
+        libcvht.mandy_set_jvx(self._mnd_handle, float(jvx))
+
+    @property
+    def jvy(self):
+        return libcvht.mandy_get_jvy(self._mnd_handle)
+
+    @jvy.setter
+    def jvy(self, jvy):
+        libcvht.mandy_set_jvy(self._mnd_handle, float(jvy))
+
+    @property
     def bail(self):
         return libcvht.mandy_get_bail(self._mnd_handle)
 
@@ -135,6 +197,14 @@ class VHTMandy(Iterable):
     @miter.setter
     def miter(self, miter):
         libcvht.mandy_set_miter(self._mnd_handle, int(miter))
+
+    @property
+    def max_iter(self):
+        return libcvht.mandy_get_max_iter(self._mnd_handle)
+
+    @property
+    def max_speed(self):
+        return libcvht.mandy_get_max_speed()
 
     @property
     def info(self):

@@ -96,6 +96,7 @@ def pack_seq(seq):
                 rn += 1
             t["col"].append(c)
 
+        t["mandy"] = trk.mandy.save_state
         s["trk"].append(t)
 
     return s
@@ -601,6 +602,9 @@ class VHTModule(Iterable):
                     rr.note = row["note"]
                     rr.velocity = row["velocity"]
                     rr.delay = row["delay"]
+
+            if "mandy" in trk:
+                t.mandy.init_from(trk["mandy"])
 
         return sq
 

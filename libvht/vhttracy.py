@@ -22,13 +22,6 @@ class VHTTracy:
     def __init__(self, trc):
         self._trc_handle = trc
 
-    def set_init(x1, y1, x2, y2):
-        libcvht.tracy_set_init(self._trc_handle, x1, y1, x2, y2)
-
-    @property
-    def init(self):
-        return libcvht.tracy_get_init(self._trc_handle)
-
     @property
     def pos(self):
         return libcvht.tracy_get_pos(self._trc_handle)
@@ -40,3 +33,35 @@ class VHTTracy:
     @property
     def tail(self):
         return libcvht.tracy_get_tail(self._trc_handle)
+
+    @property
+    def speed(self):
+        return libcvht.tracy_get_speed(self._trc_handle)
+
+    @speed.setter
+    def speed(self, v):
+        return libcvht.tracy_set_speed(self._trc_handle, float(v))
+
+    @property
+    def phase(self):
+        return libcvht.tracy_get_phase(self._trc_handle)
+
+    @phase.setter
+    def phase(self, v):
+        return libcvht.tracy_set_phase(self._trc_handle, float(v))
+
+    @property
+    def mult(self):
+        return libcvht.tracy_get_mult(self._trc_handle)
+
+    @mult.setter
+    def mult(self, v):
+        return libcvht.tracy_set_mult(self._trc_handle, float(v))
+
+    @property
+    def amode(self):
+        return libcvht.tracy_get_amode(self._trc_handle)
+
+    @amode.setter
+    def amode(self, i):
+        return libcvht.tracy_set_amode(self._trc_handle, int(i))

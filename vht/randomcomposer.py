@@ -30,14 +30,4 @@ def muzakize():
     # mod.bpm = 120
     seq = mod.add_sequence(cfg.default_seq_length)
     trk = seq.add_track()
-
-    trk.mandy.add_tracy(0, 0, 5, 0)
-    # ~ trk.mandy.add_tracy(0, 0, 0, 5)
-    # ~ trk.mandy.add_tracy(0, 0, -5, 0)
-    # ~ trk.mandy.add_tracy(0, 0, 0, -5)
-    # ~ trk.mandy.add_tracy(0, 0, 5, 5)
-    # ~ trk.mandy.add_tracy(0, 0, 5, -5)
-    # ~ trk.mandy.add_tracy(0, 0, -5, 5)
-    # ~ trk.mandy.add_tracy(0, 0, -5, -5)
-
     seq.playing = 1

@@ -27,6 +27,8 @@ setup(name = "vht",
 			"libvht/envelope.c",
 			"libvht/timeline.c",
 			"libvht/mandy.c",
+			"libvht/mandy_trk_disp.c",
+			"libvht/mandy_pix_scan.c",
 			"libvht/tracy.c"], 
 			libraries = ["jack"])],
 

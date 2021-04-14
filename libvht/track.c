@@ -98,7 +98,6 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	trk->crows = 0;
 
 	track_add_ctrl(trk, -1);
-	track_reset(trk);
 	trk->playing = 1;
 	trk->clt = NULL;
 	trk->indicators = 0;
@@ -106,6 +105,7 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	trk->dirty_wheel = 0;
 
 	trk->mand = mandy_new(trk);
+	track_reset(trk);
 	return trk;
 };
 
@@ -122,6 +122,10 @@ void track_reset(track *trk) {
 	for (int c = 0; c < trk->nctrl; c++) {
 		trk->lctrlrow[c] = -1;
 		trk->lctrlval[c] = -1;
+	}
+
+	if (trk->mand->active) {
+		mandy_reset(trk->mand);
 	}
 }
 
@@ -719,9 +723,6 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 	if (row_end > trk->nrows)
 		row_end = trk->nrows;
 
-	if (trk->mand && trk->mand->active)
-		mandy_advance(trk->mand, tperiod, nframes);
-
 	track_fix_program_change(trk);
 
 	// quick controls
@@ -752,6 +753,10 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 				trk->qc2_last = trk->qc2_val;
 			}
 		}
+	}
+
+	if (trk->mand && trk->mand->active) {
+		mandy_advance(trk->mand, tperiod, nframes);
 	}
 
 	//printf("%f %f %f\n", trk->pos, floor(trk->pos), round(trk->pos));
@@ -861,7 +866,9 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 
 	trk->last_pos = trk->pos;
 	trk->last_period = tperiod;
-	trk->pos += tperiod;
+
+	if (!(trk->mand && trk->mand->active))
+		trk->pos += tperiod;
 
 	if (trk->loop) {
 		if (trk->pos > trk->nrows)

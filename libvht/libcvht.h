@@ -348,10 +348,21 @@ extern void mandy_set_xy(mandy *mand, double x, double y);
 extern void mandy_set_cxy(mandy *mand, float x, float y);
 extern void mandy_set_jxy(mandy *mand, double jx, double jy);
 
+extern void mandy_set_jsx(mandy *mand, double jsx);
+extern void mandy_set_jsy(mandy *mand, double jsy);
+extern void mandy_set_jvx(mandy *mand, double jvx);
+extern void mandy_set_jvy(mandy *mand, double jvy);
+
+extern double mandy_get_jsx(mandy *mand);
+extern double mandy_get_jsy(mandy *mand);
+extern double mandy_get_jvx(mandy *mand);
+extern double mandy_get_jvy(mandy *mand);
+
 extern void mandy_set_pause(mandy *mand, int p);
 extern int mandy_get_pause(mandy *mand);
 
 extern void mandy_translate(mandy *mand, float x, float y, float w, float h);
+extern void mandy_translate_julia(mandy *mand, float x, float y, float w, float h);
 extern void mandy_rotate(mandy *mand, float x, float y, float w, float h);
 extern void mandy_zoom(mandy *mand, float x, float y, float w, float h);
 
@@ -369,22 +380,38 @@ extern double mandy_get_bail(mandy *mand);
 extern void mandy_set_bail(mandy *mand, double bail);
 extern int mandy_get_miter(mandy *mand);
 extern void mandy_set_miter(mandy *mand, int miter);
+extern int mandy_get_max_iter(mandy *mand);
 
 extern void mandy_set_julia(mandy *mand, int v);
 extern int mandy_get_julia(mandy *mand);
 
+extern double mandy_get_max_speed();
+
+extern void mandy_reinit_from_scan(mandy *mand);
+extern void mandy_reset(mandy *mand);
+extern void mandy_reset_anim(mandy *mand);
+
+extern PyObject *mandy_save(mandy *mand);
+extern void mandy_restore(mandy *mand, PyObject *o);
+
 // tracy
 extern int mandy_get_ntracies(mandy *mand);
-extern tracy *mandy_add_tracy(mandy *mand, double ix1, double iy1, double ix2, double iy2);
 extern tracy *mandy_get_tracy(mandy *mand, int trc_id);
-extern void mandy_del_tracy(mandy *mand, int trc_id);
+extern tracy *mandy_get_scan_tracy(mandy *mand);
+extern tracy *mandy_get_init_tracy(mandy *mand);
 extern void mandy_set_follow(mandy *mand, int trc_id);
 extern int mandy_get_follow(mandy *mand);
 
-extern void tracy_set_init(tracy *trc, double ix1, double iy1, double ix2, double iy2);
-extern PyObject *tracy_get_init(tracy *trc);
 extern PyObject *tracy_get_pos(tracy *trc);
 extern PyObject *tracy_get_disp(tracy *trc);
 extern PyObject *tracy_get_tail(tracy *trc);
+extern double tracy_get_speed(tracy *trc);
+extern void tracy_set_speed(tracy *trc, double s);
+extern double tracy_get_phase(tracy *trc);
+extern void tracy_set_phase(tracy *trc, double p);
+extern double tracy_get_mult(tracy *trc);
+extern void tracy_set_mult(tracy *trc, double m);
+extern int tracy_get_amode(tracy *trc);
+extern void tracy_set_amode(tracy *trc, int m);
 
 #endif //__LIBCVHT_H__

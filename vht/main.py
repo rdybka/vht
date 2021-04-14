@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-#
+
 # Valhalla Tracker - a live MIDI sequencer for JACK
 #
-# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,10 +18,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # I hereby testify,
-# on Setting Orange, the 8th day of The Aftermath in the YOLD 3186,
+# on Boomtime, the 19th day of Discord in the YOLD 3187,
 # that everything in this program checks out with The Law of Fives
 
 # [^^^intentionally left blank]
+
+# ...and that guis are the worst
+# - St. Frater Shrater aka 57xD (captioning intended)
 
 from vht.mainwin import MainWin
 from vht.shortcutmayhem import ShortcutMayhem
@@ -147,9 +150,6 @@ class VHTApp(Gtk.Application):
 
         refresh_connections(mod, cfg)
         mod.transport = cfg.start_transport
-
-        if mod.autostart_win:
-            mod.autostart_win.pop()
 
     def on_prefs(self, action, param):
         PreferencesWin(self.main_win, mod, cfg).show()

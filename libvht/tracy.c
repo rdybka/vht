@@ -26,24 +26,26 @@ void tracy_excl_out(tracy *trc) {
 	pthread_mutex_unlock(&trc->excl);
 }
 
-tracy *tracy_new(double ix1, double iy1, double ix2, double iy2) {
+tracy *tracy_new(double ix, double iy, double ir) {
 	tracy *trc = malloc(sizeof(tracy));
-	trc->ix1 = ix1;
-	trc->iy1 = iy1;
-	trc->ix2 = ix2;
-	trc->iy2 = iy2;
+	trc->ix = ix;
+	trc->iy = iy;
+	trc->ir = ir;
 
-	trc->x = 0;
-	trc->y = 0;
+	trc->x = ix;
+	trc->y = iy;
 	trc->lhx = 0;
 	trc->lhy = 0;
-	trc->r = 0;
-	trc->rd = 0;
+	trc->r = ir;
+	trc->rd = ir;
 
 	trc->zoom = 1;
-	trc->speed = .1;
+	trc->speed = 5;
 	trc->r_sm = .2;
 	trc->tail_length = 0;
+	trc->phase = 0;
+	trc->mult = 1;
+	trc->amode = 0;
 
 	trc->homed = 0;
 	trc->bailed = 0;
@@ -57,12 +59,15 @@ void tracy_del(tracy *trc) {
 	free(trc);
 }
 
-void tracy_set_init(tracy *trc, double ix1, double iy1, double ix2, double iy2) {
+void tracy_set_init(tracy *trc, double ix, double iy, double ir) {
 	tracy_excl_in(trc);
-	trc->ix1 = ix1;
-	trc->iy1 = iy1;
-	trc->ix2 = ix2;
-	trc->iy2 = iy2;
+	trc->ix = ix;
+	trc->iy = iy;
+	trc->ir = ir;
+
+	trc->rd = ir;
+	trc->x = ix;
+	trc->y = iy;
 	tracy_excl_out(trc);
 }
 
@@ -95,10 +100,9 @@ PyObject *tracy_get_tail(tracy *trc) {
 PyObject *tracy_get_init(tracy *trc) {
 	tracy_excl_in(trc);
 	PyObject *r = PyDict_New();
-	PyDict_SetItemString(r, "ix1", PyFloat_FromDouble(trc->ix1));
-	PyDict_SetItemString(r, "iy1", PyFloat_FromDouble(trc->iy1));
-	PyDict_SetItemString(r, "ix2", PyFloat_FromDouble(trc->ix2));
-	PyDict_SetItemString(r, "iy2", PyFloat_FromDouble(trc->iy2));
+	PyDict_SetItemString(r, "ix", PyFloat_FromDouble(trc->ix));
+	PyDict_SetItemString(r, "iy", PyFloat_FromDouble(trc->iy));
+	PyDict_SetItemString(r, "ir", PyFloat_FromDouble(trc->ir));
 	tracy_excl_out(trc);
 	return r;
 }
@@ -125,7 +129,57 @@ PyObject *tracy_get_disp(tracy *trc) {
 	PyDict_SetItemString(r, "y1", PyFloat_FromDouble(trc->disp_y1));
 	PyDict_SetItemString(r, "x2", PyFloat_FromDouble(trc->disp_x2));
 	PyDict_SetItemString(r, "y2", PyFloat_FromDouble(trc->disp_y2));
+	trc->bailed = 0;
 	tracy_excl_out(trc);
 	return r;
 }
 
+double tracy_get_speed(tracy *trc) {
+	return trc->speed;
+}
+void tracy_set_speed(tracy *trc, double s) {
+	tracy_excl_in(trc);
+	int swp = 0;
+
+	if (s < 0) {
+		swp = 1;
+		s *= -1;
+	}
+
+	if (s < .1)
+		s = .1;
+
+	if (s > TRACY_MAX_SPEED)
+		s = TRACY_MAX_SPEED;
+
+	if (swp) {
+		s *= -1;
+	}
+
+	trc->speed = s;
+	tracy_excl_out(trc);
+}
+
+double tracy_get_phase(tracy *trc) {
+	return trc->phase * 180 / M_PI;
+}
+
+void tracy_set_phase(tracy *trc, double p) {
+	trc->phase = p * M_PI / 180;
+}
+
+double tracy_get_mult(tracy *trc) {
+	return trc->mult;
+}
+
+void tracy_set_mult(tracy *trc, double m) {
+	trc->mult = m;
+}
+
+int tracy_get_amode(tracy *trc) {
+	return trc->amode;
+}
+
+void tracy_set_amode(tracy *trc, int m) {
+	trc->amode = m;
+}
