@@ -495,7 +495,9 @@ void midi_refresh_port_names(midi_client *clt) {
 	if (clt->ports)
 		jack_free(clt->ports);
 
-	clt->ports = jack_get_ports(clt->jack_client, 0, 0, 0);
+	if (clt->jack_client)
+		clt->ports = jack_get_ports(clt->jack_client, 0, 0, 0);
+
 	clt->ports_changed = 0;
 	midi_ports_excl_out(clt);
 }
