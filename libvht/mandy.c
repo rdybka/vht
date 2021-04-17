@@ -298,6 +298,13 @@ void mandy_reset(mandy *mand) {
 	}
 
 	mandy_excl_out(mand);
+
+	mandy_advance(mand, 0, 0);
+	if (mand->active) {
+		track *trk = (track *)mand->trk;
+		trk->last_pos = 0;
+	}
+
 	mandy_gen_info(mand);
 }
 
@@ -407,7 +414,6 @@ void mandy_restore(mandy *mand, PyObject *o) {
 		mand->tracies[0]->unit = getdouble(o, "trc_unit");
 		mand->tracies[0]->phase = getdouble(o, "trc_phase");
 		mand->tracies[0]->mult = getdouble(o, "trc_mult");
-		mand->tracies[0]->amode = getint(o, "trc_amode");
 		mand->tracies[0]->type = getint(o, "trc_type");
 		mandy_trc_home(mand, mand->tracies[0]);
 	}
@@ -451,7 +457,6 @@ PyObject *mandy_save(mandy *mand) {
 		PyDict_SetItemString(r, "trc_unit", PyFloat_FromDouble(mand->tracies[0]->unit));
 		PyDict_SetItemString(r, "trc_phase", PyFloat_FromDouble(mand->tracies[0]->phase));
 		PyDict_SetItemString(r, "trc_mult", PyFloat_FromDouble(mand->tracies[0]->mult));
-		PyDict_SetItemString(r, "trc_amode", PyLong_FromLong(mand->tracies[0]->amode));
 		PyDict_SetItemString(r, "trc_type", PyLong_FromLong(mand->tracies[0]->type));
 	}
 
@@ -475,7 +480,6 @@ void mandy_advance(mandy *mand, double tperiod, jack_nframes_t nframes) {
 		return;
 	}
 
-
 	mand->jrx += (tperiod / 16) * mand->jsx;
 	mand->jry += (tperiod / 16) * mand->jsy;
 
@@ -489,7 +493,15 @@ void mandy_advance(mandy *mand, double tperiod, jack_nframes_t nframes) {
 		trc->unit = 0.1 / pow(MAGIC_MITER2UNIT_RATIO, mand->miter);
 		mandy_trc_move(mand, trc, tperiod);
 		trc->r += atan2(sin(trc->rd - trc->r), cos(trc->rd - trc->r)) * trc->r_sm;
-		trk->pos = (trk->nrows / 2) + (trk->nrows / 2) * sin(trc->phase + (trc->r * trc->mult));
+
+		trk->pos = (-trc->phase + (-trc->r * trc->mult)) / (M_PI * 2.0) * trk->nrows;
+
+		while(trk->pos > trk->nrows)
+			trk->pos -= trk->nrows;
+
+		while(trk->pos < 0)
+			trk->pos += trk->nrows;
+
 		tracy_excl_out(trc);
 	}
 
@@ -533,7 +545,7 @@ void mandy_animate(mandy *mand) {
 		mand->x += (mand->dx - mand->x) / sm;
 		mand->y += (mand->dy - mand->y) / sm;
 
-		mand->rot += (mand->drot - mand->rot) / (sm * 5);
+		mand->rot += (mand->drot - mand->rot) / (sm * 10);
 		mand->zoom += (mand->dzoom - mand->zoom) / (sm * 2);
 
 		mand->render = 1;
@@ -589,47 +601,7 @@ inline unsigned char mandy_v(mandy *mand, long double x, long double y) {
 
 	return v;
 }
-/*
-// the algo for tracing
-inline unsigned char vj(int miter, long double bail, long double x, long double y, long double jx, long double jy, int j) {
-	long double xx = jx;
-	long double yy = jy;
-	long double nx = 0.0;
-	long double ny = 0.0;
-	long double sx = x;
-	long double sy = y;
-	unsigned char v = 0;
 
-	if (j) {
-		xx = x;
-		yy = y;
-		sx = jx;
-		sy = jy;
-
-	}
-
-	for (int f = 0; f < miter; f++) {
-		nx = xx*xx - yy*yy + sx;
-		ny = 2.0*xx*yy + sy;
-
-		v = f;
-
-		if ((nx*nx+ny*ny) > bail) {
-			break;
-		}
-
-		xx = nx;
-		yy = ny;
-	}
-
-	v++;
-
-	if (v == miter)
-		v = 0;
-
-	return v;
-}
-*/
 // the god function
 long double mandy_isect(mandy *mand,\
                         long double x1, long double y1,\
@@ -973,14 +945,6 @@ unsigned long mandy_render(mandy *mand, int width, int height) {
 	for (unsigned int t = 0; t < mand->ntracies; t++) {
 		tracy *trc = mand->tracies[t];
 
-		tracy_add_tail(trc, trc->x, trc->y, trc->rd);
-
-		for (int t = 0; t < trc->tail_length; t++) {
-			mandy_f2d(mand, &trc->tail[t].dx, &trc->tail[t].dy, trc->tail[t].x, trc->tail[t].y);
-			trc->tail[t].dr = mand->rot - trc->tail[t].r;
-			trc->tail[t].dr += HALFPI;
-		}
-
 		mandy_f2d(mand, &trc->disp_x, &trc->disp_y, trc->x, trc->y);
 		trc->disp_r = mand->rot - trc->r;
 	}
@@ -988,8 +952,19 @@ unsigned long mandy_render(mandy *mand, int width, int height) {
 	mandy_f2d(mand, &mand->init_trc->disp_x, &mand->init_trc->disp_y, mand->init_trc->x, mand->init_trc->y);
 	mand->init_trc->disp_r = mand->rot - mand->init_trc->rd;
 
+	if (mand->ntracies) {
+		tracy *trc = mand->tracies[0];
+		for (int t = 0; t < trc->tail_length; t++) {
+			mandy_f2d(mand, &trc->tail[t].dx, &trc->tail[t].dy, trc->tail[t].x, trc->tail[t].y);
+			trc->tail[t].dr = mand->rot - trc->tail[t].r;
+			trc->tail[t].dr += HALFPI;
+		}
+	}
+
 	//mandy mnd = *mand;
 	mandy_excl_out(mand);
+
+
 
 	mandy_excl_vect_in(mand);
 	VECT_CLEAR(mand);
@@ -1334,6 +1309,14 @@ void mandy_trc_home(mandy *mand, tracy *trc) {
 	}
 }
 
+/* is this a valid position/rotation for a tracy?
+ *
+ *      0     0            *  |  0             p0     p1
+ *     ----T----              T----                T
+ *      *     *    valid   *     *   invalid   p2     p3 if p2 == 0 || p3 == 0
+ *              return 1            return 0              outside - return -1
+ */
+
 int mandy_trc_is_valid(mandy *mnd, long double unit, long double x, long double y, long double r) {
 	int p0, p1, p2, p3;
 	long double xx, yy;
@@ -1352,8 +1335,12 @@ int mandy_trc_is_valid(mandy *mnd, long double unit, long double x, long double 
 	yy = y + unit * sin(r + QPI + M_PI);
 	p3 = mandy_v(mnd, xx, yy);
 
-	if ((p0 == 0) && (p1 == 0) && (p2 > 0) && (p3 > 0)) {
-		return 1;
+	if ((p2 > 0) && (p3 > 0)) {
+		if ((p0 == 0) && (p1 == 0)) {
+			return 1;
+		}
+	} else {
+		return -1;
 	}
 
 	return 0;
@@ -1361,6 +1348,7 @@ int mandy_trc_is_valid(mandy *mnd, long double unit, long double x, long double 
 
 void mandy_trc_move(mandy *mnd, tracy *trc, long double l) {
 	mandy_trc_home(mnd, trc);
+	tracy_add_tail(trc, trc->x, trc->y, trc->speed > 0?trc->rd:trc->rd + M_PI);
 
 	long double togo = l * trc->unit * trc->speed;
 	long double gone = 0;
@@ -1369,6 +1357,7 @@ void mandy_trc_move(mandy *mnd, tracy *trc, long double l) {
 	long double togo1 = unit;
 	if (togo < 0)
 		togo1 = -togo1;
+
 	int valid = 0;
 	int bail = 20;
 
@@ -1378,6 +1367,23 @@ void mandy_trc_move(mandy *mnd, tracy *trc, long double l) {
 		long double nr = 0;
 
 		valid = mandy_trc_is_valid(mnd, unit, nx, ny, trc->rd);
+
+		if (valid < 1) {
+			if (valid == 0) {
+				if (trc->speed > 0) {
+					trc->rd -= M_PI / 8;
+				} else {
+					trc->rd += M_PI / 8;
+				}
+			} else { // outside
+				valid = 1;
+				trc->x = nx;
+				trc->y = ny;
+				mandy_trc_home(mnd, trc);
+			}
+
+			valid = 0;
+		}
 
 		long double gone1 = 0.0;
 
@@ -1390,7 +1396,7 @@ void mandy_trc_move(mandy *mnd, tracy *trc, long double l) {
 			nr = mandy_isect(mnd, x1, y1, x2, y2, mnd->unit0, &nx, &ny, 0);
 
 			gone1 = fabsl(sqrtl(pow(nx - trc->x, 2) + pow(ny - trc->y, 2)));
-			if (gone + gone1 < togo * 1.1 || togo1 < mnd->unit0) {
+			if (gone + gone1 < fabs(togo) * 1.1 || fabs(togo1) < mnd->unit0) {
 				gone += gone1;
 				trc->x = nx;
 				trc->y = ny;
@@ -1420,8 +1426,6 @@ void mandy_trc_move(mandy *mnd, tracy *trc, long double l) {
 	} else {
 		trc->unit *= 2;
 	}
-
-
 }
 
 void mandy_set_follow(mandy *mand, int trc_id) {

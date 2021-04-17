@@ -42,7 +42,7 @@ typedef struct track_t {
 	double pos;
 	int index;
 
-	// used for recording
+	// used for recording and mandy
 	double last_pos;
 	double last_period;
 

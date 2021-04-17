@@ -26,7 +26,7 @@
 #include "tracy.h"
 
 #define MANDY_DEF_MITER  2
-#define MAGIC_MITER2UNIT_RATIO	1.666
+#define MAGIC_MITER2UNIT_RATIO	1.5833333
 // this is waaaaay more than tracy can
 // work with. it becomes erratic pretty quickly
 #define MANDY_MAX_ITER 123

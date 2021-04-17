@@ -57,11 +57,3 @@ class VHTTracy:
     @mult.setter
     def mult(self, v):
         return libcvht.tracy_set_mult(self._trc_handle, float(v))
-
-    @property
-    def amode(self):
-        return libcvht.tracy_get_amode(self._trc_handle)
-
-    @amode.setter
-    def amode(self, i):
-        return libcvht.tracy_set_amode(self._trc_handle, int(i))

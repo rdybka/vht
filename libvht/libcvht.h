@@ -411,7 +411,5 @@ extern double tracy_get_phase(tracy *trc);
 extern void tracy_set_phase(tracy *trc, double p);
 extern double tracy_get_mult(tracy *trc);
 extern void tracy_set_mult(tracy *trc, double m);
-extern int tracy_get_amode(tracy *trc);
-extern void tracy_set_amode(tracy *trc, int m);
 
 #endif //__LIBCVHT_H__

@@ -1049,10 +1049,4 @@ def tracy_get_mult(trc):
 def tracy_set_mult(trc, m):
     return _libcvht.tracy_set_mult(trc, m)
 
-def tracy_get_amode(trc):
-    return _libcvht.tracy_get_amode(trc)
-
-def tracy_set_amode(trc, m):
-    return _libcvht.tracy_set_amode(trc, m)
-
 

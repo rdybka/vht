@@ -12476,58 +12476,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_tracy_get_amode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  tracy *arg1 = (tracy *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject *swig_obj[1] ;
-  int result;
-  
-  if (!args) SWIG_fail;
-  swig_obj[0] = args;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_tracy, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "tracy_get_amode" "', argument " "1"" of type '" "tracy *""'"); 
-  }
-  arg1 = (tracy *)(argp1);
-  result = (int)tracy_get_amode(arg1);
-  resultobj = SWIG_From_int((int)(result));
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
-SWIGINTERN PyObject *_wrap_tracy_set_amode(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  tracy *arg1 = (tracy *) 0 ;
-  int arg2 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  int val2 ;
-  int ecode2 = 0 ;
-  PyObject *swig_obj[2] ;
-  
-  if (!SWIG_Python_UnpackTuple(args, "tracy_set_amode", 2, 2, swig_obj)) SWIG_fail;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_tracy, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "tracy_set_amode" "', argument " "1"" of type '" "tracy *""'"); 
-  }
-  arg1 = (tracy *)(argp1);
-  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
-  if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "tracy_set_amode" "', argument " "2"" of type '" "int""'");
-  } 
-  arg2 = (int)(val2);
-  tracy_set_amode(arg1,arg2);
-  resultobj = SWIG_Py_Void();
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 static PyMethodDef SwigMethods[] = {
 	 { "SWIG_PyInstanceMethod_New", SWIG_PyInstanceMethod_New, METH_O, NULL},
 	 { "new_int_array", _wrap_new_int_array, METH_O, NULL},
@@ -12857,8 +12805,6 @@ static PyMethodDef SwigMethods[] = {
 	 { "tracy_set_phase", _wrap_tracy_set_phase, METH_VARARGS, NULL},
 	 { "tracy_get_mult", _wrap_tracy_get_mult, METH_O, NULL},
 	 { "tracy_set_mult", _wrap_tracy_set_mult, METH_VARARGS, NULL},
-	 { "tracy_get_amode", _wrap_tracy_get_amode, METH_O, NULL},
-	 { "tracy_set_amode", _wrap_tracy_set_amode, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
 };
 

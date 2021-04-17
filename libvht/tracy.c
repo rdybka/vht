@@ -45,7 +45,6 @@ tracy *tracy_new(double ix, double iy, double ir) {
 	trc->tail_length = 0;
 	trc->phase = 0;
 	trc->mult = 1;
-	trc->amode = 0;
 
 	trc->homed = 0;
 	trc->bailed = 0;
@@ -176,10 +175,3 @@ void tracy_set_mult(tracy *trc, double m) {
 	trc->mult = m;
 }
 
-int tracy_get_amode(tracy *trc) {
-	return trc->amode;
-}
-
-void tracy_set_amode(tracy *trc, int m) {
-	trc->amode = m;
-}

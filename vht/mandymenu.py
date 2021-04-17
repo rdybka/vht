@@ -106,13 +106,11 @@ class MandyMenu(Gtk.Box):
         )
         self.buttgrid.attach(self.butt_follow, 0, 1, 1, 1)
 
-        # absolute/cumulative
-        self.butt_amode = Gtk.Button.new_with_label("abs")
-        self.butt_amode.connect("clicked", self.on_amode_clicked, 0)
-        self.butt_amode.set_tooltip_markup(
-            cfg.tooltip_markup2 % ("angle 2 pos mode", "absolute / additive")
-        )
-        self.buttgrid.attach(self.butt_amode, 1, 1, 1, 1)
+        # reset
+        self.butt_reset = Gtk.Button.new_with_label("///")
+        self.butt_reset.connect("clicked", self.on_reset_clicked, 0)
+        self.butt_reset.set_tooltip_markup(cfg.tooltip_markup % ("reset"))
+        self.buttgrid.attach(self.butt_reset, 1, 1, 1, 1)
 
         # mnd/jul
         self.butt_jmode = Gtk.ToggleButton.new_with_label("jul")
@@ -208,7 +206,6 @@ class MandyMenu(Gtk.Box):
             self.butt_pause.set_sensitive(True)
             self.butt_dir.set_sensitive(True)
             self.butt_follow.set_sensitive(True)
-            self.butt_amode.set_sensitive(True)
             self.scale_speed.set_sensitive(True)
             self.scale_mult.set_sensitive(True)
             self.scale_phase.set_sensitive(True)
@@ -220,7 +217,6 @@ class MandyMenu(Gtk.Box):
             self.butt_pause.set_sensitive(False)
             self.butt_dir.set_sensitive(False)
             self.butt_follow.set_sensitive(False)
-            self.butt_amode.set_sensitive(False)
             self.scale_speed.set_sensitive(False)
             self.scale_mult.set_sensitive(False)
             self.scale_phase.set_sensitive(False)
@@ -257,11 +253,6 @@ class MandyMenu(Gtk.Box):
             self.lab_jsy.set_text("%.1f" % self.mandy.jsy)
             self.scale_jsy.set_value(self.mandy.jsy)
 
-            if self.mandy[0].amode == 0:
-                self.butt_amode.set_label("abs")
-            else:
-                self.butt_amode.set_label("add")
-
         if fr:
             self.get_window().thaw_updates()
 
@@ -294,12 +285,14 @@ class MandyMenu(Gtk.Box):
         self.mandy[0].speed *= -1
         self.update()
 
-    def on_amode_clicked(self, wdg, param):
+    def on_reset_clicked(self, wdg, param):
         if self.frozen:
             return
 
-        self.mandy[0].amode = 0 if self.mandy[0].amode else 1
-        self.update()
+        self.mandy.zoom = 6
+        self.mandy.rot = 0
+        self.mandy.set_xy(-0.7, 0)
+        self.mandy.set_jxy(0.0, 0)
 
     def on_jmode_toggled(self, wdg, param):
         if self.frozen:

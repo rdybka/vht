@@ -439,7 +439,6 @@ track *track_clone(track *src) {
 		dst->playing = src->playing;
 		dst->resync = 1;
 		mandy_clone(src->mand, dst);
-
 		track_set_extras(dst, src->extras);
 	}
 
@@ -568,7 +567,7 @@ int col_last_note(track *trk, int col, double pos) {
 void track_play_row(track *trk, int pos, int c, int delay) {
 	row r;
 
-	if (trk->lplayed[c] == pos) {
+	if (trk->lplayed[c] == pos && !trk->mand->active) {
 		return;
 	}
 
@@ -640,7 +639,7 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 		}
 	}
 
-	if (r.type == note_on) {
+	if (r.type == note_on && !trk->mand->active) {
 		trk->ring[c] = r.note;
 		track_set_wanderer(trk, c, pos, 0);
 	}
@@ -692,6 +691,63 @@ void track_fix_program_change(track *trk) {
 			midi_buffer_add(clt, trk->port, evt);
 
 			trk->indicators |= 8;
+		}
+	}
+}
+
+void track_strum(track *trk, double pos_from, double pos_to, jack_nframes_t nframes) {
+	int rw0 = (int)pos_to;
+	rw0 -= 1;
+
+	int strum_down = 1;
+	if (pos_to < pos_from) {
+		strum_down = 0;
+	}
+
+	for (int c = 0; c < trk->ncols; c++) {
+		int strummed = 0;
+		for (int rw = rw0; rw < rw0 + 3 && !strummed; rw++) {
+			row r;
+			int rrw = rw;
+			if (rrw < 0)
+				rrw = 0;
+
+			while (rrw >= trk->nrows)
+				rrw -= trk->nrows;
+
+			track_get_row(trk, c, rrw, &r);
+			if(r.type == note_on || r.type == note_off) {
+				double trigger_time = (double)rrw + ((double)r.delay / 100);
+				unsigned int frm = fabs(round((trigger_time - trk->last_pos) / (pos_to - pos_from) * nframes));
+
+				int play = 0;
+
+				if (strum_down && trigger_time <= pos_to) {
+					if (trigger_time > pos_from)
+						play = 1;
+				}
+
+				if (!strum_down && trigger_time >= pos_to) {
+					if (trigger_time < pos_from)
+						play = 1;
+				}
+
+				if (pos_from > trk->nrows - 1 && pos_to < 1) {
+					frm = fabs(round((trigger_time - (trk->last_pos - trk->nrows)) / (pos_to - (pos_from - trk->nrows)) * nframes));
+					play = 1;
+				} else if (pos_to > trk->nrows - 1 && pos_from < 1) {
+					frm = fabs(round(((trk->last_pos - trigger_time) / (-((pos_to - trk->nrows) - pos_from))) * nframes));
+					play = 1;
+				}
+
+				if (play && frm <= nframes) {
+					if (trk->playing)
+						track_play_row(trk, rrw, c, frm);
+
+					//printf("strum: %f -> %f %d -- %d:%d:%.3f:%d\n", trk->last_pos, trk->pos, strum_down, c, rrw, trigger_time, frm);
+					strummed = 1;
+				}
+			}
 		}
 	}
 }
@@ -755,8 +811,14 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 		}
 	}
 
-	if (trk->mand && trk->mand->active) {
+	if (trk->mand->active) {
 		mandy_advance(trk->mand, tperiod, nframes);
+
+		track_strum(trk, trk->last_pos, trk->pos, nframes);
+
+		trk->last_pos = trk->pos;
+		trk->last_period = tperiod;
+		return;
 	}
 
 	//printf("%f %f %f\n", trk->pos, floor(trk->pos), round(trk->pos));
@@ -765,7 +827,6 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 	for (int c = 0; c < trk->ncols; c++)
 		for (int n = row_start; n <= row_end; n++) {
 			int nn = n;
-
 
 			if (nn >= trk->nrows) {
 				nn = 0;

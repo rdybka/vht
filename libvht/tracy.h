@@ -21,7 +21,7 @@
 
 #include <Python.h>
 
-#define TRACY_MAX_TAIL	64
+#define TRACY_MAX_TAIL	253
 #define TRACY_MAX_SPEED	127
 
 typedef struct tracy_tail_coord {
@@ -43,7 +43,6 @@ typedef struct tracy_t {
 	double unit;
 	double phase;
 	double mult;
-	int amode;		// angle 2 pos mode: 0 - absolute, 1 - additive
 
 	// updated each render
 	float disp_x, disp_y, disp_r;
