@@ -269,9 +269,6 @@ def queue_midi_note_off(clt, seq, port, chn, note):
 def queue_midi_ctrl(clt, seq, trk, val, ctrl):
     return _libcvht.queue_midi_ctrl(clt, seq, trk, val, ctrl)
 
-def module_get_timeline(mod):
-    return _libcvht.module_get_timeline(mod)
-
 def midi_refresh_port_names(clt):
     return _libcvht.midi_refresh_port_names(clt)
 
@@ -701,6 +698,9 @@ def ctrlrow_set_anchor(crw, a):
 def ctrlrow_set(crw, v, l, s, a):
     return _libcvht.ctrlrow_set(crw, v, l, s, a)
 
+def module_get_timeline(mod):
+    return _libcvht.module_get_timeline(mod)
+
 def timeline_set_pos(tl, npos, let_ring):
     return _libcvht.timeline_set_pos(tl, npos, let_ring)
 
@@ -1048,5 +1048,11 @@ def tracy_get_mult(trc):
 
 def tracy_set_mult(trc, m):
     return _libcvht.tracy_set_mult(trc, m)
+
+def tracy_get_qnt(trc):
+    return _libcvht.tracy_get_qnt(trc)
+
+def tracy_set_qnt(trc, q):
+    return _libcvht.tracy_set_qnt(trc, q)
 
 

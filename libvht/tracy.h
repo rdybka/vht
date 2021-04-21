@@ -21,7 +21,7 @@
 
 #include <Python.h>
 
-#define TRACY_MAX_TAIL	253
+#define TRACY_MAX_TAIL	64
 #define TRACY_MAX_SPEED	127
 
 typedef struct tracy_tail_coord {
@@ -43,6 +43,7 @@ typedef struct tracy_t {
 	double unit;
 	double phase;
 	double mult;
+	int qnt;
 
 	// updated each render
 	float disp_x, disp_y, disp_r;
@@ -76,5 +77,6 @@ double tracy_get_mult(tracy *trc);
 void tracy_set_mult(tracy *trc, double m);
 int tracy_get_amode(tracy *trc);
 void tracy_set_amode(tracy *trc, int m);
-
+int tracy_get_qnt(tracy *trc);
+void tracy_set_qnt(tracy *trc, int q);
 #endif //__TRACY_H__

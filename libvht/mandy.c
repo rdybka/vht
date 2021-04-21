@@ -415,6 +415,7 @@ void mandy_restore(mandy *mand, PyObject *o) {
 		mand->tracies[0]->phase = getdouble(o, "trc_phase");
 		mand->tracies[0]->mult = getdouble(o, "trc_mult");
 		mand->tracies[0]->type = getint(o, "trc_type");
+		mand->tracies[0]->qnt = getint(o, "trc_qnt");
 		mandy_trc_home(mand, mand->tracies[0]);
 	}
 
@@ -458,6 +459,7 @@ PyObject *mandy_save(mandy *mand) {
 		PyDict_SetItemString(r, "trc_phase", PyFloat_FromDouble(mand->tracies[0]->phase));
 		PyDict_SetItemString(r, "trc_mult", PyFloat_FromDouble(mand->tracies[0]->mult));
 		PyDict_SetItemString(r, "trc_type", PyLong_FromLong(mand->tracies[0]->type));
+		PyDict_SetItemString(r, "trc_qnt", PyLong_FromLong(mand->tracies[0]->qnt));
 	}
 
 	mandy_excl_out(mand);

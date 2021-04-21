@@ -143,9 +143,16 @@ class MandyMenu(Gtk.Box):
             cfg.tooltip_markup2 % ("iterations", "ctrl-scroll")
         )
 
+        # quantise
+        self.scale_qnt, self.lab_qnt = add_scale(
+            self.det1, 1, 0, 8, 1, "qnt", self.on_qnt_changed
+        )
+
+        self.scale_qnt.set_tooltip_markup(cfg.tooltip_markup % ("quantise to nth-row"))
+
         # speed
         self.scale_speed, self.lab_spd = add_scale(
-            self.det1, 1, 0.1, self.mandy.max_speed, 0.1, "spd", self.on_speed_changed
+            self.det1, 2, 0.1, self.mandy.max_speed, 0.1, "spd", self.on_speed_changed
         )
         self.scale_speed.set_tooltip_markup(
             cfg.tooltip_markup2 % ("speed", "shift-scroll")
@@ -153,7 +160,7 @@ class MandyMenu(Gtk.Box):
 
         # phase
         self.scale_phase, self.lab_phs = add_scale(
-            self.det1, 2, -180, 180, 0.1, "phs", self.on_phase_changed
+            self.det1, 3, -180, 180, 0.1, "phs", self.on_phase_changed
         )
 
         self.scale_phase.add_mark(0, Gtk.PositionType.TOP, None)
@@ -162,25 +169,40 @@ class MandyMenu(Gtk.Box):
 
         # mult
         self.scale_mult, self.lab_mlt = add_scale(
-            self.det1, 3, 0.1, 5, 0.1, "mlt", self.on_mult_changed
+            self.det1, 4, 0.1, 5, 0.1, "mlt", self.on_mult_changed
         )
 
         self.scale_mult.add_mark(1, Gtk.PositionType.TOP, None)
         self.scale_mult.set_digits(1)
-        self.scale_mult.set_tooltip_markup(cfg.tooltip_markup % ("multiply"))
+        self.scale_mult.set_tooltip_markup(cfg.tooltip_markup % ("angle multiplier"))
 
         # julias
         self.scale_jvx, self.lab_jvx = add_scale(
-            self.det1, 4, 0, 100, 0.1, "jvx", self.on_jvx_changed
+            self.det1, 5, 0, 100, 0.1, "jvx", self.on_jvx_changed
         )
+        self.scale_jvx.set_tooltip_markup(
+            cfg.tooltip_markup % ("julia (e) LFO x velocity")
+        )
+
         self.scale_jvy, self.lab_jvy = add_scale(
-            self.det1, 5, 0, 100, 0.1, "jvy", self.on_jvy_changed
+            self.det1, 6, 0, 100, 0.1, "jvy", self.on_jvy_changed
         )
+        self.scale_jvy.set_tooltip_markup(
+            cfg.tooltip_markup % ("julia (e) LFO y velocity")
+        )
+
         self.scale_jsx, self.lab_jsx = add_scale(
-            self.det1, 6, 0, 100, 0.1, "jsx", self.on_jsx_changed
+            self.det1, 7, 0, 100, 0.1, "jsx", self.on_jsx_changed
         )
+        self.scale_jsx.set_tooltip_markup(
+            cfg.tooltip_markup % ("julia (e) LFO x speed")
+        )
+
         self.scale_jsy, self.lab_jsy = add_scale(
-            self.det1, 7, 0, 100, 0.1, "jsy", self.on_jsy_changed
+            self.det1, 8, 0, 100, 0.1, "jsy", self.on_jsy_changed
+        )
+        self.scale_jsy.set_tooltip_markup(
+            cfg.tooltip_markup % ("julia (e) LFO y speed")
         )
 
         self.details.pack_start(self.det1, True, True, 0)
@@ -206,6 +228,7 @@ class MandyMenu(Gtk.Box):
             self.butt_pause.set_sensitive(True)
             self.butt_dir.set_sensitive(True)
             self.butt_follow.set_sensitive(True)
+            self.scale_qnt.set_sensitive(True)
             self.scale_speed.set_sensitive(True)
             self.scale_mult.set_sensitive(True)
             self.scale_phase.set_sensitive(True)
@@ -216,6 +239,7 @@ class MandyMenu(Gtk.Box):
         else:
             self.butt_pause.set_sensitive(False)
             self.butt_dir.set_sensitive(False)
+            self.scale_qnt.set_sensitive(False)
             self.butt_follow.set_sensitive(False)
             self.scale_speed.set_sensitive(False)
             self.scale_mult.set_sensitive(False)
@@ -232,6 +256,8 @@ class MandyMenu(Gtk.Box):
                 self.butt_dir.set_image(self.right_image)
 
             self.butt_follow.set_active(True if self.mandy.follow > -1 else False)
+            self.lab_qnt.set_text("%d" % self.mandy[0].qnt)
+            self.scale_qnt.set_value(self.mandy[0].qnt)
             self.lab_itr.set_text("%d" % self.mandy.miter)
             self.scale_miter.set_value(self.mandy.miter)
             self.lab_spd.set_text("%.1f" % self.mandy[0].speed)
@@ -309,6 +335,13 @@ class MandyMenu(Gtk.Box):
             self.mandy.follow = 0
         else:
             self.mandy.follow = -1
+
+    def on_qnt_changed(self, adj):
+        if self.frozen:
+            return
+
+        self.mandy[0].qnt = int(adj.get_value())
+        self.update()
 
     def on_miter_changed(self, adj):
         if self.frozen:

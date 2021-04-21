@@ -75,6 +75,7 @@ typedef struct track_t {
 	int arows; // allocated rows
 	int *ring;
 	int *lplayed;
+	int *mand_qnt;
 
 	int resync;
 
@@ -94,6 +95,7 @@ typedef struct track_t {
 	int dirty; // for thumbnail
 	int dirty_wheel; // is the pitch_weel active
 
+	int *mand_qnt_cue;
 	mandy *mand;
 } track;
 

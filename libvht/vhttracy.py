@@ -57,3 +57,11 @@ class VHTTracy:
     @mult.setter
     def mult(self, v):
         return libcvht.tracy_set_mult(self._trc_handle, float(v))
+
+    @property
+    def qnt(self):
+        return libcvht.tracy_get_qnt(self._trc_handle)
+
+    @qnt.setter
+    def qnt(self, q):
+        return libcvht.tracy_set_qnt(self._trc_handle, int(q))

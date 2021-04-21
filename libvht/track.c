@@ -1,6 +1,6 @@
 /* track.c - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,6 +76,7 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	trk->rows = malloc(sizeof(row*) * trk->ncols);
 	trk->ring = malloc(sizeof(int) * trk->ncols);
 	trk->lplayed = malloc(sizeof(int) * trk->ncols);
+	trk->mand_qnt = malloc(sizeof(int) * trk->ncols);
 
 	for (int c = 0; c < trk->ncols; c++) {
 		trk->rows[c] = malloc(sizeof(row) * trk->nrows);
@@ -83,6 +84,7 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 
 		trk->ring[c] = -1;
 		trk->lplayed[c] = -1;
+		trk->mand_qnt[c] = -232323;
 	}
 
 	trk->ctrlpr = ctrlpr;
@@ -117,6 +119,7 @@ void track_reset(track *trk) {
 	trk->loop = 1;
 	for (int c = 0; c < trk->ncols; c++) {
 		trk->lplayed[c] = -1;
+		trk->mand_qnt[c] = -232323;
 	}
 
 	for (int c = 0; c < trk->nctrl; c++) {
@@ -344,6 +347,7 @@ void track_free(track *trk) {
 	free(trk->lctrlrow);
 	free(trk->env);
 	mandy_free(trk->mand);
+	free(trk->mand_qnt);
 	free(trk);
 }
 
@@ -704,6 +708,8 @@ void track_strum(track *trk, double pos_from, double pos_to, jack_nframes_t nfra
 		strum_down = 0;
 	}
 
+	midi_client *clt = (midi_client *)trk->clt;
+
 	for (int c = 0; c < trk->ncols; c++) {
 		int strummed = 0;
 		for (int rw = rw0; rw < rw0 + 3 && !strummed; rw++) {
@@ -741,9 +747,11 @@ void track_strum(track *trk, double pos_from, double pos_to, jack_nframes_t nfra
 				}
 
 				if (play && frm <= nframes) {
-					if (trk->playing)
-						track_play_row(trk, rrw, c, frm);
-
+					if (trk->playing && trk->mand->tracies[0]->qnt == 0) {
+						track_play_row(trk, rrw, c, (clt->jack_buffer_size - nframes) + frm);
+					} else {
+						trk->mand_qnt[c] = -(++rrw);
+					}
 					//printf("strum: %f -> %f %d -- %d:%d:%.3f:%d\n", trk->last_pos, trk->pos, strum_down, c, rrw, trigger_time, frm);
 					strummed = 1;
 				}
@@ -813,8 +821,16 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 
 	if (trk->mand->active) {
 		mandy_advance(trk->mand, tperiod, nframes);
-
 		track_strum(trk, trk->last_pos, trk->pos, nframes);
+
+		for (int c = 0; c < trk->ncols; c++) {
+			int qnt = trk->mand_qnt[c];
+			//printf("%d!!\n", trk->mand_qnt[c]);
+			if (qnt > -1) {
+				track_play_row(trk, qnt, c, clt->jack_buffer_size - nframes);
+				trk->mand_qnt[c] = -232323;
+			}
+		}
 
 		trk->last_pos = trk->pos;
 		trk->last_period = tperiod;
@@ -1008,9 +1024,11 @@ void track_add_col(track *trk) {
 	trk->rows[trk->ncols -1] = malloc(sizeof(row) * trk->arows);
 	trk->ring = realloc(trk->ring, sizeof(int) * trk->ncols);
 	trk->lplayed = realloc(trk->lplayed, sizeof(int) * trk->ncols);
+	trk->mand_qnt = realloc(trk->mand_qnt, sizeof(int) * trk->ncols);
 
 	trk->ring[trk->ncols - 1] = -1;
 	trk->lplayed[trk->ncols - 1] = -1;
+	trk->mand_qnt[trk->ncols - 1] = -1;
 	trk->dirty = 1;
 	pthread_mutex_unlock(&trk->excl);
 
@@ -1060,6 +1078,7 @@ void track_del_col(track *trk, int c) {
 		trk->rows[cc] = trk->rows[cc+1];
 		trk->ring[cc] = trk->ring[cc+1];
 		trk->lplayed[cc] = trk->lplayed[cc+1];
+		trk->mand_qnt[cc] = trk->mand_qnt[cc+1];
 	}
 
 	trk->ncols--;
@@ -1067,6 +1086,7 @@ void track_del_col(track *trk, int c) {
 	trk->rows = realloc(trk->rows, sizeof(row*) * trk->ncols);
 	trk->ring = realloc(trk->ring, sizeof(int) * trk->ncols);
 	trk->lplayed = realloc(trk->lplayed, sizeof(int) * trk->ncols);
+	trk->mand_qnt = realloc(trk->mand_qnt, sizeof(int) * trk->ncols);
 
 	trk->dirty = 1;
 	trk_mod_excl_out(trk);

@@ -1,6 +1,6 @@
 /* libcvht.h - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,6 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+// behold, the API
 
 #ifndef __LIBCVHT_H__
 #define __LIBCVHT_H__
@@ -83,6 +85,7 @@ extern int module_get_switch_req(module *mod);
 extern char *track_get_rec_update(track *trk);
 extern void track_clear_updates(track *trk);
 
+// midi
 extern char *midi_in_get_event(midi_client *clt);
 extern void midi_in_clear_events(midi_client *clt);
 extern void midi_ignore_buffer_clear(midi_client *clt);
@@ -91,10 +94,6 @@ extern void midi_ignore_buffer_add(midi_client *clt, int channel, int type, int 
 extern void queue_midi_note_on(midi_client *clt, sequence *seq, int port, int chn, int note, int velocity);
 extern void queue_midi_note_off(midi_client *clt, sequence *seq, int port, int chn, int note);
 extern void queue_midi_ctrl(midi_client *clt, sequence *seq, track *trk, int val, int ctrl);
-
-
-extern timeline *module_get_timeline(module *mod);
-
 extern void midi_refresh_port_names(midi_client *clt);
 extern int midi_nport_names(midi_client *clt);
 extern char *midi_get_port_name(midi_client *clt, int prt);
@@ -266,6 +265,7 @@ extern void ctrlrow_set_anchor(ctrlrow *crw, int a);
 extern void ctrlrow_set(ctrlrow *crw, int v, int l, int s, int a);
 
 // timeline
+extern timeline *module_get_timeline(module *mod);
 extern void timeline_set_pos(timeline *tl, double npos, int let_ring);
 extern double timeline_get_pos(timeline *tl);
 
@@ -411,5 +411,7 @@ extern double tracy_get_phase(tracy *trc);
 extern void tracy_set_phase(tracy *trc, double p);
 extern double tracy_get_mult(tracy *trc);
 extern void tracy_set_mult(tracy *trc, double m);
+extern int tracy_get_qnt(tracy *trc);
+extern void tracy_set_qnt(tracy *trc, int q);
 
 #endif //__LIBCVHT_H__

@@ -4996,29 +4996,6 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_module_get_timeline(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
-  PyObject *resultobj = 0;
-  module *arg1 = (module *) 0 ;
-  void *argp1 = 0 ;
-  int res1 = 0 ;
-  PyObject *swig_obj[1] ;
-  timeline *result = 0 ;
-  
-  if (!args) SWIG_fail;
-  swig_obj[0] = args;
-  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_module, 0 |  0 );
-  if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_get_timeline" "', argument " "1"" of type '" "module *""'"); 
-  }
-  arg1 = (module *)(argp1);
-  result = (timeline *)module_get_timeline(arg1);
-  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_timeline, 0 |  0 );
-  return resultobj;
-fail:
-  return NULL;
-}
-
-
 SWIGINTERN PyObject *_wrap_midi_refresh_port_names(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   midi_client *arg1 = (midi_client *) 0 ;
@@ -9067,6 +9044,29 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_module_get_timeline(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  timeline *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_get_timeline" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (timeline *)module_get_timeline(arg1);
+  resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_timeline, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_timeline_set_pos(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   timeline *arg1 = (timeline *) 0 ;
@@ -12476,6 +12476,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_tracy_get_qnt(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  tracy *arg1 = (tracy *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_tracy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "tracy_get_qnt" "', argument " "1"" of type '" "tracy *""'"); 
+  }
+  arg1 = (tracy *)(argp1);
+  result = (int)tracy_get_qnt(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_tracy_set_qnt(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  tracy *arg1 = (tracy *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "tracy_set_qnt", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_tracy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "tracy_set_qnt" "', argument " "1"" of type '" "tracy *""'"); 
+  }
+  arg1 = (tracy *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "tracy_set_qnt" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  tracy_set_qnt(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 static PyMethodDef SwigMethods[] = {
 	 { "SWIG_PyInstanceMethod_New", SWIG_PyInstanceMethod_New, METH_O, NULL},
 	 { "new_int_array", _wrap_new_int_array, METH_O, NULL},
@@ -12545,7 +12597,6 @@ static PyMethodDef SwigMethods[] = {
 	 { "queue_midi_note_on", _wrap_queue_midi_note_on, METH_VARARGS, NULL},
 	 { "queue_midi_note_off", _wrap_queue_midi_note_off, METH_VARARGS, NULL},
 	 { "queue_midi_ctrl", _wrap_queue_midi_ctrl, METH_VARARGS, NULL},
-	 { "module_get_timeline", _wrap_module_get_timeline, METH_O, NULL},
 	 { "midi_refresh_port_names", _wrap_midi_refresh_port_names, METH_O, NULL},
 	 { "midi_nport_names", _wrap_midi_nport_names, METH_O, NULL},
 	 { "midi_get_port_name", _wrap_midi_get_port_name, METH_VARARGS, NULL},
@@ -12689,6 +12740,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "ctrlrow_set_smooth", _wrap_ctrlrow_set_smooth, METH_VARARGS, NULL},
 	 { "ctrlrow_set_anchor", _wrap_ctrlrow_set_anchor, METH_VARARGS, NULL},
 	 { "ctrlrow_set", _wrap_ctrlrow_set, METH_VARARGS, NULL},
+	 { "module_get_timeline", _wrap_module_get_timeline, METH_O, NULL},
 	 { "timeline_set_pos", _wrap_timeline_set_pos, METH_VARARGS, NULL},
 	 { "timeline_get_pos", _wrap_timeline_get_pos, METH_O, NULL},
 	 { "timechange_set_bpm", _wrap_timechange_set_bpm, METH_VARARGS, NULL},
@@ -12805,6 +12857,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "tracy_set_phase", _wrap_tracy_set_phase, METH_VARARGS, NULL},
 	 { "tracy_get_mult", _wrap_tracy_get_mult, METH_O, NULL},
 	 { "tracy_set_mult", _wrap_tracy_set_mult, METH_VARARGS, NULL},
+	 { "tracy_get_qnt", _wrap_tracy_get_qnt, METH_O, NULL},
+	 { "tracy_set_qnt", _wrap_tracy_set_qnt, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
 };
 

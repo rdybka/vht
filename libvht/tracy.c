@@ -45,7 +45,7 @@ tracy *tracy_new(double ix, double iy, double ir) {
 	trc->tail_length = 0;
 	trc->phase = 0;
 	trc->mult = 1;
-
+	trc->qnt = 0;
 	trc->homed = 0;
 	trc->bailed = 0;
 
@@ -175,3 +175,10 @@ void tracy_set_mult(tracy *trc, double m) {
 	trc->mult = m;
 }
 
+int tracy_get_qnt(tracy *trc) {
+	return trc->qnt;
+}
+
+void tracy_set_qnt(tracy *trc, int q) {
+	trc->qnt = q;
+}

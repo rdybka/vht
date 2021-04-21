@@ -201,7 +201,6 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 			seq->lost = 1;
 			for (int t = 0; t < seq->ntrk; t++)
 				track_reset(seq->trk[t]);
-
 		} else {
 			seq->playing = 1;
 			seq->pos = 0;
@@ -232,6 +231,19 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 
 	if (seq->pos - floor(seq->pos) < 0.0000001) {
 		int r = (int)seq->pos;
+
+		for (int t = 0; t < seq->ntrk; t++) {
+			if (seq->trk[t]->mand->active) {
+				int qnt = seq->trk[t]->mand->tracies[0]->qnt;
+				if (qnt > 0 && r % qnt == 0)
+					for (int c = 0; c < seq->trk[t]->ncols; c++) {
+						int v = seq->trk[t]->mand_qnt[c];
+						if (v > -232323 && v < 0) {
+							seq->trk[t]->mand_qnt[c] = abs(v) - 1;
+						}
+					}
+			}
+		}
 
 		if (seq->parent == -1 && mod->render_mode != 1 && seq->loop_active) {
 			if (r > seq->loop_end || r < seq->loop_start) {
@@ -354,6 +366,7 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 		}
 
 		for (int t = 0; t < seq->ntrk; t++) {
+
 			track_advance(seq->trk[t], period, nframes);
 		}
 	}
