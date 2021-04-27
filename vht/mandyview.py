@@ -79,6 +79,9 @@ class MandyView(Gtk.DrawingArea):
         self.translate_start = None
         self.translate_julia = False
 
+        self.last_xy = (0, 0)
+        self.trc_pos = None
+
     def on_configure(self, wdg, event):
         win = self.get_window()
         if not win:
@@ -195,12 +198,22 @@ class MandyView(Gtk.DrawingArea):
             for trcid, trc in enumerate(self.mandy):
                 d = trc.disp
 
+                if trcid == 0 and not self.trc_pos:
+                    self.trc_pos = (d["x"], d["y"])
+
                 tail = trc.tail
                 tl = len(tail)
 
                 tw = max(8, 8 * 0.5 / d["zoom"])
+                sm = 3
+                np = (
+                    self.trc_pos[0] + (d["x"] - self.trc_pos[0]) / sm,
+                    self.trc_pos[1] + (d["y"] - self.trc_pos[1]) / sm,
+                )
 
-                cr.move_to(d["x"], d["y"])
+                self.trc_pos = np
+
+                cr.move_to(np[0], np[1])
                 for n, t in enumerate(tail):
                     cr.set_source_rgb(
                         *(col * (1 - (n / tl)) for col in cfg.star_colour)
@@ -220,7 +233,7 @@ class MandyView(Gtk.DrawingArea):
                 if trc.speed < 0:
                     matrix.rotate(math.pi)
 
-                matrix.translate(-d["x"], -d["y"])
+                matrix.translate(-np[0], -np[1])
                 self.turtle_gfx.set_matrix(matrix)
 
                 cr.set_source(self.turtle_gfx)
@@ -357,53 +370,15 @@ class MandyView(Gtk.DrawingArea):
         w = self.get_allocated_width()
         h = self.get_allocated_height()
 
-        ptr = event.get_seat().get_pointer()
-        wnd = self.get_window()
-        wndx, wndy = wnd.get_position()
-
-        if event.x > w:
-            scrn, ptrx, ptry = ptr.get_position()
-            ptr.warp(scrn, ptrx - w, ptry)
-            if self.translate_start:
-                self.translate_start = [
-                    self.translate_start[0] - w,
-                    self.translate_start[1],
-                ]
-            return
-
-        if event.x < 0:
-            scrn, ptrx, ptry = ptr.get_position()
-            ptr.warp(scrn, ptrx + w, ptry)
-            if self.translate_start:
-                self.translate_start = [
-                    self.translate_start[0] + w,
-                    self.translate_start[1],
-                ]
-            return
-
-        if event.y > h:
-            scrn, ptrx, ptry = ptr.get_position()
-            ptr.warp(scrn, ptrx, ptry - h)
-            if self.translate_start:
-                self.translate_start = [
-                    self.translate_start[0],
-                    self.translate_start[1] - h,
-                ]
-            return
-
-        if event.y < 0:
-            scrn, ptrx, ptry = ptr.get_position()
-            ptr.warp(scrn, ptrx, ptry + h)
-            if self.translate_start:
-                self.translate_start = [
-                    self.translate_start[0],
-                    self.translate_start[1] + h,
-                ]
-            return
+        self.last_xy = (event.x, event.y)
 
         if self.translate_start:
             x = event.x - self.translate_start[0]
             y = event.y - self.translate_start[1]
+
+            if self.mandy.follow == 0 and self.mandy.pause:
+                self.mandy.follow = -1
+                self.parent.mandymenu.update()
 
             handled = False
             if event.state & Gdk.ModifierType.CONTROL_MASK:
@@ -412,6 +387,7 @@ class MandyView(Gtk.DrawingArea):
 
             if event.state & Gdk.ModifierType.SHIFT_MASK:
                 handled = True
+
                 self.mandy.screen_rotate(x, y, w, h)
 
             if not handled:
@@ -441,35 +417,13 @@ class MandyView(Gtk.DrawingArea):
         if event.button == cfg.delete_button:
             self.mandy.reset()
 
-        if event.button == cfg.select_button:
-            self.translate_start = [event.x, event.y]
-            self.translate_julia = True
-            w = self.get_window()
-            m = (
-                Gdk.EventMask.BUTTON_MOTION_MASK
-                | Gdk.EventMask.BUTTON_PRESS_MASK
-                | Gdk.EventMask.BUTTON_RELEASE_MASK
-            )
-
-            Gdk.pointer_grab(w, False, m, w, self.blank_curs, Gdk.CURRENT_TIME)
-
         if event.button == 2:
-            self.translate_start = [event.x, event.y]
+            self.translate_start = (event.x, event.y)
             self.translate_julia = False
-            w = self.get_window()
-            m = (
-                Gdk.EventMask.BUTTON_MOTION_MASK
-                | Gdk.EventMask.BUTTON_PRESS_MASK
-                | Gdk.EventMask.BUTTON_RELEASE_MASK
-            )
-
-            Gdk.pointer_grab(w, False, m, w, self.blank_curs, Gdk.CURRENT_TIME)
 
     def on_button_release(self, widget, event):
-        Gdk.pointer_ungrab(Gdk.CURRENT_TIME)
         self.mandy.set_cxy(event.x, event.y)
         if self.translate_start:
-            Gdk.pointer_ungrab(Gdk.CURRENT_TIME)
             self.translate_start = None
 
     def on_key_press(self, widget, event):
@@ -497,11 +451,21 @@ class MandyView(Gtk.DrawingArea):
             self.mandy.zoom = 6
             self.mandy.rot = 0
             self.mandy.set_xy(-0.7, 0)
+            self.mandy.set_jxy(0.0, 0)
+            self.mandy.follow = -1
+            self.parent.mandymenu.update()
             return True
 
         if cfg.key["mandy_pause"].matches(event):
             self.mandy.pause = not self.mandy.pause
             self.parent.mandymenu.update()
+            return True
+
+        if cfg.key["mandy_step"].matches(event):
+            refr = not self.mandy.pause
+            self.mandy.step()
+            if refr:
+                self.parent.mandymenu.update()
             return True
 
         if cfg.key["mandy_active"].matches(event):
@@ -525,7 +489,7 @@ class MandyView(Gtk.DrawingArea):
             self.parent.mandymenu.update()
             return True
 
-        if cfg.key["mandy_pick_julia"].matches(event):
+        if cfg.key["mandy_switch_mode"].matches(event):
             if not self.mandy.julia:
                 self.mandy.follow = -1
             self.mandy.julia = not self.mandy.julia
@@ -538,9 +502,17 @@ class MandyView(Gtk.DrawingArea):
             self.mandy[0].speed *= -1
             self.parent.mandymenu.update()
 
+        if cfg.key["mandy_pick_julia"].matches(event):
+            if self.mandy.follow == -1:
+                self.translate_start = self.last_xy
+                self.translate_julia = True
+
         return False
 
     def on_key_release(self, widget, event):
+        if cfg.key["mandy_pick_julia"].matches(event):
+            self.translate_start = None
+            self.translate_julia = False
         return False
 
     def tick(self, wdg, param):

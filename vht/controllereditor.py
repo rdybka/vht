@@ -1526,7 +1526,7 @@ class ControllerEditor:
 
             self.doodle_hint_row = r
             self.doodle_hint_offs = rr
-            self.doodle_hint = v / 129 if self.ctrlnum == 0 else v
+            self.doodle_hint = v / 128 if self.ctrlnum == 0 else v
 
             self.tv.redraw(r, ctrl=self)
         else:

@@ -21,6 +21,6 @@
 
 #define PIX_MASK_SIZE	16
 
-int mandy_pix_scan(float **pix_mask, char *pixmap, int x, int y, int w, int h, int stride, int *xx, int *yy);
+int mandy_pix_scan(float **pix_mask, char *pixmap, int x, int y, int w, int h, int stride, int *xx, int *yy, int *out);
 
 #endif //__MANDY_PIX_SCAN_H__

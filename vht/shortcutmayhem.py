@@ -1,6 +1,6 @@
 # shortcutmayhem.py - Valhalla Tracker
 #
-# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -142,6 +142,26 @@ shorts = {
         ("Halve", "strip_halve"),
         ("Loop", "sequence_loop"),
     ],
+    "Mandy": [
+        ("Active", "mandy_active"),
+        ("Show info", "mandy_show_info"),
+        ("Show crosshair", "mandy_show_crosshair"),
+        ("Julia", "mandy_switch_mode"),
+        ("Pick julia", "mandy_pick_julia"),
+        ("Pause", "mandy_pause"),
+        ("Step", "mandy_step"),
+        ("Follow", "mandy_next"),
+    ],
+    "Mandy cont.": [
+        ("Direction", "mandy_direction"),
+        ("Reset", "mandy_reset"),
+        ("Reset julia", "mandy_zero_julia"),
+        ("Reset translation", "mandy_reset_translation"),
+        ("Reset rotation", "mandy_reset_rotation"),
+        ("Reset zoom", "mandy_reset_zoom"),
+    ],
+    "Mandy middle mouse": [],
+    "Mandy scroll": [],
 }
 
 customs = {
@@ -155,6 +175,16 @@ customs = {
         ("Snap", "<alt>"),
         ("Zoom / Add bpm node / Clone", "<ctrl>"),
         ("Shift", "<shift>"),
+    ],
+    "Mandy middle mouse": [
+        ("Translate", ""),
+        ("Rotate", "<shift>"),
+        ("Zoom", "<ctrl>"),
+    ],
+    "Mandy scroll": [
+        ("Zoom", ""),
+        ("Iterations", "<ctrl>"),
+        ("Speed", "<shift>"),
     ],
 }
 

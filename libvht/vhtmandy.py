@@ -119,6 +119,9 @@ class VHTMandy(Iterable):
     def pause(self, val):
         libcvht.mandy_set_pause(self._mnd_handle, 1 if val else 0)
 
+    def step(self):
+        libcvht.mandy_step(self._mnd_handle)
+
     @property
     def active(self):
         return libcvht.mandy_get_active(self._mnd_handle)

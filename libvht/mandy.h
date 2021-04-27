@@ -1,6 +1,6 @@
 /* mandy.h - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,15 +26,13 @@
 #include "tracy.h"
 
 #define MANDY_DEF_MITER  2
-#define MAGIC_MITER2UNIT_RATIO	1.42
-// this is waaaaay more than tracy can
-// work with. it becomes erratic pretty quickly
+#define MAGIC_MITER2UNIT_RATIO	1.67
+// this is waaaaay more than tracy can handle
 #define MANDY_MAX_ITER 123
 #define MANDY_DEF_BAIL   4
-
 #define MANDY_REND_RES	9
 
-#define HALFPI M_PI / 2.0
+#define HALFPI 	M_PI / 2.0
 #define QPI	M_PI / 4.0
 
 typedef struct mandy_t {
@@ -90,6 +88,7 @@ typedef struct mandy_t {
 	char *info;
 	int active;
 	int pause;
+	int step;
 	pthread_mutex_t excl;
 	int fps;
 	time_t last_t;
@@ -169,6 +168,7 @@ int mandy_get_active(mandy *mand);
 
 void mandy_set_pause(mandy *mand, int p);
 int mandy_get_pause(mandy *mand);
+void mandy_step(mandy *mand);
 
 unsigned long mandy_render(mandy *mand, int width, int height);
 unsigned long mandy_get_points(mandy *mand, double *ret_arr, unsigned long l);
@@ -200,7 +200,7 @@ void mandy_zoom(mandy *mand, float x, float y, float w, float h);
 
 double mandy_get_max_speed();
 
-// drawing macros
+// drawing macros (ment for debug)
 #define VECT_CLEAR(m) mandy_vect_clear(m);
 
 #define VECT_SET_TYPE(m, t) {\

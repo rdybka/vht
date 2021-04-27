@@ -929,6 +929,9 @@ def mandy_set_pause(mand, p):
 def mandy_get_pause(mand):
     return _libcvht.mandy_get_pause(mand)
 
+def mandy_step(mand):
+    return _libcvht.mandy_step(mand)
+
 def mandy_translate(mand, x, y, w, h):
     return _libcvht.mandy_translate(mand, x, y, w, h)
 

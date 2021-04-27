@@ -37,14 +37,19 @@ void fix_mask(float **pix_msk) {
 			                                      (y - PIX_MASK_SIZE) *  (y - PIX_MASK_SIZE))));
 }
 
-int mandy_pix_scan(float **pix_msk, char *pixmap, int x, int y, int w, int h, int stride, int *ret_x, int *ret_y) {
+int mandy_pix_scan(float **pix_msk, char *pixmap, int x, int y, int w, int h, int stride, int *ret_x, int *ret_y, int *out) {
 	if (!*pix_msk)
 		fix_mask(pix_msk);
 
 	unsigned int *ipx = (unsigned int *)pixmap;
 	int strd = stride / 4;
 	float *pix_mask = *pix_msk;
-	int outside = ipx[x + y * strd]?1:0;
+
+	int outside = 1;
+	if ((x < w) && (y < h) && (x >= 0) && (y >= 0))
+		outside = ipx[x + y * strd]?1:0;
+
+	*out = outside;
 
 	int sz = 1 + PIX_MASK_SIZE * 2;
 	float max_dist = PIX_MASK_SIZE;

@@ -588,10 +588,11 @@ class TrackPropViewPopover(Gtk.Popover):
         # self.popup()
 
     def tick(self, wdg, param):
-        if self.extend_notebook.get_current_page() == 2:
-            self.mandyview.tick(wdg, param)
-            self.time_want_to_leave = 0
-            return True
+        if self.parent.popped:
+            if self.extend_notebook.get_current_page() == 2:
+                self.mandyview.tick(wdg, param)
+                self.time_want_to_leave = 0
+                return True
 
         if self.time_want_to_leave == 0:  # normal
             op = self.get_opacity()

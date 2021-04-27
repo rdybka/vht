@@ -11373,6 +11373,28 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_mandy_step(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  mandy *arg1 = (mandy *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_mandy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "mandy_step" "', argument " "1"" of type '" "mandy *""'"); 
+  }
+  arg1 = (mandy *)(argp1);
+  mandy_step(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_mandy_translate(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   mandy *arg1 = (mandy *) 0 ;
@@ -12817,6 +12839,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "mandy_get_jvy", _wrap_mandy_get_jvy, METH_O, NULL},
 	 { "mandy_set_pause", _wrap_mandy_set_pause, METH_VARARGS, NULL},
 	 { "mandy_get_pause", _wrap_mandy_get_pause, METH_O, NULL},
+	 { "mandy_step", _wrap_mandy_step, METH_O, NULL},
 	 { "mandy_translate", _wrap_mandy_translate, METH_VARARGS, NULL},
 	 { "mandy_translate_julia", _wrap_mandy_translate_julia, METH_VARARGS, NULL},
 	 { "mandy_rotate", _wrap_mandy_rotate, METH_VARARGS, NULL},

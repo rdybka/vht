@@ -699,7 +699,31 @@ void track_fix_program_change(track *trk) {
 	}
 }
 
+int get_ctrl_v(track *trk, int c, int r) {
+	int ret = -1;
+	int nc = trk->nrows * trk->ctrlpr;
+
+	if (r < 0)
+		r += nc;
+
+	if (r >= nc)
+		r -= nc;
+
+	ret = env_get_v(trk->env[c], trk->ctrlpr, (float)r / (float)trk->ctrlpr);
+	if (ret > -1 && c == 0) {
+		ret *= 128;
+	}
+
+	if (ret == -1)
+		ret = trk->ctrl[c][r];
+
+	return ret;
+}
+
 void track_strum(track *trk, double pos_from, double pos_to, jack_nframes_t nframes) {
+	if (!trk->playing)
+		return;
+
 	int rw0 = (int)pos_to;
 	rw0 -= 1;
 
@@ -710,6 +734,7 @@ void track_strum(track *trk, double pos_from, double pos_to, jack_nframes_t nfra
 
 	midi_client *clt = (midi_client *)trk->clt;
 
+	// sound notes
 	for (int c = 0; c < trk->ncols; c++) {
 		int strummed = 0;
 		for (int rw = rw0; rw < rw0 + 3 && !strummed; rw++) {
@@ -747,7 +772,7 @@ void track_strum(track *trk, double pos_from, double pos_to, jack_nframes_t nfra
 				}
 
 				if (play && frm <= nframes) {
-					if (trk->playing && trk->mand->tracies[0]->qnt == 0) {
+					if (trk->mand->tracies[0]->qnt == 0) {
 						track_play_row(trk, rrw, c, (clt->jack_buffer_size - nframes) + frm);
 					} else {
 						trk->mand_qnt[c] = -(++rrw);
@@ -755,6 +780,80 @@ void track_strum(track *trk, double pos_from, double pos_to, jack_nframes_t nfra
 					//printf("strum: %f -> %f %d -- %d:%d:%.3f:%d\n", trk->last_pos, trk->pos, strum_down, c, rrw, trigger_time, frm);
 					strummed = 1;
 				}
+			}
+		}
+	}
+
+	// controllers
+	for (int c = 0; c < trk->nctrl; c++) {
+		int ctrlto = (pos_to  / trk->nrows) * trk->nrows * trk->ctrlpr;
+		int ctrlfrom = (pos_from  / trk->nrows) * trk->nrows * trk->ctrlpr;
+		int ctrl = trk->ctrlnum[c];
+		int found = 0;
+		int data = -1;
+		int nc = trk->nrows * trk->ctrlpr;
+		int drow = 0;
+
+		if (abs(ctrlto - ctrlfrom) > trk->nrows / 2) {
+			if (strum_down) {
+				ctrlto -= nc;
+			} else {
+				ctrlto += nc;
+			}
+
+			strum_down = !strum_down;
+		}
+
+		if (strum_down) {
+			for (int r = ctrlto; r >= ctrlfrom && !found; r--) {
+				data = get_ctrl_v(trk, c, r);
+				if (data > -1) {
+					found = 1;
+					drow = r;
+				}
+			}
+		} else {
+			for (int r = ctrlto; r <= ctrlfrom && !found; r++) {
+				data = get_ctrl_v(trk, c, r);
+				if (data > -1) {
+					found = 1;
+					drow = r;
+				}
+			}
+		}
+
+		if (drow < 0)
+			drow += nc;
+
+		if (drow >= nc)
+			drow -= nc;
+
+		if (data > -1) {
+			midi_event evt;
+
+			evt.time = 0;
+			evt.channel = trk->channel;
+			evt.type = control_change;
+			evt.control = ctrl;
+			evt.data = data;
+
+			if (ctrl == -1) {
+				evt.type = pitch_wheel;
+				evt.msb = data / 128;
+				evt.lsb = data - (evt.msb * 128);
+
+				if (evt.msb == 64 && evt.lsb == 0) {
+					trk->dirty_wheel = 0;
+				} else {
+					trk->dirty_wheel = 1;
+				}
+			}
+
+			if (data != trk->lctrlval[c] || drow != trk->lctrlrow[c]) {
+				trk->lctrlval[c] = data;
+				trk->lctrlrow[c] = drow;
+				midi_buffer_add(clt, trk->port, evt);
+				trk->indicators |= 4;
 			}
 		}
 	}
@@ -931,7 +1030,7 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 							trk->lctrlval[c] = data;
 							trk->lctrlrow[c] = rr;
 							midi_buffer_add(clt, trk->port, evt);
-							trk->indicators |= 8;
+							trk->indicators |= 4;
 						}
 					}
 				}

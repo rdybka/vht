@@ -109,14 +109,17 @@ class MandyMenu(Gtk.Box):
         # reset
         self.butt_reset = Gtk.Button.new_with_label("///")
         self.butt_reset.connect("clicked", self.on_reset_clicked, 0)
-        self.butt_reset.set_tooltip_markup(cfg.tooltip_markup % ("reset"))
+        self.butt_reset.set_tooltip_markup(
+            cfg.tooltip_markup2 % ("reset", cfg.key["mandy_reset"])
+        )
         self.buttgrid.attach(self.butt_reset, 1, 1, 1, 1)
 
         # mnd/jul
         self.butt_jmode = Gtk.ToggleButton.new_with_label("jul")
         self.butt_jmode.connect("toggled", self.on_jmode_toggled, 0)
         self.butt_jmode.set_tooltip_markup(
-            cfg.tooltip_markup2 % ("fractal type", "mandelbrot / julia")
+            cfg.tooltip_markup2
+            % ("fractal type", "mandelbrot / julia\n%s" % cfg.key["mandy_switch_mode"])
         )
         self.buttgrid.attach(self.butt_jmode, 2, 1, 1, 1)
 
@@ -225,7 +228,6 @@ class MandyMenu(Gtk.Box):
         self.butt_jmode.set_active(self.mandy.julia)
 
         if self.mandy.active:
-            self.butt_pause.set_sensitive(True)
             self.butt_dir.set_sensitive(True)
             self.butt_follow.set_sensitive(True)
             self.scale_qnt.set_sensitive(True)
@@ -237,7 +239,6 @@ class MandyMenu(Gtk.Box):
             self.scale_jsx.set_sensitive(True)
             self.scale_jsy.set_sensitive(True)
         else:
-            self.butt_pause.set_sensitive(False)
             self.butt_dir.set_sensitive(False)
             self.scale_qnt.set_sensitive(False)
             self.butt_follow.set_sensitive(False)
@@ -256,28 +257,25 @@ class MandyMenu(Gtk.Box):
                 self.butt_dir.set_image(self.right_image)
 
             self.butt_follow.set_active(True if self.mandy.follow > -1 else False)
-            self.lab_qnt.set_text("%d" % self.mandy[0].qnt)
             self.scale_qnt.set_value(self.mandy[0].qnt)
-            self.lab_itr.set_text("%d" % self.mandy.miter)
             self.scale_miter.set_value(self.mandy.miter)
-            self.lab_spd.set_text("%.1f" % self.mandy[0].speed)
             self.scale_speed.set_value(abs(self.mandy[0].speed))
-            self.lab_phs.set_text("%.1f" % self.mandy[0].phase)
             self.scale_phase.set_value(self.mandy[0].phase)
-            self.lab_mlt.set_text("%.1f" % self.mandy[0].mult)
             self.scale_mult.set_value(self.mandy[0].mult)
-
-            self.lab_jvx.set_text("%.1f" % self.mandy.jvx)
             self.scale_jvx.set_value(self.mandy.jvx)
-
-            self.lab_jvy.set_text("%.1f" % self.mandy.jvy)
             self.scale_jvy.set_value(self.mandy.jvy)
-
-            self.lab_jsx.set_text("%.1f" % self.mandy.jsx)
             self.scale_jsx.set_value(self.mandy.jsx)
-
-            self.lab_jsy.set_text("%.1f" % self.mandy.jsy)
             self.scale_jsy.set_value(self.mandy.jsy)
+
+        self.lab_qnt.set_text("%d" % self.scale_qnt.get_value())
+        self.lab_itr.set_text("%d" % self.mandy.miter)
+        self.lab_spd.set_text("%.1f" % self.scale_speed.get_value())
+        self.lab_phs.set_text("%.1f" % self.scale_phase.get_value())
+        self.lab_mlt.set_text("%.1f" % self.scale_mult.get_value())
+        self.lab_jvx.set_text("%.1f" % self.mandy.jvx)
+        self.lab_jsy.set_text("%.1f" % self.mandy.jsy)
+        self.lab_jsx.set_text("%.1f" % self.mandy.jsx)
+        self.lab_jvy.set_text("%.1f" % self.mandy.jvy)
 
         if fr:
             self.get_window().thaw_updates()
@@ -319,6 +317,8 @@ class MandyMenu(Gtk.Box):
         self.mandy.rot = 0
         self.mandy.set_xy(-0.7, 0)
         self.mandy.set_jxy(0.0, 0)
+        self.mandy.follow = -1
+        self.update()
 
     def on_jmode_toggled(self, wdg, param):
         if self.frozen:

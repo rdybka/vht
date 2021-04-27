@@ -202,6 +202,7 @@ void render_track(char *pix, track *trk, unsigned int col, int w, int h, int str
 	r -= rup;
 	int y = hh - (rup * rwh) - rwoffs;
 	int rend_w = trk->ncols * 16 + 14;
+	rend_w += 16 * trk->nctrl;
 	int x0 = w - rend_w;
 
 	while (y < h) {
@@ -243,6 +244,61 @@ void render_track(char *pix, track *trk, unsigned int col, int w, int h, int str
 		}
 
 		// add controllers
+		for (int c = 0; c < trk->nctrl; c++) {
+			for (int yy = 0; yy < rwh; yy++) {
+				int crw = rw * trk->ctrlpr + ((float)yy / (float)rwh) * trk->ctrlpr;
+				float dt = env_get_v(trk->env[c], trk->ctrlpr, (float)crw / (float)trk->ctrlpr);
+				int data = dt;
+
+				if (data == -1) {
+					data = trk->ctrl[c][crw];
+
+					if ((data > -1) && (c == 0)) { // pitchwheel
+						data /= 128;
+					}
+				}
+
+				if (data > -1) {
+					int xx0 = 1 + x0 + 16 + (trk->ncols * 14) + c * 16;
+					int xs = 0;
+					int xe = round(14 * data / 127);
+
+					if (c == 0) {
+						xs = 7;
+
+						if (xe < xs) {
+							int xm = xs;
+							xs = xe;
+							xe = xm;
+						}
+					}
+
+					int y0 = (y + yy) - 1;
+					if ((y0 < h) && (y0 > -1)) {
+						int hh = h / 2;
+
+						float alpha = (y0 % hh) / (float)hh;
+						if (y0 > h - 2)
+							alpha = 1;
+
+						if (y0 < hh) {
+							alpha = 1 - alpha;
+						}
+
+						if (alpha < 0)
+							alpha = 0;
+
+						if (alpha > 1)
+							alpha = 1;
+
+						for (int xx = xs; xx < xe; xx++) {
+							int addr = y0 * str + xx0 + xx;
+							ipx[addr] = col_mix(col, ipx[addr], alpha);
+						}
+					}
+				}
+			}
+		}
 
 		if ((rw == 0) && (y > 0) && (y < h))
 			for (int xx = 0; xx < 3; xx++) {
@@ -254,8 +310,9 @@ void render_track(char *pix, track *trk, unsigned int col, int w, int h, int str
 	}
 
 	int yy = h / 2;
-	for (int xx = 0; xx < trk->ncols * 16 + 14; xx++) {
-		ipx[yy * str + x0 + xx] |= col;
+	for (int xx = 0; xx < rend_w; xx++) {
+		int addr = yy * str + x0 + xx;
+		ipx[addr] = col_mix(0xFFFFFF, ipx[addr], .2);
 	}
 }
 

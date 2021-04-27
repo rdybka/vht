@@ -360,6 +360,7 @@ extern double mandy_get_jvy(mandy *mand);
 
 extern void mandy_set_pause(mandy *mand, int p);
 extern int mandy_get_pause(mandy *mand);
+extern void mandy_step(mandy *mand);
 
 extern void mandy_translate(mandy *mand, float x, float y, float w, float h);
 extern void mandy_translate_julia(mandy *mand, float x, float y, float w, float h);
