@@ -1040,6 +1040,12 @@ def tracy_get_speed(trc):
 def tracy_set_speed(trc, s):
     return _libcvht.tracy_set_speed(trc, s)
 
+def tracy_get_scale(trc):
+    return _libcvht.tracy_get_scale(trc)
+
+def tracy_set_scale(trc, s):
+    return _libcvht.tracy_set_scale(trc, s)
+
 def tracy_get_phase(trc):
     return _libcvht.tracy_get_phase(trc)
 

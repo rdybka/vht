@@ -12394,6 +12394,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_tracy_get_scale(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  tracy *arg1 = (tracy *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  double result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_tracy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "tracy_get_scale" "', argument " "1"" of type '" "tracy *""'"); 
+  }
+  arg1 = (tracy *)(argp1);
+  result = (double)tracy_get_scale(arg1);
+  resultobj = SWIG_From_double((double)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_tracy_set_scale(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  tracy *arg1 = (tracy *) 0 ;
+  double arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "tracy_set_scale", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_tracy, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "tracy_set_scale" "', argument " "1"" of type '" "tracy *""'"); 
+  }
+  arg1 = (tracy *)(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "tracy_set_scale" "', argument " "2"" of type '" "double""'");
+  } 
+  arg2 = (double)(val2);
+  tracy_set_scale(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_tracy_get_phase(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   tracy *arg1 = (tracy *) 0 ;
@@ -12876,6 +12928,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "tracy_get_tail", _wrap_tracy_get_tail, METH_O, NULL},
 	 { "tracy_get_speed", _wrap_tracy_get_speed, METH_O, NULL},
 	 { "tracy_set_speed", _wrap_tracy_set_speed, METH_VARARGS, NULL},
+	 { "tracy_get_scale", _wrap_tracy_get_scale, METH_O, NULL},
+	 { "tracy_set_scale", _wrap_tracy_set_scale, METH_VARARGS, NULL},
 	 { "tracy_get_phase", _wrap_tracy_get_phase, METH_O, NULL},
 	 { "tracy_set_phase", _wrap_tracy_set_phase, METH_VARARGS, NULL},
 	 { "tracy_get_mult", _wrap_tracy_get_mult, METH_O, NULL},

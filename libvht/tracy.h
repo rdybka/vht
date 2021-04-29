@@ -39,6 +39,7 @@ typedef struct tracy_t {
 
 	double r_sm;
 	double zoom;
+	double scale;
 	double speed;
 	double unit;
 	double phase;
@@ -71,6 +72,8 @@ PyObject *tracy_get_disp(tracy *trc);
 PyObject *tracy_get_tail(tracy *trc);
 double tracy_get_speed(tracy *trc);
 void tracy_set_speed(tracy *trc, double s);
+double tracy_get_scale(tracy *trc);
+void tracy_set_scale(tracy *trc, double s);
 double tracy_get_phase(tracy *trc);
 void tracy_set_phase(tracy *trc, double p);
 double tracy_get_mult(tracy *trc);

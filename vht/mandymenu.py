@@ -142,7 +142,7 @@ class MandyMenu(Gtk.Box):
         self.scale_miter, self.lab_itr = add_scale(
             self.det1, 0, 2, mandy.max_iter, 1, "itr", self.on_miter_changed
         )
-        self.scale_miter.set_tooltip_markup(
+        self.lab_itr.set_tooltip_markup(
             cfg.tooltip_markup2 % ("iterations", "ctrl-scroll")
         )
 
@@ -151,62 +151,66 @@ class MandyMenu(Gtk.Box):
             self.det1, 1, 0, 8, 1, "qnt", self.on_qnt_changed
         )
 
-        self.scale_qnt.set_tooltip_markup(cfg.tooltip_markup % ("quantise to nth-row"))
+        self.lab_qnt.set_tooltip_markup(cfg.tooltip_markup % ("quantise to nth-row"))
+
+        # scale
+        self.scale_scl, self.lab_scl = add_scale(
+            self.det1, 2, 1, 32, 0.1, "scl", self.on_scale_changed
+        )
+
+        self.lab_scl.set_tooltip_markup(cfg.tooltip_markup % ("scale (exp)"))
 
         # speed
         self.scale_speed, self.lab_spd = add_scale(
-            self.det1, 2, 0.1, self.mandy.max_speed, 0.1, "spd", self.on_speed_changed
+            self.det1, 3, 0.1, self.mandy.max_speed, 0.1, "spd", self.on_speed_changed
         )
-        self.scale_speed.set_tooltip_markup(
-            cfg.tooltip_markup2 % ("speed", "shift-scroll")
-        )
+        self.lab_spd.set_tooltip_markup(cfg.tooltip_markup2 % ("speed", "shift-scroll"))
 
         # phase
         self.scale_phase, self.lab_phs = add_scale(
-            self.det1, 3, -180, 180, 0.1, "phs", self.on_phase_changed
+            self.det1, 4, -180, 180, 0.1, "phs", self.on_phase_changed
         )
 
         self.scale_phase.add_mark(0, Gtk.PositionType.TOP, None)
         self.scale_phase.set_digits(1)
-        self.scale_phase.set_tooltip_markup(cfg.tooltip_markup % ("phase"))
+        self.lab_phs.set_tooltip_markup(cfg.tooltip_markup % ("phase"))
 
         # mult
         self.scale_mult, self.lab_mlt = add_scale(
-            self.det1, 4, 0.1, 5, 0.1, "mlt", self.on_mult_changed
+            self.det1, 5, 0.1, 5, 0.1, "mlt", self.on_mult_changed
         )
 
         self.scale_mult.add_mark(1, Gtk.PositionType.TOP, None)
         self.scale_mult.set_digits(1)
-        self.scale_mult.set_tooltip_markup(cfg.tooltip_markup % ("angle multiplier"))
+        self.lab_mlt.set_tooltip_markup(cfg.tooltip_markup % ("angle multiplier"))
 
         # julias
         self.scale_jvx, self.lab_jvx = add_scale(
-            self.det1, 5, 0, 100, 0.1, "jvx", self.on_jvx_changed
+            self.det1, 6, 0, 50, 0.1, "jvx", self.on_jvx_changed
         )
-        self.scale_jvx.set_tooltip_markup(
-            cfg.tooltip_markup % ("julia (e) LFO x velocity")
+
+        self.scale_jvx.set_digits(3)
+        self.lab_jvx.set_tooltip_markup(
+            cfg.tooltip_markup % ("julia (e) LFO x velocity (exp)")
         )
 
         self.scale_jvy, self.lab_jvy = add_scale(
-            self.det1, 6, 0, 100, 0.1, "jvy", self.on_jvy_changed
+            self.det1, 7, 0, 50, 0.1, "jvy", self.on_jvy_changed
         )
-        self.scale_jvy.set_tooltip_markup(
-            cfg.tooltip_markup % ("julia (e) LFO y velocity")
+        self.scale_jvy.set_digits(3)
+        self.lab_jvy.set_tooltip_markup(
+            cfg.tooltip_markup % ("julia (e) LFO y velocity (exp)")
         )
 
         self.scale_jsx, self.lab_jsx = add_scale(
-            self.det1, 7, 0, 100, 0.1, "jsx", self.on_jsx_changed
+            self.det1, 8, 0, 100, 0.1, "jsx", self.on_jsx_changed
         )
-        self.scale_jsx.set_tooltip_markup(
-            cfg.tooltip_markup % ("julia (e) LFO x speed")
-        )
+        self.lab_jsx.set_tooltip_markup(cfg.tooltip_markup % ("julia (e) LFO x speed"))
 
         self.scale_jsy, self.lab_jsy = add_scale(
-            self.det1, 8, 0, 100, 0.1, "jsy", self.on_jsy_changed
+            self.det1, 9, 0, 100, 0.1, "jsy", self.on_jsy_changed
         )
-        self.scale_jsy.set_tooltip_markup(
-            cfg.tooltip_markup % ("julia (e) LFO y speed")
-        )
+        self.lab_jsy.set_tooltip_markup(cfg.tooltip_markup % ("julia (e) LFO y speed"))
 
         self.details.pack_start(self.det1, True, True, 0)
 
@@ -232,6 +236,7 @@ class MandyMenu(Gtk.Box):
             self.butt_follow.set_sensitive(True)
             self.scale_qnt.set_sensitive(True)
             self.scale_speed.set_sensitive(True)
+            self.scale_scl.set_sensitive(True)
             self.scale_mult.set_sensitive(True)
             self.scale_phase.set_sensitive(True)
             self.scale_jvx.set_sensitive(True)
@@ -243,6 +248,7 @@ class MandyMenu(Gtk.Box):
             self.scale_qnt.set_sensitive(False)
             self.butt_follow.set_sensitive(False)
             self.scale_speed.set_sensitive(False)
+            self.scale_scl.set_sensitive(False)
             self.scale_mult.set_sensitive(False)
             self.scale_phase.set_sensitive(False)
             self.scale_jvx.set_sensitive(False)
@@ -259,6 +265,7 @@ class MandyMenu(Gtk.Box):
             self.butt_follow.set_active(True if self.mandy.follow > -1 else False)
             self.scale_qnt.set_value(self.mandy[0].qnt)
             self.scale_miter.set_value(self.mandy.miter)
+            self.scale_scl.set_value(abs(self.mandy[0].scale))
             self.scale_speed.set_value(abs(self.mandy[0].speed))
             self.scale_phase.set_value(self.mandy[0].phase)
             self.scale_mult.set_value(self.mandy[0].mult)
@@ -269,6 +276,7 @@ class MandyMenu(Gtk.Box):
 
         self.lab_qnt.set_text("%d" % self.scale_qnt.get_value())
         self.lab_itr.set_text("%d" % self.mandy.miter)
+        self.lab_scl.set_text("%.1f" % self.scale_scl.get_value())
         self.lab_spd.set_text("%.1f" % self.scale_speed.get_value())
         self.lab_phs.set_text("%.1f" % self.scale_phase.get_value())
         self.lab_mlt.set_text("%.1f" % self.scale_mult.get_value())
@@ -357,6 +365,15 @@ class MandyMenu(Gtk.Box):
         s = adj.get_value()
 
         self.mandy[0].speed = s if self.mandy[0].speed > 0 else -s
+        self.update()
+
+    def on_scale_changed(self, adj):
+        if self.frozen:
+            return
+
+        s = adj.get_value()
+
+        self.mandy[0].scale = s
         self.update()
 
     def on_phase_changed(self, adj):

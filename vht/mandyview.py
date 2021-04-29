@@ -82,6 +82,8 @@ class MandyView(Gtk.DrawingArea):
         self.last_xy = (0, 0)
         self.trc_pos = None
 
+        self.refollow = False
+
     def on_configure(self, wdg, event):
         win = self.get_window()
         if not win:
@@ -211,7 +213,8 @@ class MandyView(Gtk.DrawingArea):
                     self.trc_pos[1] + (d["y"] - self.trc_pos[1]) / sm,
                 )
 
-                self.trc_pos = np
+                if math.isfinite(np[0]) and math.isfinite(np[1]):
+                    self.trc_pos = np
 
                 cr.move_to(np[0], np[1])
                 for n, t in enumerate(tail):
@@ -228,6 +231,7 @@ class MandyView(Gtk.DrawingArea):
                 sc = d["zoom"] * 2
                 sc = max(min(sc, 1), 0.01)
 
+                # print(sc, np[0], np[1])
                 matrix.scale(sc, sc)
                 matrix.rotate(-d["r"])
                 if trc.speed < 0:
@@ -503,9 +507,12 @@ class MandyView(Gtk.DrawingArea):
             self.parent.mandymenu.update()
 
         if cfg.key["mandy_pick_julia"].matches(event):
-            if self.mandy.follow == -1:
-                self.translate_start = self.last_xy
-                self.translate_julia = True
+            if self.mandy.follow > -1:
+                self.refollow = True
+                self.mandy.follow = -1
+
+            self.translate_start = self.last_xy
+            self.translate_julia = True
 
         return False
 
@@ -513,6 +520,10 @@ class MandyView(Gtk.DrawingArea):
         if cfg.key["mandy_pick_julia"].matches(event):
             self.translate_start = None
             self.translate_julia = False
+            if self.refollow:
+                self.mandy.follow = 0
+                self.refollow = False
+
         return False
 
     def tick(self, wdg, param):

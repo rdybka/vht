@@ -40,7 +40,15 @@ class VHTTracy:
 
     @speed.setter
     def speed(self, v):
-        return libcvht.tracy_set_speed(self._trc_handle, float(v))
+        libcvht.tracy_set_speed(self._trc_handle, float(v))
+
+    @property
+    def scale(self):
+        return libcvht.tracy_get_scale(self._trc_handle)
+
+    @scale.setter
+    def scale(self, s):
+        libcvht.tracy_set_scale(self._trc_handle, float(s))
 
     @property
     def phase(self):
@@ -48,7 +56,7 @@ class VHTTracy:
 
     @phase.setter
     def phase(self, v):
-        return libcvht.tracy_set_phase(self._trc_handle, float(v))
+        libcvht.tracy_set_phase(self._trc_handle, float(v))
 
     @property
     def mult(self):
@@ -56,7 +64,7 @@ class VHTTracy:
 
     @mult.setter
     def mult(self, v):
-        return libcvht.tracy_set_mult(self._trc_handle, float(v))
+        libcvht.tracy_set_mult(self._trc_handle, float(v))
 
     @property
     def qnt(self):
@@ -64,4 +72,4 @@ class VHTTracy:
 
     @qnt.setter
     def qnt(self, q):
-        return libcvht.tracy_set_qnt(self._trc_handle, int(q))
+        libcvht.tracy_set_qnt(self._trc_handle, int(q))

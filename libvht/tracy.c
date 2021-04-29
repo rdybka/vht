@@ -40,6 +40,7 @@ tracy *tracy_new(double ix, double iy, double ir) {
 	trc->rd = ir;
 
 	trc->zoom = 1;
+	trc->scale = 1;
 	trc->speed = 5;
 	trc->r_sm = .5;
 	trc->tail_length = 0;
@@ -157,6 +158,13 @@ void tracy_set_speed(tracy *trc, double s) {
 
 	trc->speed = s;
 	tracy_excl_out(trc);
+}
+
+double tracy_get_scale(tracy *trc) {
+	return trc->scale;
+}
+void tracy_set_scale(tracy *trc, double s) {
+	trc->scale = s;
 }
 
 double tracy_get_phase(tracy *trc) {

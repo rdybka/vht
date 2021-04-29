@@ -112,7 +112,7 @@ mandy *mandy_new(void *vtrk) {
 	mand->last_t = 0;
 	mand->nframes = 0;
 
-	mand->mn = 23;
+	mand->mn = 2.23;
 	mand->mubrot = 0;	// maybe one day
 
 	mandy_reset(mand);
@@ -187,8 +187,8 @@ void mandy_translate(mandy *mand, float x, float y, float w, float h) {
 
 void mandy_update_julia(mandy *mand) {
 	long double unit = 0.1 / pow(MAGIC_MITER2UNIT_RATIO, mand->miter);
-	double vx = unit * mand->jvx;
-	double vy = unit * mand->jvy;
+	double vx = unit * pow(2, mand->jvx);
+	double vy = unit * pow(2, mand->jvy);
 
 	mand->jx = mand->jcx + vx * cos(mand->jrx);
 	mand->jy = mand->jcy + vy * cos(mand->jry);
@@ -268,8 +268,13 @@ mandy *mandy_clone(mandy *mand, void *vtrk) {
 
 void mandy_gen_info(mandy *mand) {
 	char inf[256];
-	sprintf(inf, "fps: %d niter: %d\nzoom: %.7Lf\nx, y, r = [%.7Lf, %.7Lf, %.3f]\njcx, jcy = [%.7Lf, %.7Lf]\njx, jy = [%.7Lf, %.7Lf]\nrgb = [%d, %d, %d]", \
-	        mand->fps, mand->miter, mand->zoom, mand->x, mand->y, rad2deg(mand->rot), mand->jcx, mand->jcy, mand->jx, mand->jy, mand->fr, mand->fg, mand->fb);
+	if (!mand->ntracies) {
+		sprintf(inf, "fps: %d niter: %d\nzoom: %.7Lf\nx, y, r = [%.7Lf, %.7Lf, %.3f]\njcx, jcy = [%.7Lf, %.7Lf]\njx, jy = [%.7Lf, %.7Lf]", \
+		        mand->fps, mand->miter, mand->zoom, mand->x, mand->y, rad2deg(mand->rot), mand->jcx, mand->jcy, mand->jx, mand->jy);
+	} else {
+		sprintf(inf, "fps: %d niter: %d\nzoom: %.7Lf\nx, y, r = [%.7Lf, %.7Lf, %.3f]\ntrc x, y, r = [%.7Lf, %.7Lf, %.3f]\njcx, jcy = [%.7Lf, %.7Lf]\njx, jy = [%.7Lf, %.7Lf]", \
+		        mand->fps, mand->miter, mand->zoom, mand->x, mand->y, rad2deg(mand->rot), mand->tracies[0]->x, mand->tracies[0]->y, rad2deg(mand->tracies[0]->r), mand->jcx, mand->jcy, mand->jx, mand->jy);
+	}
 
 	mandy_set_info(mand, inf);
 }
@@ -419,6 +424,8 @@ void mandy_restore(mandy *mand, PyObject *o) {
 		mand->tracies[0]->mult = getdouble(o, "trc_mult");
 		mand->tracies[0]->type = getint(o, "trc_type");
 		mand->tracies[0]->qnt = getint(o, "trc_qnt");
+		mand->tracies[0]->scale = fmax(1, getdouble(o, "trc_scl"));
+
 		mandy_trc_home(mand, mand->tracies[0]);
 	}
 
@@ -463,6 +470,7 @@ PyObject *mandy_save(mandy *mand) {
 		PyDict_SetItemString(r, "trc_mult", PyFloat_FromDouble(mand->tracies[0]->mult));
 		PyDict_SetItemString(r, "trc_type", PyLong_FromLong(mand->tracies[0]->type));
 		PyDict_SetItemString(r, "trc_qnt", PyLong_FromLong(mand->tracies[0]->qnt));
+		PyDict_SetItemString(r, "trc_scl", PyFloat_FromDouble(mand->tracies[0]->scale));
 	}
 
 	mandy_excl_out(mand);
@@ -491,6 +499,7 @@ void mandy_advance(mandy *mand, double tperiod, jack_nframes_t nframes) {
 	mand->jry += (tperiod / 16) * mand->jsy;
 
 	mandy_update_julia(mand);
+	mandy_excl_out(mand);
 
 	// update tracies
 	for (unsigned int t = 0; t < mand->ntracies; t++) {
@@ -498,6 +507,7 @@ void mandy_advance(mandy *mand, double tperiod, jack_nframes_t nframes) {
 		tracy_excl_in(trc);
 
 		long double nunit = 0.1 / pow(MAGIC_MITER2UNIT_RATIO, mand->miter);
+		nunit *= pow(2, trc->scale);
 		trc->unit = nunit;//fmin(fmax(trc->unit, nunit), nunit * 4);
 
 		mandy_trc_move(mand, trc, tperiod);
@@ -513,8 +523,6 @@ void mandy_advance(mandy *mand, double tperiod, jack_nframes_t nframes) {
 
 		tracy_excl_out(trc);
 	}
-
-	mandy_excl_out(mand);
 	mandy_gen_info(mand);
 }
 
@@ -546,8 +554,8 @@ void mandy_animate(mandy *mand) {
 		mand->x += (mand->dx - mand->x) / sm;
 		mand->y += (mand->dy - mand->y) / sm;
 
-		mand->rot += (mand->drot - mand->rot) / (sm * 2);
-		mand->zoom += (mand->dzoom - mand->zoom) / (sm * 2);
+		mand->rot += (mand->drot - mand->rot) / (sm);
+		mand->zoom += (mand->dzoom - mand->zoom) / (sm);
 
 		mand->render = 1;
 	} else {
@@ -795,6 +803,8 @@ PyObject *mandy_get_pixels(mandy *mand, int width, int height, int stride) {
 		height = 32;
 	}
 
+	mandy_gen_info(mand);
+
 	mandy_excl_in(mand);
 	mandy_animate(mand);
 	mandy_set_display(mand, width, height, stride);
@@ -893,7 +903,6 @@ PyObject *mandy_get_pixels(mandy *mand, int width, int height, int stride) {
 			if (!chk_time) {
 				clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t_now);
 				int millis = (t_now.tv_nsec - t_start.tv_nsec) / 1000000;
-
 
 				if (millis > 20)
 					bail = 1;

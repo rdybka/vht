@@ -408,6 +408,8 @@ extern PyObject *tracy_get_disp(tracy *trc);
 extern PyObject *tracy_get_tail(tracy *trc);
 extern double tracy_get_speed(tracy *trc);
 extern void tracy_set_speed(tracy *trc, double s);
+extern double tracy_get_scale(tracy *trc);
+extern void tracy_set_scale(tracy *trc, double s);
 extern double tracy_get_phase(tracy *trc);
 extern void tracy_set_phase(tracy *trc, double p);
 extern double tracy_get_mult(tracy *trc);
