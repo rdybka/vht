@@ -415,6 +415,8 @@ extern double tracy_get_phase(tracy *trc);
 extern void tracy_set_phase(tracy *trc, double p);
 extern double tracy_get_mult(tracy *trc);
 extern void tracy_set_mult(tracy *trc, double m);
+extern double tracy_get_zoom(tracy *trc);
+extern void tracy_set_zoom(tracy *trc, double z);
 extern int tracy_get_qnt(tracy *trc);
 extern void tracy_set_qnt(tracy *trc, int q);
 

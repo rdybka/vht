@@ -530,7 +530,7 @@ void mandy_advance(mandy *mand, double tperiod, jack_nframes_t nframes) {
 
 // this runs in gui thread
 void mandy_animate(mandy *mand) {
-	double sm = 3;
+	double sm = 2;
 
 	long double dx = mand->dx;
 	long double dy = mand->dy;
@@ -550,7 +550,7 @@ void mandy_animate(mandy *mand) {
 		mand->dx = mand->tracies[mand->follow]->x;
 		mand->dy = mand->tracies[mand->follow]->y;
 
-		mand->dzoom = mand->tracies[mand->follow]->zoom * mand->tracies[mand->follow]->unit * 50;
+		mand->dzoom = mand->tracies[mand->follow]->zoom * mand->tracies[mand->follow]->unit * 10;
 		mand->drot = mand->tracies[mand->follow]->r - HALFPI;
 
 		mand->x += (mand->dx - mand->x) / sm;
@@ -1032,10 +1032,6 @@ double mandy_get_zoom(mandy *mand) {
 void mandy_set_zoom(mandy *mand, double zoom) {
 	mandy_excl_in(mand);
 	mand->dzoom = fmin(zoom, 20);
-
-	if (mand->follow > -1) {
-		mand->tracies[0]->zoom = mand->dzoom;
-	}
 
 	mand->render = 1;
 	mandy_excl_out(mand);

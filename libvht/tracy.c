@@ -39,7 +39,7 @@ tracy *tracy_new(double ix, double iy, double ir) {
 	trc->r = ir;
 	trc->rd = ir;
 
-	trc->zoom = 1;
+	trc->zoom = 3;
 	trc->scale = 1;
 	trc->speed = 5;
 	trc->r_sm = .5;
@@ -189,4 +189,12 @@ int tracy_get_qnt(tracy *trc) {
 
 void tracy_set_qnt(tracy *trc, int q) {
 	trc->qnt = q;
+}
+
+double tracy_get_zoom(tracy *trc) {
+	return trc->zoom;
+}
+
+void tracy_set_zoom(tracy *trc, double z) {
+	trc->zoom = z;
 }

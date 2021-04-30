@@ -82,4 +82,6 @@ int tracy_get_amode(tracy *trc);
 void tracy_set_amode(tracy *trc, int m);
 int tracy_get_qnt(tracy *trc);
 void tracy_set_qnt(tracy *trc, int q);
+double tracy_get_zoom(tracy *trc);
+void tracy_set_zoom(tracy *trc, double z);
 #endif //__TRACY_H__

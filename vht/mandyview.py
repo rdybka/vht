@@ -292,7 +292,11 @@ class MandyView(Gtk.DrawingArea):
                         self.bailed_txt = None
 
         scan_trc = self.mandy.scan_tracy
-        if scan_trc and not self.translate_start and self.mandy.follow == -1:
+        if (
+            scan_trc
+            and not self.translate_start
+            and (self.mandy.follow == -1 or self.mandy.pause)
+        ):
             d = scan_trc.disp
             cr.set_source_rgb(*(cfg.star_colour))
             cr.set_line_width(1)
@@ -413,7 +417,10 @@ class MandyView(Gtk.DrawingArea):
         ):
             return
 
-        if event.button == cfg.select_button and self.mandy.follow == -1:
+        if event.button == cfg.select_button and (
+            self.mandy.follow == -1 or self.mandy.pause
+        ):
+            self.mandy.follow = -1
             scan_trc = self.mandy.scan_tracy
             if scan_trc:
                 self.mandy.reinit_from_scan()
@@ -448,11 +455,16 @@ class MandyView(Gtk.DrawingArea):
             return True
 
         if cfg.key["mandy_reset_zoom"].matches(event):
-            self.mandy.zoom = 6
+            if len(self.mandy):
+                self.mandy[0].zoom = 3
+            else:
+                self.mandy.zoom = 6
             return True
 
         if cfg.key["mandy_reset"].matches(event):
             self.mandy.zoom = 6
+            if len(self.mandy):
+                self.mandy[0].zoom = 3
             self.mandy.rot = 0
             self.mandy.set_xy(-0.7, 0)
             self.mandy.set_jxy(0.0, 0)

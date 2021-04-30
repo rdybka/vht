@@ -67,6 +67,14 @@ class VHTTracy:
         libcvht.tracy_set_mult(self._trc_handle, float(v))
 
     @property
+    def zoom(self):
+        return libcvht.tracy_get_zoom(self._trc_handle)
+
+    @zoom.setter
+    def zoom(self, z):
+        libcvht.tracy_set_zoom(self._trc_handle, float(z))
+
+    @property
     def qnt(self):
         return libcvht.tracy_get_qnt(self._trc_handle)
 

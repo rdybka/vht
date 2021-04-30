@@ -1061,6 +1061,12 @@ def tracy_get_mult(trc):
 def tracy_set_mult(trc, m):
     return _libcvht.tracy_set_mult(trc, m)
 
+def tracy_get_zoom(trc):
+    return _libcvht.tracy_get_zoom(trc)
+
+def tracy_set_zoom(trc, z):
+    return _libcvht.tracy_set_zoom(trc, z)
+
 def tracy_get_qnt(trc):
     return _libcvht.tracy_get_qnt(trc)
 
