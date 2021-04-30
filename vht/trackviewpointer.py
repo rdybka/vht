@@ -130,7 +130,9 @@ class TrackviewPointer:
 
                 rw = self.trk[c][r]
 
-                if rw.type == 1 and self.trk.playing:
+                lp = self.trk.get_last_row_played(c)
+
+                if lp > -1 and self.trk[c][lp].type == 1 and abs(r - lp) <= 1:
                     i *= 1.5 + 2.0 * (self.trk.pos - r)
 
                 veled = 0

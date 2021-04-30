@@ -246,8 +246,8 @@ class VHTTrack(Iterable):
         return libcvht.track_get_lctrlval(self._trk_handle, c)
 
     # last row played
-    def get_lplayed(self, c):
-        return libcvht.track_get_lplayed(self._trk_handle, c)
+    def get_last_row_played(self, c):
+        return libcvht.track_get_last_row_played(self._trk_handle, c)
 
     def env_del_node(self, c, n):
         libcvht.track_envelope_del_node(self._trk_handle, c, n)
