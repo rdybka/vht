@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+#include <Python.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1096,6 +1096,9 @@ void track_kill_notes(track *trk) {
 			trk->ring[c] = -1;
 		}
 
+		trk->lplayed[c] = -1;
+		trk->mand_qnt[c] = -1;
+
 		for (int t = 0; t < trk->nrows; t++) {
 			trk->rows[c][t].ringing = 0;
 		}
@@ -1610,6 +1613,10 @@ int track_get_lctrlval(track *trk, int c) {
 	return ret;
 }
 
+int track_get_last_row_played(track *trk, int col) {
+	return trk->lplayed[col];
+}
+
 // from python, we will access envelopes through track
 // all controllers will have envs added automatically
 void track_envelope_add_node(track *trk, int c, float x, float y, float z, int linked) {
@@ -1624,22 +1631,20 @@ void track_envelope_set_node(track *trk, int c, int n, float x, float y, float z
 	envelope_set_node(trk->env[c], n, x, y, z, linked);
 }
 
-
-// don't do this
-char *track_get_envelope(track *trk, int c) {
-	static char ret[(ENV_MAX_NNODES * 50) + 2];
-
-	sprintf(ret, "[");
+PyObject *track_get_envelope(track *trk, int c) {
+	PyObject *ret = PyList_New(0);
 
 	for (int n = 0; n < trk->env[c]->nnodes; n++) {
-		char buff[256];
-		sprintf(buff, "{\"x\":%07.2f,\"y\":%07.2f,\"z\":%07.2f,\"l\":%d},", trk->env[c]->nodes[n].x,
-		        trk->env[c]->nodes[n].y, trk->env[c]->nodes[n].z, trk->env[c]->nodes[n].linked);
+		PyObject *r = PyDict_New();
 
-		strcat(ret, buff);
+		PyDict_SetItemString(r, "x", PyFloat_FromDouble(trk->env[c]->nodes[n].x));
+		PyDict_SetItemString(r, "y", PyFloat_FromDouble(trk->env[c]->nodes[n].y));
+		PyDict_SetItemString(r, "z", PyFloat_FromDouble(trk->env[c]->nodes[n].z));
+		PyDict_SetItemString(r, "l", PyLong_FromLong(trk->env[c]->nodes[n].linked));
+
+		PyList_Append(ret, r);
 	}
 
-	strcat(ret, "]");
 	return ret;
 }
 

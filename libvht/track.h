@@ -95,7 +95,6 @@ typedef struct track_t {
 	int dirty; // for thumbnail
 	int dirty_wheel; // is the pitch_weel active
 
-	int *mand_qnt_cue;
 	mandy *mand;
 } track;
 
@@ -131,6 +130,7 @@ void track_set_ctrl_row(track *trk, int c, int r, int val, int linked, int smoot
 int track_get_ctrl_row(track *trk, int c, int r, ctrlrow *row);
 
 char *track_get_rec_update(track *trk);
+int track_get_last_row_played(track *trk, int col);
 void track_insert_rec_update(track *trk, int col, int row);
 void track_clear_rec_updates(track *trk);
 void track_handle_record(track *trk, midi_event evt);

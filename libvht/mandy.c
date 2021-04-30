@@ -307,7 +307,9 @@ void mandy_reset(mandy *mand) {
 		if (mand->ntracies)
 			mand->tracies[0]->tail_length = 0;
 	}
-	//mandy_advance(mand, 0, 0);
+
+	mandy_advance(mand, 0, 0);
+
 	if (mand->active) {
 		track *trk = (track *)mand->trk;
 		trk->last_pos = 0;
@@ -528,7 +530,7 @@ void mandy_advance(mandy *mand, double tperiod, jack_nframes_t nframes) {
 
 // this runs in gui thread
 void mandy_animate(mandy *mand) {
-	double sm = 5;
+	double sm = 3;
 
 	long double dx = mand->dx;
 	long double dy = mand->dy;
@@ -554,8 +556,8 @@ void mandy_animate(mandy *mand) {
 		mand->x += (mand->dx - mand->x) / sm;
 		mand->y += (mand->dy - mand->y) / sm;
 
-		mand->rot += (mand->drot - mand->rot) / (sm);
-		mand->zoom += (mand->dzoom - mand->zoom) / (sm);
+		mand->rot += (mand->drot - mand->rot) / (sm * 5);
+		mand->zoom += (mand->dzoom - mand->zoom) / (sm * 5);
 
 		mand->render = 1;
 	} else {

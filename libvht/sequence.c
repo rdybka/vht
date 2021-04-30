@@ -696,30 +696,8 @@ int sequence_gen_thumb(sequence *seq) {
 
 					if (seq->trk[t]->rows[c][r].type == note_on) {
 						v = 1;
-
-						if (seq->trk[t]->ring[c] == seq->trk[t]->rows[c][r].note) {
-							if (seq->trk[t]->pos >= r) {
-								v = 2;
-
-								for (int yy = seq->trk[t]->pos; yy > r; yy--) {
-									if (seq->trk[t]->rows[c][yy].type == note_on)
-										v = 1;
-								}
-							} else {
-								v = 2;
-								for (int yy = 0; yy < seq->trk[t]->pos; yy++)
-									if (seq->trk[t]->rows[c][yy].type > 0)
-										v = 1;
-
-								for (int yy = seq->trk[t]->nrows; yy >= r && v == 2; yy--) {
-									if ((seq->trk[t]->rows[c][yy].type == note_on) &&
-									        (seq->trk[t]->ring[c] == seq->trk[t]->rows[c][yy].note)) {
-										if (r != yy)
-											v = 1;
-									}
-								}
-							}
-						}
+						if (seq->trk[t]->lplayed[c] == r)
+							v = 2;
 					}
 
 					int addr = 2 + (ncols * rr) + col + c;
@@ -732,7 +710,6 @@ int sequence_gen_thumb(sequence *seq) {
 					}
 				}
 			}
-
 
 			col += seq->trk[t]->ncols;
 			seq->trk[t]->dirty = 0;

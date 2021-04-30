@@ -245,6 +245,9 @@ def module_get_switch_req(mod):
 def track_get_rec_update(trk):
     return _libcvht.track_get_rec_update(trk)
 
+def track_get_last_row_played(trk, col):
+    return _libcvht.track_get_last_row_played(trk, col)
+
 def track_clear_updates(trk):
     return _libcvht.track_clear_updates(trk)
 

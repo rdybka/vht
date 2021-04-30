@@ -83,6 +83,7 @@ extern int module_get_play_mode(module *mod);
 extern double module_get_jack_pos(module *mod);
 extern int module_get_switch_req(module *mod);
 extern char *track_get_rec_update(track *trk);
+extern int track_get_last_row_played(track *trk, int col);
 extern void track_clear_updates(track *trk);
 
 // midi
@@ -209,7 +210,7 @@ extern void track_ctrl_refresh_envelope(track *trk, int c);
 extern int track_get_nctrl(track *trk);
 extern int track_get_ctrlpr(track *trk);
 
-extern char *track_get_envelope(track *trk, int c);
+extern PyObject *track_get_envelope(track *trk, int c);
 
 extern void track_add_col(track *trk);
 extern void track_del_col(track *trk, int c);

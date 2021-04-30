@@ -80,6 +80,10 @@ class MainWin(Gtk.ApplicationWindow):
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
         button.add(image)
         button.connect("clicked", self.on_stop_button_activate)
+        button.set_tooltip_markup(
+            cfg.tooltip_markup
+            % ("stop %s\nreset %s" % (cfg.key["play"], cfg.key["reset"]))
+        )
         self.hb.pack_start(button)
 
         button = Gtk.Button()
@@ -87,6 +91,7 @@ class MainWin(Gtk.ApplicationWindow):
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
         button.add(image)
         button.connect("clicked", self.on_start_button_activate)
+        button.set_tooltip_markup(cfg.tooltip_markup2 % ("play", cfg.key["play"]))
         self.hb.pack_start(button)
 
         self.transport_switch = Gtk.Switch()

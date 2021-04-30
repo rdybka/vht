@@ -245,9 +245,9 @@ class VHTTrack(Iterable):
     def get_lctrlval(self, c):
         return libcvht.track_get_lctrlval(self._trk_handle, c)
 
-    # get envelope for ctrl c
-    def env(self, c):
-        return eval(libcvht.track_get_envelope(self._trk_handle, c))
+    # last row played
+    def get_lplayed(self, c):
+        return libcvht.track_get_lplayed(self._trk_handle, c)
 
     def env_del_node(self, c, n):
         libcvht.track_envelope_del_node(self._trk_handle, c, n)
@@ -259,7 +259,7 @@ class VHTTrack(Iterable):
         libcvht.track_envelope_set_node(self._trk_handle, c, n, x, y, z, linked)
 
     def get_envelope(self, c):
-        return eval(libcvht.track_get_envelope(self._trk_handle, c))
+        return libcvht.track_get_envelope(self._trk_handle, c)
 
     def trigger(self):
         libcvht.track_trigger(self._trk_handle)
