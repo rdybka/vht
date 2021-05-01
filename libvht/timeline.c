@@ -1167,10 +1167,15 @@ void timeline_set_pos(timeline *tl, double npos, int let_ring) {
 	if (!let_ring)
 		for (int s = 0; s < tl->nstrips; s++) {
 			sequence *seq = tl->strips[s].seq;
-			if (seq->playing) {
-				for (int t = 0; t < seq->ntrk; t++)
-					track_kill_notes(seq->trk[t]);
 
+			for (int t = 0; t < seq->ntrk; t++) {
+				if (seq->trk[t]->mand->active) {
+					mandy_reset(seq->trk[t]->mand);
+				}
+
+				if (seq->playing) {
+					track_kill_notes(seq->trk[t]);
+				}
 				seq->playing = 0;
 			}
 		}
