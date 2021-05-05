@@ -61,7 +61,7 @@ class TimelineView(Gtk.DrawingArea):
         self.spl = 0.5  # seconds per line (on screen)
         self.qb_start = 0
         self.max_qb_start = 23.0
-        self.spl_dest = 0.015625
+        self.spl_dest = 0.02
         self.qb_start_dest = self.qb_start
         self.max_qb_start_dest = 23.0
         self.pointer_ry = 0
@@ -133,6 +133,8 @@ class TimelineView(Gtk.DrawingArea):
         self.resize_curs = Gdk.Cursor.new_from_name(
             mod.mainwin.get_display(), "row-resize"
         )
+
+        self.follow = False  # just for timeline export for now
 
     def fix_extras(self):
         if "timeline_zoom" in mod.extras:
@@ -1458,6 +1460,13 @@ class TimelineView(Gtk.DrawingArea):
         self.playhead_ry = (
             mod.timeline.qb2t(mod.timeline.pos) - mod.timeline.qb2t(self.qb_start)
         ) / self.spl
+
+        if self.follow:
+            if self.playhead_ry < self.qb_start_dest:
+                self.qb_start_dest = mod.timeline.pos - 1
+
+            if self.playhead_ry > self.get_allocated_height() * 0.333:
+                self.qb_start_dest = mod.timeline.pos + 1
 
         if not self.drawing_loop:
             if self.mouse_loop_nearest == -1:

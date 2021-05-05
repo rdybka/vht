@@ -932,7 +932,7 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 
 	module *mod = (module *)tl->clt->mod_ref;
 
-	if (mod->render_mode == 3)
+	if (mod->render_mode == 23)
 		return;
 
 	if (rperiod - p > 0.0000001) {
@@ -953,13 +953,13 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 	if (tl->pos - floor(tl->pos) < 0.0000001) {	// row boundary
 		if (tl->loop_active) {
 			if (round(tl->pos) >= tl->loop_end) {
-				if (!mod->render_mode) {
+				if (!mod->render_mode || mod->render_mode == 3) {
 					if (mod->play_mode == 1) {
 						timeline_set_pos(tl, tl->loop_start, 0);
 						return;
 					}
 				} else {
-					mod->render_mode = 3;
+					mod->render_mode = 23;
 					mod->end_time = mod->clt->jack_last_frame;
 					return;
 				}
@@ -1081,7 +1081,7 @@ void timeline_advance_inner(timeline *tl, double period, jack_nframes_t nframes)
 	if (tl->pos > tl->length) {
 		tl->pos = tl->length;
 		if (mod->render_mode) {
-			mod->render_mode = 3;
+			mod->render_mode = 23;
 			mod->end_time = mod->clt->jack_last_frame;
 		}
 	}

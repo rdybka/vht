@@ -189,7 +189,7 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 	midi_client *clt = (midi_client *)seq->clt;
 	module *mod = (module *)clt->mod_ref;
 
-	if (mod->render_mode == 3)
+	if (mod->render_mode == 23)
 		return;
 
 	//printf("*** %d %d %d %d -", seq->trg_times[0], seq->trg_times[1], seq->trg_times[2], seq->trg_times[3]);
@@ -375,7 +375,7 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 
 	if (seq->pos >= seq->length) {
 		if (mod->render_mode == 1 && seq->playing) {
-			mod->render_mode = 3;
+			mod->render_mode = 23;
 			mod->end_time = mod->clt->jack_last_frame;
 		}
 	}

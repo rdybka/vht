@@ -73,7 +73,7 @@ that users refrain from utilising it as a fractal explorer. Tinkering introduces
 
 ## Rendering
 All rendering depends on jack_capture. Live mode will record what you hear in real-time. The other three modes
-(Sequence, Sequence Loop and Timeline) will switch JACK into freewheeling mode, which not all soft synths may support.
+(Sequence, Timeline, What u'd hear) will switch JACK into freewheeling mode, which not all soft synths support.
 
 # SEE ALSO
 qjackctl jack_capture qsynth zynaddsubfx

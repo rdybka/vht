@@ -32,6 +32,7 @@ class Renderer:
         self._finished = False
         self._queue = []
         self._seqs = []
+        self._orig_pm = None
 
         try:
             prc = subprocess.Popen(
@@ -50,15 +51,22 @@ class Renderer:
             t = datetime.now() - self._pre_delay_start
             t = float(t.seconds) + t.microseconds / 1000000
 
-            if t > 0.5:
+            if t > 0.5:  # or self.mod.render_mode == 3:
                 self._pre_delay_start = 0
                 self.mod.play = 1
+
+                if self.mod.render_mode == 3:
+                    self.mod.freewheel_on()
 
         if self._pre_delay_start:
             return True
 
-        if self.mod.render_mode == 3 and self.mod.play == 0:
+        if self.mod.render_mode == 23 and self.mod.play == 0:
             self.mod.freewheel_off()
+
+            if self.mod.play_mode == 1:
+                self.mod.play_mode = self._orig_pm
+
             if self._proc:
                 stdout, stderr = self._proc.communicate(input="\n", timeout=5)
                 self._proc = None
@@ -66,6 +74,7 @@ class Renderer:
                 self.start_queue()
             else:
                 self._finished = True
+                self.mod.mainwin.timeline_view.follow = False
                 if self._proc:
                     self._proc.terminate()
                 self.mod.render_mode = 0
@@ -80,13 +89,6 @@ class Renderer:
 
         if not self._proc:
             return False
-
-        # p = self._proc.poll()
-
-        # if self._proc.returncode != None:
-        #    self._finished = True
-        #    self.mod.render_mode = 0
-        #    return False
 
         return True
 
@@ -110,6 +112,8 @@ class Renderer:
             opts.append("-mt")
             opts.append(meters[meter])
 
+        self._orig_pm = self.mod.play_mode
+
         self._proc = subprocess.Popen(
             opts,
             stdin=subprocess.PIPE,
@@ -119,6 +123,30 @@ class Renderer:
         )
 
         self._finished = False
+
+    def start_wudh(self, folder, filename, fmt, meter):
+        self._finished = False
+
+        opts = ["jack_capture"]
+        opts.append("-jf")
+        # opts.append("--daemon")
+        opts.append("-f")
+        opts.append(fmt)
+        opts.append("-fp")
+        opts.append(os.path.join(folder, filename + "_"))
+
+        self.mod.render_mode = 3
+        self._orig_pm = self.mod.play_mode
+
+        self._proc = subprocess.Popen(
+            opts,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            text=True,
+        )
+
+        self._pre_delay_start = datetime.now()
 
     def start_queue(self):
         seqid = self._queue[0]
@@ -144,6 +172,7 @@ class Renderer:
 
         self.mod.play_mode = 0
         self.mod.render_mode = 1
+        self._orig_pm = self.mod.play_mode
         self.mod.set_lead_out(lead_out)
 
         for m in self.mod:
@@ -196,6 +225,8 @@ class Renderer:
                 self._seqs.append(s.index)
             s.playing = False
 
+        self._orig_pm = self.mod.play_mode
+
         self.mod.play_mode = 1
         self.mod.render_mode = 2
         self.mod.set_lead_out(lead_out)
@@ -213,6 +244,11 @@ class Renderer:
         self._pre_delay_start = datetime.now()
 
     def stop(self):
+        if self.mod.render_mode == 3:
+            self.mod.freewheel_off()
+
+        self.mod.mainwin.timeline_view.follow = False
+
         if self._proc:
             stdout, stderr = self._proc.communicate(input="\n", timeout=5)
             self._proc = None

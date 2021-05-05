@@ -73,11 +73,11 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 		return;
 	}
 
-	if (mod->render_mode == 3 && !mod->playing) {
+	if (mod->render_mode == 23 && !mod->playing) {
 		return;
 	}
 
-	if (mod->render_mode == 3 && mod->playing) {
+	if (mod->render_mode == 23 && mod->playing) {
 		double t = (curr_frames - mod->end_time) / (double)mod->clt->jack_sample_rate;
 		if (t > mod->render_lead_out) {
 			mod->playing = 0;

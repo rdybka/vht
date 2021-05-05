@@ -58,9 +58,10 @@ class RenderWin(Gtk.Window):
         self.grid.attach(lab, 0, 0, 1, 1)
 
         self.mode_cmb = Gtk.ComboBoxText()
-        self.mode_cmb.append_text("Sequence bump")
-        self.mode_cmb.append_text("Timeline bump")
+        self.mode_cmb.append_text("Sequence")
+        self.mode_cmb.append_text("Timeline")
         self.mode_cmb.append_text("Live")
+        self.mode_cmb.append_text("What u'd hear")
         self.mode_cmb.connect("changed", self.on_mode_cmb_changed)
 
         self.grid.attach(self.mode_cmb, 1, 0, 2, 1)
@@ -161,6 +162,10 @@ class RenderWin(Gtk.Window):
             self.secs_button.set_sensitive(True)
             self.meter_cmb.set_sensitive(False)
 
+        if self.cfg.render_mode == 3:
+            self.secs_button.set_sensitive(False)
+            self.meter_cmb.set_sensitive(False)
+
     def on_format_cmb_changed(self, wdg):
         self.cfg.render_format = wdg.get_active_text()
 
@@ -176,6 +181,17 @@ class RenderWin(Gtk.Window):
         if not self.capturing:
             self.capturing = True
             self.exit_off()
+
+            if self.cfg.render_mode == 3:
+                self.rend.start_wudh(
+                    self.cfg.render_folder,
+                    fnm,
+                    self.cfg.render_format,
+                    self.cfg.render_meter,
+                )
+
+                wdg.set_label("Stop")
+                self.mod.mainwin.timeline_view.follow = True
 
             if self.cfg.render_mode == 2:
                 self.rend.start_live(
@@ -196,8 +212,9 @@ class RenderWin(Gtk.Window):
                 )
 
                 self.set_modal(True)
-                wdg.set_label("Working")
-                wdg.set_sensitive(False)
+                wdg.set_label("Stop")
+                self.mod.mainwin.timeline_view.follow = True
+                # wdg.set_sensitive(False)
 
             if self.cfg.render_mode == 0:
                 self.rend.start_sequence(
@@ -224,11 +241,16 @@ class RenderWin(Gtk.Window):
         self.exit_on()
 
         wdg.set_label("Start")
+
         if self.cfg.render_mode < 2:
             self.secs_button.set_sensitive(True)
             self.meter_cmb.set_sensitive(False)
         else:
             self.meter_cmb.set_sensitive(True)
+
+        if self.cfg.render_mode == 3:
+            self.secs_button.set_sensitive(False)
+            self.meter_cmb.set_sensitive(False)
 
         self.butt_fc.set_sensitive(True)
         self.format_cmb.set_sensitive(True)
@@ -248,6 +270,7 @@ class RenderWin(Gtk.Window):
             self.capturing = False
             self.rbutt.set_label("Start")
             self.rbutt.set_sensitive(True)
+
             if self.cfg.render_mode < 2:
                 self.secs_button.set_sensitive(True)
                 self.meter_cmb.set_sensitive(False)
