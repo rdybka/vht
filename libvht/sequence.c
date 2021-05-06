@@ -192,8 +192,6 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 	if (mod->render_mode == 23)
 		return;
 
-	//printf("*** %d %d %d %d -", seq->trg_times[0], seq->trg_times[1], seq->trg_times[2], seq->trg_times[3]);
-
 	if ((seq->trg_quantise == 0) && (seq->trg_times[2] == -2)) {
 		seq->trg_times[2] = -1;
 		if (seq->playing && seq->trg_times[3] != -2) {
@@ -213,8 +211,6 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 		}
 	}
 
-	//printf("> %d %d %d %d\n", seq->trg_times[0], seq->trg_times[1], seq->trg_times[2], seq->trg_times[3]);
-
 	double p = ceil(seq->pos) - seq->pos;
 
 	if (period - p > 0.00000001) {
@@ -224,13 +220,14 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 		if (frm > 0) {
 			period -= p;
 			nframes -= frm;
-			//printf("re-adv seq %f %d\n", p, frm);
+			//printf("re-adv seq %f %d \n", p, frm);
 			sequence_advance(seq, p, frm);// :]
 		}
 	}
 
 	if (seq->pos - floor(seq->pos) < 0.0000001) {
 		int r = (int)seq->pos;
+		//printf("%03d %d %d %d %d\n", r, seq->trg_times[0], seq->trg_times[1], seq->trg_times[2], seq->trg_times[3]);
 
 		for (int t = 0; t < seq->ntrk; t++) {
 			if (seq->trk[t]->mand->active) {
@@ -259,8 +256,6 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 		while (r >= seq->length) {
 			r-=seq->length;
 		}
-
-		//printf("%03d %d %d %d %d\n", r, seq->trg_times[0], seq->trg_times[1], seq->trg_times[2], seq->trg_times[3]);
 
 		// quantised play
 		if (seq->trg_times[2] == r) {
@@ -361,11 +356,7 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 				seq->trk[t]->resync = 0;
 				seq->trk[t]->pos = 0;
 				track_wind(seq->trk[t], seq->pos);
-				track_advance(seq->trk[t], period, nframes);
 			}
-		}
-
-		for (int t = 0; t < seq->ntrk; t++) {
 
 			track_advance(seq->trk[t], period, nframes);
 		}
@@ -378,10 +369,8 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 			mod->render_mode = 23;
 			mod->end_time = mod->clt->jack_last_frame;
 		}
-	}
 
-	if (seq->pos > seq->length) {
-		seq->pos -= seq->length;
+		seq->pos = roundf(seq->pos - seq->length);
 	}
 }
 
@@ -559,6 +548,8 @@ void sequence_trigger_play_on(sequence *seq, int blk) {
 	midi_client *clt = (midi_client *)seq->clt;
 	module *mod = (module *)clt->mod_ref;
 
+	seq->trg_times[1] = -1; //clear cue
+
 	if (blk)
 		module_excl_in(mod);
 
@@ -602,6 +593,8 @@ done:
 void sequence_trigger_play_off(sequence *seq, int blk) {
 	midi_client *clt = (midi_client *)seq->clt;
 	module *mod = (module *)clt->mod_ref;
+
+	seq->trg_times[1] = -1;	// clear cue
 
 	if (blk)
 		module_excl_in(mod);
