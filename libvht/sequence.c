@@ -1,6 +1,6 @@
 /* sequence.c - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,17 +24,13 @@
 #include "track.h"
 
 void seq_mod_excl_in(sequence *seq) {
-	//printf("mod_excl in");
 	if (seq->mod_excl)
 		pthread_mutex_lock(seq->mod_excl);
-	//printf(".\n");
 }
 
 void seq_mod_excl_out(sequence *seq) {
-	//printf("mod_excl out");
 	if (seq->mod_excl)
 		pthread_mutex_unlock(seq->mod_excl);
-	//printf(".\n");
 }
 
 sequence *sequence_new(int length) {
@@ -689,7 +685,7 @@ int sequence_gen_thumb(sequence *seq) {
 
 					if (seq->trk[t]->rows[c][r].type == note_on) {
 						v = 1;
-						if (seq->trk[t]->lplayed[c] == r)
+						if (seq->trk[t]->lsounded[c] == r)
 							v = 2;
 					}
 

@@ -1,6 +1,6 @@
 # trackpropview.py - Valhalla Tracker
 #
-# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -389,6 +389,15 @@ class TrackPropView(Gtk.DrawingArea):
             c = len(self.trk)
             xfrom = -width * 2
             xto = self.trkview.txt_width * c
+
+            if self.trkview.velocity_editor:
+                xto += self.trkview.velocity_editor.width
+
+            if self.trkview.timeshift_editor:
+                xto += self.trkview.timeshift_editor.width
+
+            if self.trkview.prob_editor:
+                xto += self.trkview.prob_editor.width
 
             kf = self.trkview.keyboard_focus
             if kf:

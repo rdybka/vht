@@ -250,7 +250,15 @@ extern void row_set_note(row *rw, int note);
 extern void row_set_velocity(row *rw, int velocity);
 extern void row_set_delay(row *rw, int delay);
 
-extern void row_set(row *rw, int type, int note, int velocity, int delay);
+extern int row_get_prob(row *rw);
+extern void row_set_prob(row *rw, int prob);
+
+extern int row_get_velocity_range(row *rw);
+extern int row_get_delay_range(row *rw);
+extern void row_set_velocity_range(row *rw, int range);
+extern void row_set_delay_range(row *rw, int range);
+
+extern void row_set(row *rw, int type, int note, int velocity, int delay, int prob, int v_r, int d_r);
 
 // ctrlrow
 extern int ctrlrow_get_velocity(ctrlrow *crw);

@@ -19,6 +19,7 @@ from vht.controllerundobuffer import ControllerUndoBuffer
 from vht.controllereditor import ControllerEditor
 from vht.timeshifteditor import TimeshiftEditor
 from vht.velocityeditor import VelocityEditor
+from vht.probeditor import ProbEditor
 from vht.poormanspiano import PoorMansPiano
 from vht.trackundobuffer import TrackUndoBuffer
 from vht.trackviewpointer import TrackviewPointer
@@ -31,7 +32,7 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gdk, Gtk
 
-import inspect
+# import inspect
 
 
 class TrackView(Gtk.DrawingArea):
@@ -106,6 +107,7 @@ class TrackView(Gtk.DrawingArea):
         self._pointer = TrackviewPointer(self, trk, seq)
         self.txt_width = 0
         self.txt_height = 0
+        self.fld_width = 0
         self.width = 0
         self.spacing = 1.0
         self.pmp = PoorMansPiano(self.trk, self.seq)
@@ -128,6 +130,7 @@ class TrackView(Gtk.DrawingArea):
 
         self.velocity_editor = None
         self.timeshift_editor = None
+        self.prob_editor = None
         self.pitchwheel_editor = None
         self.controller_editors = []
 
@@ -135,6 +138,7 @@ class TrackView(Gtk.DrawingArea):
         self.show_timeshift = False
         self.show_pitchwheel = False
         self.show_controllers = False
+        self.show_probs = False
 
         self.extras = None
 
@@ -146,6 +150,7 @@ class TrackView(Gtk.DrawingArea):
             self.show_pitchwheel = self.extras["track_show_pitchwheel"]
             self.show_controllers = self.extras["track_show_controllers"]
             self.show_notes = self.extras["track_show_notes"]
+            self.show_probs = self.extras["track_show_probs"]
 
         self._surface = None
         self._context = None
@@ -219,9 +224,18 @@ class TrackView(Gtk.DrawingArea):
         crf = self._context
         crf.set_source_surface(self._back_surface)
 
-        (x, y, width, height, dx, dy) = cr.text_extents("000 000|")
+        fld_txt = "000 "
+        *_, self.fld_width, _ = cr.text_extents(fld_txt)
+
+        row_txt = "000 000"
         if self.show_timeshift:
-            (x, y, width, height, dx, dy) = cr.text_extents("000 000 000|")
+            row_txt += " 000"
+
+        if self.show_probs:
+            row_txt += " 000"
+
+        row_txt += "|"
+        (x, y, width, height, dx, dy) = cr.text_extents(row_txt)
 
         self.txt_height = float(height) * self.spacing * cfg.seq_spacing
         self.txt_width = int(dx)
@@ -233,6 +247,10 @@ class TrackView(Gtk.DrawingArea):
         if self.velocity_editor:
             self.velocity_editor.precalc(cr)
             nw = nw + self.velocity_editor.width
+
+        if self.prob_editor:
+            self.prob_editor.precalc(cr)
+            nw = nw + self.prob_editor.width
 
         if self.timeshift_editor:
             self.timeshift_editor.precalc(cr)
@@ -350,6 +368,10 @@ class TrackView(Gtk.DrawingArea):
                     if self.timeshift_editor:
                         if c > self.timeshift_editor.col:
                             xtraoffs = self.timeshift_editor.width
+
+                    if self.prob_editor:
+                        if c > self.prob_editor.col:
+                            xtraoffs = self.prob_editor.width
 
                     (x, y, width, height, dx, dy) = cr.text_extents("0")
                     yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2.0)
@@ -502,12 +524,6 @@ class TrackView(Gtk.DrawingArea):
         if from_row > to_row:
             from_row, to_row = to_row, from_row
 
-        # ~ if not complete and ctrl:
-        # ~ cf = inspect.currentframe()
-        # ~ of = inspect.getouterframes(cf, 2)
-        # ~ for f in of:
-        # ~ print("redraw full", f[3], f[2], f[1])
-
         # normal view
         rows_to_draw = []
         if complete:
@@ -549,8 +565,11 @@ class TrackView(Gtk.DrawingArea):
             for r in rows_to_draw:
                 veled = 0
                 tsed = 0
+                probsed = 0
                 xtraoffs = 0
                 ed_width = 0
+
+                sep = 0
 
                 if self.velocity_editor:
                     ed_width = self.velocity_editor.width
@@ -559,12 +578,23 @@ class TrackView(Gtk.DrawingArea):
                     if c > self.velocity_editor.col:
                         xtraoffs = self.velocity_editor.width
 
+                    sep = 1
+
                 if self.timeshift_editor:
                     ed_width = self.timeshift_editor.width
                     if c == self.timeshift_editor.col:
                         tsed = self.timeshift_editor.width
                     if c > self.timeshift_editor.col:
                         xtraoffs = self.timeshift_editor.width
+
+                    sep = 2
+
+                if self.prob_editor:
+                    ed_width = self.prob_editor.width
+                    if c == self.prob_editor.col:
+                        probsed = self.prob_editor.width
+                    if c > self.prob_editor.col:
+                        xtraoffs = self.prob_editor.width
 
                 even_high = cfg.even_highlight
                 if r % 2 == 0:
@@ -580,6 +610,8 @@ class TrackView(Gtk.DrawingArea):
                     draw_text = False
                 else:
                     cr.set_source(self.zero_pattern)
+
+                # print(xtraoffs, ed_width)
 
                 if self.show_notes:
                     cr.rectangle(
@@ -605,7 +637,7 @@ class TrackView(Gtk.DrawingArea):
                         )
 
                 show_selection = True
-                if self.velocity_editor or self.timeshift_editor:
+                if self.velocity_editor or self.timeshift_editor or self.prob_editor:
                     show_selection = False
 
                 if (
@@ -666,7 +698,7 @@ class TrackView(Gtk.DrawingArea):
                             cr.rectangle(
                                 c * self.txt_width + xtraoffs,
                                 (r * self.txt_height) + self.txt_height * 0.1,
-                                (self.txt_width / 8.0) * 7.2,
+                                (self.txt_width / 8.0) * 7.4,
                                 self.txt_height * 0.8,
                             )
                         else:
@@ -683,7 +715,11 @@ class TrackView(Gtk.DrawingArea):
                         )
 
                 if draw_text:
-                    (x, y, width, height, dx, dy) = cr.text_extents("000 0000")
+                    if sep == 0 or sep == 1:
+                        (x, y, width, height, dx, dy) = cr.text_extents("000 0000")
+                    else:
+                        (x, y, width, height, dx, dy) = cr.text_extents("000 0000 000")
+
                     yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2)
                     cr.move_to((c * self.txt_width) + x + xtraoffs, yy)
 
@@ -694,14 +730,31 @@ class TrackView(Gtk.DrawingArea):
                         ts_sign = "-"
 
                     if self.show_notes and rw.type == 1:  # note_on
+                        ltxt = "%3s %03d" % (str(rw), rw.velocity)
+                        rtxt = ""
+
                         if self.show_timeshift:
-                            if not self.velocity_editor:
-                                cr.show_text(
-                                    "%3s %03d %c%02d"
-                                    % (str(rw), rw.velocity, ts_sign, abs(rw.delay))
-                                )
-                            else:
-                                cr.show_text("%3s %03d" % (str(rw), rw.velocity))
+                            tstxt = "%c%02d" % (ts_sign, abs(rw.delay))
+                            if sep == 0 or sep == 2:
+                                ltxt += " " + tstxt
+                            elif sep == 1:
+                                rtxt = tstxt
+
+                        if self.show_probs:
+                            prtxt = "%03d" % (100 - rw.prob)
+                            if sep == 0:
+                                ltxt += " " + prtxt
+                            elif sep == 1:
+                                if self.show_timeshift:
+                                    rtxt += " "
+
+                                rtxt += prtxt
+                            elif sep == 2:
+                                rtxt = prtxt
+
+                        cr.show_text(ltxt)
+                        if rtxt:
+                            if sep == 1:
                                 cr.move_to(
                                     (c * self.txt_width)
                                     + dx
@@ -709,9 +762,17 @@ class TrackView(Gtk.DrawingArea):
                                     + self.velocity_editor.width,
                                     yy,
                                 )
-                                cr.show_text("%c%02d" % (ts_sign, abs(rw.delay)))
-                        else:
-                            cr.show_text("%3s %03d" % (str(rw), rw.velocity))
+
+                            if sep == 2:
+                                cr.move_to(
+                                    (c * self.txt_width)
+                                    + dx
+                                    + xtraoffs
+                                    + self.timeshift_editor.width,
+                                    yy,
+                                )
+
+                            cr.show_text(rtxt)
 
                     if self.show_notes and rw.type == 2:  # note_off
                         if self.show_timeshift:
@@ -731,6 +792,9 @@ class TrackView(Gtk.DrawingArea):
 
                 if tsed and 0 < rw.type < 3:
                     self.timeshift_editor.draw(cr, c, r, rw)
+
+                if probsed and 0 < rw.type < 3:
+                    self.prob_editor.draw(cr, c, r, rw)
 
                 if c == len(self.trk) - 1:
                     if self.show_pitchwheel:
@@ -846,6 +910,12 @@ class TrackView(Gtk.DrawingArea):
             and (event.state & Gdk.ModifierType.BUTTON1_MASK)
         ):
             return self.timeshift_editor.on_motion(widget, event)
+
+        if self.prob_editor and not (
+            (event.state & Gdk.ModifierType.CONTROL_MASK)
+            and (event.state & Gdk.ModifierType.BUTTON1_MASK)
+        ):
+            return self.prob_editor.on_motion(widget, event)
 
         oldf = self.keyboard_focus
 
@@ -1090,8 +1160,7 @@ class TrackView(Gtk.DrawingArea):
                             self.trk[nc[0]][nc[1]].velocity = rr[2]
                             self.trk[nc[0]][nc[1]].delay = rr[3]
 
-                self.redraw(*(old))
-                self.redraw(self.select_start[1], self.select_end[1])
+                self.redraw()
 
             self.edit = self.select_end
 
@@ -1173,7 +1242,10 @@ class TrackView(Gtk.DrawingArea):
 
             flds = 2
             if self.show_timeshift:
-                flds = 3
+                flds += 1
+
+            if self.show_probs:
+                flds += 1
 
             fldwidth = self.txt_width / flds
 
@@ -1182,6 +1254,7 @@ class TrackView(Gtk.DrawingArea):
                     self.velocity_editor = VelocityEditor(self, col, row, event)
                     self.velocity_editor.clearing = True
                     self.trk[col][row].velocity = cfg.velocity
+                    self.trk[col][row].velocity_range = 0
 
                     self.configure()
                     self.redraw()
@@ -1195,6 +1268,24 @@ class TrackView(Gtk.DrawingArea):
                         self.timeshift_editor = TimeshiftEditor(self, col, row, event)
                         self.timeshift_editor.clearing = True
                         self.trk[col][row].delay = 0
+                        self.trk[col][row].delay_range = 0
+
+                        self.configure()
+                        self.redraw()
+                        self.parent.prop_view.redraw()
+                        self.undo_buff.add_state()
+                        return True
+
+            if self.show_probs:
+                fld = 2
+                if self.show_timeshift:
+                    fld += 1
+
+                if fldwidth * fld < offs < fldwidth * (fld + 1):  # reset probs
+                    if 0 < self.trk[col][row].type < 3:
+                        self.prob_editor = ProbEditor(self, col, row, event)
+                        self.prob_editor.clearing = True
+                        self.trk[col][row].prob = 0
 
                         self.configure()
                         self.redraw()
@@ -1209,7 +1300,7 @@ class TrackView(Gtk.DrawingArea):
 
         enter_edit = False
 
-        if event.button != cfg.select_button:
+        if event.button != cfg.select_button and event.button != 2:
             return False
 
         if event.state & Gdk.ModifierType.CONTROL_MASK:
@@ -1220,49 +1311,55 @@ class TrackView(Gtk.DrawingArea):
 
         self.sel_drag = False
         self.sel_dragged = False
-        if self.select_start:
-            ssx = self.select_start[0]
-            ssy = self.select_start[1]
-            sex = self.select_end[0]
-            sey = self.select_end[1]
+        if event.button == cfg.select_button:
+            if self.select_start:
+                ssx = self.select_start[0]
+                ssy = self.select_start[1]
+                sex = self.select_end[0]
+                sey = self.select_end[1]
 
-            if sex < ssx:
-                sex, ssx = ssx, sex
+                if sex < ssx:
+                    sex, ssx = ssx, sex
 
-            if sey < ssy:
-                sey, ssy = ssy, sey
+                if sey < ssy:
+                    sey, ssy = ssy, sey
 
-            if ssx <= col <= sex:
-                if ssy <= row <= sey:
-                    self.sel_drag = True
-                    self.sel_drag_prev = col, row
+                if ssx <= col <= sex:
+                    if ssy <= row <= sey:
+                        self.sel_drag = True
+                        self.sel_drag_prev = col, row
 
-                    self.sel_drag_front = self.to_dict(True)
-                    self.sel_drag_back = self.to_dict()
+                        self.sel_drag_front = self.to_dict(True)
+                        self.sel_drag_back = self.to_dict()
 
-                    for r in self.sel_drag_front:
-                        del self.sel_drag_back[(r[0] + ssx, r[1] + ssy)]
+                        for r in self.sel_drag_front:
+                            del self.sel_drag_back[(r[0] + ssx, r[1] + ssy)]
 
-                    return True
+                        return True
 
-        if not self.trk[col][row].type:  # empty
-            enter_edit = True
-            if not shift:
-                self.select = True
-                self.select_start = None
-                self.select_end = None
+            if not self.trk[col][row].type:  # empty
+                enter_edit = True
+                if not shift:
+                    self.select = True
+                    self.select_start = None
+                    self.select_end = None
 
-        if self.trk[col][row].type == 1:  # note_on
-            enter_edit = True
-            self.drag = True
+            if self.trk[col][row].type == 1:  # note_on
+                enter_edit = True
+                self.drag = True
 
         flds = 2
         if self.show_timeshift:
-            flds = 3
+            flds += 1
+
+        if self.show_probs:
+            flds += 1
 
         fldwidth = self.txt_width / flds
 
-        if self.trk[col][row].type == 2:  # note_off
+        if (
+            self.trk[col][row].type == 2 and event.button == cfg.select_button
+        ):  # note_off
             enter_edit = True
             self.drag = True
 
@@ -1276,7 +1373,7 @@ class TrackView(Gtk.DrawingArea):
                 self.parent.prop_view.redraw()
                 self.undo_buff.add_state()
         else:
-            if offs < fldwidth:  # edit note
+            if offs < fldwidth and event.button == cfg.select_button:  # edit note
                 enter_edit = True
             else:  # edit velocity or timeshift
                 if not shift and 0 < self.trk[col][row].type < 3:
@@ -1292,12 +1389,20 @@ class TrackView(Gtk.DrawingArea):
                                 self, col, row, event
                             )
 
+                        if self.show_probs and event.button == cfg.select_button:
+                            if fldwidth * 3 < offs < fldwidth * 4:
+                                self.prob_editor = ProbEditor(self, col, row, event)
+
+                    elif self.show_probs and event.button == cfg.select_button:
+                        if fldwidth * 2 < offs < fldwidth * 3:
+                            self.prob_editor = ProbEditor(self, col, row, event)
+
                     self.configure()
                     self.redraw()
                     self.parent.prop_view.redraw()
                     self.undo_buff.add_state()
 
-        if enter_edit:
+        if enter_edit and event.button == cfg.select_button:
             if shift:
                 self.select_end = col, row
                 if self.select_start:
@@ -1397,15 +1502,21 @@ class TrackView(Gtk.DrawingArea):
                     self.drag = False
                     self.undo_buff.add_state()
 
+        redr = False
+
         if self.velocity_editor:
             self.velocity_editor = None
-            self.configure()
-            self.redraw()
-            self.parent.prop_view.redraw()
-            self.undo_buff.add_state()
+            redr = True
 
         if self.timeshift_editor:
             self.timeshift_editor = None
+            redr = True
+
+        if self.prob_editor:
+            self.prob_editor = None
+            redr = True
+
+        if redr:
             self.configure()
             self.redraw()
             self.parent.prop_view.redraw()
@@ -1654,7 +1765,15 @@ class TrackView(Gtk.DrawingArea):
         for x in range(ssx, sex + 1):
             for y in range(ssy, sey + 1):
                 r = self.trk[x][y]
-                d[(x - ssx, y - ssy)] = (r.type, r.note, r.velocity, r.delay)
+                d[(x - ssx, y - ssy)] = (
+                    r.type,
+                    r.note,
+                    r.velocity,
+                    r.delay,
+                    r.prob,
+                    r.velocity_range,
+                    r.delay_range,
+                )
 
                 if cut:
                     self.trk[x][y].clear()
@@ -1701,6 +1820,9 @@ class TrackView(Gtk.DrawingArea):
                         self.trk[dx][dy].note = r[1]
                         self.trk[dx][dy].velocity = r[2]
                         self.trk[dx][dy].delay = r[3]
+                        self.trk[dx][dy].prob = r[4]
+                        self.trk[dx][dy].velocity_range = r[5]
+                        self.trk[dx][dy].delay_range = r[6]
 
             if new_y:
                 self.edit = self.edit[0], new_y
@@ -1738,6 +1860,9 @@ class TrackView(Gtk.DrawingArea):
                         self.trk[x][y].note = r[1]
                         self.trk[x][y].velocity = r[2]
                         self.trk[x][y].delay = r[3]
+                        self.trk[x][y].prob = r[4]
+                        self.trk[x][y].velocity_range = r[5]
+                        self.trk[x][y].delay_range = r[6]
                     x += 1
 
                 yy += 1
@@ -1807,6 +1932,11 @@ class TrackView(Gtk.DrawingArea):
 
     def toggle_time(self):
         self.show_timeshift = not self.show_timeshift
+        self.parent.redraw_track(self.trk)
+        return True
+
+    def toggle_probs(self):
+        self.show_probs = not self.show_probs
         self.parent.redraw_track(self.trk)
         return True
 
@@ -1915,8 +2045,11 @@ class TrackView(Gtk.DrawingArea):
         if cfg.key["toggle_pitch"].matches(event):
             return self.toggle_pitch()
 
-        if cfg.key["toggle_controls"].matches(event):
+        if cfg.key["toggle_controllers"].matches(event):
             return self.toggle_controls()
+
+        if cfg.key["toggle_probs"].matches(event):
+            return self.toggle_probs()
 
         if self.keyboard_focus is not None and self.select_start is None:
             if self.keyboard_focus.on_key_press(widget, event):
@@ -2566,7 +2699,10 @@ class TrackView(Gtk.DrawingArea):
         if cfg.key["toggle_pitch"].matches(event):
             return True
 
-        if cfg.key["toggle_controls"].matches(event):
+        if cfg.key["toggle_controllers"].matches(event):
+            return True
+
+        if cfg.key["toggle_probs"].matches(event):
             return True
 
         if ctrl:

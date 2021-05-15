@@ -85,7 +85,7 @@ class Configuration:
         )
         self.tooltip_markup2 = """<span font_family="Sans" size="large">%s\n</span><span font_family="Monospace" size="medium">%s</span>"""
 
-        self.window_opacity = 1.0
+        self.window_opacity = 1
 
         self.sequence_name_format = "s%02d"
         self.row_number_format = "%03d"
@@ -223,7 +223,8 @@ class Configuration:
             "toggle_notes": cfgkey("1", False, True, False),
             "toggle_time": cfgkey("2", False, True, False),
             "toggle_pitch": cfgkey("3", False, True, False),
-            "toggle_controls": cfgkey("4", False, True, False),
+            "toggle_controllers": cfgkey("4", False, True, False),
+            "toggle_probs": cfgkey("5", False, True, False),
             # controllereditor
             "link": cfgkey("l", False, True, False),
             "doodle_copy": cfgkey("c", True, True, False),

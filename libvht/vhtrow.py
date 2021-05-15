@@ -1,6 +1,6 @@
 # vhtrow.py - Valhalla Tracker (libvht)
 #
-# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,6 +26,10 @@ class VHTRow:
         self._note = libcvht.row_get_note(self._rowptr)
         self._velocity = libcvht.row_get_velocity(self._rowptr)
         self._delay = libcvht.row_get_delay(self._rowptr)
+        self._prob = libcvht.row_get_prob(self._rowptr)
+        self._velocity_range = libcvht.row_get_velocity_range(self._rowptr)
+        self._delay_range = libcvht.row_get_delay_range(self._rowptr)
+
         self.update_strrep()
 
     def __eq__(self, other):
@@ -36,6 +40,12 @@ class VHTRow:
         if self._velocity != other._velocity:
             return False
         if self._delay != other._delay:
+            return False
+        if self._prob != other._prob:
+            return False
+        if self._velocity_range != other._velocity_range:
+            return False
+        if self._delay_range != other._delay_range:
             return False
 
         return True
@@ -65,9 +75,20 @@ class VHTRow:
         self._note = row._note
         self._velocity = row._velocity
         self._delay = row._delay
+        self._prob = row._prob
+        self._velocity_range = row._velocity_range
+        self._delay_range = row._delay_range
         libcvht.row_set(
-            self._rowptr, self._type, self._note, self._velocity, self._delay
+            self._rowptr,
+            self._type,
+            self._note,
+            self._velocity,
+            self._delay,
+            self._prob,
+            self._velocity_range,
+            self._delay_range,
         )
+
         libcvht.track_set_dirty(self._trkptr, 1)
         self.update_strrep()
 
@@ -76,7 +97,10 @@ class VHTRow:
         self._note = 0
         self._velocity = 0
         self._delay = 0
-        libcvht.row_set(self._rowptr, 0, 0, 0, 0)
+        self._prob = 0
+        self._velocity_range = 0
+        self._delay_range = 0
+        libcvht.row_set(self._rowptr, 0, 0, 0, 0, 0, 0, 0)
         libcvht.track_set_dirty(self._trkptr, 1)
         self.update_strrep()
 
@@ -132,6 +156,33 @@ class VHTRow:
         self._delay = int(value)
         libcvht.row_set_delay(self._rowptr, self._delay)
         libcvht.track_set_dirty(self._trkptr, 1)
+
+    @property
+    def prob(self):
+        return self._prob
+
+    @prob.setter
+    def prob(self, p):
+        self._prob = int(p)
+        libcvht.row_set_prob(self._rowptr, self._prob)
+
+    @property
+    def velocity_range(self):
+        return self._velocity_range
+
+    @velocity_range.setter
+    def velocity_range(self, r):
+        self._velocity_range = int(r)
+        libcvht.row_set_velocity_range(self._rowptr, self._velocity_range)
+
+    @property
+    def delay_range(self):
+        return self._delay_range
+
+    @delay_range.setter
+    def delay_range(self, r):
+        self._delay_range = int(r)
+        libcvht.row_set_delay_range(self._rowptr, self._delay_range)
 
     def __str__(self):
         return self._strrep

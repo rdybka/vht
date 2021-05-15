@@ -1,6 +1,6 @@
 # trackpropviewpopover.py - Valhalla Tracker
 #
-# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -161,7 +161,11 @@ class TrackPropViewPopover(Gtk.Popover):
         )
         self.show_controllers_button = Gtk.ToggleButton("ctrl")
         self.show_controllers_button.set_tooltip_markup(
-            cfg.tooltip_markup % (cfg.key["toggle_controls"])
+            cfg.tooltip_markup % (cfg.key["toggle_controllers"])
+        )
+        self.show_probs_button = Gtk.ToggleButton("probs")
+        self.show_probs_button.set_tooltip_markup(
+            cfg.tooltip_markup % (cfg.key["toggle_probs"])
         )
 
         self.show_notes_button.set_vexpand(False)
@@ -172,6 +176,7 @@ class TrackPropViewPopover(Gtk.Popover):
         self.show_controllers_button.connect(
             "toggled", self.on_show_controllers_toggled
         )
+        self.show_probs_button.connect("toggled", self.on_show_probs_toggled)
 
         pad = Gtk.Label()
         pad.set_vexpand(True)
@@ -181,10 +186,16 @@ class TrackPropViewPopover(Gtk.Popover):
         lab.set_vexpand(True)
 
         grid.attach(lab, 0, 0, 1, 1)
-        grid.attach(self.show_notes_button, 1, 0, 1, 1)
-        grid.attach(self.show_timeshift_button, 2, 0, 1, 1)
-        grid.attach(self.show_pitchwheel_button, 3, 0, 1, 1)
-        grid.attach(self.show_controllers_button, 4, 0, 1, 1)
+
+        show_grid = Gtk.Grid()
+        show_grid.set_column_homogeneous(True)
+        show_grid.set_vexpand(True)
+        show_grid.attach(self.show_notes_button, 0, 0, 1, 1)
+        show_grid.attach(self.show_timeshift_button, 1, 0, 1, 1)
+        show_grid.attach(self.show_pitchwheel_button, 2, 0, 1, 1)
+        show_grid.attach(self.show_controllers_button, 3, 0, 1, 1)
+        show_grid.attach(self.show_probs_button, 4, 0, 1, 1)
+        grid.attach(show_grid, 1, 0, 4, 1)
 
         lab = Gtk.Label(cfg.quick_controls_desc + ":")
         lab.set_vexpand(True)
@@ -548,6 +559,7 @@ class TrackPropViewPopover(Gtk.Popover):
         self.show_timeshift_button.set_active(self.trkview.show_timeshift)
         self.show_pitchwheel_button.set_active(self.trkview.show_pitchwheel)
         self.show_controllers_button.set_active(self.trkview.show_controllers)
+        self.show_probs_button.set_active(self.trkview.show_probs)
 
         if not self.trkview.show_notes:
             self.show_controllers_button.set_sensitive(False)
@@ -715,6 +727,15 @@ class TrackPropViewPopover(Gtk.Popover):
 
         if self.trkview.show_controllers != wdg.get_active():
             self.trkview.toggle_controls()
+
+        if self.parent.popped:
+            self.trkview.redraw_full()
+            self.parent.redraw()
+
+    def on_show_probs_toggled(self, wdg):
+        self.extras["track_show_probs"] = wdg.get_active()
+        if self.trkview.show_probs != wdg.get_active():
+            self.trkview.toggle_probs()
 
         if self.parent.popped:
             self.trkview.redraw_full()

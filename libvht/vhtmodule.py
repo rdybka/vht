@@ -1,6 +1,6 @@
 # vhtmodule.py - Valhalla Tracker (libvht)
 #
-# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -91,6 +91,9 @@ def pack_seq(seq):
                     r["note"] = row.note
                     r["velocity"] = row.velocity
                     r["delay"] = row.delay
+                    r["prob"] = row.prob
+                    r["v_range"] = row.velocity_range
+                    r["d_range"] = row.delay_range
                     c.append(r)
 
                 rn += 1
@@ -602,6 +605,15 @@ class VHTModule(Iterable):
                     rr.note = row["note"]
                     rr.velocity = row["velocity"]
                     rr.delay = row["delay"]
+
+                    if "prob" in row:
+                        rr.prob = row["prob"]
+
+                    if "v_range" in row:
+                        rr.velocity_range = row["v_range"]
+
+                    if "d_range" in row:
+                        rr.delay_range = row["d_range"]
 
             if "mandy" in trk:
                 t.mandy.init_from(trk["mandy"])

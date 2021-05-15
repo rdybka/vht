@@ -76,6 +76,7 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	trk->rows = malloc(sizeof(row*) * trk->ncols);
 	trk->ring = malloc(sizeof(int) * trk->ncols);
 	trk->lplayed = malloc(sizeof(int) * trk->ncols);
+	trk->lsounded = malloc(sizeof(int) * trk->ncols);
 	trk->mand_qnt = malloc(sizeof(int) * trk->ncols);
 
 	for (int c = 0; c < trk->ncols; c++) {
@@ -84,6 +85,7 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 
 		trk->ring[c] = -1;
 		trk->lplayed[c] = -1;
+		trk->lsounded[c] = -1;
 		trk->mand_qnt[c] = -232323;
 	}
 
@@ -119,6 +121,7 @@ void track_reset(track *trk) {
 	trk->loop = 1;
 	for (int c = 0; c < trk->ncols; c++) {
 		trk->lplayed[c] = -1;
+		trk->lsounded[c] = -1;
 		trk->mand_qnt[c] = -232323;
 	}
 
@@ -130,8 +133,15 @@ void track_reset(track *trk) {
 	if (trk->mand->active) {
 		mandy_reset(trk->mand);
 	}
+
+	for (int c = 0; c < trk->ncols; c++) {
+		for (int r = 0; r < trk->nrows; r++) {
+			row_randomise(&trk->rows[c][r]);
+		}
+	}
 }
 
+// this is used whiled recording
 void track_set_row(track *trk, int c, int n, int type, int note, int velocity, int delay) {
 	pthread_mutex_lock(&trk->excl);
 
@@ -141,6 +151,11 @@ void track_set_row(track *trk, int c, int n, int type, int note, int velocity, i
 	r->velocity = velocity;
 	r->delay = delay;
 	r->ringing = 0;
+	r->prob = 0;
+	r->velocity_range = 0;
+	r->velocity_next = 0;
+	r->delay_range = 0;
+	r->delay_next = 0;
 
 	for (int c = 0; c < trk->nctrl; c++)
 		trk->lctrlval[c] = -1;
@@ -176,6 +191,11 @@ int track_get_row(track *trk, int c, int n, row *r) {
 	r->velocity = s->velocity;
 	r->delay = s->delay;
 	r->ringing = s->ringing;
+	r->prob = s->prob;
+	r->delay_range = s->delay_range;
+	r->delay_next = s->delay_next;
+	r->velocity_range = s->velocity_range;
+	r->velocity_next = s->velocity_next;
 
 	pthread_mutex_unlock(&trk->excl);
 	return 0;
@@ -340,6 +360,7 @@ void track_free(track *trk) {
 	free(trk->crows);
 	free(trk->ring);
 	free(trk->lplayed);
+	free(trk->lsounded);
 	free(trk->rows);
 	free(trk->ctrl);
 	free(trk->ctrlnum);
@@ -360,6 +381,9 @@ void track_clear_rows(track *trk, int c) {
 		trk->rows[c][t].velocity = 0;
 		trk->rows[c][t].delay = 0;
 		trk->rows[c][t].ringing = 0;
+		trk->rows[c][t].prob = 0;
+		trk->rows[c][t].velocity_range = 0;
+		trk->rows[c][t].delay_range = 0;
 	}
 
 	pthread_mutex_unlock(&trk->excl);
@@ -405,7 +429,8 @@ track *track_clone(track *src) {
 
 		for (int r = 0; r < src->nrows; r++) {
 			row *s = &src->rows[c][r];
-			row_set(&dst->rows[c][r], s->type, s->note, s->velocity, s->delay);
+			row_set(&dst->rows[c][r], s->type, s->note, s->velocity, s->delay, s->prob, s->velocity_range, s->delay_range);
+			dst->rows[c][r].prob = s->prob;
 		}
 	}
 
@@ -581,6 +606,15 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 	if (r.type == none)
 		return;
 
+	if (r.prob > 0) {
+		int rnd = rand() % 100;
+
+		if (rnd < r.prob) {
+			row_randomise(&trk->rows[c][pos]);
+			return;
+		}
+	}
+
 	midi_client *clt = (midi_client *)trk->clt;
 	module *mod = (module *)clt->mod_ref;
 
@@ -596,6 +630,7 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 			midi_buffer_add(trk->clt, trk->port, evt);
 			trk->indicators |= 4;
 			trk->ring[c] = -1;
+			trk->lsounded[c] = -1;
 		}
 	}
 
@@ -604,9 +639,12 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 		evt.channel = trk->channel;
 		evt.type = r.type;
 		evt.note = r.note;
-		evt.velocity = r.velocity;
+		evt.velocity = r.velocity_next;
+		trk->lsounded[c] = pos;
 
 		midi_buffer_add(trk->clt, trk->port, evt);
+
+		row_randomise(&trk->rows[c][pos]);
 
 		// fix wandering notes?
 		if (!mod->recording) {
@@ -954,7 +992,7 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 				row r;
 				track_get_row(trk, c, nn, &r);
 
-				double trigger_time = (double)n + ((double)r.delay / 100);
+				double trigger_time = (double)n + ((double)r.delay_next / 100);
 				double delay = trigger_time - trk->pos;
 				double fdelay = (clt->jack_buffer_size - nframes) + delay * tmul;
 				unsigned int frm = fabs(round(fdelay));
@@ -1097,6 +1135,7 @@ void track_kill_notes(track *trk) {
 		}
 
 		trk->lplayed[c] = -1;
+		trk->lsounded[c] = -1;
 		trk->mand_qnt[c] = -1;
 
 		for (int t = 0; t < trk->nrows; t++) {
@@ -1126,10 +1165,12 @@ void track_add_col(track *trk) {
 	trk->rows[trk->ncols -1] = malloc(sizeof(row) * trk->arows);
 	trk->ring = realloc(trk->ring, sizeof(int) * trk->ncols);
 	trk->lplayed = realloc(trk->lplayed, sizeof(int) * trk->ncols);
+	trk->lsounded = realloc(trk->lsounded, sizeof(int) * trk->ncols);
 	trk->mand_qnt = realloc(trk->mand_qnt, sizeof(int) * trk->ncols);
 
 	trk->ring[trk->ncols - 1] = -1;
 	trk->lplayed[trk->ncols - 1] = -1;
+	trk->lsounded[trk->ncols - 1] = -1;
 	trk->mand_qnt[trk->ncols - 1] = -1;
 	trk->dirty = 1;
 	pthread_mutex_unlock(&trk->excl);
@@ -1180,6 +1221,7 @@ void track_del_col(track *trk, int c) {
 		trk->rows[cc] = trk->rows[cc+1];
 		trk->ring[cc] = trk->ring[cc+1];
 		trk->lplayed[cc] = trk->lplayed[cc+1];
+		trk->lsounded[cc] = trk->lsounded[cc+1];
 		trk->mand_qnt[cc] = trk->mand_qnt[cc+1];
 	}
 
@@ -1188,6 +1230,7 @@ void track_del_col(track *trk, int c) {
 	trk->rows = realloc(trk->rows, sizeof(row*) * trk->ncols);
 	trk->ring = realloc(trk->ring, sizeof(int) * trk->ncols);
 	trk->lplayed = realloc(trk->lplayed, sizeof(int) * trk->ncols);
+	trk->lsounded = realloc(trk->lsounded, sizeof(int) * trk->ncols);
 	trk->mand_qnt = realloc(trk->mand_qnt, sizeof(int) * trk->ncols);
 
 	trk->dirty = 1;
@@ -1365,7 +1408,7 @@ void track_double(track *trk) {
 	for (int c = 0; c < trk->ncols; c++) {
 		for (int r = 0; r < offs; r++) {
 			row *s = &trk->rows[c][r];
-			row_set(&trk->rows[c][r + offs], s->type, s->note, s->velocity, s->delay);
+			row_set(&trk->rows[c][r + offs], s->type, s->note, s->velocity, s->delay, s->prob, s->velocity_range, s->delay_range);
 		}
 	}
 
@@ -1614,7 +1657,7 @@ int track_get_lctrlval(track *trk, int c) {
 }
 
 int track_get_last_row_played(track *trk, int col) {
-	return trk->lplayed[col];
+	return trk->lsounded[col];
 }
 
 // from python, we will access envelopes through track
@@ -1660,8 +1703,6 @@ void track_swap_rows(track *trk, int rw1, int rw2) {
 		ctrlrow curr = trk->crows[c][rw2];
 		trk->crows[c][rw2] = trk->crows[c][rw1];
 		trk->crows[c][rw1] = curr;
-
-
 
 		int ll = 0;
 		for (int nn = rw2 * trk->ctrlpr ; nn < (rw2 + 1) * trk->ctrlpr; nn++) {

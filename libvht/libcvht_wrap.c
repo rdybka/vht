@@ -8760,6 +8760,162 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_row_get_prob(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  row *arg1 = (row *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_row, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "row_get_prob" "', argument " "1"" of type '" "row *""'"); 
+  }
+  arg1 = (row *)(argp1);
+  result = (int)row_get_prob(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_row_set_prob(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  row *arg1 = (row *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "row_set_prob", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_row, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "row_set_prob" "', argument " "1"" of type '" "row *""'"); 
+  }
+  arg1 = (row *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "row_set_prob" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  row_set_prob(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_row_get_velocity_range(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  row *arg1 = (row *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_row, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "row_get_velocity_range" "', argument " "1"" of type '" "row *""'"); 
+  }
+  arg1 = (row *)(argp1);
+  result = (int)row_get_velocity_range(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_row_get_delay_range(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  row *arg1 = (row *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_row, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "row_get_delay_range" "', argument " "1"" of type '" "row *""'"); 
+  }
+  arg1 = (row *)(argp1);
+  result = (int)row_get_delay_range(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_row_set_velocity_range(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  row *arg1 = (row *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "row_set_velocity_range", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_row, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "row_set_velocity_range" "', argument " "1"" of type '" "row *""'"); 
+  }
+  arg1 = (row *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "row_set_velocity_range" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  row_set_velocity_range(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_row_set_delay_range(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  row *arg1 = (row *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "row_set_delay_range", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_row, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "row_set_delay_range" "', argument " "1"" of type '" "row *""'"); 
+  }
+  arg1 = (row *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "row_set_delay_range" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  row_set_delay_range(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_row_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   row *arg1 = (row *) 0 ;
@@ -8767,6 +8923,9 @@ SWIGINTERN PyObject *_wrap_row_set(PyObject *SWIGUNUSEDPARM(self), PyObject *arg
   int arg3 ;
   int arg4 ;
   int arg5 ;
+  int arg6 ;
+  int arg7 ;
+  int arg8 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int val2 ;
@@ -8777,9 +8936,15 @@ SWIGINTERN PyObject *_wrap_row_set(PyObject *SWIGUNUSEDPARM(self), PyObject *arg
   int ecode4 = 0 ;
   int val5 ;
   int ecode5 = 0 ;
-  PyObject *swig_obj[5] ;
+  int val6 ;
+  int ecode6 = 0 ;
+  int val7 ;
+  int ecode7 = 0 ;
+  int val8 ;
+  int ecode8 = 0 ;
+  PyObject *swig_obj[8] ;
   
-  if (!SWIG_Python_UnpackTuple(args, "row_set", 5, 5, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "row_set", 8, 8, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_row, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "row_set" "', argument " "1"" of type '" "row *""'"); 
@@ -8805,7 +8970,22 @@ SWIGINTERN PyObject *_wrap_row_set(PyObject *SWIGUNUSEDPARM(self), PyObject *arg
     SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "row_set" "', argument " "5"" of type '" "int""'");
   } 
   arg5 = (int)(val5);
-  row_set(arg1,arg2,arg3,arg4,arg5);
+  ecode6 = SWIG_AsVal_int(swig_obj[5], &val6);
+  if (!SWIG_IsOK(ecode6)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode6), "in method '" "row_set" "', argument " "6"" of type '" "int""'");
+  } 
+  arg6 = (int)(val6);
+  ecode7 = SWIG_AsVal_int(swig_obj[6], &val7);
+  if (!SWIG_IsOK(ecode7)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode7), "in method '" "row_set" "', argument " "7"" of type '" "int""'");
+  } 
+  arg7 = (int)(val7);
+  ecode8 = SWIG_AsVal_int(swig_obj[7], &val8);
+  if (!SWIG_IsOK(ecode8)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode8), "in method '" "row_set" "', argument " "8"" of type '" "int""'");
+  } 
+  arg8 = (int)(val8);
+  row_set(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -12887,6 +13067,12 @@ static PyMethodDef SwigMethods[] = {
 	 { "row_set_note", _wrap_row_set_note, METH_VARARGS, NULL},
 	 { "row_set_velocity", _wrap_row_set_velocity, METH_VARARGS, NULL},
 	 { "row_set_delay", _wrap_row_set_delay, METH_VARARGS, NULL},
+	 { "row_get_prob", _wrap_row_get_prob, METH_O, NULL},
+	 { "row_set_prob", _wrap_row_set_prob, METH_VARARGS, NULL},
+	 { "row_get_velocity_range", _wrap_row_get_velocity_range, METH_O, NULL},
+	 { "row_get_delay_range", _wrap_row_get_delay_range, METH_O, NULL},
+	 { "row_set_velocity_range", _wrap_row_set_velocity_range, METH_VARARGS, NULL},
+	 { "row_set_delay_range", _wrap_row_set_delay_range, METH_VARARGS, NULL},
 	 { "row_set", _wrap_row_set, METH_VARARGS, NULL},
 	 { "ctrlrow_get_velocity", _wrap_ctrlrow_get_velocity, METH_O, NULL},
 	 { "ctrlrow_get_linked", _wrap_ctrlrow_get_linked, METH_O, NULL},

@@ -1,6 +1,6 @@
 # trackundobuffer.py - Valhalla Tracker
 #
-# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,7 +35,15 @@ class TrackUndoBuffer:
         for x, c in enumerate(self._trk):
             for y, r in enumerate(c):
                 if r.type:
-                    state[(x, y)] = (r.type, r.note, r.velocity, r.delay)
+                    state[(x, y)] = (
+                        r.type,
+                        r.note,
+                        r.velocity,
+                        r.delay,
+                        r.prob,
+                        r.velocity_range,
+                        r.delay_range,
+                    )
 
         if self._states:
             s = self._state
@@ -93,3 +101,6 @@ class TrackUndoBuffer:
                         self._trk[x][y].note = r[1]
                         self._trk[x][y].velocity = r[2]
                         self._trk[x][y].delay = r[3]
+                        self._trk[x][y].prob = r[4]
+                        self._trk[x][y].velocity_range = r[5]
+                        self._trk[x][y].delay_range = r[6]

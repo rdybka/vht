@@ -123,6 +123,7 @@ class TrackviewPointer:
             return
 
         if self._parent.show_notes:
+            xtraoffs = 0
             for c in range(len(self.trk)):
                 i = 0.5
                 if r % self.seq.rpb == 0:
@@ -140,26 +141,23 @@ class TrackviewPointer:
                 ):
                     i *= 1.5 + 2.0 * (self.trk.pos - r)
 
-                veled = 0
-                xtraoffs = 0
-
-                if self._parent.velocity_editor:
-                    if c == self._parent.velocity_editor.col:
-                        veled = self._parent.velocity_editor.width
-                    if c > self._parent.velocity_editor.col:
-                        xtraoffs = self._parent.velocity_editor.width
-
-                if self._parent.timeshift_editor:
-                    if c > self._parent.timeshift_editor.col:
-                        xtraoffs = self._parent.timeshift_editor.width
-
                 x = c * self._parent.txt_width + xtraoffs
-                # xx = (self._parent.txt_width / 8.0) * 7.2
-                xx = self._parent.txt_width * 0.95
+                xx = self._parent.txt_width
 
-                if veled:
-                    if self._parent.show_timeshift and self._parent.velocity_editor:
-                        xx = (self._parent.txt_width / 12.0) * 7.2
+                ed = self._parent.velocity_editor
+                if ed and c == ed.col:
+                    xx = ed.x_from
+                    xtraoffs += ed.width
+
+                ed = self._parent.timeshift_editor
+                if ed and c == ed.col:
+                    xx = ed.x_from
+                    xtraoffs += ed.width
+
+                ed = self._parent.prob_editor
+                if ed and c == ed.col:
+                    xx = ed.x_from
+                    xtraoffs += ed.width
 
                 cl = cfg.colour
                 if mod.active_track:
@@ -183,20 +181,6 @@ class TrackviewPointer:
                 cr.set_source(gradient)
                 cr.rectangle(x, y, xx, self.height)
                 cr.fill()
-
-                if veled:
-                    if self._parent.show_timeshift and self._parent.velocity_editor:
-                        x = (
-                            x
-                            + xx
-                            + self._parent.velocity_editor.width
-                            + (self._parent.txt_width / 12.0) * 0.5
-                        )
-                        cr.set_source(gradient)
-                        cr.rectangle(
-                            x, y, (self._parent.txt_width / 12.0) * 3.2, self.height
-                        )
-                        cr.fill()
 
         if self._parent.show_pitchwheel or self._parent.show_controllers:
             for c in range(self.trk.nctrl):

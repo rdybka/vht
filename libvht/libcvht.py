@@ -671,8 +671,26 @@ def row_set_velocity(rw, velocity):
 def row_set_delay(rw, delay):
     return _libcvht.row_set_delay(rw, delay)
 
-def row_set(rw, type, note, velocity, delay):
-    return _libcvht.row_set(rw, type, note, velocity, delay)
+def row_get_prob(rw):
+    return _libcvht.row_get_prob(rw)
+
+def row_set_prob(rw, prob):
+    return _libcvht.row_set_prob(rw, prob)
+
+def row_get_velocity_range(rw):
+    return _libcvht.row_get_velocity_range(rw)
+
+def row_get_delay_range(rw):
+    return _libcvht.row_get_delay_range(rw)
+
+def row_set_velocity_range(rw, range):
+    return _libcvht.row_set_velocity_range(rw, range)
+
+def row_set_delay_range(rw, range):
+    return _libcvht.row_set_delay_range(rw, range)
+
+def row_set(rw, type, note, velocity, delay, prob, v_r, d_r):
+    return _libcvht.row_set(rw, type, note, velocity, delay, prob, v_r, d_r)
 
 def ctrlrow_get_velocity(crw):
     return _libcvht.ctrlrow_get_velocity(crw)

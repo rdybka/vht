@@ -17,6 +17,11 @@
 
 from vht import cfg
 
+import gi
+
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gdk, Gtk
+
 
 class TimeshiftEditor:
     def __init__(self, tv, col, row, event):
@@ -31,6 +36,15 @@ class TimeshiftEditor:
         self.clearing = False
         self.lock = False
         self.locked = self.trk[col][row].delay
+
+        if event.type == Gdk.EventType.BUTTON_PRESS:
+            self.range_mode = True if event.button == 2 else False
+        else:
+            self.range_mode = False
+
+        if self.range_mode:
+            self.locked = self.trk[col][row].delay_range
+
         self.start_value = self.locked
 
         self.x_from = 0
@@ -40,8 +54,11 @@ class TimeshiftEditor:
     def precalc(self, cr):
         (x, y, width, height, dx, dy) = cr.text_extents("0")
         self.width = max((cfg.timeshift_editor_char_width * width), 99)
-        self.x_from = (self.col * self.tv.txt_width + self.tv.txt_width) - (width / 1.2)
+        self.x_from = self.tv.txt_width * self.col + self.tv.fld_width * 3 - dx / 2
         self.x_to = self.width
+
+        if self.col == len(self.trk) - 1:
+            self.width += dx / 2
 
     def draw(self, cr, col, r, rw):
         yh = cfg.editor_row_height * self.tv.txt_height
@@ -57,13 +74,33 @@ class TimeshiftEditor:
         )
         cr.fill()
 
+        midp = self.x_from + (self.x_to / 2)
         cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), 1.0)
         cr.rectangle(self.x_from, r * self.tv.txt_height + yp, self.x_to, yh)
-        cr.move_to(self.x_from + (self.x_to / 2), r * self.tv.txt_height + (yp * 0.5))
-        cr.line_to(
-            self.x_from + (self.x_to / 2), (r + 1) * self.tv.txt_height - (yp * 0.5)
-        )
+        cr.move_to(midp, r * self.tv.txt_height + (yp * 0.5))
+        cr.line_to(midp, (r + 1) * self.tv.txt_height - (yp * 0.5))
         cr.stroke()
+
+        if rw.delay_range:
+            cr.set_line_width(3.0)
+            cr.set_source_rgba(
+                *(col * cfg.intensity_txt_highlight for col in cfg.colour), 1
+            )
+
+            onep = self.x_to / 100
+
+            x1 = max(
+                midp + onep * rw.delay - (self.x_to / 100.0) * rw.delay_range,
+                self.x_from,
+            )
+            x2 = min(
+                midp + onep * rw.delay + (self.x_to / 100.0) * rw.delay_range,
+                self.x_to + self.x_from,
+            )
+
+            cr.move_to(x1, r * self.tv.txt_height + yp)
+            cr.line_to(x2, r * self.tv.txt_height + yp)
+            cr.stroke()
 
     def on_key_press(self, widget, event):
         if cfg.key["hold_editor"].matches(event):
@@ -87,9 +124,9 @@ class TimeshiftEditor:
         return False
 
     def on_motion(self, widget, event):
-        # edit single velocity in place
+        # edit single in place
         if not self.clearing and not self.confirmed and not self.lock:
-            if event.x < self.x_from:
+            if event.x < self.x_from and not self.range_mode:
                 vel = self.trk[self.col][self.row].delay
 
                 vel = self.start_value + (
@@ -100,6 +137,21 @@ class TimeshiftEditor:
                 self.locked = vel
 
                 self.tv.trk[self.col][self.row].delay = vel
+                self.tv.redraw(self.row)
+                return True
+            elif self.range_mode:
+                rng = max(
+                    min(
+                        self.start_value
+                        + ((event.y - self.event_y) / cfg.drag_edit_divisor),
+                        49,
+                    ),
+                    0,
+                )
+
+                self.locked = rng
+
+                self.tv.trk[self.col][self.row].delay_range = rng
                 self.tv.redraw(self.row)
                 return True
 
@@ -128,13 +180,14 @@ class TimeshiftEditor:
             vel = min(max(((event.x - self.x_from) / self.x_to) * 98.0, 0), 98)
             vel = vel - 49
 
-        if self.lock:
-            vel = self.locked
-
-        if self.clearing:
-            vel = 0
-
         if new_hover_row > -1:
+            if self.lock:
+                vel = self.locked
+
+            if self.clearing:
+                vel = 0
+                self.tv.trk[self.col][new_hover_row].delay_range = 0
+
             if not self.lock and self.tv.trk[self.col][new_hover_row].type == 1:
                 self.locked = vel
 

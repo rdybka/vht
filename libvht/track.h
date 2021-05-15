@@ -75,6 +75,7 @@ typedef struct track_t {
 	int arows; // allocated rows
 	int *ring;
 	int *lplayed;
+	int *lsounded;
 	int *mand_qnt;
 
 	int resync;
@@ -84,7 +85,7 @@ typedef struct track_t {
 
 	int loop;
 
-	pthread_mutex_t excl; // for atomic row access
+	pthread_mutex_t excl; // for atomic row access - never used :)
 	pthread_mutex_t exclrec; // for row changes
 	pthread_mutex_t exclctrl; // for ctrls
 	pthread_mutex_t *mod_excl;
@@ -102,7 +103,7 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr);
 track *track_clone(track *t);
 
 void track_set_row(track *trk, int c, int n, int type, int note, int velocity, int delay);
-int track_get_row(track *trk, int c, int n, row *r);
+
 void track_free(track *);
 void track_clear_rows(track *trk, int c);
 

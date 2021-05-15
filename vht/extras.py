@@ -1,6 +1,6 @@
 # extras.py - Valhalla Tracker
 #
-# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ def fix_extras_new_trk(s, t):
     xx["track_show_timeshift"] = False
     xx["track_show_pitchwheel"] = False
     xx["track_show_controllers"] = False
+    xx["track_show_probs"] = False
 
     for k, v in xx.items():
         if k not in x:

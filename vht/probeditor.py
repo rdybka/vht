@@ -1,5 +1,5 @@
-# velocityeditor.py - Valhalla Tracker
-
+# probeditor.py - Valhalla Tracker
+#
 # Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gdk, Gtk
 
 
-class VelocityEditor:
+class ProbEditor:
     def __init__(self, tv, col, row, event):
         self.col = col
         self.row = row
@@ -35,30 +35,24 @@ class VelocityEditor:
         self.confirmed = False
         self.clearing = False
         self.lock = False
-
-        self.locked = self.trk[col][row].velocity
-
-        if event.type == Gdk.EventType.BUTTON_PRESS:
-            self.range_mode = True if event.button == 2 else False
-        else:
-            self.range_mode = False
-
-        if self.range_mode:
-            self.locked = min(self.trk[col][row].velocity_range, self.locked)
-
+        self.locked = self.trk[col][row].prob
         self.start_value = self.locked
         self.line = -1
         self.hover_row = -1
-        self.hover_vel = -1
+        self.hover_prob = -1
 
         self.x_from = 0
         self.x_to = 0
-        self.width = 127
+        self.width = 100
 
     def precalc(self, cr):
         (x, y, width, height, dx, dy) = cr.text_extents("0")
-        self.width = max((cfg.velocity_editor_char_width * width), 127)
-        self.x_from = self.tv.txt_width * self.col + self.tv.fld_width * 2 - dx / 2
+        self.width = max((cfg.timeshift_editor_char_width * width), 100)
+        fld = 3
+        if self.tv.show_timeshift:
+            fld += 1
+
+        self.x_from = self.tv.txt_width * self.col + self.tv.fld_width * fld - dx / 2
         self.x_to = self.width
 
         if self.col == len(self.trk) - 1:
@@ -72,9 +66,9 @@ class VelocityEditor:
             cr.set_line_width(1.0)
             cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), 1)
             cr.rectangle(
-                self.x_from,
+                self.x_from + ((self.x_to / 100) * (rw.prob)),
                 r * self.tv.txt_height + yp,
-                (self.x_to / 127.0) * rw.velocity,
+                self.x_to - ((self.x_to / 100) * (rw.prob)),
                 yh,
             )
             cr.fill()
@@ -83,31 +77,15 @@ class VelocityEditor:
             cr.rectangle(self.x_from, r * self.tv.txt_height + yp, self.x_to, yh)
             cr.stroke()
 
-            if rw.velocity_range:
-                cr.set_line_width(3.0)
-                cr.set_source_rgba(
-                    *(col * cfg.intensity_txt_highlight for col in cfg.colour), 1
-                )
-                x1 = self.x_from + (self.x_to / 127.0) * rw.velocity
-                x2 = self.x_from + (self.x_to / 127.0) * max(
-                    0, rw.velocity - rw.velocity_range
-                )
-
-                cr.move_to(x1, r * self.tv.txt_height + yp)
-                cr.line_to(x2, r * self.tv.txt_height + yp)
-                cr.stroke()
-
         if self.line > -1:
-            cr.set_source_rgba(
-                *(col * cfg.intensity_txt_highlight for col in cfg.colour), 1
-            )
+            cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), 1)
             cr.move_to(
                 self.x_from
-                + (self.x_to / 127.0) * self.tv.trk[self.col][self.line].velocity,
+                + (self.x_to / 100.0) * self.tv.trk[self.col][self.line].prob,
                 self.line * self.tv.txt_height + yp,
             )
             cr.line_to(
-                self.x_from + (self.x_to / 127.0) * self.hover_vel,
+                self.x_from + (self.x_to / 100) * self.hover_prob,
                 self.hover_row * self.tv.txt_height + yp,
             )
             cr.stroke()
@@ -118,7 +96,7 @@ class VelocityEditor:
                 if not self.lock:
                     self.lock = True
                     if not self.confirmed:
-                        self.locked = self.tv.trk[self.col][self.row].velocity
+                        self.locked = self.tv.trk[self.col][self.row].prob
 
         if 65505 <= event.keyval <= 65506:  # shift
             if self.hover_row > -1 and self.confirmed:
@@ -134,7 +112,7 @@ class VelocityEditor:
 
         if not self.confirmed:
             self.lock = False
-            self.locked = self.tv.trk[self.col][self.row].velocity
+            self.locked = self.tv.trk[self.col][self.row].prob
 
         if self.confirmed:
             self.lock = False
@@ -142,42 +120,26 @@ class VelocityEditor:
         return False
 
     def on_motion(self, widget, event):
-        # edit single velocity in place
+        # edit single probbie in place
         if (
             not self.clearing
             and not self.confirmed
             and not self.lock
             and self.line == -1
         ):
-            if event.x < self.x_from and not self.range_mode:
-                vel = self.start_value - (
+            if event.x < self.x_from:
+                prob = self.start_value - (
                     (event.y - self.event_y) / cfg.drag_edit_divisor
                 )
-                vel = max(min(vel, 127), 0)
+                prob = max(min(prob, 100), 0)
 
-                self.locked = vel
+                self.locked = prob
 
-                self.tv.trk[self.col][self.row].velocity = vel
-                self.tv.redraw(self.row)
-                cfg.velocity = vel
-                return True
-            elif self.range_mode:
-                rng = max(
-                    min(
-                        self.start_value
-                        + ((event.y - self.event_y) / cfg.drag_edit_divisor),
-                        self.tv.trk[self.col][self.row].velocity,
-                    ),
-                    0,
-                )
-
-                self.locked = rng
-
-                self.tv.trk[self.col][self.row].velocity_range = rng
+                self.tv.trk[self.col][self.row].prob = prob
                 self.tv.redraw(self.row)
                 return True
 
-        if not self.range_mode and not self.confirmed:
+        if not self.confirmed:
             if event.x >= self.x_from and event.x <= self.x_from + self.x_to:
                 self.confirmed = True
 
@@ -195,23 +157,23 @@ class VelocityEditor:
         y1 = new_hover_row * self.tv.txt_height
         y2 = y1 + self.tv.txt_height
 
-        vel = cfg.default_velocity
+        prob = 0
 
         if (
             (event.y > y1 and event.y < y2)
             or (event.y > y1 and new_hover_row >= self.tv.trk.nrows - 1)
             or new_hover_row == 0
         ):
-            vel = min(max(((event.x - self.x_from) / self.x_to) * 127.0, 0), 127)
+            prob = min(max(((event.x - self.x_from) / self.x_to) * 100, 0), 100)
 
         if self.line > -1:
             rs = self.line
             re = min(self.trk.nrows - 1, int(event.y / self.tv.txt_height))
-            vs = self.tv.trk[self.col][self.line].velocity
-            self.hover_vel = vel
+            vs = self.tv.trk[self.col][self.line].prob
+            self.hover_prob = prob
 
             if abs(re - rs) > 0:
-                d = (vel - vs) / (re - rs)
+                d = (prob - vs) / (re - rs)
                 vv = vs
 
                 if re > rs:
@@ -220,32 +182,30 @@ class VelocityEditor:
                     re += 1
                 else:
                     rs, re = re, rs
-                    vel, vs = vs, vel
+                    prob, vs = vs, prob
 
-                    d = (vel - vs) / (re - rs)
+                    d = (prob - vs) / (re - rs)
                     vv = vs
 
                 for r in range(rs, re):
                     if r > -1 and r <= self.tv.trk.nrows:
                         if self.tv.trk[self.col][r].type == 1:
-                            self.tv.trk[self.col][r].velocity = vv
+                            self.tv.trk[self.col][r].prob = vv
                     vv += d
 
             self.tv.redraw()
             return
 
+        if self.lock:
+            prob = self.locked
+
+        if self.clearing:
+            prob = 0
+
         if new_hover_row > -1:
-            if self.lock:
-                vel = self.locked
-
-            if self.clearing:
-                vel = cfg.velocity
-                self.tv.trk[self.col][new_hover_row].velocity_range = 0
-
             if not self.lock and self.tv.trk[self.col][new_hover_row].type == 1:
-                self.locked = vel
+                self.locked = prob
 
-            self.tv.trk[self.col][new_hover_row].velocity = vel
+            self.tv.trk[self.col][new_hover_row].prob = prob
             self.tv.redraw(new_hover_row, new_hover_row)
-            cfg.velocity = vel
         return True

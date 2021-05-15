@@ -23,9 +23,6 @@
 
 # [^^^intentionally left blank]
 
-# ...and that guis are the worst
-# - St. Frater Shrater aka 57xD (captioning intended)
-
 from vht.mainwin import MainWin
 from vht.shortcutmayhem import ShortcutMayhem
 from vht.preferenceswin import PreferencesWin
@@ -195,7 +192,7 @@ class VHTApp(Gtk.Application):
         ab = Gtk.AboutDialog(self.main_win)
         ab.set_license_type(Gtk.License.GPL_3_0)
         ab.set_copyright(
-            "Copyright (C) 2020 Remigiusz Dybka\nremigiusz.dybka@gmail.com\n@schtixfnord"
+            "Copyright (C) 2021 Remigiusz Dybka\nremigiusz.dybka@gmail.com\n@schtixfnord"
         )
         pkg = pkg_resources.require("vht")[0]
         ab.set_version(pkg.version)

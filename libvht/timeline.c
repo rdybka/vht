@@ -1,6 +1,6 @@
 /* timeline.c - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -913,6 +913,7 @@ void fix_ring_for_new_strip(timeline *tl, timestrip *strp) {
 								if (dtrk->ring[cc] == -1) {
 									dtrk->ring[cc] = trk->ring[c];
 									trk->ring[c] = -1;
+									trk->lsounded[c] = -1;
 									passed = 1;
 								}
 							}

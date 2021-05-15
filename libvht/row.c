@@ -1,6 +1,6 @@
 /* row.c - Valhalla Tracker (libvht)
  *
- * Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
 #include "row.h"
 
 int row_get_type(row *rw) {
@@ -34,6 +35,10 @@ int row_get_delay(row *rw) {
 	return rw->delay;
 }
 
+int row_get_prob(row *rw) {
+	return rw->prob;
+}
+
 void row_set_type(row *rw, int type) {
 	rw->type = type;
 }
@@ -50,9 +55,69 @@ void row_set_delay(row *rw, int delay) {
 	rw->delay = delay;
 }
 
-void row_set(row *rw, int type, int note, int velocity, int delay) {
-	rw->type = type;
+void row_set_prob(row *rw, int prob) {
+	rw->prob = prob;
+}
+
+int row_get_velocity_range(row *rw) {
+	return rw->velocity_range;
+}
+
+int row_get_delay_range(row *rw) {
+	return rw->delay_range;
+}
+
+void row_set_velocity_range(row *rw, int range) {
+	rw->velocity_range = range;
+}
+
+void row_set_delay_range(row *rw, int range) {
+	rw->delay_range = range;
+}
+
+void row_set(row *rw, int type, int note, int velocity, int delay, int prob, int v_r, int d_r) {
 	rw->note = note;
 	rw->velocity = velocity;
 	rw->delay = delay;
+	rw->prob = prob;
+	rw->velocity_range = v_r;
+	rw->delay_range = d_r;
+	rw->velocity_next = velocity;
+	rw->delay_next = delay;
+	rw->type = type;
+}
+
+void row_randomise(row *rw) {
+	if (rw->type == 0)
+		return;
+
+	rw->velocity_next = rw->velocity;
+	rw->delay_next = rw->delay;
+
+	int rng = rw->velocity_range;
+	if (rng > rw->velocity)
+		rng = rw->velocity;
+
+	int rnd = random() % (rng + 1);
+	int vel = rw->velocity - rnd;
+	if (vel < 0)
+		vel = 0;
+
+	rw->velocity_next = vel;
+
+	int dfrom = rw->delay - rw->delay_range;
+	int dto = rw->delay + rw->delay_range;
+
+	if (dfrom < -49)
+		dfrom = -49;
+
+	if (dto > 49)
+		dto = 49;
+
+	rng = dto - dfrom;
+
+	if (rng >= 0) {
+		rnd = random() % (rng + 1);
+		rw->delay_next = dfrom + rnd;
+	}
 }
