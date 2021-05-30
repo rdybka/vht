@@ -84,7 +84,7 @@ shorts = {
         ("Toggle notes", "toggle_notes"),
         ("Toggle time", "toggle_time"),
         ("Toggle pitch", "toggle_pitch"),
-        ("Toggle controllers", "toggle_controls"),
+        ("Toggle controllers", "toggle_controllers"),
         ("Channel up", "channel_up"),
         ("Channel down", "channel_down"),
         ("Port up", "port_up"),

@@ -76,7 +76,7 @@ All rendering depends on jack_capture. Live mode will record what you hear in re
 (Sequence, Timeline, What u'd hear) will switch JACK into freewheeling mode, which not all soft synths support.
 
 # SEE ALSO
-qjackctl jack_capture qsynth zynaddsubfx
+qjackctl jack_capture qsynth zynaddsubfx carla
 
 # COPYRIGHT
 This program is free software: you can redistribute it and/or modify

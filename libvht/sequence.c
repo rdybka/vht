@@ -209,21 +209,17 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 
 	double p = ceil(seq->pos) - seq->pos;
 
-	if (period - p > 0.00000001) {
+	if (period - p > 0.00000001 && nframes > 0) {
 		jack_nframes_t frm = nframes;
 		frm *= p / period;
 
-		if (frm > 0) {
-			period -= p;
-			nframes -= frm;
-			//printf("re-adv seq %f %d \n", p, frm);
-			sequence_advance(seq, p, frm);// :]
-		}
+		period -= p;
+		nframes -= frm;
+		sequence_advance(seq, p, frm);// :]
 	}
 
 	if (seq->pos - floor(seq->pos) < 0.0000001) {
 		int r = (int)seq->pos;
-		//printf("%03d %d %d %d %d\n", r, seq->trg_times[0], seq->trg_times[1], seq->trg_times[2], seq->trg_times[3]);
 
 		for (int t = 0; t < seq->ntrk; t++) {
 			if (seq->trk[t]->mand->active) {
@@ -366,7 +362,7 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 			mod->end_time = mod->clt->jack_last_frame;
 		}
 
-		seq->pos = roundf(seq->pos - seq->length);
+		seq->pos = seq->pos - seq->length;
 	}
 }
 

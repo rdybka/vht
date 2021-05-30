@@ -1085,8 +1085,9 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 		trk->pos += tperiod;
 
 	if (trk->loop) {
-		if (trk->pos > trk->nrows)
+		if (trk->pos > trk->nrows) {
 			trk->pos -= trk->nrows;
+		}
 	}
 
 	// update midi_out ind if ringing
