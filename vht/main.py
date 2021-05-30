@@ -108,8 +108,11 @@ class VHTApp(Gtk.Application):
 
     def do_activate(self):
         if self.start_load_file:
-            if not mod.load(self.start_load_file):
-                self.quit()
+            try:
+                mod.load(self.start_load_file)
+            except FileNotFoundError:
+                mod.reset()
+                mod.play = cfg.start_playing
         else:
             mod.reset()
             mod.play = cfg.start_playing

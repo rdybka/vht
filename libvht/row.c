@@ -45,18 +45,22 @@ void row_set_type(row *rw, int type) {
 
 void row_set_note(row *rw, int note) {
 	rw->note = note;
+	row_randomise(rw);
 }
 
 void row_set_velocity(row *rw, int velocity) {
 	rw->velocity = velocity;
+	row_randomise(rw);
 }
 
 void row_set_delay(row *rw, int delay) {
 	rw->delay = delay;
+	row_randomise(rw);
 }
 
 void row_set_prob(row *rw, int prob) {
 	rw->prob = prob;
+	row_randomise(rw);
 }
 
 int row_get_velocity_range(row *rw) {
@@ -69,10 +73,12 @@ int row_get_delay_range(row *rw) {
 
 void row_set_velocity_range(row *rw, int range) {
 	rw->velocity_range = range;
+	row_randomise(rw);
 }
 
 void row_set_delay_range(row *rw, int range) {
 	rw->delay_range = range;
+	row_randomise(rw);
 }
 
 void row_set(row *rw, int type, int note, int velocity, int delay, int prob, int v_r, int d_r) {
@@ -85,6 +91,7 @@ void row_set(row *rw, int type, int note, int velocity, int delay, int prob, int
 	rw->velocity_next = velocity;
 	rw->delay_next = delay;
 	rw->type = type;
+	row_randomise(rw);
 }
 
 void row_randomise(row *rw) {
