@@ -1,6 +1,6 @@
 # configuration.py - Valhalla Tracker
 #
-# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -53,6 +53,7 @@ class Configuration:
         self.console_steal_stderr = True
         self.start_playing = True
         self.start_transport = False
+        self.port_popup = True
 
         c = (0.6, 1.0, 1.0)
         self.colour = c
@@ -334,6 +335,10 @@ class Configuration:
             "render_folder": self.render_folder,
         }
 
+        cfg["other"] = {
+            "port_popup": self.port_popup,
+        }
+
         return cfg
 
     def save(self):
@@ -390,6 +395,9 @@ class Configuration:
         rnd["render_meter"] = str(self.render_meter)
         rnd["render_format"] = self.render_format
         rnd["render_folder"] = self.render_folder
+
+        oth = self.cfg_parser["other"]
+        oth["port_popup"] = str(self.port_popup)
 
         with open(self.filename, "w") as cfgfile:
             self.cfg_parser.write(cfgfile)
@@ -483,6 +491,9 @@ class Configuration:
             self.render_meter = rnd.getint("render_meter")
             self.render_format = rnd["render_format"]
             self.render_folder = rnd["render_folder"]
+
+            oth = self.cfg_parser["other"]
+            self.port_popup = oth.getboolean("port_popup")
 
 
 key_aliases = {

@@ -1356,7 +1356,7 @@ void mandy_trc_move(mandy *mnd, tracy *trc, long double l) {
 		togo1 = -togo1;
 
 	int valid = 0;
-	int bail = 23;
+	int bail = 48;
 
 	while(fabsf(gone) < fabsf(togo) && bail) {
 		long double nx = trc->x + togo1 * cos(trc->rd + HALFPI);
@@ -1364,25 +1364,7 @@ void mandy_trc_move(mandy *mnd, tracy *trc, long double l) {
 		long double nr = 0;
 
 		valid = mandy_trc_is_valid(mnd, unit, nx, ny, trc->rd);
-		/*
-		if (valid < 1) {
-			if (valid == 0) {
-				if (trc->speed > 0) {
-					trc->rd -= M_PI / 8;
-				} else {
-					trc->rd += M_PI / 8;
-				}
-			} else { // outside
-				valid = 0;
-				trc->x = nx;
-				trc->y = ny;
-				printf("outside!\n");
-				mandy_trc_home(mnd, trc);
-			}
 
-			valid = 0;
-		}
-		*/
 		long double gone1 = 0.0;
 
 		if (valid && bail) {
@@ -1418,7 +1400,8 @@ void mandy_trc_move(mandy *mnd, tracy *trc, long double l) {
 
 	if (!bail) {
 		trc->bailed = 1;
-		if (!valid) { // we're cornered
+		if (!valid) {
+			// we're cornered
 			// take a step back
 			double r_d = M_PI / 2;
 			if (trc->speed > 0) {

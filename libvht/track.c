@@ -153,9 +153,9 @@ void track_set_row(track *trk, int c, int n, int type, int note, int velocity, i
 	r->ringing = 0;
 	r->prob = 0;
 	r->velocity_range = 0;
-	r->velocity_next = 0;
+	r->velocity_next = velocity;
 	r->delay_range = 0;
-	r->delay_next = 0;
+	r->delay_next = delay;
 
 	for (int c = 0; c < trk->nctrl; c++)
 		trk->lctrlval[c] = -1;
@@ -384,6 +384,8 @@ void track_clear_rows(track *trk, int c) {
 		trk->rows[c][t].prob = 0;
 		trk->rows[c][t].velocity_range = 0;
 		trk->rows[c][t].delay_range = 0;
+		trk->rows[c][t].velocity_next = 100;
+		trk->rows[c][t].delay_next = 0;
 	}
 
 	pthread_mutex_unlock(&trk->excl);
@@ -958,14 +960,16 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 
 	if (trk->mand->active) {
 		mandy_advance(trk->mand, tperiod, nframes);
-		track_strum(trk, trk->last_pos, trk->pos, nframes);
 
-		for (int c = 0; c < trk->ncols; c++) {
-			int qnt = trk->mand_qnt[c];
-			//printf("%d!!\n", trk->mand_qnt[c]);
-			if (qnt > -1) {
-				track_play_row(trk, qnt, c, clt->jack_buffer_size - nframes);
-				trk->mand_qnt[c] = -232323;
+		if (trk->playing) {
+			track_strum(trk, trk->last_pos, trk->pos, nframes);
+
+			for (int c = 0; c < trk->ncols; c++) {
+				int qnt = trk->mand_qnt[c];
+				if (qnt > -1) {
+					track_play_row(trk, qnt, c, clt->jack_buffer_size - nframes);
+					trk->mand_qnt[c] = -232323;
+				}
 			}
 		}
 
@@ -1137,7 +1141,7 @@ void track_kill_notes(track *trk) {
 
 		trk->lplayed[c] = -1;
 		trk->lsounded[c] = -1;
-		trk->mand_qnt[c] = -1;
+		trk->mand_qnt[c] = -232323;
 
 		for (int t = 0; t < trk->nrows; t++) {
 			trk->rows[c][t].ringing = 0;

@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name = "vht",
-	version = "0.2.6",
+	version = "0.3",
 	description = "Valhalla Tracker - a live MIDI sequencer for JACK",
 	long_description=long_description,
     long_description_content_type="text/markdown",
@@ -49,7 +49,7 @@ setup(name = "vht",
 	],
 	
 	classifiers=[
-        'Development Status :: 3 - Alpha',
+		'Development Status :: 4 - Beta',
 		'Environment :: X11 Applications :: Gnome',
 		'Intended Audience :: End Users/Desktop',
 		'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',

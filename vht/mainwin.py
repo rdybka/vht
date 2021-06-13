@@ -244,7 +244,7 @@ class MainWin(Gtk.ApplicationWindow):
                     if prt.connections:
                         show_pop = False
 
-            if show_pop:
+            if show_pop and cfg.port_popup:
                 self._status_bar.portpopover.pop()
 
         if mod.ports_changed:

@@ -1,6 +1,6 @@
 # preferenceswin.py - Valhalla Tracker
 #
-# Copyright (C) 2020 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -55,11 +55,13 @@ class PreferencesWin(Gtk.Window):
         self.box2 = self.create_box2()
         self.box3 = self.create_box3()
         self.box4 = self.create_box4()
+        self.box5 = self.create_box5()
 
         self.st.add_titled(self.box1, "lnf", "Look & Feel")
         self.st.add_titled(self.box2, "mid", "MIDI")
         self.st.add_titled(self.box3, "adv", "Advanced")
         self.st.add_titled(self.box4, "bck", "Backup")
+        self.st.add_titled(self.box5, "oth", "Tweaks")
 
         self.sbar = Gtk.StackSidebar()
         self.sbar.set_stack(self.st)
@@ -440,6 +442,28 @@ class PreferencesWin(Gtk.Window):
 
         return grid
 
+    def create_box5(self):
+        grid = Gtk.Grid()
+        mrg = 5
+        grid.set_margin_top(mrg)
+        grid.set_margin_bottom(mrg)
+        grid.set_margin_left(mrg)
+        grid.set_margin_right(mrg)
+
+        bx = Gtk.Box()
+        lab = Gtk.Label.new("Pop up ports:")
+        bx.set_hexpand(True)
+
+        sw = Gtk.Switch()
+        sw.set_active(self.cfg.port_popup)
+        sw.connect("state-set", self.on_port_popup_switch)
+        sw.set_tooltip_markup(self.cfg.tooltip_markup % ("if no connections active"))
+        bx.pack_start(lab, False, False, 0)
+        bx.pack_end(sw, False, False, 0)
+        grid.attach(bx, 0, 0, 1, 1)
+
+        return grid
+
     def on_nbck_value_changed(self, adj):
         self.cfg.n_backups = int(adj.get_value())
 
@@ -580,6 +604,9 @@ class PreferencesWin(Gtk.Window):
 
     def on_new_tracks_left_switch(self, wdg, prm):
         self.cfg.new_tracks_left = prm
+
+    def on_port_popup_switch(self, wdg, prm):
+        self.cfg.port_popup = prm
 
     def on_key_press(self, widget, event):
         if event.keyval == Gdk.KEY_Escape:
