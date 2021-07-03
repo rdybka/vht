@@ -59,6 +59,7 @@ typedef struct module_t {
 	int render_mode;
 	jack_nframes_t end_time;
 	int render_lead_out;
+	int pnq_hack;
 } module;
 
 module *module_new(void);
@@ -98,5 +99,9 @@ int module_get_render_mode(module *mod);
 
 void module_set_render_lead_out(module *mod, int lead_out);
 void module_set_freewheel(module *mod, int on);
+
+void module_seq_pnq_hack(module *mod, int ph);
+int module_get_pnq_hack(module *mod);
+
 
 #endif //__MODULE_H__

@@ -408,6 +408,14 @@ class VHTModule(Iterable):
         libcvht.module_unpanic(self._mod_handle)
 
     @property
+    def pnq_hack(self):
+        return libcvht.module_get_pnq_hack(self._mod_handle)
+
+    @pnq_hack.setter
+    def pnq_hack(self, ph):
+        libcvht.module_set_pnq_hack(self._mod_handle, 1 if ph else 0)
+
+    @property
     def is_panicking(self):
         return libcvht.module_is_panicking(self._mod_handle)
 

@@ -462,6 +462,20 @@ class PreferencesWin(Gtk.Window):
         bx.pack_end(sw, False, False, 0)
         grid.attach(bx, 0, 0, 1, 1)
 
+        bx = Gtk.Box()
+        lab = Gtk.Label.new("pnq_hack:")
+        bx.set_hexpand(True)
+
+        sw = Gtk.Switch()
+        sw.set_active(self.cfg.pnq_hack)
+        sw.connect("state-set", self.on_pnq_hack_switch)
+        sw.set_tooltip_markup(
+            self.cfg.tooltip_markup % ("sending c16:g-9 will panik given port")
+        )
+        bx.pack_start(lab, False, False, 0)
+        bx.pack_end(sw, False, False, 0)
+        grid.attach(bx, 0, 1, 1, 1)
+
         return grid
 
     def on_nbck_value_changed(self, adj):
@@ -607,6 +621,12 @@ class PreferencesWin(Gtk.Window):
 
     def on_port_popup_switch(self, wdg, prm):
         self.cfg.port_popup = prm
+
+    def on_pnq_hack_switch(self, wdg, prm):
+        self.cfg.pnq_hack = prm
+        self.mod.pnq_hack = prm
+        self.parent.sequence_view.zoom(1)
+        self.parent.sequence_view.zoom(-1)
 
     def on_key_press(self, widget, event):
         if event.keyval == Gdk.KEY_Escape:

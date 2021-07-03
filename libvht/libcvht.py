@@ -197,6 +197,12 @@ def module_set_transport(mod, t):
 def module_get_transport(mod):
     return _libcvht.module_get_transport(mod)
 
+def module_set_pnq_hack(mod, ph):
+    return _libcvht.module_set_pnq_hack(mod, ph)
+
+def module_get_pnq_hack(mod):
+    return _libcvht.module_get_pnq_hack(mod)
+
 def module_get_nseq(mod):
     return _libcvht.module_get_nseq(mod)
 

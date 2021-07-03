@@ -124,6 +124,7 @@ class Configuration:
 
         self.default_seq_length = 16
         self.controller_resolution = 8
+        self.pnq_hack = False
 
         self.last_load_path = ""
         self.last_save_path = ""
@@ -337,6 +338,7 @@ class Configuration:
 
         cfg["other"] = {
             "port_popup": self.port_popup,
+            "pnq_hack": self.pnq_hack,
         }
 
         return cfg
@@ -398,6 +400,7 @@ class Configuration:
 
         oth = self.cfg_parser["other"]
         oth["port_popup"] = str(self.port_popup)
+        oth["pnq_hack"] = str(self.pnq_hack)
 
         with open(self.filename, "w") as cfgfile:
             self.cfg_parser.write(cfgfile)
@@ -494,6 +497,7 @@ class Configuration:
 
             oth = self.cfg_parser["other"]
             self.port_popup = oth.getboolean("port_popup")
+            self.pnq_hack = oth.getboolean("pnq_hack")
 
 
 key_aliases = {

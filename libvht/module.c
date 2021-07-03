@@ -290,6 +290,15 @@ int module_get_render_mode(module *mod) {
 	return mod->render_mode;
 }
 
+void module_set_pnq_hack(module *mod, int ph) {
+	mod->pnq_hack = ph;
+}
+
+int module_get_pnq_hack(module *mod) {
+	return mod->pnq_hack;
+}
+
+
 void module_play(module *mod, int play) {
 	module_excl_in(mod);
 	int prev_state = mod->playing;
@@ -338,7 +347,7 @@ module *module_new() {
 	tc->bpm = mod->bpm;
 	tc->row = 0;
 	tc->linked = 0;
-
+	mod->pnq_hack = 0;
 	timeline_update(mod->tline);
 
 	return mod;

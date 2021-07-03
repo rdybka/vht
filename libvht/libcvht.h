@@ -67,6 +67,9 @@ extern void module_set_bpm(module *mod, float);
 extern void module_set_transport(module *mod, int t);
 extern int module_get_transport(module *mod);
 
+extern void module_set_pnq_hack(module *mod, int ph);
+extern int module_get_pnq_hack(module *mod);
+
 extern int module_get_nseq(module *mod);
 extern sequence *module_get_seq(module *mod, int);
 extern void module_add_sequence(module *mod, sequence *seq);

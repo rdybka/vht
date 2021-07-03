@@ -594,6 +594,29 @@ int col_last_note(track *trk, int col, double pos) {
 	return ret;
 }
 
+void trk_mod_panic(module *mod, int prt) {
+	for (int s = 0; s < mod->nseq; s++) {
+		for (int t = 0; t < mod->seq[s]->ntrk; t++) {
+			if (mod->seq[s]->trk[t]->port == prt) {
+				track_kill_notes(mod->seq[s]->trk[t]);
+				mod->seq[s]->thumb_panic = 9;
+				queue_midi_ctrl(mod->clt, mod->seq[s], mod->seq[s]->trk[t], 0, 0x7B);
+			}
+		}
+	}
+
+	for (int s = 0; s < mod->tline->nstrips; s++) {
+		for (int t = 0; t < mod->tline->strips[s].seq->ntrk; t++) {
+			if (mod->seq[s]->trk[t]->port == prt) {
+				track_kill_notes(mod->tline->strips[s].seq->trk[t]);
+				mod->tline->strips[s].seq->thumb_panic = 9;
+			}
+		}
+	}
+
+	mod->panic = 1;
+}
+
 // yooohoooo!!!
 void track_play_row(track *trk, int pos, int c, int delay) {
 	row r;
@@ -623,6 +646,22 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 	midi_event evt;
 
 	if (r.type == note_on || r.type == note_off ) {
+		if (mod->pnq_hack && trk->channel == 16 && r.note == 127) {
+			trk_mod_panic(mod, trk->port);
+			trk->indicators |= 4;
+			trk->ring[c] = 127;
+			trk->lsounded[c] = -1;
+			return;
+		}
+
+		if (mod->pnq_hack && trk->channel == 16 && r.type == note_off && trk->ring[c] == 127) {
+			trk->indicators |= 4;
+			trk->ring[c] = -1;
+			trk->lsounded[c] = -1;
+			mod->panic = 0;
+			return;
+		}
+
 		if (trk->ring[c] != -1) {
 			evt.time = delay;
 			evt.channel = trk->channel;
@@ -1110,6 +1149,9 @@ void track_wind(track *trk, double period) {
 void track_kill_notes(track *trk) {
 	pthread_mutex_lock(&trk->excl);
 
+	midi_client *clt = (midi_client *)trk->clt;
+	module *mod = (module *)clt->mod_ref;
+
 	midi_event evtp;
 	evtp.type = pitch_wheel;
 	evtp.channel = trk->channel;
@@ -1124,6 +1166,10 @@ void track_kill_notes(track *trk) {
 
 	for (int c = 0; c < trk->ncols; c++) {
 		if (trk->ring[c] != -1) {
+			if (mod->pnq_hack && trk->ring[c] == 127) {
+				mod->panic = 0;
+			}
+
 			midi_event evt;
 
 			evt.type = note_off;

@@ -312,7 +312,7 @@ void midi_buffer_flush_port(midi_client *clt, int port) {
 		if (clt->dump_notes && !dbl) {
 			char desc[256];
 			midi_describe_event(clt->midi_buffer[port][i], desc, 256);
-			printf("%02d:%02d:%03d pt: %02d, %s\n", mod->min, mod->sec, mod->ms, port, desc);
+			printf("%02d:%02d:%03d >> pt: %02d, %s\n", mod->min, mod->sec, mod->ms, port, desc);
 		}
 
 	}

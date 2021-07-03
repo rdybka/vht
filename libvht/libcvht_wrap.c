@@ -4247,6 +4247,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_module_set_pnq_hack(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "module_set_pnq_hack", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_set_pnq_hack" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "module_set_pnq_hack" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  module_set_pnq_hack(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_module_get_pnq_hack(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_get_pnq_hack" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (int)module_get_pnq_hack(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_module_get_nseq(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   module *arg1 = (module *) 0 ;
@@ -12909,6 +12961,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "module_set_bpm", _wrap_module_set_bpm, METH_VARARGS, NULL},
 	 { "module_set_transport", _wrap_module_set_transport, METH_VARARGS, NULL},
 	 { "module_get_transport", _wrap_module_get_transport, METH_O, NULL},
+	 { "module_set_pnq_hack", _wrap_module_set_pnq_hack, METH_VARARGS, NULL},
+	 { "module_get_pnq_hack", _wrap_module_get_pnq_hack, METH_O, NULL},
 	 { "module_get_nseq", _wrap_module_get_nseq, METH_O, NULL},
 	 { "module_get_seq", _wrap_module_get_seq, METH_VARARGS, NULL},
 	 { "module_add_sequence", _wrap_module_add_sequence, METH_VARARGS, NULL},

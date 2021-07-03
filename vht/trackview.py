@@ -731,6 +731,9 @@ class TrackView(Gtk.DrawingArea):
 
                     if self.show_notes and rw.type == 1:  # note_on
                         ltxt = "%3s %03d" % (str(rw), rw.velocity)
+                        if rw.note == 127 and self.trk.channel == 16 and mod.pnq_hack:
+                            ltxt = "pnq /o\\"
+
                         rtxt = ""
 
                         if self.show_timeshift:

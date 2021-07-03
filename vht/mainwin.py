@@ -418,6 +418,7 @@ class MainWin(Gtk.ApplicationWindow):
         if not self.sequence_view.load(filename, append):
             return False
 
+        mod.pnq_hack = cfg.pnq_hack
         lfn = self.app.fixfn_backup(filename)
         self.last_filename = lfn
         self.set_header_from_filename(lfn)
