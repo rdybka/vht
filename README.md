@@ -2,19 +2,27 @@
 ## about
 Valhalla Tracker is a MIDI sequencing companion
 for GNU/Linux audio setups. Adhering to Unix philosophy,
-it tries to do one thing well
+it tries to do one thing well, which, in it's instance boils
+down to providing the most rebellious of musicians
+a tool of expression that:
 
-- input/output relies 100% on JACK
-- which allows for sample exact timing
-- and freewheel rendering
-- fits well between a MIDI controller and Carla/fluidsynth/Zyn
-- fast workflow with lots of keyboard shortcuts
-- "unheard of" time signatures
-- fits on a floppy
+- doesn't make a sound
+- relies 100% on JACK for input/output
+- ...which allows sample exact timing
+- ...and freewheel rendering
+- has a fast workflow with a splendid selection of keyboard shortcuts 
+- is built for live editing/performance
+- has scenes a'la 'ton
+- and fractal turtles!
+- allows ridiculous, yet accurate BPM
+- and unheard of time signatures!
+- takes less than a fifth of a floppy
 
-The sequencing engine is written in C, has a Python library on top
-of it, which can be used headless (generative composition).
-The GUI is also written in Python and uses GTK through GObject Introspection.
+The sequencing engine is written in C (by an old guy), has a Python library on top
+of it, which can be used headless for generative composition, or whatevs
+or if you don't like the GUI which also was dearly written in the
+language we shall no longer spam about, uses GTK through GObject Introspection.
+And relies on GNOME. And Linux.
 
 ## dependencies
 ```

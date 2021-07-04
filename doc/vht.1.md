@@ -11,8 +11,8 @@
 # DESCRIPTION
 **vht** (Valhalla Tracker) is a live MIDI sequencing application for GNU/Linux audio setups.
 Main motivation behind developing it was to create a fast workflow for putting down musical
-ideas, exploring exotic time signatures and generally playing with sound. It can be seen as a helper app
-for physical MIDI controllers.
+ideas, exploring exotic time signatures and generally playing with sound. It can be seen as a helper app 
+for the most rebellious of musicians.
 
 ## The Paradigm
 The module consists of sequences, sequences of tracks, tracks of rows and envelopes, row is basically a midi message.
