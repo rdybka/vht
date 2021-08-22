@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include <Python.h>
 #include <string.h>
 #include <stdio.h>
@@ -1017,39 +1018,44 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 		return;
 	}
 
-	//printf("%f %f %f\n", trk->pos, floor(trk->pos), round(trk->pos));
-
 	// play notes
-	for (int c = 0; c < trk->ncols; c++)
-		for (int n = row_start; n <= row_end; n++) {
-			int nn = n;
+	if (!(!row_start && row_end == trk->nrows))
+		for (int c = 0; c < trk->ncols; c++)
+			for (int n = row_start; n <= row_end; n++) {
+				int nn = n;
 
-			if (nn >= trk->nrows) {
-				nn = 0;
-				if (!trk->loop) {
-					return;
+				if (nn >= trk->nrows) {
+					nn = 0;
+					if (!trk->loop) {
+						return;
+					}
 				}
-			}
 
-			if (nn < trk->nrows) {
-				row r;
-				track_get_row(trk, c, nn, &r);
+				if (nn < trk->nrows) {
+					row r;
+					track_get_row(trk, c, nn, &r);
 
-				double trigger_time = (double)n + ((double)r.delay_next / 100);
-				double delay = trigger_time - trk->pos;
-				double fdelay = (clt->jack_buffer_size - nframes) + delay * tmul;
-				unsigned int frm = fabs(round(fdelay));
+					double trigger_time = (double)n + ((double)r.delay_next / 100);
+					double delay = trigger_time - trk->pos;
+					double fdelay = (clt->jack_buffer_size - nframes) + delay * tmul;
+					unsigned int frm = fabs(round(fdelay));
 
-				if (frm == 0 && fdelay < 0.0)
-					fdelay = 0.0;
+					if (frm == 0 && fdelay < 0.0)
+						fdelay = 0.0;
 
-				if (fdelay >= 0.0 && frm < clt->jack_buffer_size) {
-					if (trk->playing) {
-						track_play_row(trk, nn, c, frm);
+					// infinity
+					if (fdelay > 23 * clt->jack_buffer_size) {
+						fdelay = 7 * clt->jack_buffer_size;
+						frm = 2323;
+					}
+
+					if (fdelay >= 0.0 && frm < clt->jack_buffer_size) {
+						if (trk->playing) {
+							track_play_row(trk, nn, c, frm);
+						}
 					}
 				}
 			}
-		}
 
 	// play controllers
 	int ctrlfrom = (trk->pos / trk->nrows) * trk->nrows * trk->ctrlpr;

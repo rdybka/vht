@@ -1235,7 +1235,6 @@ void timestrip_set_enabled(timestrip *tstr, int v) {
 		seq->playing = 0;
 		seq->pos = 0;
 	}
-
 }
 
 void timestrip_insert_noteoff(timestrip *tstr, track *src_trk) {
