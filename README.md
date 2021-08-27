@@ -3,8 +3,8 @@
 Valhalla Tracker is a MIDI sequencing companion
 for GNU/Linux audio setups. Adhering to Unix philosophy,
 it tries to do one thing well, which, in it's instance boils
-down to providing the most rebellious of musicians
-a tool of expression that:
+down to providing the most rebellious of musicians (software-wise,
+at least) a tool of expression that:
 
 - doesn't make a sound
 - relies 100% on JACK for input/output
