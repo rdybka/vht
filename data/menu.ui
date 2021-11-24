@@ -34,7 +34,7 @@
       </item>
       <item>
         <attribute name="action">app.about</attribute>
-        <attribute name="label">_About Valhalla Tracker</attribute>
+        <attribute name="label">_About vahatraker</attribute>
       </item>
     </section>
   </menu>
