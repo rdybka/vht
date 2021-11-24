@@ -1,4 +1,4 @@
-# preferenceswin.py - Valhalla Tracker
+# preferenceswin.py - vahatraker
 #
 # Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #

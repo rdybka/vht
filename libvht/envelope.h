@@ -1,4 +1,4 @@
-/* envelope.h - Valhalla Tracker (libvht)
+/* envelope.h - vahatraker (libvht)
  *
  * Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *

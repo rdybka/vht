@@ -1,4 +1,4 @@
-# mandyview.py - Valhalla Tracker
+# mandyview.py - vahatraker
 #
 # Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #

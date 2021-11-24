@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Valhalla Tracker - a live MIDI sequencer for JACK
+# vahatraker - a live MIDI sequencer for JACK
 #
 # Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
@@ -202,7 +202,7 @@ class VHTApp(Gtk.Application):
         )
         pkg = pkg_resources.require("vht")[0]
         ab.set_version(pkg.version)
-        ab.set_program_name("Valhalla Tracker")
+        ab.set_program_name("vahatraker")
         ab.set_comments("a live MIDI sequencer for JACK")
         ab.set_logo(
             GdkPixbuf.Pixbuf.new_from_file_at_size(
@@ -299,7 +299,7 @@ class VHTApp(Gtk.Application):
 
 def run():
     pkg = pkg_resources.require("vht")[0]
-    print("Valhalla Tracker %s" % (pkg.version))
+    print("vahatraker %s" % (pkg.version))
 
     mod.start_error = None
     if mod.midi_start() != 0:

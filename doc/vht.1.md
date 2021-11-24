@@ -1,6 +1,6 @@
-% VHT(1) vht 0.3
+% VHT(1) vht 0.3.1
 % Remigiusz Dybka
-% June 2021
+% November 2021
 
 # NAME
 **vht** - a minimalistic MIDI sequencer for JACK/GNOME
@@ -9,7 +9,7 @@
 **vht** [file]
 
 # DESCRIPTION
-**vht** (Valhalla Tracker) is a live MIDI sequencing application for GNU/Linux audio setups.
+**vht** (vahatraker) is a live MIDI sequencing application for GNU/Linux audio setups.
 Main motivation behind developing it was to create a fast workflow for putting down musical
 ideas, exploring exotic time signatures and generally playing with sound. It can be seen as a helper app 
 for the most rebellious of musicians.

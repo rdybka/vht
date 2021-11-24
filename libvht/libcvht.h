@@ -1,4 +1,4 @@
-/* libcvht.h - Valhalla Tracker (libvht)
+/* libcvht.h - vahatraker (libvht)
  *
  * Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *

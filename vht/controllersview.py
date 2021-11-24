@@ -1,4 +1,4 @@
-# controllersview.py - Valhalla Tracker
+# controllersview.py - vahatraker
 #
 # Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #

@@ -1,4 +1,4 @@
-/* mandy_pix_scan.h - Valhalla Tracker (libvht)
+/* mandy_pix_scan.h - vahatraker (libvht)
  *
  * Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *

@@ -1,4 +1,4 @@
-/* track_renderer.h - Valhalla Tracker (libvht)
+/* track_renderer.h - vahatraker (libvht)
  *
  * Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *

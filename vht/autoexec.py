@@ -1,4 +1,4 @@
-# autoexec.py - Valhalla Tracker
+# autoexec.py - vahatraker
 #
 # Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #

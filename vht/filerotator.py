@@ -1,4 +1,4 @@
-# filerotator.py - Valhalla Tracker
+# filerotator.py - vahatraker
 #
 # Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #

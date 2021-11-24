@@ -1,4 +1,4 @@
-/* ctrlrow.h - Valhalla Tracker (libvht)
+/* ctrlrow.h - vahatraker (libvht)
  *
  * Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *

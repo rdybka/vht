@@ -1,6 +1,6 @@
 ![vht header](/data/vht_header.png)
 ## about
-Valhalla Tracker is a MIDI sequencing companion
+vahatraker is a MIDI sequencing companion
 for GNU/Linux audio setups. Adhering to Unix philosophy,
 it tries to do one thing well, which, in it's instance boils
 down to providing the most rebellious of musicians (software-wise,

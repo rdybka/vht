@@ -1,4 +1,4 @@
-/* jack_process.h - Valhalla Tracker (libvht)
+/* jack_process.h - vahatraker (libvht)
  *
  * Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *

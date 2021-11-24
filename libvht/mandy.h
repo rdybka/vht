@@ -1,4 +1,4 @@
-/* mandy.h - Valhalla Tracker (libvht)
+/* mandy.h - vahatraker (libvht)
  *
  * Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *

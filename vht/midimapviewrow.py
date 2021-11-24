@@ -1,4 +1,4 @@
-# midimapviewrow.py - Valhalla Tracker
+# midimapviewrow.py - vahatraker
 #
 # Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #

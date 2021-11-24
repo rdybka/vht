@@ -1,4 +1,4 @@
-/* midi_event.h - Valhalla Tracker (libvht)
+/* midi_event.h - vahatraker (libvht)
  *
  * Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
