@@ -19,7 +19,7 @@
 #ifndef __MIDI_CLIENT_H__
 #define __MIDI_CLIENT_H__
 
-#define MIDI_CLIENT_NAME "valhalla"
+#define MIDI_CLIENT_NAME "vahata"
 #define MIDI_CLIENT_MAX_PORTS 16
 #define MIDI_CLIENT_PORT_NAME "out_%02d"
 #define MIDI_EVT_BUFFER_LENGTH 1023
