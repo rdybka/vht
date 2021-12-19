@@ -489,7 +489,11 @@ class VHTModule(Iterable):
 
             tl = jm["tl"]
             for chng in tl["changes"]:
-                self.timeline.changes.insert(chng["bpm"], chng["row"], chng["lnk"])
+                if not (append and chng["row"] == 0):
+                    if not self.timeline.changes.get_at_qb(chng["row"]):
+                        self.timeline.changes.insert(
+                            chng["bpm"], chng["row"], chng["lnk"]
+                        )
 
             if not self.timeline.changes.get_at_qb(0):
                 self.timeline.changes.insert(self.bpm, 0, 0)
