@@ -3,8 +3,7 @@
 vahatraker is a MIDI sequencing companion
 for GNU/Linux audio setups. Adhering to Unix philosophy,
 it tries to do one thing well, which, in it's instance boils
-down to providing the most rebellious of musicians (software-wise,
-at least) a tool of expression that:
+down to providing a tool of expression that:
 
 - doesn't make a sound
 - relies 100% on JACK for input/output
@@ -16,7 +15,6 @@ at least) a tool of expression that:
 - and fractal turtles!
 - allows ridiculous, yet accurate BPM
 - and unheard of time signatures!
-- takes less than a fifth of a floppy
 
 The sequencing engine is written in C (by an old guy), has a Python library on top
 of it, which can be used headless for generative composition, or whatevs
