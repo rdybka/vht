@@ -1,6 +1,6 @@
-# vhtctrllist.py - Valhalla Tracker (libvht)
+# vhtctrllist.py - vahatraker (libvht)
 #
-# Copyright (C) 2021 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2022 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
