@@ -346,6 +346,8 @@ class StatusBar(Gtk.DrawingArea):
         self._context.set_line_width((fs / 6.0) * cfg.seq_line_width)
 
         self.redraw()
+        if self.portpopover:
+            self.portpopover.set_pointing_to(self.portpopover_rect)
         return True
 
     def on_draw(self, widget, cr):
