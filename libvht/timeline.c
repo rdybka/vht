@@ -1128,8 +1128,18 @@ void timeline_update_loops_in_strips(timeline *tl) {
 		int strplen = ceil((seq->length) * mtl);
 
 		if ((strp->start <= tl->loop_end) && (strp->start + strplen > tl->loop_start) && (tl->loop_active)) {
-			int ls = (tl->loop_start - strp->start) * mtl;
-			int le = seq->length - (((strp->start + seq->length) - (tl->loop_end - 1)) / mtl);
+			int ls = (tl->loop_start - strp->start);
+			if (ls > 0) {
+				ls /= mtl;
+			}
+
+			int le = tl->loop_end - (strp->start + strplen);
+			if (le < 0) {
+				le /= mtl;
+			}
+
+			le += seq->length;
+			le--;
 
 			if (ls <= 0 && le >= seq->length - 1) {
 				seq->loop_active = 0;
