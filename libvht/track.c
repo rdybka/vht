@@ -950,7 +950,7 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 	double tperiod = ((double)trk->nrows / (double)trk->nsrows) * speriod;
 	double tmul = (double) nframes / tperiod;
 
-	if (nframes < 1) {
+	if (nframes <= 1) {
 		trk->last_pos = trk->pos;
 		trk->last_period = tperiod;
 		trk->pos += tperiod;
@@ -1026,6 +1026,7 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 
 			if (nn >= trk->nrows) {
 				nn = 0;
+
 				if (!trk->loop) {
 					return;
 				}
@@ -1137,6 +1138,7 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 		if (trk->pos > trk->nrows) {
 			trk->pos -= trk->nrows;
 		}
+		trk->last_pos = trk->pos - tperiod;
 	}
 
 	// update midi_out ind if ringing
@@ -1147,6 +1149,7 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 
 void track_wind(track *trk, double period) {
 	double tperiod = ((double)trk->nrows / (double)trk->nsrows) * period;
+	trk->last_pos = trk->pos;
 	trk->pos += tperiod;
 	while (trk->pos > trk->nsrows)
 		trk->pos -= trk->nsrows;
