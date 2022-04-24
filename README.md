@@ -3,15 +3,26 @@
 vahatraker is a MIDI sequencing companion
 for GNU/Linux audio setups. Adhering to Unix philosophy,
 it tries to do one thing well, which in it's instance boils
-down to providing a tool of expression that:
+down to driving MIDI devices - with added value of:
 
-- doesn't make a sound
-- relies 100% on JACK
-- has fast workflow
+- fast workflow
+- live editing
+- intuitive midi-in handling
+- freewheel rendering
 - unheard of time signatures
+- ridiculous BPM
 - fractal turtles
-- ridiculous, accurate BPM
 - scenes a'la 'ton
+
+Frankly speaking, vht was envisaged to replace seq24 in author's "studio" and offers
+similar functionality (and limitations) with a different approach. It relies 100% on
+JACK audio connection kit for input/output/synch and uses jack_capture for rendering.
+Tracker paradigm has been chosen to allow for rhythmic gymnastics otherwise hard to
+convey and because it's fun.
+
+Low level stuff is written in C and wrapped in a Python library. GUI uses
+GTK through gobject introspection and is also written in the language we shall
+no longer spam about.
 
 ## dependencies
 ```

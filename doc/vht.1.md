@@ -14,8 +14,8 @@ Main motivation behind developing it was to create a fast workflow for putting d
 ideas, exploring exotic time signatures and generally playing with sound. It is more a
 rhythm toy than a DAW, ment to be used along programs like carla, calf, zynaddsubfx,
 qsynth to drive the synths/automation or like a tracker engine for LMMS/Ardour or a glorified MIDI
-repeater for a hardware setup. One of it's goals was to repond well to input from
-keyboards/surfaces allowing it to be used as a performance/live tool.
+repeater for a hardware setup. One of it's goals was to respond well to input from
+keyboards/surfaces - allowing it to be used as a performance/live tool.
 
 The tracker format has been chosen to better convey rhythmic gymnastics.
 
@@ -73,8 +73,7 @@ interpolate tempo from last one.
 
 ## Mandy
 Mandy, if active, will strum it's track with playhead based on bearing of an imaginary turtle trapped on boundary of a
-low-iteration wobbling fractal. It's limited by FPU, unprecise, unpredictable and it has been requested
-that users refrain from utilising it as a fractal explorer. Tinkering introduces chaos. Good luck.
+low-iteration wobbling fractal. Tinkering introduces chaos. Good luck.
 
 ## Probbies and randies
 Turning on probs (ctrl+5) for a track, reveals the probability (in %). Mid-clicking and dragging velocity or time
@@ -85,28 +84,6 @@ All rendering depends on jack_capture. Live mode will record what you hear in re
 (Sequence, Timeline, What u'd hear) will switch JACK into freewheeling mode, which not all soft synths support.
 What u'd hear is for tinkerwheeling (a recipe for disaster) and stops on stop.
 
-## From the author
-As I'm writing this, the program has all the features I originally envisioned (and more). I will now
-use it for what it's for and hopefully iron out few more bugs. Otherwise, I consider v0.3.3 the sh*t.
-
-As this is a one man hobby project, I will not apologise for my coding style, dubious math, lack of tests,
-magic numbers or structure inspired by his noodly light. I will though, as an open source developer,
-admit to room for immediate improvement:
-
-- get rid of swig
-- driver system / windows port
-- refactor gui / cloning of windows / multiselect
-- gtk4
-- context menus?
-- sysex support
-- midi export
-- documentation / console intellisense
-- programmable triggers / code execution
-- lv2
-
-I may or may not work on these one day. I hope maintainers, developers and users - whom I all thank in advance,
-will make the best of this version for the time being.
-
 # SEE ALSO
 jack_capture qsynth zynaddsubfx calf carla
 
@@ -115,4 +92,3 @@ This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-
