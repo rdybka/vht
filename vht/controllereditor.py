@@ -597,8 +597,6 @@ class ControllerEditor:
         ctrl = False
         alt = False
 
-        print("kp ctrl")
-
         if event.state:
             if event.state & Gdk.ModifierType.SHIFT_MASK:
                 shift = True
