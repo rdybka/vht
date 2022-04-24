@@ -597,6 +597,8 @@ class ControllerEditor:
         ctrl = False
         alt = False
 
+        print("kp ctrl")
+
         if event.state:
             if event.state & Gdk.ModifierType.SHIFT_MASK:
                 shift = True
@@ -1140,6 +1142,8 @@ class ControllerEditor:
                     return
                 else:
                     self.tv.leave_all()
+                    self.edit = int(node["y"])
+                    self.tv.recalc_edit(self.tv)
                     self.moving = True
                     self.tv.autoscroll_req = False
                 return
