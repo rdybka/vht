@@ -1,4 +1,4 @@
-/* tracy.h - vahatraker (libvht)
+/* tracy.h - vahatraker (libvht - ifrt)
  *
  * Copyright (C) 2022 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *

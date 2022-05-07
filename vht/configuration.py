@@ -292,6 +292,7 @@ class Configuration:
             "console_colour": self.console_colour,
             "matrix_colour": self.mixer_colour,
             "timeline_colour": self.timeline_colour,
+            "mandy_colour": self.mandy_colour,
             "star_colour": self.star_colour,
             "record_colour": self.record_colour,
             "seq_spacing": self.seq_spacing,
@@ -354,6 +355,7 @@ class Configuration:
         lnf["console_colour"] = str(self.console_colour)
         lnf["matrix_colour"] = str(self.mixer_colour)
         lnf["timeline_colour"] = str(self.timeline_colour)
+        lnf["mandy_colour"] = str(self.mandy_colour)
         lnf["star_colour"] = str(self.star_colour)
         lnf["record_colour"] = str(self.record_colour)
         lnf["notebook_mouseover"] = str(self.notebook_mouseover)
@@ -446,6 +448,13 @@ class Configuration:
                 [
                     float(a.strip(" '"))
                     for a in lnf["record_colour"].strip("()").split(",")
+                ]
+            )
+
+            self.mandy_colour = tuple(
+                [
+                    float(a.strip(" '"))
+                    for a in lnf["mandy_colour"].strip("()").split(",")
                 ]
             )
 

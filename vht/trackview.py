@@ -1869,7 +1869,7 @@ class TrackView(Gtk.DrawingArea):
                     x += 1
 
                 yy += 1
-                if yy >= len(d):
+                if yy >= len(dd):
                     yy = 0
 
         self.parent.redraw_track(self.trk)
@@ -2163,8 +2163,9 @@ class TrackView(Gtk.DrawingArea):
             old = self.edit[1]
             rw = self.trk[self.edit[0]][self.edit[1]]
             rw.note = note
-            rw.type = 1
             rw.velocity = cfg.velocity
+            rw.prob = 0
+            rw.type = 1
 
             self.edit = self.edit[0], self.edit[1] + cfg.skip
             if self.edit[1] >= self.trk.nrows:

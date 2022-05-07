@@ -1,4 +1,4 @@
-/* mandy.h - vahatraker (libvht)
+/* mandy.h - vahatraker (libvht - ifrt)
  *
  * Copyright (C) 2022 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
@@ -27,7 +27,7 @@
 
 #define MANDY_DEF_MITER  2
 #define MAGIC_MITER2UNIT_RATIO	1.67
-// this is waaaaay more than tracy can handle
+// should be 20 for what it's for
 #define MANDY_MAX_ITER 123
 #define MANDY_DEF_BAIL   4
 #define MANDY_REND_RES	9

@@ -213,14 +213,12 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 		jack_nframes_t frm = nframes;
 		frm *= p / period;
 
-		if (frm < 1) {
-			frm = 1;
+		if (frm > 0) {
+			period -= p;
+			nframes -= frm;
+
+			sequence_advance(seq, p, frm);// :]
 		}
-
-		period -= p;
-		nframes -= frm;
-
-		sequence_advance(seq, p, frm);// :]
 	}
 
 	if (seq->pos - floor(seq->pos) < 0.0000001) {

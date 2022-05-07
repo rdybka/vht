@@ -72,12 +72,15 @@ a new node. An empty node will set new tempo at it's position. A filled node (do
 interpolate tempo from last one.
 
 ## Mandy
-Mandy, if active, will strum it's track with playhead based on bearing of an imaginary turtle trapped on boundary of a
-low-iteration wobbling fractal. Tinkering introduces chaos. Good luck.
+Mandy, if active, will introduce chaos by strumming it's track based on bearing of an imaginary fractal
+riding turtle (ifrt). It works best at max 10 iterations. Moving mouse while holding e will shift something
+I don't really understand in formula and introduce shapes and stuff. The shift can also be wobbled at given
+speed and velocity (jsx, jvx, jsy, jvy). The ifrt may complain when algo bails out, often indicating
+you're doing it wrong.
 
 ## Probbies and randies
 Turning on probs (ctrl+5) for a track, reveals the probability (in %). Mid-clicking and dragging velocity or time
-edits their randies.
+edits their randie ranges.
 
 ## Rendering
 All rendering depends on jack_capture. Live mode will record what you hear in real-time. The other three modes

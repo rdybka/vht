@@ -635,6 +635,11 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 	if (r.prob > 0) {
 		int rnd = rand() % 100;
 
+		if (r.prob > 100) {
+			trk->rows[c][pos].prob = 0; // ugly #hack
+			r.prob = 0;
+		}
+
 		if (rnd < r.prob) {
 			row_randomise(&trk->rows[c][pos]);
 			return;
@@ -949,13 +954,6 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 	// length of period in track time
 	double tperiod = ((double)trk->nrows / (double)trk->nsrows) * speriod;
 	double tmul = (double) nframes / tperiod;
-
-	if (nframes <= 1) {
-		trk->last_pos = trk->pos;
-		trk->last_period = tperiod;
-		trk->pos += tperiod;
-		return;
-	}
 
 	int row_start = floorf(trk->pos);
 	if (row_start == trk->nrows) {

@@ -201,6 +201,10 @@ class PreferencesWin(Gtk.Window):
         scbutt = self.cbutt(Gdk.RGBA(*self.cfg.star_colour, 1), 4)
         bx.pack_start(scbutt, False, False, 0)
 
+        scbutt = self.cbutt(Gdk.RGBA(*self.cfg.mandy_colour, 1), 6)
+        bx.pack_end(scbutt, False, False, 0)
+        bx.pack_end(Gtk.Label.new("mandy:"), True, True, 0)
+
         scbutt = self.cbutt(Gdk.RGBA(*self.cfg.record_colour, 1), 5)
         bx.pack_end(scbutt, False, False, 0)
         bx.pack_end(Gtk.Label.new("rec:"), True, True, 0)
@@ -530,6 +534,8 @@ class PreferencesWin(Gtk.Window):
             self.cfg.star_colour = (rgba.red, rgba.green, rgba.blue)
         elif data == 5:
             self.cfg.record_colour = (rgba.red, rgba.green, rgba.blue)
+        elif data == 6:
+            self.cfg.mandy_colour = (rgba.red, rgba.green, rgba.blue)
 
         self.cfg.save()
 
