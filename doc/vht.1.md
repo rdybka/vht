@@ -44,7 +44,7 @@ display tooltips for every operation, this will only list less obvious functions
 - Controllers
     - ctrl-click - add controller node
     - double click a node to link/unlink
-    - inner nodes can be smoothed with wouse wheel
+    - nodes can be shaved with wouse wheel
 - Timeline
     - left-click on a hint - create a clone of main sequence
     - ctrl+left-click on a strip - place clone
@@ -63,7 +63,7 @@ display tooltips for every operation, this will only list less obvious functions
     - ctrl while dragging - zoom
     - right-click - reset position
     - left-click on hint - set new start position
-    - hold e and drag to move julia (e)
+    - hold e and drag to move jx, jy
 
 ## Bpm nodes
 Bpm nodes are shown as circles in timeline. There is always a node zero on top (which can't be moved).
@@ -80,7 +80,7 @@ you're doing it wrong.
 
 ## Probbies and randies
 Turning on probs (ctrl+5) for a track, reveals the probability (in %). Mid-clicking and dragging velocity or time
-edits their randie ranges.
+edits randie ranges.
 
 ## Rendering
 All rendering depends on jack_capture. Live mode will record what you hear in real-time. The other three modes

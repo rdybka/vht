@@ -2,8 +2,8 @@
 ## about
 vahatraker is a MIDI sequencing companion
 for GNU/Linux audio setups. Adhering to Unix philosophy,
-it tries to do one thing well, which is to drive MIDI,
-adhering to other doctrines, it tries to enable expression,
+driving MIDI is the one thing it tries to do well,
+adhering to other doctrines - enabling expression,
 with added value of:
 
 - live editing
@@ -12,17 +12,20 @@ with added value of:
 - unheard of time signatures
 - fractal turtles
 - scenes a'la 'ton
+...and, like great ones before it
+- fits on a floppy and doesn't make a sound
 
 Frankly speaking, vht was envisaged to replace seq24 in author's "studio"
-and offers similar functionality (and limitations) with a different approach
-in places. It relies 100% on JACK audio connection kit for input/output/synch
-and uses jack_capture for rendering. The GUI has similar dependencies
-as gnome-calculator, tracker paradigm was chosen to allow for
-rhythmic gymnastics otherwise hard to convey and because it's fun.
+and offers similar functionality (and limitations) with a slightly
+different approach. It relies 100% on JACK audio connection kit for
+input/output/synch and uses jack_capture for rendering. The GUI has
+similar dependencies as gnome-calculator so if one runs, the other should
+too. Tracker paradigm was chosen to allow for rhythmic gymnastics otherwise
+hard to convey and because it's fun.
 
 Low level stuff was done in C and wrapped in a Python library.
-Monkeyterface employs GTK through gobject introspection and is also written
-in the language we shall no longer spam about.
+Human interfacing part of contraption employs GTK through gobject introspection
+and was also contrived in language we shall no longer spam about.
 
 ## dependencies
 ```
