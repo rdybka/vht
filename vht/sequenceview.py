@@ -359,15 +359,15 @@ class SequenceView(Gtk.Box):
             strp = mod.timeline.strips[mod.curr_seq[1]]
 
             if (
-                mod.timeline.loop_start == strp.start
-                and mod.timeline.loop_end == strp.start + strp.length
+                mod.timeline.loop.start == strp.start
+                and mod.timeline.loop.end == strp.start + strp.length
             ):
-                mod.timeline.loop_active = not mod.timeline.loop_active
+                mod.timeline.loop.active = not mod.timeline.loop.active
                 return True
 
-            mod.timeline.loop_start = strp.start
-            mod.timeline.loop_end = strp.start + strp.length
-            mod.timeline.loop_active = True
+            mod.timeline.loop.start = strp.start
+            mod.timeline.loop.end = strp.start + strp.length
+            mod.timeline.loop.active = True
             return True
 
         if cfg.key["undo"].matches(event):

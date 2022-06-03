@@ -75,28 +75,25 @@ class MainWin(Gtk.ApplicationWindow):
         self.set_icon_from_file(os.path.join(mod.data_path, "vht.svg"))
 
         self.set_opacity(cfg.window_opacity)
-        button = Gtk.Button()
+        button_start = Gtk.Button()
         icon = Gio.ThemedIcon(name="media-playback-stop")
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-        button.add(image)
-        button.connect("clicked", self.on_stop_button_activate)
-        button.set_tooltip_markup(
+        button_start.add(image)
+        button_start.connect("clicked", self.on_stop_button_activate)
+        button_start.set_tooltip_markup(
             cfg.tooltip_markup
             % ("stop %s\nreset %s" % (cfg.key["play"], cfg.key["reset"]))
         )
-        self.hb.pack_start(button)
 
-        button = Gtk.Button()
+        button_stop = Gtk.Button()
         icon = Gio.ThemedIcon(name="media-playback-start")
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-        button.add(image)
-        button.connect("clicked", self.on_start_button_activate)
-        button.set_tooltip_markup(cfg.tooltip_markup2 % ("play", cfg.key["play"]))
-        self.hb.pack_start(button)
+        button_stop.add(image)
+        button_stop.connect("clicked", self.on_start_button_activate)
+        button_stop.set_tooltip_markup(cfg.tooltip_markup2 % ("play", cfg.key["play"]))
 
         self.transport_switch = Gtk.Switch()
         self.transport_switch.set_state(cfg.start_transport)
-        self.hb.pack_start(self.transport_switch)
         self.transport_switch.set_tooltip_markup(
             cfg.tooltip_markup2 % ("transport", cfg.key["toggle_transport"])
         )
@@ -117,6 +114,9 @@ class MainWin(Gtk.ApplicationWindow):
             menu = builder.get_object("app-menu")
             self.menubutt.set_menu_model(menu)
 
+        self.hb.pack_start(button_start)
+        self.hb.pack_start(button_stop)
+        self.hb.pack_start(self.transport_switch)
         self.hb.pack_end(self.menubutt)
         self.hb.pack_end(self.time_display)
 
@@ -285,11 +285,11 @@ class MainWin(Gtk.ApplicationWindow):
             npos = 0
             tl = mod.timeline
 
-            if tl.loop_active:
+            if tl.loop.active:
                 if tl.pos == 0:
-                    npos = tl.loop_start
-                if tl.pos > tl.loop_start:
-                    npos = tl.loop_start
+                    npos = tl.loop.start
+                if tl.pos > tl.loop.start:
+                    npos = tl.loop.start
 
             mod.reset()
             if npos:

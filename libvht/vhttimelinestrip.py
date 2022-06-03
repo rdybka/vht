@@ -113,12 +113,12 @@ class VHTTimelineStrip:
         old = libcvht.timestrip_get_start(self._ptr)
         if old != value:
             if (
-                self._mod.timeline.loop_start == self.start
-                and self._mod.timeline.loop_end - self._mod.timeline.loop_start
+                self._mod.timeline.loop.start == self.start
+                and self._mod.timeline.loop.end - self._mod.timeline.loop.start
                 == self.length
             ):
-                self._mod.timeline.loop_start = value
-                self._mod.timeline.loop_end = value + self.length
+                self._mod.timeline.loop.start = value
+                self._mod.timeline.loop.end = value + self.length
             libcvht.timestrip_set_start(self._ptr, int(value))
             self._mod.timeline.update()
 
@@ -129,11 +129,11 @@ class VHTTimelineStrip:
     @length.setter
     def length(self, value):
         if (
-            self._mod.timeline.loop_start == self.start
-            and self._mod.timeline.loop_end - self._mod.timeline.loop_start
+            self._mod.timeline.loop.start == self.start
+            and self._mod.timeline.loop.end - self._mod.timeline.loop.start
             == self.length
         ):
-            self._mod.timeline.loop_end = self.start + value
+            self._mod.timeline.loop.end = self.start + value
         libcvht.timestrip_set_length(self._ptr, int(value))
         self._mod.timeline.update()
 

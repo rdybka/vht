@@ -432,9 +432,9 @@ class VHTModule(Iterable):
             jm["seq"].append(pack_seq(seq))
 
         tl = {}
-        tl["loop_start"] = self.timeline.loop_start
-        tl["loop_end"] = self.timeline.loop_end
-        tl["loop_active"] = self.timeline.loop_active
+        tl["loop_start"] = self.timeline.loop.start
+        tl["loop_end"] = self.timeline.loop.end
+        tl["loop_active"] = self.timeline.loop.active
 
         tl["changes"] = []
         for ch in self.timeline.changes:
@@ -510,9 +510,9 @@ class VHTModule(Iterable):
 
                 s.enabled = strp["enabled"]
 
-            self.timeline.loop_start = tl["loop_start"]
-            self.timeline.loop_end = tl["loop_end"]
-            self.timeline.loop_active = tl["loop_active"]
+            self.timeline.loop.start = tl["loop_start"]
+            self.timeline.loop.end = tl["loop_end"]
+            self.timeline.loop.active = tl["loop_active"]
 
             self.curr_seq = jm["curr_seq"]
             self.midi_synch_ports()

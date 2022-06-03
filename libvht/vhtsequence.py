@@ -98,11 +98,11 @@ class VHTSequence(Iterable):
         if tstr:
             if self.relative_length > tstr.length:
                 if (
-                    self._mod.timeline.loop_start == tstr.start
-                    and self._mod.timeline.loop_end - self._mod.timeline.loop_start
+                    self._mod.timeline.loop.start == tstr.start
+                    and self._mod.timeline.loop.end - self._mod.timeline.loop.start
                     == tstr.length
                 ):
-                    self._mod.timeline.loop_end = tstr.start + tstr.seq.relative_length
+                    self._mod.timeline.loop.end = tstr.start + tstr.seq.relative_length
 
                 tstr.length = self.relative_length
 
@@ -121,11 +121,11 @@ class VHTSequence(Iterable):
 
         if tstr:
             if (
-                self._mod.timeline.loop_start == tstr.start
-                and self._mod.timeline.loop_end - self._mod.timeline.loop_start
+                self._mod.timeline.loop.start == tstr.start
+                and self._mod.timeline.loop.end - self._mod.timeline.loop.start
                 == tstr.length
             ):
-                self._mod.timeline.loop_end = tstr.start + tstr.seq.relative_length
+                self._mod.timeline.loop.end = tstr.start + tstr.seq.relative_length
 
             tstr.length = self.relative_length
 
@@ -231,11 +231,11 @@ class VHTSequence(Iterable):
 
         if tstr:
             if (
-                self._mod.timeline.loop_start == tstr.start
-                and self._mod.timeline.loop_end - self._mod.timeline.loop_start
+                self._mod.timeline.loop.start == tstr.start
+                and self._mod.timeline.loop.end - self._mod.timeline.loop.start
                 == tstr.length
             ):
-                self._mod.timeline.loop_end = tstr.start + tstr.seq.relative_length
+                self._mod.timeline.loop.end = tstr.start + tstr.seq.relative_length
 
             tstr.length = tstr.seq.relative_length
             libcvht.timeline_update(self._mod.timeline._tl_handle)

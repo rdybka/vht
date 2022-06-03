@@ -116,9 +116,9 @@ class SideTrackView(Gtk.DrawingArea):
                 self.redraw()
                 return True
 
-            act = mod.timeline.loop_active
+            act = mod.timeline.loop.active
             self.seq.loop_active = False
-            mod.timeline.loop_active = act
+            mod.timeline.loop.active = act
             self.redraw()
             return True
 

@@ -1127,9 +1127,17 @@ void mandy_set_info(mandy *mand, char *info) {
 }
 
 void mandy_set_rgb(mandy *mand, int r, int g, int b) {
+	int rend = 0;
+	if ((mand->fr != r) ||
+	        (mand->fg != g) ||
+	        (mand->fb != b))
+		rend = 1;
+
 	mand->fr = r;
 	mand->fg = g;
 	mand->fb = b;
+	if (rend)
+		mand->render = 1;
 }
 
 void mandy_set_xy(mandy *mand, double x, double y) {

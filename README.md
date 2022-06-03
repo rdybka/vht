@@ -12,16 +12,15 @@ with added value of:
 - unheard of time signatures
 - fractal turtles
 - scenes a'la 'ton
-...and, like great ones before it
-- fits on a floppy and doesn't make a sound
+- fits on a floppy
+- doesn't make a sound
 
 Frankly speaking, vht was envisaged to replace seq24 in author's "studio"
 and offers similar functionality (and limitations) with a slightly
 different approach. It relies 100% on JACK audio connection kit for
 input/output/synch and uses jack_capture for rendering. The GUI has
-similar dependencies as gnome-calculator so if one runs, the other should
-too. Tracker paradigm was chosen to allow for rhythmic gymnastics otherwise
-hard to convey and because it's fun.
+similar dependencies as gnome-calculator and tracker paradigm was chosen
+to allow for rhythmic gymnastics otherwise hard to convey.
 
 Low level stuff was done in C and wrapped in a Python library.
 Human interfacing part of contraption employs GTK through gobject introspection

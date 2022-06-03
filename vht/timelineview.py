@@ -262,7 +262,7 @@ class TimelineView(Gtk.DrawingArea):
         # loop points
         cr.save()
 
-        col = cfg.star_colour if mod.timeline.loop_active else cfg.timeline_colour
+        col = cfg.star_colour if mod.timeline.loop.active else cfg.timeline_colour
         i = (
             cfg.intensity_txt_highlight
             if self.highlight_loop
@@ -276,19 +276,19 @@ class TimelineView(Gtk.DrawingArea):
         ler = -1
         ll = 5
 
-        if mod.timeline.loop_start > -1:
+        if mod.timeline.loop.start > -1:
             lsr = (
-                mod.timeline.qb2t(mod.timeline.loop_start)
+                mod.timeline.qb2t(mod.timeline.loop.start)
                 - mod.timeline.qb2t(self.qb_start)
             ) / self.spl
 
-        if mod.timeline.loop_end > -1:
+        if mod.timeline.loop.end > -1:
             ler = (
-                mod.timeline.qb2t(mod.timeline.loop_end)
+                mod.timeline.qb2t(mod.timeline.loop.end)
                 - mod.timeline.qb2t(self.qb_start)
             ) / self.spl
 
-        if mod.timeline.loop_start > -1 and mod.timeline.loop_end > -1:
+        if mod.timeline.loop.start > -1 and mod.timeline.loop.end > -1:
             xx = w - self._txt_height * 1.2
 
             cr.move_to(w - tw / 2, lsr)
@@ -644,8 +644,8 @@ class TimelineView(Gtk.DrawingArea):
                     self.highlight_alignment(ystart + lend)
 
             if self.drawing_loop:
-                ls = mod.timeline.loop_start
-                le = mod.timeline.loop_end
+                ls = mod.timeline.loop.start
+                le = mod.timeline.loop.end
 
                 if ls == st.start:
                     self.highlight_alignment(ystart)
@@ -814,8 +814,8 @@ class TimelineView(Gtk.DrawingArea):
         if self.highlight_loop:
             if event.button == cfg.delete_button:
                 if (
-                    mod.timeline.loop_start == 0
-                    and mod.timeline.loop_end == mod.timeline.nqb
+                    mod.timeline.loop.start == 0
+                    and mod.timeline.loop.end == mod.timeline.nqb
                 ):
                     strp = (
                         mod.timeline.strips[mod.curr_seq[1]]
@@ -823,15 +823,15 @@ class TimelineView(Gtk.DrawingArea):
                         else None
                     )
                     if strp:
-                        mod.timeline.loop_start = strp.start
-                        mod.timeline.loop_end = strp.start + strp.length
+                        mod.timeline.loop.start = strp.start
+                        mod.timeline.loop.end = strp.start + strp.length
                 else:
-                    mod.timeline.loop_start = 0
-                    mod.timeline.loop_end = mod.timeline.nqb
+                    mod.timeline.loop.start = 0
+                    mod.timeline.loop.end = mod.timeline.nqb
                 return
 
             if event.button == 2:
-                mod.timeline.loop_active = not mod.timeline.loop_active
+                mod.timeline.loop.active = not mod.timeline.loop.active
                 return
 
         # draw loop
@@ -842,10 +842,10 @@ class TimelineView(Gtk.DrawingArea):
             and event.button == cfg.select_button
             and not self.zoom_hold
         ):
-            self.drawing_loop_active = mod.timeline.loop_active
+            self.drawing_loop_active = mod.timeline.loop.active
             self.drawing_loop_fallback = (
-                mod.timeline.loop_start,
-                mod.timeline.loop_end,
+                mod.timeline.loop.start,
+                mod.timeline.loop.end,
             )
 
             self.drawing_loop = True
@@ -853,16 +853,16 @@ class TimelineView(Gtk.DrawingArea):
             if self.mouse_loop_nearest == -1:
                 self.gest_start_r = self.pointer_r
 
-                mod.timeline.loop_active = False
-                mod.timeline.loop_start = mod.timeline.loop_end = self.gest_start_r
+                mod.timeline.loop.active = False
+                mod.timeline.loop.start = mod.timeline.loop.end = self.gest_start_r
                 return
             elif self.mouse_loop_nearest == 1:
-                self.gest_start_r = mod.timeline.loop_end
-                mod.timeline.loop_active = False
+                self.gest_start_r = mod.timeline.loop.end
+                mod.timeline.loop.active = False
                 return
             elif self.mouse_loop_nearest == 2:
-                self.gest_start_r = mod.timeline.loop_start
-                mod.timeline.loop_active = False
+                self.gest_start_r = mod.timeline.loop.start
+                mod.timeline.loop.active = False
                 return
 
         if event.button == 2:
@@ -1087,13 +1087,13 @@ class TimelineView(Gtk.DrawingArea):
 
         if self.drawing_loop:
             self.drawing_loop = False
-            if mod.timeline.loop_start == mod.timeline.loop_end:
+            if mod.timeline.loop.start == mod.timeline.loop.end:
                 (
-                    mod.timeline.loop_start,
-                    mod.timeline.loop_end,
+                    mod.timeline.loop.start,
+                    mod.timeline.loop.end,
                 ) = self.drawing_loop_fallback
 
-            mod.timeline.loop_active = self.drawing_loop_active
+            mod.timeline.loop.active = self.drawing_loop_active
 
         if self.moving:
             self.moving = False
@@ -1160,15 +1160,15 @@ class TimelineView(Gtk.DrawingArea):
             e = self.gest_start_r
 
             if self.pointer_r == self.gest_start_r:
-                mod.timeline.loop_start = mod.timeline.loop_end = s
+                mod.timeline.loop.start = mod.timeline.loop.end = s
             else:
                 if self.pointer_r > self.gest_start_r:
                     e = self.pointer_r
                 else:
                     s = self.pointer_r
 
-                mod.timeline.loop_start = max(s, 0)
-                mod.timeline.loop_end = min(e, mod.timeline.nqb)
+                mod.timeline.loop.start = max(s, 0)
+                mod.timeline.loop.end = min(e, mod.timeline.nqb)
 
         if self.expanding:
             xp = max(self.exp_min, self.pointer_r - self.gest_start_r)
@@ -1261,14 +1261,14 @@ class TimelineView(Gtk.DrawingArea):
 
             self.mouse_loop_nearest = -1
             tstart = mod.timeline.qb2t(self.qb_start)
-            yend = (mod.timeline.qb2t(mod.timeline.loop_start) - tstart) / self.spl
+            yend = (mod.timeline.qb2t(mod.timeline.loop.start) - tstart) / self.spl
 
             if abs(event.y - yend) < 5:
                 self.show_resize_handle = True
                 self.highlight_loop = True
                 self.mouse_loop_nearest = 1
 
-            yend = (mod.timeline.qb2t(mod.timeline.loop_end) - tstart) / self.spl
+            yend = (mod.timeline.qb2t(mod.timeline.loop.end) - tstart) / self.spl
 
             if abs(event.y - yend) < 5:
                 self.show_resize_handle = True
@@ -1473,8 +1473,8 @@ class TimelineView(Gtk.DrawingArea):
                 self.highlight_loop = False
 
             if self.mouse_in_loop:
-                ls = mod.timeline.loop_start
-                le = mod.timeline.loop_end
+                ls = mod.timeline.loop.start
+                le = mod.timeline.loop.end
                 if self.pointer_r >= ls and self.pointer_r <= le:
                     self.highlight_loop = True
 

@@ -230,8 +230,8 @@ class Renderer:
         self.mod.play_mode = 1
         self.mod.render_mode = 2
         self.mod.set_lead_out(lead_out)
-        if self.mod.timeline.loop_active:
-            self.mod.timeline.pos = self.mod.timeline.loop_start
+        if self.mod.timeline.loop.active:
+            self.mod.timeline.pos = self.mod.timeline.loop.start
 
         self._proc = subprocess.Popen(
             opts,

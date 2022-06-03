@@ -74,7 +74,6 @@ class MandyView(Gtk.DrawingArea):
 
         self._surface = None
         self._context = None
-        self.vector = vector
 
         self.translate_start = None
         self.translate_julia = False
@@ -111,6 +110,7 @@ class MandyView(Gtk.DrawingArea):
         self.redraw()
 
     def redraw(self):
+        self.mandy.set_rgb(*[c * 255 for c in cfg.mandy_colour])
         cr = self._context
 
         if not cr:
@@ -119,14 +119,9 @@ class MandyView(Gtk.DrawingArea):
         w = self.get_allocated_width()
         h = self.get_allocated_height()
 
-        if self.vector:
-            cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
-            cr.rectangle(0, 0, w, h)
-            cr.fill()
-        else:
-            cr.set_source(self.gen_pix(w, h))
-            cr.rectangle(0, 0, w, h)
-            cr.fill()
+        cr.set_source(self.gen_pix(w, h))
+        cr.rectangle(0, 0, w, h)
+        cr.fill()
 
         npts = self.mandy.render(w, h)
         if npts:
@@ -318,6 +313,7 @@ class MandyView(Gtk.DrawingArea):
             wnd.invalidate_rect(None, False)
 
     def gen_pix(self, w, h, d=1):
+        self.mandy.set_rgb(*[c * 255 for c in cfg.mandy_colour])
         w = int(w // d)
         h = int(h // d)
         fmt = cairo.Format.RGB24
