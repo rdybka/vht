@@ -9,7 +9,7 @@ setup(name = "vht",
 	version = "0.3.1",
 	description = "vahatraker - a live MIDI sequencer for JACK",
 	long_description=long_description,
-    long_description_content_type="text/markdown",
+	long_description_content_type="text/markdown",
 	author = "Remigiusz Dybka",
 	author_email = "remigiusz.dybka@gmail.com",
 	url = "https://github.com/rdybka/vht",
@@ -49,12 +49,13 @@ setup(name = "vht",
 	],
 	
 	classifiers=[
-		'Development Status :: 4 - Beta',
-		'Environment :: X11 Applications :: Gnome',
+		'Development Status :: 5 - Production/Stable',
+		'Environment :: X11 Applications :: GTK',
 		'Intended Audience :: End Users/Desktop',
 		'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
 		'Programming Language :: Python :: 3',
 		'Programming Language :: C',
+		'Operating System :: POSIX :: Linux',
 		'Topic :: Multimedia :: Sound/Audio :: MIDI'
 	]
 )
