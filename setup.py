@@ -34,9 +34,9 @@ setup(name = "vht",
 
 	packages = ["vht", "libvht"],
 	entry_points={
-        'console_scripts': [
-            'vht = vht.main:run',
-        ]},
+		'console_scripts': [
+		'vht = vht.main:run',
+		]},
 	
 	data_files = [
 		('share/vht', ['data/mandy.png', 'data/vht.svg', 'data/vht.png', 'data/menu.ui']),
