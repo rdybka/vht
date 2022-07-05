@@ -25,6 +25,8 @@ def run():
     aename = mod.cfg_path + os.sep + "autoexec"
     if not os.path.exists(aename):
         with open(aename, "w") as ph:
-            ph.write("#this will run after parsing config\n#let yourself go")
+            ph.write(
+                "#this will run after parsing config\n#let yourself go\n\n#mod.dump_notes = True"
+            )
 
     exec(open(aename).read())
