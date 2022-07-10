@@ -419,6 +419,11 @@ class StatusBar(Gtk.DrawingArea):
                     cfg.key["def_port_down"],
                 )
 
+            if self.active_field == 8:  # ***
+                self.tt_txt = "<big>toggle timeline</big>\n%s" % (
+                    cfg.key["toggle_timeline"],
+                )
+
             self.last_active_field = self.active_field
 
     def on_scroll(self, widget, event):
