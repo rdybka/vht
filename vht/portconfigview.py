@@ -25,6 +25,46 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
 
+class BoolListView(Gtk.ListBox):
+    def __init__(self, lab1, lab2, tgl_func):
+        super(BoolListView, self).__init__()
+
+        self.set_selection_mode(Gtk.SelectionMode.NONE)
+
+        self.lab1 = lab1
+        self.lab2 = lab2
+        self.tgl_func = tgl_func
+
+        self.clear()
+
+    def clear(self):
+        for wdg in self.get_children():
+            self.remove(wdg)
+
+        self.head_row = Gtk.Box()
+        self.head_row.set_sensitive(False)
+
+        self.head_row.pack_start(Gtk.Label(self.lab1), False, False, 0)
+        self.head_row.pack_end(Gtk.Label(self.lab2), False, False, 0)
+
+        self.insert(self.head_row, 0)
+        wdg = self.get_children()[0]
+        wdg.set_sensitive(False)
+
+    def add(self, prtname, state):
+        rw = Gtk.Box()
+        rw.pack_start(Gtk.Label(prtname), False, False, 0)
+        statewdg = Gtk.CheckButton()
+        statewdg.set_active(state)
+        statewdg.connect("toggled", self.tgl_meta, prtname)
+        rw.pack_end(statewdg, False, False, 0)
+        self.insert(rw, -1)
+
+    def tgl_meta(self, widget, prtname):
+        if self.tgl_func:
+            self.tgl_func(prtname, not widget.get_active())
+
+
 class PortConfigView(Gtk.Grid):
     def __init__(self, parent):
         super(PortConfigView, self).__init__()
@@ -35,57 +75,28 @@ class PortConfigView(Gtk.Grid):
         self.set_row_homogeneous(False)
         self.set_column_homogeneous(True)
 
-        self.store_in = Gtk.ListStore(str, bool)
-        self.store_out = Gtk.ListStore(str, bool)
-        self.store_unv_in = Gtk.ListStore(str, bool)
-        self.store_unv_out = Gtk.ListStore(str, bool)
-
-        self.tv_in = Gtk.TreeView(self.store_in)
-        rendtxt = Gtk.CellRendererText()
-        rend_in_toggle = Gtk.CellRendererToggle()
-        rend_in_toggle.connect("toggled", self.on_input_toggled)
-        in_col1 = Gtk.TreeViewColumn("inputs", rendtxt, text=0)
-        in_col2 = Gtk.TreeViewColumn("active", rend_in_toggle, active=True)
-        self.tv_in.append_column(in_col1)
-        self.tv_in.append_column(in_col2)
-
-        self.tv_unv_in = Gtk.TreeView(self.store_unv_in)
-        rend_unv_in_toggle = Gtk.CellRendererToggle()
-        rend_unv_in_toggle.connect("toggled", self.on_unv_input_toggled)
-        in_unv_col1 = Gtk.TreeViewColumn("unavailable", rendtxt, text=0)
-        in_unv_col2 = Gtk.TreeViewColumn("keep", rend_unv_in_toggle, active=True)
-        self.tv_unv_in.append_column(in_unv_col1)
-        self.tv_unv_in.append_column(in_unv_col2)
-
-        self.tv_out = Gtk.TreeView(self.store_out)
-        rend_out_toggle = Gtk.CellRendererToggle()
-        rend_out_toggle.connect("toggled", self.on_output_toggled)
-        out_col1 = Gtk.TreeViewColumn("outputs", rendtxt, text=0)
-        out_col2 = Gtk.TreeViewColumn("active", rend_out_toggle, active=True)
-        self.tv_out.append_column(out_col1)
-        self.tv_out.append_column(out_col2)
-
-        self.tv_unv_out = Gtk.TreeView(self.store_unv_out)
-        rend_out_toggle = Gtk.CellRendererToggle()
-        rend_out_toggle.connect("toggled", self.on_unv_output_toggled)
-        out_col1 = Gtk.TreeViewColumn("unavailable", rendtxt, text=0)
-        out_col2 = Gtk.TreeViewColumn("keep", rend_out_toggle, active=True)
-        self.tv_unv_out.append_column(out_col1)
-        self.tv_unv_out.append_column(out_col2)
+        self.bl_in = BoolListView("inputs", "active", self.in_toggle)
+        self.bl_unv_in = BoolListView("unavailable", "keep", self.in_unv_toggle)
+        self.bl_out = BoolListView("outputs", "active", self.out_toggle)
+        self.bl_unv_out = BoolListView("unavailable", "keep", self.out_unv_toggle)
 
         self.combo_out = Gtk.ComboBoxText()
         self.combo_out.connect("changed", self.on_combo_changed)
         self.combo_ignore_change = True
 
+        self.box_in = Gtk.Box()
+        self.box_in.set_orientation(Gtk.Orientation.VERTICAL)
+        self.box_in.pack_start(self.bl_in, False, False, 0)
+        self.box_in.pack_end(self.bl_unv_in, False, False, 0)
+
         self.box_out = Gtk.Box()
         self.box_out.set_orientation(Gtk.Orientation.VERTICAL)
-        self.box_out.pack_start(self.combo_out, False, False, 0)
-        self.box_out.pack_start(self.tv_out, False, False, 0)
-        self.box_out.pack_start(self.tv_unv_out, False, False, 0)
+        self.box_out.pack_start(self.bl_out, False, False, 0)
+        self.box_out.pack_start(self.bl_unv_out, False, False, 0)
+        self.box_out.pack_end(self.combo_out, False, False, 0)
 
-        self.attach(self.tv_in, 0, 0, 1, 1)
+        self.attach(self.box_in, 0, 0, 1, 1)
         self.attach(self.box_out, 1, 0, 1, 1)
-        self.attach(self.tv_unv_in, 0, 1, 1, 1)
 
         self.show_all()
         refresh_connections(mod, cfg)
@@ -97,10 +108,10 @@ class PortConfigView(Gtk.Grid):
         if parwin:
             parwin.freeze_updates()
 
-        self.store_in.clear()
-        self.store_unv_in.clear()
-        self.store_out.clear()
-        self.store_unv_out.clear()
+        self.bl_in.clear()
+        self.bl_unv_in.clear()
+        self.bl_out.clear()
+        self.bl_unv_out.clear()
 
         act_out = max(0, self.combo_out.get_active())
         self.combo_out.remove_all()
@@ -113,7 +124,6 @@ class PortConfigView(Gtk.Grid):
         self.combo_out.set_active(act_out)
 
         # inputs
-
         inp = None
         outp = None
         mod.ports.refresh()
@@ -125,16 +135,11 @@ class PortConfigView(Gtk.Grid):
         for prt in mod.ports:
             if prt.type == "midi" and not prt.mine:
                 if prt.output:
-                    self.store_in.append([prt.name, inp in prt.connections])
+                    self.bl_in.add(*[prt.name, inp in prt.connections])
 
         for p in mod.extras["portconfig"]["in"]:
             if not p in mod.ports:
-                self.store_unv_in.append([p, 1])
-
-        if len(self.store_unv_in):
-            self.tv_unv_in.show()
-        else:
-            self.tv_unv_in.hide()
+                self.bl_unv_in.add(p, 1)
 
         # outputs
         inp = None
@@ -152,16 +157,23 @@ class PortConfigView(Gtk.Grid):
                     if inp and inp in prt.connections:
                         conn = True
 
-                    self.store_out.append([prt.name, conn])
+                    self.bl_out.add(prt.name, conn)
 
         for p in mod.extras["portconfig"]["out"][act_out]:
             if not p in mod.ports:
-                self.store_unv_out.append([p, 1])
+                self.bl_unv_out.add(p, 1)
 
-        if len(self.store_unv_out):
-            self.tv_unv_out.show()
+        self.show_all()
+
+        if len(self.bl_unv_out) > 1:
+            self.bl_unv_out.show()
         else:
-            self.tv_unv_out.hide()
+            self.bl_unv_out.hide()
+
+        if len(self.bl_unv_in) > 1:
+            self.bl_unv_in.show()
+        else:
+            self.bl_unv_in.hide()
 
         if parwin:
             parwin.thaw_updates()
@@ -174,17 +186,13 @@ class PortConfigView(Gtk.Grid):
 
         self.populate()
 
-    def on_unv_input_toggled(self, widget, path):
-        pname = self.store_unv_in[path][0]
+    def in_unv_toggle(self, pname, active):
         if pname in mod.extras["portconfig"]["in"]:
             mod.extras["portconfig"]["in"].remove(pname)
 
         self.populate()
 
-    def on_input_toggled(self, widget, path):
-        pname = self.store_in[path][0]
-        active = self.store_in[path][1]
-
+    def in_toggle(self, pname, active):
         if pname not in mod.extras["portconfig"]["in"]:
             mod.extras["portconfig"]["in"].append(pname)
 
@@ -206,11 +214,9 @@ class PortConfigView(Gtk.Grid):
         refresh_connections(mod, cfg)
         self.populate()
 
-    def on_output_toggled(self, widget, path):
-        pname = self.store_out[path][0]
+    def out_toggle(self, pname, active):
         act_out = max(0, self.combo_out.get_active())
         act_out_pname = mod.ports.output_get_name(act_out)
-        active = self.store_out[path][1]
 
         if not active:
             if pname not in mod.extras["portconfig"]["out"][act_out]:
@@ -237,9 +243,9 @@ class PortConfigView(Gtk.Grid):
         refresh_connections(mod, cfg)
         self.populate()
 
-    def on_unv_output_toggled(self, widget, path):
+    def out_unv_toggle(self, pname, active):
         act_out = max(0, self.combo_out.get_active())
-        pname = self.store_unv_out[path][0]
+
         if pname in mod.extras["portconfig"]["out"][act_out]:
             mod.extras["portconfig"]["out"][act_out].remove(pname)
 
