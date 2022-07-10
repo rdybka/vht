@@ -27,8 +27,8 @@
 
 #define MANDY_DEF_MITER  2
 #define MAGIC_MITER2UNIT_RATIO	1.67
-// should be 20 for what it's for
-#define MANDY_MAX_ITER 123
+// should be 5 for what it's for
+#define MANDY_MAX_ITER 	23
 #define MANDY_DEF_BAIL   4
 #define MANDY_REND_RES	9
 
