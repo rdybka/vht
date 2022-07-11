@@ -134,7 +134,7 @@ class PreferencesWin(Gtk.Window):
         grid.set_margin_right(mrg)
 
         bx = Gtk.Box()
-        lab = Gtk.Label.new("Prefer dark theme:")
+        lab = Gtk.Label.new("Prefer dark theme")
 
         sw = Gtk.Switch()
         sw.set_active(self.cfg.dark_theme)
@@ -160,7 +160,7 @@ class PreferencesWin(Gtk.Window):
         cmb.connect("changed", self.on_combo_mouseover_changed)
         # gr.attach(cmb, 0, 0, 1, 1)
         bx = Gtk.Box()
-        lab = Gtk.Label.new("Mouse-over:")
+        lab = Gtk.Label.new("Mouse-over")
         bx.pack_start(lab, False, False, 0)
         bx.pack_end(cmb, False, True, 0)
         grid.attach(bx, 0, 6, 1, 1)
@@ -197,17 +197,17 @@ class PreferencesWin(Gtk.Window):
 
         bx = Gtk.Box()
 
-        bx.pack_start(Gtk.Label.new("star:"), True, True, 0)
+        bx.pack_start(Gtk.Label.new("star"), True, True, 0)
         scbutt = self.cbutt(Gdk.RGBA(*self.cfg.star_colour, 1), 4)
         bx.pack_start(scbutt, False, False, 0)
 
         scbutt = self.cbutt(Gdk.RGBA(*self.cfg.mandy_colour, 1), 6)
         bx.pack_end(scbutt, False, False, 0)
-        bx.pack_end(Gtk.Label.new("mandy:"), True, True, 0)
+        bx.pack_end(Gtk.Label.new("mandy"), True, True, 0)
 
         scbutt = self.cbutt(Gdk.RGBA(*self.cfg.record_colour, 1), 5)
         bx.pack_end(scbutt, False, False, 0)
-        bx.pack_end(Gtk.Label.new("rec:"), True, True, 0)
+        bx.pack_end(Gtk.Label.new("rec"), True, True, 0)
 
         grid.attach(bx, 0, 5, 1, 1)
 
@@ -307,24 +307,15 @@ class PreferencesWin(Gtk.Window):
         grid.set_margin_right(mrg)
 
         bx = Gtk.Box()
-        lab = Gtk.Label.new("New tracks on left:")
+        lab = Gtk.Label.new("Confirm quit")
 
         sw = Gtk.Switch()
-        sw.set_active(self.cfg.new_tracks_left)
-        sw.connect("state-set", self.on_new_tracks_left_switch)
+        sw.set_active(self.cfg.ask_quit)
+        sw.connect("state-set", self.on_ask_quit_switch)
+        sw.set_tooltip_markup(self.cfg.tooltip_markup % ("when unsaved changes"))
         bx.pack_start(lab, False, False, 0)
         bx.pack_end(sw, False, False, 0)
         grid.attach(bx, 0, 0, 1, 1)
-
-        bx = Gtk.Box()
-        lab = Gtk.Label.new("Empty track in new seq:")
-
-        sw = Gtk.Switch()
-        sw.set_active(self.cfg.new_seqs_with_tracks)
-        sw.connect("state-set", self.on_new_seqs_tracks_switch)
-        bx.pack_start(lab, False, False, 0)
-        bx.pack_end(sw, False, False, 0)
-        grid.attach(bx, 0, 1, 1, 1)
 
         fr, gr = self.create_frame("Quick controls", mrg)
 
@@ -455,7 +446,27 @@ class PreferencesWin(Gtk.Window):
         grid.set_margin_right(mrg)
 
         bx = Gtk.Box()
-        lab = Gtk.Label.new("Pop up ports:")
+        lab = Gtk.Label.new("New tracks on left")
+
+        sw = Gtk.Switch()
+        sw.set_active(self.cfg.new_tracks_left)
+        sw.connect("state-set", self.on_new_tracks_left_switch)
+        bx.pack_start(lab, False, False, 0)
+        bx.pack_end(sw, False, False, 0)
+        grid.attach(bx, 0, 0, 1, 1)
+
+        bx = Gtk.Box()
+        lab = Gtk.Label.new("Empty track in new seq")
+
+        sw = Gtk.Switch()
+        sw.set_active(self.cfg.new_seqs_with_tracks)
+        sw.connect("state-set", self.on_new_seqs_tracks_switch)
+        bx.pack_start(lab, False, False, 0)
+        bx.pack_end(sw, False, False, 0)
+        grid.attach(bx, 0, 1, 1, 1)
+
+        bx = Gtk.Box()
+        lab = Gtk.Label.new("Pop up ports")
         bx.set_hexpand(True)
 
         sw = Gtk.Switch()
@@ -464,10 +475,10 @@ class PreferencesWin(Gtk.Window):
         sw.set_tooltip_markup(self.cfg.tooltip_markup % ("if no connections active"))
         bx.pack_start(lab, False, False, 0)
         bx.pack_end(sw, False, False, 0)
-        grid.attach(bx, 0, 0, 1, 1)
+        grid.attach(bx, 0, 2, 1, 1)
 
         bx = Gtk.Box()
-        lab = Gtk.Label.new("pnq_hack:")
+        lab = Gtk.Label.new("pnq_hack")
         bx.set_hexpand(True)
 
         sw = Gtk.Switch()
@@ -478,7 +489,7 @@ class PreferencesWin(Gtk.Window):
         )
         bx.pack_start(lab, False, False, 0)
         bx.pack_end(sw, False, False, 0)
-        grid.attach(bx, 0, 1, 1, 1)
+        grid.attach(bx, 0, 3, 1, 1)
 
         return grid
 
@@ -624,6 +635,9 @@ class PreferencesWin(Gtk.Window):
 
     def on_new_tracks_left_switch(self, wdg, prm):
         self.cfg.new_tracks_left = prm
+
+    def on_ask_quit_switch(self, wdg, prm):
+        self.cfg.ask_quit = prm
 
     def on_port_popup_switch(self, wdg, prm):
         self.cfg.port_popup = prm

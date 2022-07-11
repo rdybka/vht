@@ -229,6 +229,7 @@ class SequenceTriggersView(Gtk.Grid):
         ms[d] = evt.button
         x["mouse_cfg"] = ms
         self.refresh()
+        mod.should_save = True
 
     def on_butt_in(self, wdg, sign, i):
         if i == 0:

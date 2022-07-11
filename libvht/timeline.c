@@ -30,6 +30,14 @@ void timeline_excl_out(timeline *tl) {
 	pthread_mutex_unlock(&tl->excl);
 }
 
+inline void tl_should_save(timeline *tl) {
+	if (tl->clt) {
+		midi_client *clt = (midi_client *)tl->clt;
+		module *mod = (module *)clt->mod_ref;
+		mod->should_save = 1;
+	}
+}
+
 timeline *timeline_new(midi_client *clt) {
 	timeline *ntl = malloc(sizeof(timeline));
 
@@ -112,6 +120,7 @@ timechange *timeline_add_change(timeline *tl, float bpm, long row, int linked) {
 	tc->tag = 0;
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
+	tl_should_save(tl);
 	return tc;
 }
 
@@ -124,6 +133,7 @@ void timechange_set(timeline *tl, timechange *tc, float bpm, long row, int linke
 
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
+	tl_should_save(tl);
 }
 
 void timechange_set_bpm(timeline *tl, timechange *tc, float bpm) {
@@ -131,6 +141,7 @@ void timechange_set_bpm(timeline *tl, timechange *tc, float bpm) {
 	tc->bpm = bpm;
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
+	tl_should_save(tl);
 }
 
 void timechange_set_row(timeline *tl, timechange *tc, long row) {
@@ -138,6 +149,7 @@ void timechange_set_row(timeline *tl, timechange *tc, long row) {
 	tc->row = row;
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
+	tl_should_save(tl);
 }
 
 void timechange_set_linked(timeline *tl, timechange *tc, int linked) {
@@ -145,6 +157,7 @@ void timechange_set_linked(timeline *tl, timechange *tc, int linked) {
 	tc->linked = linked;
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
+	tl_should_save(tl);
 }
 
 float timechange_get_bpm(timechange *tc) {
@@ -170,6 +183,7 @@ void timechange_del(timeline *tl, int id) {
 
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
+	tl_should_save(tl);
 }
 
 float timeline_get_bpm_at_qb(timeline *tl, long row) {
@@ -629,6 +643,7 @@ int timeline_expand(timeline *tl, long qb_start, long qb_n) {
 
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
+	tl_should_save(tl);
 	return 0;
 }
 
@@ -739,6 +754,7 @@ timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, long start, 
 	s->seq->playing = 0;
 	s->seq->pos = 0;
 	s->seq->clt = tl->clt;
+
 	s->enabled = 1;
 
 	for (int t = 0; t < s->seq->ntrk; t++) {
@@ -747,6 +763,7 @@ timestrip *timeline_add_strip(timeline *tl, int col, sequence *seq, long start, 
 
 	timeline_update_inner(tl);
 	timeline_excl_out(tl);
+	tl_should_save(tl);
 	return s;
 }
 
@@ -761,6 +778,7 @@ void timeline_del_strip(timeline *tl, int id) {
 
 	tl->strips = realloc(tl->strips, sizeof(timestrip) * --tl->nstrips);
 	timeline_excl_out(tl);
+	tl_should_save(tl);
 }
 
 void timeline_delete_all_strips(timeline *tl, int col) {
@@ -783,6 +801,7 @@ void timeline_delete_all_strips(timeline *tl, int col) {
 			tl->strips[s].seq->parent = tl->strips[s].col;
 		}
 	}
+	tl_should_save(tl);
 }
 
 void timeline_clear(timeline *tl) {
@@ -851,6 +870,7 @@ void timeline_swap_sequence(timeline *tl, int s1, int s2) {
 	}
 
 	timeline_excl_out(tl);
+	tl_should_save(tl);
 }
 
 void timeline_reset(timeline *tl) {
@@ -867,6 +887,7 @@ void timestrip_set_start(timestrip *tstr, int start) {
 	timeline *tl = mod->tline;
 	timeline_update(tl);
 	timeline_update_loops_in_strips(tl);
+	tl_should_save(tl);
 }
 
 void timestrip_set_length(timestrip *tstr, int length) {
@@ -876,6 +897,7 @@ void timestrip_set_length(timestrip *tstr, int length) {
 	timeline *tl = mod->tline;
 	timeline_update(tl);
 	timeline_update_loops_in_strips(tl);
+	tl_should_save(tl);
 }
 
 double timestrip_get_rpb(timestrip *strp, double offs) {
@@ -1110,6 +1132,7 @@ void timeline_set_loop_active(timeline *tl, int val) {
 
 	tl->loop_active = val;
 	timeline_update_loops_in_strips(tl);
+	tl_should_save(tl);
 }
 
 long timeline_get_loop_start(timeline *tl) {
@@ -1161,11 +1184,13 @@ void timeline_update_loops_in_strips(timeline *tl) {
 void timeline_set_loop_start(timeline *tl, long val) {
 	tl->loop_start = val;
 	timeline_update_loops_in_strips(tl);
+	tl_should_save(tl);
 }
 
 void timeline_set_loop_end(timeline *tl, long val) {
 	tl->loop_end = val;
 	timeline_update_loops_in_strips(tl);
+	tl_should_save(tl);
 }
 
 void timeline_set_pos(timeline *tl, double npos, int let_ring) {

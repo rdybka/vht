@@ -28,14 +28,22 @@
 #include "track.h"
 #include "row.h"
 
-void trk_mod_excl_in(track *trk) {
+inline void trk_mod_excl_in(track *trk) {
 	if (trk->mod_excl)
 		pthread_mutex_lock(trk->mod_excl);
 }
 
-void trk_mod_excl_out(track *trk) {
+inline void trk_mod_excl_out(track *trk) {
 	if (trk->mod_excl)
 		pthread_mutex_unlock(trk->mod_excl);
+}
+
+inline void trk_should_save(track *trk) {
+	if (trk->clt) {
+		midi_client *clt = (midi_client *)trk->clt;
+		module *mod = (module *)clt->mod_ref;
+		mod->should_save = 1;
+	}
 }
 
 track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
@@ -68,6 +76,7 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	trk->qc2_val = -1;
 	trk->qc2_last = -1;
 	trk->extras = NULL;
+	trk->clt = NULL;
 
 	pthread_mutex_init(&trk->excl, NULL);
 	pthread_mutex_init(&trk->exclrec, NULL);
@@ -102,12 +111,12 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 
 	trk->crows = 0;
 
-	track_add_ctrl(trk, -1);
 	trk->playing = 1;
-	trk->clt = NULL;
 	trk->indicators = 0;
 	trk->dirty = 0;
 	trk->dirty_wheel = 0;
+
+	track_add_ctrl(trk, -1);
 
 	trk->mand = mandy_new(trk);
 	track_reset(trk);
@@ -138,6 +147,7 @@ void track_reset(track *trk) {
 	for (int c = 0; c < trk->ncols; c++) {
 		for (int r = 0; r < trk->nrows; r++) {
 			row_randomise(&trk->rows[c][r]);
+			trk->rows[c][r].clt = trk->clt;
 		}
 	}
 }
@@ -197,7 +207,7 @@ int track_get_row(track *trk, int c, int n, row *r) {
 	r->delay_next = s->delay_next;
 	r->velocity_range = s->velocity_range;
 	r->velocity_next = s->velocity_next;
-
+	r->clt = trk->clt;
 	pthread_mutex_unlock(&trk->excl);
 	return 0;
 }
@@ -224,7 +234,7 @@ void track_set_ctrl(track *trk, int c, int n, int val) {
 			}
 		}
 	}
-
+	trk_should_save(trk);
 	pthread_mutex_unlock(&trk->exclctrl);
 
 	track_insert_rec_update(trk, c + trk->ncols, n / trk->ctrlpr);
@@ -250,6 +260,7 @@ char *track_get_ctrl_nums(track *trk) {
 void track_set_ctrl_num(track *trk, int c, int v) {
 	pthread_mutex_lock(&trk->exclctrl);
 	trk->ctrlnum[c] = v;
+	trk_should_save(trk);
 	pthread_mutex_unlock(&trk->exclctrl);
 }
 
@@ -326,6 +337,7 @@ char *track_get_extras(track *trk) {
 }
 
 void track_set_extras(track *trk, char *extr) {
+	trk_should_save(trk);
 	//printf("xtra: %p <- %s\n", trk, extr);
 	if (extr == NULL) {
 		free(trk->extras);
@@ -387,6 +399,7 @@ void track_clear_rows(track *trk, int c) {
 		trk->rows[c][t].delay_range = 0;
 		trk->rows[c][t].velocity_next = 100;
 		trk->rows[c][t].delay_next = 0;
+		trk->rows[c][t].clt = trk->clt;
 	}
 
 	pthread_mutex_unlock(&trk->excl);
@@ -1236,6 +1249,7 @@ void track_add_col(track *trk) {
 	trk->lsounded[trk->ncols - 1] = -1;
 	trk->mand_qnt[trk->ncols - 1] = -1;
 	trk->dirty = 1;
+	trk_should_save(trk);
 	pthread_mutex_unlock(&trk->excl);
 
 	track_clear_rows(trk, trk->ncols - 1);
@@ -1267,7 +1281,7 @@ void track_add_ctrl(track *trk, int c) {
 	for (int r = 0; r < trk->ctrlpr * trk->arows; r++) {
 		trk->ctrl[trk->nctrl -1][r] = -1;
 	}
-
+	trk_should_save(trk);
 	pthread_mutex_unlock(&trk->exclctrl);
 
 	track_clear_crows(trk, trk->nctrl - 1);
@@ -1297,6 +1311,7 @@ void track_del_col(track *trk, int c) {
 	trk->mand_qnt = realloc(trk->mand_qnt, sizeof(int) * trk->ncols);
 
 	trk->dirty = 1;
+	trk_should_save(trk);
 	trk_mod_excl_out(trk);
 }
 
@@ -1325,7 +1340,7 @@ void track_del_ctrl(track *trk, int c) {
 	trk->env = realloc(trk->env, sizeof(envelope *) * trk->nctrl);
 	trk->lctrlval = realloc(trk->lctrlval, sizeof(int) * trk->nctrl);
 	trk->lctrlrow = realloc(trk->lctrlrow, sizeof(int) * trk->nctrl);
-
+	trk_should_save(trk);
 	pthread_mutex_unlock(&trk->exclctrl);
 }
 
@@ -1340,6 +1355,7 @@ void track_swap_col(track *trk, int c, int c2) {
 	trk->rows[c2] = c3;
 	trk->dirty = 1;
 	trk_mod_excl_out(trk);
+	trk_should_save(trk);
 }
 
 void track_swap_ctrl(track *trk, int c, int c2) {
@@ -1375,6 +1391,7 @@ void track_swap_ctrl(track *trk, int c, int c2) {
 	trk->env[c2] = env3;
 
 	pthread_mutex_unlock(&trk->exclctrl);
+	trk_should_save(trk);
 }
 
 void track_clear_updates(track *trk) {
@@ -1411,6 +1428,7 @@ void track_resize(track *trk, int size) {
 			trk->rows[c][n].note = 0;
 			trk->rows[c][n].velocity = 0;
 			trk->rows[c][n].delay = 0;
+			trk->rows[c][n].clt = trk->clt;
 		}
 	}
 
@@ -1440,6 +1458,7 @@ void track_resize(track *trk, int size) {
 
 	pthread_mutex_unlock(&trk->excl);
 	track_clear_updates(trk);
+	trk_should_save(trk);
 	trk->dirty = 1;
 }
 
@@ -1459,6 +1478,7 @@ void track_set_nsrows(track *trk, int n) {
 
 	trk->resync = 1;
 	trk->dirty = 1;
+	trk_should_save(trk);
 }
 
 void track_double(track *trk) {
@@ -1471,6 +1491,7 @@ void track_double(track *trk) {
 	for (int c = 0; c < trk->ncols; c++) {
 		for (int r = 0; r < offs; r++) {
 			row *s = &trk->rows[c][r];
+			trk->rows[c][r + offs].clt = trk->clt;
 			row_set(&trk->rows[c][r + offs], s->type, s->note, s->velocity, s->delay, s->prob, s->velocity_range, s->delay_range);
 		}
 	}
@@ -1487,7 +1508,7 @@ void track_double(track *trk) {
 
 		track_ctrl_refresh_envelope(trk, c);
 	}
-
+	trk_should_save(trk);
 	trk_mod_excl_out(trk);
 }
 
@@ -1507,6 +1528,7 @@ void track_halve(track *trk) {
 
 	track_resize(trk, trk->nrows / 2);
 	trk->nsrows /= 2;
+	trk_should_save(trk);
 }
 
 void track_trigger(track *trk) {
@@ -1541,6 +1563,12 @@ void track_insert_rec_update(track *trk, int col, int row) {
 		        && (trk->updates[trk->cur_rec_update - 1].row == row)) {
 			return;
 		}
+	}
+
+	if (trk->clt) {
+		midi_client *clt = (midi_client *)trk->clt;
+		module *mod = (module *)clt->mod_ref;
+		mod->should_save = 1;
 	}
 
 	pthread_mutex_lock(&trk->exclrec);
@@ -1727,14 +1755,17 @@ int track_get_last_row_played(track *trk, int col) {
 // all controllers will have envs added automatically
 void track_envelope_add_node(track *trk, int c, float x, float y, float z, int linked) {
 	envelope_add_node(trk->env[c], x, y, z, linked);
+	trk_should_save(trk);
 }
 
 void track_envelope_del_node(track *trk, int c, int n) {
 	envelope_del_node(trk->env[c], n);
+	trk_should_save(trk);
 }
 
 void track_envelope_set_node(track *trk, int c, int n, float x, float y, float z, int linked) {
 	envelope_set_node(trk->env[c], n, x, y, z, linked);
+	trk_should_save(trk);
 }
 
 PyObject *track_get_envelope(track *trk, int c) {

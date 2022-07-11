@@ -59,6 +59,7 @@ class MainWin(Gtk.ApplicationWindow):
         self.set_events(Gdk.EventMask.KEY_PRESS_MASK | Gdk.EventMask.KEY_RELEASE_MASK)
         self.connect("key-press-event", self.on_key_press)
         self.connect("key-release-event", self.on_key_release)
+        self.connect("delete-event", self.on_destroy)
 
         if "timeline_win_pos_y" in mod.extras:
             cfg.timeline_position_y = mod.extras["timeline_win_pos_y"]
@@ -221,14 +222,34 @@ class MainWin(Gtk.ApplicationWindow):
             dialog.run()
             dialog.destroy()
 
+        mod.should_save = False
         self.add_tick_callback(self.tick)
+
+    def on_destroy(self, wdg, param):
+        if not mod.should_save:
+            return
+
+        if not cfg.ask_quit:
+            return
+
+        dialog = Gtk.MessageDialog(
+            self,
+            0,
+            Gtk.MessageType.QUESTION,
+            Gtk.ButtonsType.OK_CANCEL,
+            "Quit without saving?",
+        )
+
+        rt = dialog.run()
+        dialog.destroy()
+        if rt == Gtk.ResponseType.CANCEL:
+            return True
 
     def tick(self, wdg, param):
         self.time_display.set_markup(
             """<span font_desc="Roboto bold" font_family="monospace" size="x-large">%s</span>"""
             % mod.time
         )
-
         if self.transport_switch.props.state != mod.transport:
             self.transport_switch.props.state = mod.transport
 

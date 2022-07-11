@@ -24,7 +24,47 @@
 #include "module.h"
 
 // getters/setters and stuff for python
-// bad idea, probably
+
+// dear mother of god...
+inline void trk_should_save(track *trk) {
+	if (trk->clt) {
+		midi_client *clt = (midi_client *)trk->clt;
+		module *mod = (module *)clt->mod_ref;
+		mod->should_save = 1;
+	}
+}
+
+inline void seq_should_save(sequence *seq) {
+	if (seq->clt) {
+		midi_client *clt = (midi_client *)seq->clt;
+		module *mod = (module *)clt->mod_ref;
+		mod->should_save = 1;
+	}
+}
+
+inline void mod_should_save(module *mod) {
+	if (mod->clt) {
+		midi_client *clt = (midi_client *)mod->clt;
+		module *mod = (module *)clt->mod_ref;
+		mod->should_save = 1;
+	}
+}
+
+inline void tl_should_save(timeline *tl) {
+	if (tl->clt) {
+		midi_client *clt = (midi_client *)tl->clt;
+		module *mod = (module *)clt->mod_ref;
+		mod->should_save = 1;
+	}
+}
+
+inline void ts_should_save(timestrip *ts) {
+	if (ts->seq->clt) {
+		midi_client *clt = (midi_client *)ts->seq->clt;
+		module *mod = (module *)clt->mod_ref;
+		mod->should_save = 1;
+	}
+}
 
 int charpp_nitems(char **cpp) {
 	if (!cpp)
@@ -180,20 +220,24 @@ double track_get_pos(track *trk) {
 
 void track_set_port(track *trk, int n) {
 	trk->port = n;
+	trk_should_save(trk);
 }
 
 void track_set_channel(track *trk, int n) {
 	trk->channel = n;
+	trk_should_save(trk);
 }
 
 void track_set_program(track *trk, int p) {
 	trk->prog = p;
 	trk->prog_sent = 0;
+	trk_should_save(trk);
 }
 
 void track_set_bank(track *trk, int msb, int lsb) {
 	trk->bank_msb = msb;
 	trk->bank_lsb = lsb;
+	trk_should_save(trk);
 }
 
 char *track_get_program(track *trk) {
@@ -211,15 +255,18 @@ char *track_get_qc(track *trk) {
 void track_set_qc1(track *trk, int ctrl, int val) {
 	trk->qc1_ctrl = ctrl;
 	trk->qc1_val = val;
+	trk_should_save(trk);
 }
 
 void track_set_qc2(track *trk, int ctrl, int val) {
 	trk->qc2_ctrl = ctrl;
 	trk->qc2_val = val;
+	trk_should_save(trk);
 }
 
 void track_set_loop(track *trk, int v) {
 	trk->loop = v;
+	trk_should_save(trk);
 }
 
 void track_set_dirty(track *trk, int d) {
@@ -245,6 +292,7 @@ void track_clear_indicators(track *trk) {
 
 void sequence_set_trg_quantise(sequence *seq, int v) {
 	seq->trg_quantise = v;
+	seq_should_save(seq);
 }
 
 int sequence_get_trg_quantise(sequence *seq) {
@@ -253,6 +301,7 @@ int sequence_get_trg_quantise(sequence *seq) {
 
 void sequence_set_trg_playmode(sequence *seq, int v) {
 	seq->trg_playmode = v;
+	seq_should_save(seq);
 }
 
 int sequence_get_trg_playmode(sequence *seq) {
@@ -265,6 +314,7 @@ void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt) {
 	seq->triggers[t].type = tp;
 	seq->triggers[t].channel = ch;
 	seq->triggers[t].note = nt;
+	seq_should_save(seq);
 }
 
 char *sequence_get_trig(sequence *seq, int t) {
@@ -343,13 +393,16 @@ int timestrip_get_rpb_end(timestrip *tstr) {
 
 void timestrip_set_rpb_start(timestrip *tstr, int rpb_start) {
 	tstr->rpb_start = rpb_start;
+	ts_should_save(tstr);
 }
 
 void timestrip_set_rpb_end(timestrip *tstr, int rpb_end) {
 	tstr->rpb_end = rpb_end;
+	ts_should_save(tstr);
 }
 
 void timestrip_set_col(timestrip *tstr, int col) {
 	tstr->col = col;
 	tstr->seq->parent = col;
+	ts_should_save(tstr);
 }

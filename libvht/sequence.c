@@ -33,6 +33,14 @@ void seq_mod_excl_out(sequence *seq) {
 		pthread_mutex_unlock(seq->mod_excl);
 }
 
+inline void seq_should_save(sequence *seq) {
+	if (seq->clt) {
+		midi_client *clt = (midi_client *)seq->clt;
+		module *mod = (module *)clt->mod_ref;
+		mod->should_save = 1;
+	}
+}
+
 sequence *sequence_new(int length) {
 	sequence *seq = malloc(sizeof(sequence));
 	seq->ntrk = 0;
@@ -80,6 +88,11 @@ void sequence_strip_parent(sequence *seq) {
 void sequence_trk_reindex(sequence *seq) {
 	for (int t = 0; t < seq->ntrk; t++) {
 		seq->trk[t]->index = t;
+		for (int c = 0; c < seq->trk[t]->ncols; c++) {
+			for (int r = 0; r < seq->trk[t]->nrows; r++) {
+				seq->trk[t]->rows[c][r].clt = seq->clt;
+			}
+		}
 	}
 
 	seq->thumb_dirty = 1;
@@ -130,6 +143,7 @@ void sequence_add_track(sequence *seq, track *trk) {
 	sequence_trk_reindex(seq);
 	track_wind(trk, seq->pos);
 	seq->thumb_dirty = 1;
+	seq_should_save(seq);
 	seq_mod_excl_out(seq);
 	return;
 }
@@ -394,6 +408,7 @@ void sequence_del_track(sequence *seq, int t) {
 	}
 
 	sequence_trk_reindex(seq);
+	seq_should_save(seq);
 	seq_mod_excl_out(seq);
 }
 
@@ -414,6 +429,7 @@ void sequence_swap_track(sequence *seq, int t1, int t2) {
 	seq->trk[t2] = t3;
 	sequence_trk_reindex(seq);
 	seq_mod_excl_out(seq);
+	seq_should_save(seq);
 }
 
 void sequence_set_midi_focus(sequence *seq, int foc) {
@@ -432,6 +448,7 @@ void sequence_set_length(sequence *seq, int length) {
 	seq->length = length;
 	seq->lost = 1;
 	seq->thumb_dirty = 1;
+	seq_should_save(seq);
 	seq_mod_excl_out(seq);
 }
 
@@ -736,6 +753,7 @@ void sequence_set_extras(sequence *seq, char *extr) {
 	int l = strlen(extr);
 	seq->extras = malloc(l + 1);
 	strcpy(seq->extras, extr);
+	seq_should_save(seq);
 }
 
 void sequence_rotate(sequence *seq, int n, int trknum) {
@@ -775,6 +793,7 @@ void sequence_rotate(sequence *seq, int n, int trknum) {
 	}
 
 	seq_mod_excl_out(seq);
+	seq_should_save(seq);
 }
 
 int sequence_get_loop_active(sequence *seq) {

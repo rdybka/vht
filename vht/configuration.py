@@ -124,7 +124,7 @@ class Configuration:
 
         self.default_seq_length = 16
         self.controller_resolution = 8
-        self.pnq_hack = False
+        self.pnq_hack = True
 
         self.last_load_path = ""
         self.last_save_path = ""
@@ -278,6 +278,7 @@ class Configuration:
         self.n_backups = 0
         self.autosave_seq = True
         self.autosave_trk = False
+        self.ask_quit = True
 
         self.cfg_parser = self.build_parser()
 
@@ -302,8 +303,7 @@ class Configuration:
         }
 
         cfg["advanced"] = {
-            "new_tracks_left": self.new_tracks_left,
-            "new_seqs_with_tracks": self.new_seqs_with_tracks,
+            "ask_quit": self.ask_quit,
             "quick_controls_desc": self.quick_controls_desc,
             "quick_control_1_ctrl": self.quick_control_1_ctrl,
             "quick_control_1_def": self.quick_control_1_def,
@@ -338,6 +338,8 @@ class Configuration:
         }
 
         cfg["other"] = {
+            "new_tracks_left": self.new_tracks_left,
+            "new_seqs_with_tracks": self.new_seqs_with_tracks,
             "port_popup": self.port_popup,
             "pnq_hack": self.pnq_hack,
         }
@@ -364,8 +366,7 @@ class Configuration:
         lnf["timeline_show"] = str(self.timeline_show)
 
         adv = self.cfg_parser["advanced"]
-        adv["new_tracks_left"] = str(self.new_tracks_left)
-        adv["new_seqs_with_tracks"] = str(self.new_seqs_with_tracks)
+        adv["ask_quit"] = str(self.ask_quit)
         adv["quick_controls_desc"] = self.quick_controls_desc
         adv["quick_control_1_ctrl"] = str(self.quick_control_1_ctrl)
         adv["quick_control_1_def"] = str(self.quick_control_1_def)
@@ -401,6 +402,8 @@ class Configuration:
         rnd["render_folder"] = self.render_folder
 
         oth = self.cfg_parser["other"]
+        oth["new_tracks_left"] = str(self.new_tracks_left)
+        oth["new_seqs_with_tracks"] = str(self.new_seqs_with_tracks)
         oth["port_popup"] = str(self.port_popup)
         oth["pnq_hack"] = str(self.pnq_hack)
 
@@ -464,8 +467,7 @@ class Configuration:
             self.timeline_show = lnf.getboolean("timeline_show")
 
             adv = self.cfg_parser["advanced"]
-            self.new_tracks_left = adv.getboolean("new_tracks_left")
-            self.new_seqs_with_tracks = adv.getboolean("new_seqs_with_tracks")
+            self.ask_quit = adv.getboolean("ask_quit")
             self.quick_controls_desc = adv["quick_controls_desc"]
             self.quick_control_1_ctrl = adv.getint("quick_control_1_ctrl")
             self.quick_control_1_def = adv.getint("quick_control_1_def")
@@ -505,6 +507,8 @@ class Configuration:
             self.render_folder = rnd["render_folder"]
 
             oth = self.cfg_parser["other"]
+            self.new_tracks_left = oth.getboolean("new_tracks_left")
+            self.new_seqs_with_tracks = oth.getboolean("new_seqs_with_tracks")
             self.port_popup = oth.getboolean("port_popup")
             self.pnq_hack = oth.getboolean("pnq_hack")
 

@@ -60,6 +60,7 @@ typedef struct module_t {
 	jack_nframes_t end_time;
 	int render_lead_out;
 	int pnq_hack;
+	int should_save;
 } module;
 
 module *module_new(void);
@@ -103,5 +104,7 @@ void module_set_freewheel(module *mod, int on);
 void module_seq_pnq_hack(module *mod, int ph);
 int module_get_pnq_hack(module *mod);
 
+void module_set_should_save(module *mod, int ss);
+int module_get_should_save(module *mod);
 
 #endif //__MODULE_H__

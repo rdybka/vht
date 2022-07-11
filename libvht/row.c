@@ -18,7 +18,16 @@
 
 #include <stdlib.h>
 #include "row.h"
+#include "midi_client.h"
+#include "module.h"
 
+inline void rw_should_save(row *rw) {
+	if (rw->clt) {
+		midi_client *clt = (midi_client *)rw->clt;
+		module *mod = (module *)clt->mod_ref;
+		mod->should_save = 1;
+	}
+}
 int row_get_type(row *rw) {
 	return rw->type;
 }
@@ -45,21 +54,25 @@ void row_set_type(row *rw, int type) {
 
 void row_set_note(row *rw, int note) {
 	rw->note = note;
+	rw_should_save(rw);
 	row_randomise(rw);
 }
 
 void row_set_velocity(row *rw, int velocity) {
 	rw->velocity = velocity;
+	rw_should_save(rw);
 	row_randomise(rw);
 }
 
 void row_set_delay(row *rw, int delay) {
 	rw->delay = delay;
+	rw_should_save(rw);
 	row_randomise(rw);
 }
 
 void row_set_prob(row *rw, int prob) {
 	rw->prob = prob;
+	rw_should_save(rw);
 	row_randomise(rw);
 }
 
@@ -73,11 +86,13 @@ int row_get_delay_range(row *rw) {
 
 void row_set_velocity_range(row *rw, int range) {
 	rw->velocity_range = range;
+	rw_should_save(rw);
 	row_randomise(rw);
 }
 
 void row_set_delay_range(row *rw, int range) {
 	rw->delay_range = range;
+	rw_should_save(rw);
 	row_randomise(rw);
 }
 
@@ -91,6 +106,7 @@ void row_set(row *rw, int type, int note, int velocity, int delay, int prob, int
 	rw->velocity_next = velocity;
 	rw->delay_next = delay;
 	rw->type = type;
+	rw_should_save(rw);
 	row_randomise(rw);
 }
 

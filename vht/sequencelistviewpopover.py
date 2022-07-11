@@ -202,6 +202,7 @@ class SequenceListViewPopover(Gtk.Popover):
             mod.mainwin.app.autosave()
 
         mod.mainwin.gui_del_seq(self.curr)
+
         self.hide()
         self.pooped = False
         self._parent.redraw()

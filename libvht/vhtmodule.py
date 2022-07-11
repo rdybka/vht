@@ -419,6 +419,14 @@ class VHTModule(Iterable):
     def is_panicking(self):
         return libcvht.module_is_panicking(self._mod_handle)
 
+    @property
+    def should_save(self):
+        return True if libcvht.module_get_should_save(self._mod_handle) else False
+
+    @should_save.setter
+    def should_save(self, ph):
+        libcvht.module_set_should_save(self._mod_handle, 1 if ph else 0)
+
     def save(self, filename):
         jm = {}
         jm["bpm"] = self.bpm
@@ -459,6 +467,8 @@ class VHTModule(Iterable):
 
         with open(filename, "wb") as f:
             pickle.dump(jm, f)
+
+        self.should_save = False
 
     def load(self, filename, append=False):
         if not isinstance(filename, str):
@@ -535,6 +545,7 @@ class VHTModule(Iterable):
 
             self.play = jm["playing"]
 
+        self.should_save = False
         return True
 
     def unpack_seq(self, seq, matrix=False, append=False):

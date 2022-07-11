@@ -32,6 +32,7 @@ typedef struct row_t {
 	int velocity_next;
 	int delay_range;
 	int delay_next;
+	void *clt;
 } row;
 
 int row_get_type(row *rw);

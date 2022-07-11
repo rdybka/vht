@@ -220,9 +220,11 @@ class VHTApp(Gtk.Application):
     def autosave(self):
         if self.main_win.last_filename:
             vht.filerotator.rotate(self.main_win.last_filename, cfg.n_backups)
+            ss = mod.should_save
             mod.save(self.main_win.last_filename)
             mod.saving = True
             cfg.last_save_path = cfg.last_load_path
+            mod.should_save = ss
 
     def save_with_dialog(self):
         mod.extras["timeline_win_pos"] = (
@@ -348,7 +350,6 @@ def run():
     mod.ctrls = ctrlcfg.load()
     # fix patches
     mod.bank = bankcfg.load()
-
     autoexec.run()
 
     app = VHTApp()

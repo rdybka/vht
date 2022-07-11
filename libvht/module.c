@@ -48,6 +48,10 @@ int trg_equal(trigger *trg, midi_event *mev) {
 	return eq;
 }
 
+inline void mod_should_save(module *mod) {
+	mod->should_save = 1;
+}
+
 // the god-function
 void module_advance(module *mod, jack_nframes_t curr_frames) {
 	if (mod->panic) {
@@ -298,6 +302,13 @@ int module_get_pnq_hack(module *mod) {
 	return mod->pnq_hack;
 }
 
+void module_set_should_save(module *mod, int ss) {
+	mod->should_save = ss;
+}
+
+int module_get_should_save(module *mod) {
+	return mod->should_save;
+}
 
 void module_play(module *mod, int play) {
 	module_excl_in(mod);
@@ -348,6 +359,7 @@ module *module_new() {
 	tc->row = 0;
 	tc->linked = 0;
 	mod->pnq_hack = 0;
+	mod->should_save = 0;
 	timeline_update(mod->tline);
 
 	return mod;
@@ -458,6 +470,7 @@ void module_add_sequence(module *mod, sequence *seq) {
 
 	module_seqs_reindex(mod);
 	module_excl_out(mod);
+	mod_should_save(mod);
 }
 
 void module_del_sequence(module *mod, int s) {
@@ -488,6 +501,7 @@ void module_del_sequence(module *mod, int s) {
 
 	module_seqs_reindex(mod);
 	module_excl_out(mod);
+	mod_should_save(mod);
 }
 
 void module_swap_sequence(module *mod, int s1, int s2) {
@@ -510,6 +524,7 @@ void module_swap_sequence(module *mod, int s1, int s2) {
 
 	timeline_swap_sequence(mod->tline, s1, s2);
 	module_excl_out(mod);
+	mod_should_save(mod);
 }
 
 sequence *module_sequence_replace(module *mod, int s, sequence *seq) {
@@ -534,6 +549,7 @@ sequence *module_sequence_replace(module *mod, int s, sequence *seq) {
 	}
 
 	module_excl_out(mod);
+	mod_should_save(mod);
 	return seq;
 }
 
