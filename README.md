@@ -12,8 +12,8 @@ with added value of:
 - unheard of time signatures
 - scenes a'la 'ton
 - fractal turtles
-- doesn't make a sound
 - fits on a floppy
+- doesn't make a sound
 
 Frankly speaking, vht was envisaged as a re-creation
 of seq24 in tracker form for author's "studio needs"
