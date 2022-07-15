@@ -17,18 +17,17 @@ with added value of:
 
 Frankly speaking, vht was envisaged as a re-creation
 of seq24 in tracker form for author's "studio needs"
-and offers similar functionality (and limitations) 
-but in a different way. It relies 100% on JACK audio
-connection kit for input/output/synch and uses
-jack_capture for rendering. The GUI has similar 
-dependencies as gnome-calculator and tracker paradigm
-was chosen to allow for rhythmic gymnastics otherwise
-hard to convey.
+and offers similar functionality (and limitations).
+It relies 100% on JACK audio connection kit for 
+input/output/synch and uses jack_capture for rendering.
+The GUI has similar dependencies as gnome-calculator
+and tracker paradigm was chosen to allow for rhythmic
+gymnastics otherwise hard to convey.
 
 Low level stuff was done in C and wrapped in a Python
 library. Human interfacing part of contraption employs
 GTK through gobject introspection and was also contrived
-in language we shall no longer spam about.
+in the language we shall no longer spam about.
 
 ## dependencies
 ```
