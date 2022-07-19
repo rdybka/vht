@@ -204,6 +204,7 @@ class Configuration:
             "copy": cfgkey("c", False, True, False),
             "cut": cfgkey("x", False, True, False),
             "paste": cfgkey("v", False, True, False),
+            "paste_over": cfgkey("v", True, True, False),
             "delete": cfgkey("Delete", False, False, False),
             "pull": cfgkey("Delete", False, True, False),
             "push": cfgkey("Insert", False, True, False),

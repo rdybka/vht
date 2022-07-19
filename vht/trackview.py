@@ -1783,7 +1783,7 @@ class TrackView(Gtk.DrawingArea):
 
         return d
 
-    def paste(self):
+    def paste(self, repl=False):
         if not TrackView.clipboard:
             return
 
@@ -1826,6 +1826,14 @@ class TrackView(Gtk.DrawingArea):
                         self.trk[dx][dy].prob = r[4]
                         self.trk[dx][dy].velocity_range = r[5]
                         self.trk[dx][dy].delay_range = r[6]
+                    elif repl:
+                        self.trk[dx][dy].type = 0
+                        self.trk[dx][dy].note = 0
+                        self.trk[dx][dy].velocity = 0
+                        self.trk[dx][dy].delay = 0
+                        self.trk[dx][dy].prob = 0
+                        self.trk[dx][dy].velocity_range = 0
+                        self.trk[dx][dy].delay_range = 0
 
             if new_y:
                 self.edit = self.edit[0], new_y
@@ -1866,6 +1874,14 @@ class TrackView(Gtk.DrawingArea):
                         self.trk[x][y].prob = r[4]
                         self.trk[x][y].velocity_range = r[5]
                         self.trk[x][y].delay_range = r[6]
+                    elif repl:
+                        self.trk[x][y].type = 0
+                        self.trk[x][y].note = 0
+                        self.trk[x][y].velocity = 0
+                        self.trk[x][y].delay = 0
+                        self.trk[x][y].prob = 0
+                        self.trk[x][y].velocity_range = 0
+                        self.trk[x][y].delay_range = 0
                     x += 1
 
                 yy += 1
@@ -2095,6 +2111,14 @@ class TrackView(Gtk.DrawingArea):
         if cfg.key["paste"].matches(event):
             self.undo_buff.add_state()
             self.paste()
+            self.redraw()
+            self.undo_buff.add_state()
+            self.parent.prop_view.redraw(self.trk.index)
+            return True
+
+        if cfg.key["paste_over"].matches(event):
+            self.undo_buff.add_state()
+            self.paste(True)
             self.redraw()
             self.undo_buff.add_state()
             self.parent.prop_view.redraw(self.trk.index)

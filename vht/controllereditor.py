@@ -854,6 +854,13 @@ class ControllerEditor:
             self.from_clipboard()
             handled = True
 
+        if cfg.key["paste_over"].matches(event):
+            if not self.selection and self.edit == -1:
+                return False
+
+            self.from_clipboard(False, True)
+            handled = True
+
         if handled:
             self.trk.ctrl[self.ctrlnum].refresh()
             self.env = self.trk.get_envelope(self.ctrlnum)
@@ -1591,7 +1598,7 @@ class ControllerEditor:
             else:
                 d.append(self.trk.ctrl[self.ctrlnum][r + self.selection[0]].dummy())
 
-    def from_clipboard(self, doodles=False):
+    def from_clipboard(self, doodles=False, repl=False):
         d = ControllerEditor.clipboard
         if doodles:
             d = ControllerEditor.doodle_clipboard
@@ -1616,12 +1623,14 @@ class ControllerEditor:
 
         while p <= e:
             for r in d:
-                if p <= e:
+                if p < e:
                     if doodles:
                         for i, val in enumerate(r):
                             self.trk.set_ctrl(self.ctrlnum, (dpr * p) + i, val)
                     else:
-                        if self.trk.ctrl[self.ctrlnum][p].velocity == -1:
+                        if not repl and self.trk.ctrl[self.ctrlnum][p].velocity == -1:
+                            self.trk.ctrl[self.ctrlnum][p].copy(r)
+                        elif repl:
                             self.trk.ctrl[self.ctrlnum][p].copy(r)
                 p += 1
 

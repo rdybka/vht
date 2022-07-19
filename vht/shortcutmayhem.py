@@ -110,6 +110,7 @@ shorts = {
         ("Copy", "copy"),
         ("Cut", "cut"),
         ("Paste", "paste"),
+        ("Paste over", "paste_over"),
         ("Pull", "pull"),
         ("Push", "push"),
     ],
