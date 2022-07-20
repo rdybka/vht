@@ -408,6 +408,9 @@ void sequence_del_track(sequence *seq, int t) {
 	}
 
 	sequence_trk_reindex(seq);
+	if (seq->midi_focus > seq->ntrk -1)
+		seq->midi_focus = seq->ntrk -1;
+
 	seq_should_save(seq);
 	seq_mod_excl_out(seq);
 }
