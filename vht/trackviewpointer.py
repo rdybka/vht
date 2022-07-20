@@ -44,7 +44,6 @@ class TrackviewPointer:
         self.pulse = Pulsar(seq.rpb)
 
         self.stopped = False
-        self.gradient = None
 
     def draw(self, pos):
         self.pulse.freq = mod[mod.curr_seq].rpb
