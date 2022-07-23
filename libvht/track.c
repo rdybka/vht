@@ -1672,21 +1672,30 @@ void track_handle_record(track *trk, midi_event evt) {
 			}
 		}
 
-		if (!found)
+		if (!found) {
 			return;
+		}
 	}
 
 	row r;
 	track_get_row(trk, c, p, &r);
 
 	// try not to overwrite note_ons with note_offs
-	if (evt.type == note_off && r.type == note_on) {
-		return;
+	int cnt = trk->nrows;
+	while (evt.type == note_off && r.type == note_on) {
+		t = -49;
+		p++;
+		if (p >= trk->nrows)
+			p = 0;
+
+		track_get_row(trk, c, p, &r);
+		cnt--;
+		if (cnt < 0)
+			return;
 	}
 
 	if (p > trk->nrows - 1)
 		p = p - trk->nrows;
-
 
 	if (evt.type == note_on || evt.type == note_off) {
 		track_set_row(trk, c, p, evt.type, evt.note, evt.velocity, t);
