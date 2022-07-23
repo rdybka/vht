@@ -1253,7 +1253,7 @@ class TrackView(Gtk.DrawingArea):
             fldwidth = self.txt_width / flds
 
             if fldwidth < offs < fldwidth * 2:  # reset velocity
-                if 0 < self.trk[col][row].type < 3:
+                if 0 < self.trk[col][row].type < 2:
                     self.velocity_editor = VelocityEditor(self, col, row, event)
                     self.velocity_editor.clearing = True
                     self.trk[col][row].velocity = cfg.velocity
