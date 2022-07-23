@@ -286,6 +286,7 @@ class Configuration:
     def build_parser(self):
         cfg = configparser.ConfigParser()
         cfg["looknfeel"] = {
+            "window_opacity": self.window_opacity,
             "seq_font": self.seq_font,
             "console_font": self.console_font,
             "matrix_font": self.mixer_font,
@@ -349,6 +350,7 @@ class Configuration:
 
     def save(self):
         lnf = self.cfg_parser["looknfeel"]
+        lnf["window_opacity"] = str(self.window_opacity)
         lnf["seq_font"] = self.seq_font
         lnf["console_font"] = self.console_font
         lnf["matrix_font"] = self.mixer_font
@@ -417,6 +419,7 @@ class Configuration:
         if self.cfg_parser.read(filename):
             lnf = self.cfg_parser["looknfeel"]
             self.seq_font = lnf["seq_font"]
+            self.window_opacity = float(lnf["window_opacity"])
             self.console_font = lnf["console_font"]
             self.mixer_font = lnf["matrix_font"]
             self.timeline_font = lnf["timeline_font"]

@@ -144,6 +144,15 @@ class PreferencesWin(Gtk.Window):
         bx.pack_end(sw, False, False, 0)
         grid.attach(bx, 0, 0, 1, 1)
 
+        bx = Gtk.Box()
+        lab = Gtk.Label.new("Opacity")
+        lab.set_xalign(0)
+        bx.set_hexpand(True)
+        self.opslider = self.create_slider(2, self.cfg.window_opacity, 0.232323, 1, 3)
+        bx.pack_start(lab, True, True, 0)
+        bx.pack_end(self.opslider, True, True, 0)
+        grid.attach(bx, 0, 1, 1, 1)
+
         cmb = Gtk.ComboBoxText()
         cmb.append_text("none")
         cmb.append_text("not too rough")
@@ -163,7 +172,7 @@ class PreferencesWin(Gtk.Window):
         lab = Gtk.Label.new("Mouse-over")
         bx.pack_start(lab, False, False, 0)
         bx.pack_end(cmb, False, True, 0)
-        grid.attach(bx, 0, 6, 1, 1)
+        grid.attach(bx, 0, 7, 1, 1)
 
         fr, gr = self.create_frame("Sequence", mrg)
         scbutt = self.cbutt(Gdk.RGBA(*self.cfg.colour, 1), 0)
@@ -172,28 +181,28 @@ class PreferencesWin(Gtk.Window):
         gr.attach(scbutt, 0, 0, 1, 1)
         gr.attach(sfbutt, 1, 0, 1, 1)
         gr.attach(sslider, 0, 1, 2, 1)
-        grid.attach(fr, 0, 1, 1, 1)
+        grid.attach(fr, 0, 2, 1, 1)
 
         fr, gr = self.create_frame("Matrix", mrg)
         scbutt = self.cbutt(Gdk.RGBA(*self.cfg.mixer_colour, 1), 1)
         sfbutt = self.fbutt(self.cfg.mixer_font, 1)
         gr.attach(scbutt, 1, 0, 1, 1)
         gr.attach(sfbutt, 2, 0, 1, 1)
-        grid.attach(fr, 0, 2, 1, 1)
+        grid.attach(fr, 0, 3, 1, 1)
 
         fr, gr = self.create_frame("Timeline", mrg)
         scbutt = self.cbutt(Gdk.RGBA(*self.cfg.timeline_colour, 1), 2)
         sfbutt = self.fbutt(self.cfg.timeline_font, 2)
         gr.attach(scbutt, 1, 0, 1, 1)
         gr.attach(sfbutt, 2, 0, 1, 1)
-        grid.attach(fr, 0, 3, 1, 1)
+        grid.attach(fr, 0, 4, 1, 1)
 
         fr, gr = self.create_frame("Console", mrg)
         scbutt = self.cbutt(Gdk.RGBA(*self.cfg.console_colour, 1), 3)
         sfbutt = self.fbutt(self.cfg.console_font, 3)
         gr.attach(scbutt, 1, 0, 1, 1)
         gr.attach(sfbutt, 2, 0, 1, 1)
-        grid.attach(fr, 0, 4, 1, 1)
+        grid.attach(fr, 0, 5, 1, 1)
 
         bx = Gtk.Box()
 
@@ -209,7 +218,7 @@ class PreferencesWin(Gtk.Window):
         bx.pack_end(scbutt, False, False, 0)
         bx.pack_end(Gtk.Label.new("rec"), True, True, 0)
 
-        grid.attach(bx, 0, 5, 1, 1)
+        grid.attach(bx, 0, 6, 1, 1)
 
         return grid
 
@@ -581,6 +590,9 @@ class PreferencesWin(Gtk.Window):
             self.cfg.quick_control_1_def = int(val)
         if data == 2:
             self.cfg.quick_control_2_def = int(val)
+        if data == 3:
+            self.parent.set_opacity(self.cfg.window_opacity)
+            self.cfg.window_opacity = val
 
     def on_combo_midi_input_changed(self, wdg):
         self.cfg.midi_default_input = wdg.get_active_text() if wdg.get_active() else ""
