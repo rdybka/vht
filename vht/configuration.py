@@ -72,7 +72,7 @@ class Configuration:
         self.popup_timeout = 0.2
 
         self.intensity_background = 0.2
-        self.intensity_txt = 0.75
+        self.intensity_txt = 0.66
         self.intensity_indicator = 0.75
         self.intensity_txt_highlight = 1.0
         self.intensity_lines = 0.6

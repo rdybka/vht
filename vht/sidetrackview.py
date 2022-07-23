@@ -71,7 +71,7 @@ class SideTrackView(Gtk.DrawingArea):
 
         self.show_resize_handle = False
 
-        self.hover = None
+        self.hover = -1
         self.rotating = False
         self.rotate_zero = 0
 
@@ -81,6 +81,9 @@ class SideTrackView(Gtk.DrawingArea):
         self.last_loop_active = False
         self.last_loop_start = -1
         self.last_loop_end = -1
+
+        self.highlight_start = -1
+        self.highlight_end = -1
 
     def on_button_press(self, widget, event):
         if event.state & Gdk.ModifierType.CONTROL_MASK:
@@ -114,7 +117,7 @@ class SideTrackView(Gtk.DrawingArea):
                 self.seq.loop_end = -1
                 self.seq.loop_active = False
                 self.redraw()
-                return True
+                return False
 
             act = mod.timeline.loop.active
             self.seq.loop_active = False
@@ -433,7 +436,7 @@ class SideTrackView(Gtk.DrawingArea):
     def on_motion(self, widget, event):
         self.show_resize_handle = False
         lh = self.hover
-        self.hover = int(event.y / self.txt_height)
+        self.hover = min(int(event.y / self.txt_height), self.seq.length - 1)
 
         if self.drawing_loop:
             ds = self.drawing_start
@@ -480,7 +483,7 @@ class SideTrackView(Gtk.DrawingArea):
             if self.hover:
                 self.redraw(self.hover)
 
-        if self.show_resize_handle:
+        if self.seq.loop_active and self.show_resize_handle:
             self.get_window().set_cursor(self.resize_curs)
         else:
             self.get_window().set_cursor(None)
@@ -488,7 +491,7 @@ class SideTrackView(Gtk.DrawingArea):
         return True
 
     def on_leave(self, wdg, prm):
-        self.hover = None
+        self.hover = -1
         self.redraw()
 
     def on_destroy(self, wdg):
@@ -500,6 +503,78 @@ class SideTrackView(Gtk.DrawingArea):
 
         if self.zero_pattern_surface:
             self.zero_pattern_surface.finish()
+
+    def fix_highlight(self):
+        at = mod.active_track
+        ys = -1
+        ye = -1
+        rs = -1
+        re = -1
+
+        if at:
+            if at.hover:
+                rs, re = at.hover[1], at.hover[1]
+
+            if at.edit:
+                rs, re = at.edit[1], at.edit[1]
+
+            if at.select_start:
+                rs, re = at.select_start[1], at.select_end[1]
+
+            # if self.hover > -1:
+            #    rs = re = self.hover
+
+            if re < rs:
+                re, rs = rs, re
+
+            ys = int(rs * at.txt_height)
+            ye = int((re + 1) * at.txt_height)
+        else:
+            ys, ye = -1, -1
+
+            if self.hover > -1:
+                rs = re = self.hover
+
+        if ys != self.highlight_start or ye != self.highlight_end:
+            cr = self._back_context
+            crf = self._context
+            crf.set_source_surface(self._back_surface)
+            w = self.get_allocated_width()
+            h = self.get_allocated_height()
+            ir = Gdk.Rectangle()
+            (x, y, width, height, dx, dy) = cr.text_extents("|")
+            cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.colour))
+            cr.set_antialias(cairo.ANTIALIAS_NONE)
+            cr.set_line_width((self.parent.font_size / 6.0) * cfg.seq_line_width)
+            wnd = self.get_window()
+
+            # clear previous
+            if self.highlight_start > -1:
+                cr.move_to(self.txt_width - (dx / 2), self.highlight_start)
+                cr.line_to(self.txt_width - (dx / 2), self.highlight_end)
+                cr.stroke()
+
+            self.highlight_start = ys
+            self.highlight_end = ye
+
+            if self.highlight_start > -1:
+                cr.set_source_rgb(
+                    *(col * cfg.intensity_txt_highlight for col in cfg.colour)
+                )
+                cr.move_to(self.txt_width - (dx / 2), self.highlight_start)
+                cr.line_to(self.txt_width - (dx / 2), self.highlight_end)
+                cr.stroke()
+
+            ir.x = self.txt_width - (dx * 2)
+            ir.width = w - ir.x
+            ir.y = 0
+            ir.height = h
+            crf.rectangle(ir.x, ir.y, ir.width, ir.height)
+            crf.fill()
+            wnd.invalidate_rect(ir, False)
+
+            self.highlight_start = ys
+            self.highlight_end = ye
 
     def tick(self):
         redr = False
@@ -515,7 +590,7 @@ class SideTrackView(Gtk.DrawingArea):
             self.last_loop_end = self.seq.loop_end
             redr = True
 
-        # if self.last_strip_pos !=
+        self.fix_highlight()
 
         if redr:
             self.redraw()

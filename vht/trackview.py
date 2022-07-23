@@ -1168,13 +1168,16 @@ class TrackView(Gtk.DrawingArea):
             self.edit = self.select_end
 
         oh = self.hover
-        self.hover = new_hover_column, new_hover_row
+        self.hover = new_hover_column, int(event.y / self.txt_height)
+        if self.hover[1] >= self.trk.nrows:
+            self.hover = None
 
         if self.hover != oh:
             if oh:
                 self.redraw(oh[1])
 
-            self.redraw(self.hover[1])
+            if self.hover:
+                self.redraw(self.hover[1])
 
         if mod.active_track:
             if not mod.active_track == self:
@@ -1240,6 +1243,7 @@ class TrackView(Gtk.DrawingArea):
                     self.leave_all()
                     self.parent.redraw_track(mod.active_track.trk)
                     self.select = None
+                    self.hover = col, row
                 self.parent.change_active_track(self)
                 return True
 
