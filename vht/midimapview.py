@@ -28,13 +28,14 @@ class MidiMapView(Gtk.ScrolledWindow):
         super(MidiMapView, self).__init__()
         self.set_hexpand(True)
         self.set_vexpand(True)
-
         self.parent = parent
         self.mod = parent.mod
         self.cfg = parent.cfg
 
         self.capturing = False
         self.box = Gtk.Box()
+        self.set_hexpand(True)
+        self.set_vexpand(True)
         self.box.set_orientation(Gtk.Orientation.VERTICAL)
         self.box.set_homogeneous(False)
         self.box.set_spacing(2)

@@ -29,6 +29,10 @@
 #define TRIGGER_ONESHOT	1
 #define TRIGGER_HOLD	2
 
+#define	TRIGGER_GROUPS	5 + 1
+
+#define N_TRIGGERS		5
+
 typedef struct trigger_t {
 	int channel;
 	int type;
@@ -47,7 +51,8 @@ typedef struct sequence_t {
 	int index;
 
 	// triggers
-	trigger triggers[3];
+	trigger triggers[N_TRIGGERS];
+	int trg_grp[2]; // trigger group
 	int trg_times[4]; // dear children, we will contain whatever these mean in sequence.c so we can let ourselves go a bit
 	int trg_playmode;
 	int trg_quantise;

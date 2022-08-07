@@ -308,25 +308,26 @@ int sequence_get_trg_playmode(sequence *seq) {
 	return seq->trg_playmode;
 }
 
-void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt) {
-	if ((t > 2) || (t < 0))
-		return;
-	seq->triggers[t].type = tp;
-	seq->triggers[t].channel = ch;
-	seq->triggers[t].note = nt;
-	seq_should_save(seq);
-}
-
 char *sequence_get_trig(sequence *seq, int t) {
-	static char rc[256];
+	static char rc[32 * N_TRIGGERS];
 
-	if ((t > 2) || (t < 0))
+	if ((t >= N_TRIGGERS) || (t < 0))
 		return "[0,0,0]";
 
 	sprintf(rc, "[%3d, %3d, %3d]", seq->triggers[t].type, seq->triggers[t].channel, seq->triggers[t].note);
 	return rc;
 }
 
+int module_get_max_trg_grp() {
+	return TRIGGER_GROUPS;
+}
+
+int sequence_get_trg_grp(sequence *seq, int g) {
+	if ((g >= 0) && (g <= 1))
+		return seq->trg_grp[g];
+
+	return 0;
+}
 
 double sequence_get_pos(sequence *seq) {
 	return seq->pos;

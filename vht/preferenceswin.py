@@ -31,6 +31,7 @@ from gi.repository import Gtk, Gdk
 class PreferencesWin(Gtk.Window):
     def __init__(self, parent, mod, cfg):
         super(PreferencesWin, self).__init__()
+        self.set_default_size(cfg.mainwin_size[0] / 2, 0)
         self.cfg = cfg
         self.mod = mod
         self.parent = parent

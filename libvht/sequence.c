@@ -53,7 +53,7 @@ sequence *sequence_new(int length) {
 	seq->parent = -1;
 	seq->rpb = 4;
 
-	for (int t = 0; t < 3; t ++) {
+	for (int t = 0; t < N_TRIGGERS; t ++) {
 		seq->triggers[t].type = seq->triggers[t].channel = seq->triggers[t].note = 0;
 	}
 
@@ -62,6 +62,8 @@ sequence *sequence_new(int length) {
 	}
 
 	seq->trg_times[3] = 0;
+	seq->trg_grp[0] = 0;
+	seq->trg_grp[1] = 0;
 
 	seq->trg_playmode = 0;
 	seq->trg_quantise = 1;
@@ -119,11 +121,14 @@ sequence *sequence_clone(sequence *seq) {
 	ns->trg_playmode = seq->trg_playmode;
 	ns->trg_quantise = seq->trg_quantise;
 
-	for (int t = 0; t < 3; t ++) {
+	for (int t = 0; t < N_TRIGGERS; t ++) {
 		ns->triggers[t].type = seq->triggers[t].type;
 		ns->triggers[t].channel = seq->triggers[t].channel;
 		ns->triggers[t].note = seq->triggers[t].note;
 	}
+
+	ns->trg_grp[0] = seq->trg_grp[0];
+	ns->trg_grp[1] = seq->trg_grp[1];
 
 	ns->thumb_repr = NULL;
 	ns->thumb_dirty = 1;
@@ -891,5 +896,24 @@ void sequence_set_loop_end(sequence *seq, int e) {
 		tls += round((e + 1) * mlt);
 
 		mod->tline->loop_end = tls;
+	}
+}
+
+void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt) {
+	//printf("set %d - %d %d %d\n", t, tp, ch, nt);
+
+	if ((t >= N_TRIGGERS) || (t < 0))
+		return;
+
+	seq->triggers[t].type = tp;
+	seq->triggers[t].channel = ch;
+	seq->triggers[t].note = nt;
+	seq_should_save(seq);
+}
+
+void sequence_set_trg_grp(sequence *seq, int g, int grp) {
+	//printf("grp %d - %d\n", g, grp);
+	if ((g >= 0) && (g <= 1)) {
+		seq->trg_grp[g] = grp;
 	}
 }

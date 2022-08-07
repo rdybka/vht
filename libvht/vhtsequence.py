@@ -301,6 +301,16 @@ class VHTSequence(Iterable):
             self._extras = VHTExtras(self._get_extras, self._set_extras)
         return self._extras
 
+    def get_trig_grp(self, g):
+        return libcvht.sequence_get_trg_grp(self._seq_handle, g)
+
+    def set_trig_grp(self, g, v):
+        return libcvht.sequence_set_trg_grp(self._seq_handle, g, v)
+
+    @trg_playmode.setter
+    def trg_playmode(self, value):
+        libcvht.sequence_set_trg_playmode(self._seq_handle, value)
+
     def _set_extras(self, value):
         libcvht.sequence_set_extras(self._seq_handle, value)
 

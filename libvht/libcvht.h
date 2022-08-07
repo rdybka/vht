@@ -146,6 +146,9 @@ extern void sequence_set_trg_playmode(sequence *seq, int v);
 extern void sequence_set_trg_quantise(sequence *seq, int v);
 extern int sequence_get_trg_playmode(sequence *seq);
 extern int sequence_get_trg_quantise(sequence *seq);
+extern int module_get_max_trg_grp();
+extern int sequence_get_trg_grp(sequence *seq, int g);
+extern void sequence_set_trg_grp(sequence *seq, int g, int grp);
 
 extern void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt);
 extern char *sequence_get_trig(sequence *seq, int t);

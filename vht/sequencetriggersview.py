@@ -16,7 +16,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from vht import cfg, mod
+from vht.capturebutton import CaptureButton
 from gi.repository import Gtk, Gio, Gdk
+
 import gi
 
 gi.require_version("Gtk", "3.0")
@@ -38,7 +40,7 @@ class SequenceTriggersView(Gtk.Grid):
         self.set_column_homogeneous(False)
         self.set_row_homogeneous(False)
 
-        for i, l in enumerate(["mute:", "cue:", "play:"]):
+        for i, l in enumerate(["mute", "cue", "play"]):
             lbl = Gtk.Button.new_with_label(l)
             lbl.connect("button-press-event", self.on_butt_in, i)
             lbl.connect("button-release-event", self.on_butt_out, i)
@@ -46,75 +48,52 @@ class SequenceTriggersView(Gtk.Grid):
 
         entry_wc = 20
 
+        grpent = ["none"]
+        for m in range(1, mod.max_trg_grp):
+            grpent.append("%2d" % m)
+
         # mute
-        self.mute_capture_button = Gtk.ToggleButton()
-        self.mute_capture_button.set_tooltip_markup(cfg.tooltip_markup % ("capture"))
-        icon = Gio.ThemedIcon(name="media-record")
-        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-        self.mute_capture_button.add(image)
-        self.mute_capture_button.connect("toggled", self.on_capture_toggled, 0)
+        self.mute_capture_button = CaptureButton(
+            self.on_capture_toggled, self.on_capture_reset, 0
+        )
+        self.attach(self.mute_capture_button, 2, 0, 1, 1)
 
-        self.attach(self.mute_capture_button, 1, 0, 1, 1)
+        self.mute_capture_button2 = CaptureButton(
+            self.on_capture_toggled, self.on_capture_reset, 3
+        )
+        self.attach(self.mute_capture_button2, 1, 0, 1, 1)
 
-        self.mute_entry = Gtk.Entry()
-        self.mute_entry.props.sensitive = False
+        self.mute_grp_cb = Gtk.ComboBoxText()
+        for e in grpent:
+            self.mute_grp_cb.append_text(e)
 
-        self.mute_entry.set_width_chars(entry_wc)
-
-        self.attach(self.mute_entry, 3, 0, 1, 1)
-
-        button = Gtk.Button()
-        icon = Gio.ThemedIcon(name="edit-delete")
-        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-        button.add(image)
-        button.set_tooltip_markup(cfg.tooltip_markup % ("clear"))
-        button.connect("clicked", self.on_clear_clicked, 0)
-        self.attach(button, 2, 0, 1, 1)
+        self.mute_grp_cb.connect("changed", self.on_grp_changed, 0)
+        self.attach(Gtk.Label("grp"), 3, 0, 1, 1)
+        self.attach(self.mute_grp_cb, 4, 0, 1, 1)
 
         # cue
-        self.cue_capture_button = Gtk.ToggleButton()
-        self.cue_capture_button.set_tooltip_markup(cfg.tooltip_markup % ("capture"))
-        icon = Gio.ThemedIcon(name="media-record")
-        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-        self.cue_capture_button.add(image)
-        self.cue_capture_button.connect("toggled", self.on_capture_toggled, 1)
-        self.attach(self.cue_capture_button, 1, 1, 1, 1)
+        self.cue_capture_button = CaptureButton(
+            self.on_capture_toggled, self.on_capture_reset, 1
+        )
+        self.cue_capture_button2 = CaptureButton(
+            self.on_capture_toggled, self.on_capture_reset, 4
+        )
+        self.attach(self.cue_capture_button, 2, 1, 1, 1)
+        self.attach(self.cue_capture_button2, 1, 1, 1, 1)
 
-        self.cue_entry = Gtk.Entry()
-        self.cue_entry.props.sensitive = False
+        self.cue_grp_cb = Gtk.ComboBoxText()
+        for e in grpent:
+            self.cue_grp_cb.append_text(e)
 
-        self.cue_entry.set_width_chars(entry_wc)
-        self.attach(self.cue_entry, 3, 1, 1, 1)
-
-        button = Gtk.Button()
-        icon = Gio.ThemedIcon(name="edit-delete")
-        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-        button.add(image)
-        button.set_tooltip_markup(cfg.tooltip_markup % ("clear"))
-        button.connect("clicked", self.on_clear_clicked, 1)
-        self.attach(button, 2, 1, 1, 1)
+        self.cue_grp_cb.connect("changed", self.on_grp_changed, 1)
+        self.attach(Gtk.Label("grp"), 3, 1, 1, 1)
+        self.attach(self.cue_grp_cb, 4, 1, 1, 1)
 
         # play
-        self.play_capture_button = Gtk.ToggleButton()
-        self.play_capture_button.set_tooltip_markup(cfg.tooltip_markup % ("capture"))
-        icon = Gio.ThemedIcon(name="media-record")
-        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-        self.play_capture_button.add(image)
-        self.play_capture_button.connect("toggled", self.on_capture_toggled, 2)
-        self.attach(self.play_capture_button, 1, 2, 1, 1)
-
-        self.play_midi_entry = Gtk.Entry()
-        self.play_midi_entry.props.sensitive = False
-        self.play_midi_entry.set_width_chars(entry_wc)
-        self.attach(self.play_midi_entry, 3, 2, 1, 1)
-
-        button = Gtk.Button()
-        icon = Gio.ThemedIcon(name="edit-delete")
-        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-        button.add(image)
-        button.set_tooltip_markup(cfg.tooltip_markup % ("clear"))
-        button.connect("clicked", self.on_clear_clicked, 2)
-        self.attach(button, 2, 2, 1, 1)
+        self.play_capture_button = CaptureButton(
+            self.on_capture_toggled, self.on_capture_reset, 2
+        )
+        self.attach(self.play_capture_button, 2, 2, 1, 1)
 
         self.play_mode_cb = Gtk.ComboBoxText()
         for m in ["on/off", "one shot", "hold"]:
@@ -122,50 +101,60 @@ class SequenceTriggersView(Gtk.Grid):
 
         self.play_mode_cb.connect("changed", self.on_play_mode_changed)
         self.play_mode_cb.set_tooltip_markup(cfg.tooltip_markup % ("play mode"))
-        self.attach(self.play_mode_cb, 1, 3, 2, 1)
+        self.attach(self.play_mode_cb, 1, 2, 1, 1)
 
         self.quantise_scale = Gtk.Scale.new_with_range(
             Gtk.Orientation.HORIZONTAL, 0, 16, 1
         )
 
-        self.quantise_scale.set_tooltip_markup(cfg.tooltip_markup % ("quantise"))
         self.quantise_scale.connect("value-changed", self.on_quantise_changed)
-        self.attach(self.quantise_scale, 3, 3, 1, 1)
+        self.attach(Gtk.Label("qnt"), 3, 2, 1, 1)
+        self.attach(self.quantise_scale, 4, 2, 1, 1)
 
         self._mmute = Gtk.Label()
         self._mmute.set_text("")
+        self._mmute.set_width_chars(3)
         evb = Gtk.EventBox()
         evb.add(self._mmute)
         evb.connect("button-press-event", self.on_mouse_cfg_clicked, 0)
-        self.attach(evb, 4, 0, 1, 1)
+        self.attach(evb, 5, 0, 1, 1)
 
         self._mcue = Gtk.Label()
         self._mcue.set_text("")
+        self._mmute.set_width_chars(3)
         evb = Gtk.EventBox()
         evb.add(self._mcue)
         evb.connect("button-press-event", self.on_mouse_cfg_clicked, 1)
-        self.attach(evb, 4, 1, 1, 1)
+        self.attach(evb, 5, 1, 1, 1)
 
         self._mplay = Gtk.Label()
         self._mplay.set_text("")
+        self._mmute.set_width_chars(3)
         evb = Gtk.EventBox()
         evb.add(self._mplay)
         evb.connect("button-press-event", self.on_mouse_cfg_clicked, 2)
-        self.attach(evb, 4, 2, 1, 1)
+        self.attach(evb, 5, 2, 1, 1)
 
         self.refreshing = False
         self.refresh()
 
-        # self.attach(mcue, 4, 1, 1, 1)
-        # self.attach(mplay, 4, 2, 1, 1)
+        self.butts = [
+            self.mute_capture_button,
+            self.cue_capture_button,
+            self.play_capture_button,
+            self.mute_capture_button2,
+            self.cue_capture_button2,
+        ]
 
         self.show_all()
 
     @staticmethod
     def desc_trigger(trig):
+        empty = ""
+
         knob_char = "ctrl"
         note_char = "note"
-        desc = ""
+        desc = None
         if trig[0] == 1:
             notes = [
                 "C-",
@@ -189,23 +178,57 @@ class SequenceTriggersView(Gtk.Grid):
             else:
                 strrep = notes[note] + "A"
 
-            desc = "ch:%02d %s:%03d [%3s]" % (trig[1], note_char, trig[2], strrep)
+            # desc = "ch:%02d %s:%03d [%3s]" % (trig[1], note_char, trig[2], strrep)
+            desc = "n%02d:%03d" % (trig[1], trig[2])
 
         if trig[0] == 4:
-            desc = "ch:%02d %s:%03d" % (trig[1], knob_char, trig[2])
+            desc = "c%02d:%03d" % (trig[1], trig[2])
 
-        return desc
+        return desc if desc else empty
 
     def refresh(self):
         if self.seq > -1:
             self.refreshing = True
             self.quantise_scale.set_value(mod[self.seq].trg_quantise)
             self.play_mode_cb.set_active(mod[self.seq].trg_playmode)
-            self.mute_entry.props.text = self.desc_trigger(mod[self.seq].get_trig(0))
-            self.cue_entry.props.text = self.desc_trigger(mod[self.seq].get_trig(1))
-            self.play_midi_entry.props.text = self.desc_trigger(
-                mod[self.seq].get_trig(2)
+            self.mute_grp_cb.set_active(mod[self.seq].get_trig_grp(0))
+            self.cue_grp_cb.set_active(mod[self.seq].get_trig_grp(1))
+
+            self.mute_capture_button.label.set_text(
+                self.desc_trigger(mod[self.seq].get_trig(0))
             )
+
+            self.mute_capture_button2.label.set_text(
+                self.desc_trigger(mod[self.seq].get_trig(3))
+            )
+
+            self.cue_capture_button.label.set_text(
+                self.desc_trigger(mod[self.seq].get_trig(1))
+            )
+
+            self.cue_capture_button2.label.set_text(
+                self.desc_trigger(mod[self.seq].get_trig(4))
+            )
+
+            self.play_capture_button.label.set_text(
+                self.desc_trigger(mod[self.seq].get_trig(2))
+            )
+
+            if mod[self.seq].get_trig_grp(0):
+                self.mute_capture_button2.set_sensitive(True)
+            else:
+                self.mute_capture_button2.set_sensitive(False)
+
+            if mod[self.seq].get_trig_grp(1):
+                self.cue_capture_button2.set_sensitive(True)
+            else:
+                self.cue_capture_button2.set_sensitive(False)
+
+            # self.mute_entry.props.text = self.desc_trigger(mod[self.seq].get_trig(0))
+            # self.cue_entry.props.text = self.desc_trigger(mod[self.seq].get_trig(1))
+            # self.play_midi_entry.props.text = self.desc_trigger(
+            #    mod[self.seq].get_trig(2)
+            # )
 
             ms = mod[self.seq].extras["mouse_cfg"]
             l = ["   ", " l ", " m ", " r "]
@@ -213,6 +236,10 @@ class SequenceTriggersView(Gtk.Grid):
             self._mmute.set_text(l[ms[0]])
             self._mcue.set_text(l[ms[1]])
             self._mplay.set_text(l[ms[2]])
+
+            if self.capture == -1:
+                for b in self.butts:
+                    b.set_active(False)
 
             self.refreshing = False
 
@@ -245,10 +272,6 @@ class SequenceTriggersView(Gtk.Grid):
         if i == 2:
             mod[self.seq].trigger_play_off()
 
-    def on_clear_clicked(self, wdg, c):
-        mod[self.seq].set_trig(c, 0, 0, 0)
-        self.refresh()
-
     def on_quantise_changed(self, adj):
         if self.refreshing:
             return
@@ -261,32 +284,47 @@ class SequenceTriggersView(Gtk.Grid):
 
         mod[self.seq].trg_playmode = wdg.get_active()
 
+    def on_grp_changed(self, wdg, tp):
+        if self.refreshing:
+            return
+
+        act = wdg.get_active()
+
+        mod[self.seq].set_trig_grp(tp, act)
+        if act == 0 and tp == 0 and self.capture == 3:
+            mod.gui_midi_capture = False
+            self.capture = -1
+
+        if act == 0 and tp == 1 and self.capture == 4:
+            mod.gui_midi_capture = False
+            self.capture = -1
+
+        self.refresh()
+
+    def on_capture_reset(self, wdg, c):
+        mod[self.seq].set_trig(c, 0, 0, 0)
+        self.refresh()
+
     def on_capture_toggled(self, wdg, capt):
         if wdg.get_active():
             mod.gui_midi_capture = True
             self.capture = capt
             self.add_tick_callback(self.tick)
-            if capt == 0:
-                self.cue_capture_button.set_active(False)
-                self.play_capture_button.set_active(False)
 
-            if capt == 1:
-                self.mute_capture_button.set_active(False)
-                self.play_capture_button.set_active(False)
-
-            if capt == 2:
-                self.cue_capture_button.set_active(False)
-                self.mute_capture_button.set_active(False)
+            for c, b in enumerate(self.butts):
+                if capt != c:
+                    b.set_active(False)
         else:
             if capt == self.capture:
                 self.capture = -1
+
+                for b in self.butts:
+                    b.set_active(False)
+
                 mod.gui_midi_capture = False
 
     def tick(self, wdg, param):
         if self.capture == -1:
-            self.mute_capture_button.set_active(False)
-            self.cue_capture_button.set_active(False)
-            self.play_capture_button.set_active(False)
             return False
 
         midin = mod.get_midi_in_event()

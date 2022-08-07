@@ -394,7 +394,7 @@ class Configuration:
         mmp = self.cfg_parser["midi_map"]
         mmp.clear()
         for mi, mn in self.midi_in.items():
-            if mn:
+            if mi:
                 mmp[mi] = str(mn)
 
         rnd = self.cfg_parser["render"]

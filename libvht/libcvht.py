@@ -413,6 +413,15 @@ def sequence_get_trg_playmode(seq):
 def sequence_get_trg_quantise(seq):
     return _libcvht.sequence_get_trg_quantise(seq)
 
+def module_get_max_trg_grp():
+    return _libcvht.module_get_max_trg_grp()
+
+def sequence_get_trg_grp(seq, g):
+    return _libcvht.sequence_get_trg_grp(seq, g)
+
+def sequence_set_trg_grp(seq, g, grp):
+    return _libcvht.sequence_set_trg_grp(seq, g, grp)
+
 def sequence_set_trig(seq, t, tp, ch, nt):
     return _libcvht.sequence_set_trig(seq, t, tp, ch, nt)
 

@@ -6285,6 +6285,86 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_module_get_max_trg_grp(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  int result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "module_get_max_trg_grp", 0, 0, 0)) SWIG_fail;
+  result = (int)module_get_max_trg_grp();
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_get_trg_grp(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  int result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "sequence_get_trg_grp", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_get_trg_grp" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_get_trg_grp" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  result = (int)sequence_get_trg_grp(arg1,arg2);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_set_trg_grp(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  PyObject *swig_obj[3] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "sequence_set_trg_grp", 3, 3, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_set_trg_grp" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_set_trg_grp" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "sequence_set_trg_grp" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  sequence_set_trg_grp(arg1,arg2,arg3);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_sequence_set_trig(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   sequence *arg1 = (sequence *) 0 ;
@@ -13085,6 +13165,9 @@ static PyMethodDef SwigMethods[] = {
 	 { "sequence_set_trg_quantise", _wrap_sequence_set_trg_quantise, METH_VARARGS, NULL},
 	 { "sequence_get_trg_playmode", _wrap_sequence_get_trg_playmode, METH_O, NULL},
 	 { "sequence_get_trg_quantise", _wrap_sequence_get_trg_quantise, METH_O, NULL},
+	 { "module_get_max_trg_grp", _wrap_module_get_max_trg_grp, METH_NOARGS, NULL},
+	 { "sequence_get_trg_grp", _wrap_sequence_get_trg_grp, METH_VARARGS, NULL},
+	 { "sequence_set_trg_grp", _wrap_sequence_set_trg_grp, METH_VARARGS, NULL},
 	 { "sequence_set_trig", _wrap_sequence_set_trig, METH_VARARGS, NULL},
 	 { "sequence_get_trig", _wrap_sequence_get_trig, METH_VARARGS, NULL},
 	 { "sequence_trigger_mute", _wrap_sequence_trigger_mute, METH_O, NULL},

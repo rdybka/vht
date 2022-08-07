@@ -20,6 +20,8 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gio
 
+from vht.capturebutton import CaptureButton
+
 
 class MidiMapViewRow(Gtk.ActionBar):
     def __init__(self, parent, desc, mi):
@@ -33,11 +35,7 @@ class MidiMapViewRow(Gtk.ActionBar):
         self.cm.set_hexpand(True)
         self.pack_start(self.cm)
 
-        self.butt_cap = Gtk.ToggleButton()
-        icon = Gio.ThemedIcon(name="media-record")
-        image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
-        self.butt_cap.add(image)
-        self.butt_cap.connect("toggled", self.on_capture_toggled)
+        self.butt_cap = CaptureButton(self.on_capture_toggled, self.on_capture_reset, 4)
         self.pack_end(self.butt_cap)
 
         self.forbidden = []
@@ -70,8 +68,9 @@ class MidiMapViewRow(Gtk.ActionBar):
         self.parent.refresh_forbiddens()
 
     def describe_trigger(self):
-        if self.mi:
-            return "ch%02d:c%03d" % (self.mi[0], self.mi[2])
+        if self.mi and sum(self.mi):
+            return "%02d:%03d" % (self.mi[0], self.mi[2])
+
         return None
 
     def refresh(self):
@@ -100,10 +99,16 @@ class MidiMapViewRow(Gtk.ActionBar):
         if d2:
             desc += "\n\n" + d2
 
-        self.butt_cap.set_tooltip_markup(self.cfg.tooltip_markup % (desc))
+        self.butt_cap.set_text(self.describe_trigger())
+        # self.butt_cap.set_tooltip_markup(self.cfg.tooltip_markup % (desc))
         self.cm_freeze = False
 
-    def on_capture_toggled(self, wdg):
+    def on_capture_reset(self, wdg, c):
+        self.mi = None
+        self.cfg.midi_in[self.desc] = (0, 0, 0)
+        self.refresh()
+
+    def on_capture_toggled(self, wdg, c):
         if wdg.get_active():
             for r in self.parent.box.get_children():
                 if r is not self:

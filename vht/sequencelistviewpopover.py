@@ -15,16 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import copy
+import gi
+
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gdk, Gtk, Gio
+
 from vht.notebooklabel import NotebookLabel
 from vht.sequencetriggersview import SequenceTriggersView
 from vht.controllersview import ControllersView
 from vht import cfg, mod, extras
-from gi.repository import Gdk, Gtk, Gio
 from datetime import datetime
-import gi
-import copy
-
-gi.require_version("Gtk", "3.0")
 
 
 class SequenceListViewPopover(Gtk.Popover):
@@ -47,6 +48,8 @@ class SequenceListViewPopover(Gtk.Popover):
         self._parent = parent
         self._time_want_to_leave = 0
 
+        box = Gtk.Box()
+
         grid = Gtk.Grid()
         grid.set_column_spacing(3)
         grid.set_row_spacing(3)
@@ -59,7 +62,8 @@ class SequenceListViewPopover(Gtk.Popover):
         button.set_tooltip_markup(
             cfg.tooltip_markup2 % ("delete", cfg.key["sequence_delete"])
         )
-        grid.attach(button, 0, 0, 1, 1)
+        box.pack_start(button, False, True, 2)
+
         self._del_button = button
 
         button = Gtk.Button()
@@ -70,12 +74,12 @@ class SequenceListViewPopover(Gtk.Popover):
         button.set_tooltip_markup(
             cfg.tooltip_markup2 % ("clone", cfg.key["sequence_clone"])
         )
-        grid.attach(button, 1, 0, 1, 1)
+        box.pack_start(button, False, True, 2)
 
         self._entry = Gtk.Entry()
         self._entry.connect("changed", self.on_entry_changed)
-
-        grid.attach(self._entry, 2, 0, 1, 1)
+        box.pack_end(self._entry, True, True, 2)
+        grid.attach(box, 0, 0, 3, 1)
 
         self._trgview = SequenceTriggersView(-1, self)
         grid.attach(self._trgview, 0, 1, 3, 1)
@@ -141,6 +145,18 @@ class SequenceListViewPopover(Gtk.Popover):
             self.time_want_to_leave = 0
             return True
 
+        if self._trgview.mute_grp_cb.props.popup_shown:
+            self.time_want_to_leave = 0
+            return True
+
+        if self._trgview.cue_grp_cb.props.popup_shown:
+            self.time_want_to_leave = 0
+            return True
+
+        if self._trgview.capture > -1:
+            self.time_want_to_leave = 0
+            return True
+
         t = datetime.now() - self.time_want_to_leave
         t = float(t.seconds) + t.microseconds / 1000000
         if t > cfg.popup_timeout / 2.0:
@@ -175,6 +191,7 @@ class SequenceListViewPopover(Gtk.Popover):
         self.hide()
         self.pooped = False
         self._trgview.capture = -1
+        mod.gui_midi_capture = False
 
     def pop(self, curr):
         mod.clear_popups(self)

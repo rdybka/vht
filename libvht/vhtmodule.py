@@ -30,7 +30,14 @@ def pack_seq(seq):
     s["parent"] = seq.parent
     s["trg_playmode"] = seq.trg_playmode
     s["trg_quantise"] = seq.trg_quantise
-    s["trig"] = [seq.get_trig(0), seq.get_trig(1), seq.get_trig(2)]
+    s["trig"] = [
+        seq.get_trig(0),
+        seq.get_trig(1),
+        seq.get_trig(2),
+        seq.get_trig(3),
+        seq.get_trig(4),
+    ]
+    s["trig_grp"] = [seq.get_trig_grp(0), seq.get_trig_grp(1)]
     s["playing"] = seq.playing
     s["trk"] = []
     s["extras"] = seq.extras.jsn
@@ -427,6 +434,10 @@ class VHTModule(Iterable):
     def should_save(self, ph):
         libcvht.module_set_should_save(self._mod_handle, 1 if ph else 0)
 
+    @property
+    def max_trg_grp(self):
+        return libcvht.module_get_max_trg_grp()
+
     def save(self, filename):
         jm = {}
         jm["bpm"] = self.bpm
@@ -572,9 +583,12 @@ class VHTModule(Iterable):
             s.trg_playmode = seq["trg_playmode"]
             s.trg_quantise = seq["trg_quantise"]
 
-            s.set_trig(0, seq["trig"][0][0], seq["trig"][0][1], seq["trig"][0][2])
-            s.set_trig(1, seq["trig"][1][0], seq["trig"][1][1], seq["trig"][1][2])
-            s.set_trig(2, seq["trig"][2][0], seq["trig"][2][1], seq["trig"][2][2])
+            for tr, trig in enumerate(seq["trig"]):
+                s.set_trig(tr, *trig)
+
+            if "trig_grp" in seq:
+                for grp, n in enumerate(seq["trig_grp"]):
+                    s.set_trig_grp(grp, n)
 
         for trk in seq["trk"]:
             t = s.add_track(

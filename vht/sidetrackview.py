@@ -170,7 +170,7 @@ class SideTrackView(Gtk.DrawingArea):
         crf = self._context
         crf.set_source_surface(self._back_surface)
 
-        (x, y, width, height, dx, dy) = cr.text_extents("000|")
+        (x, y, width, height, dx, dy) = cr.text_extents("0 0|")
 
         self.txt_height = float(height) * self.spacing * cfg.seq_spacing
         self.txt_width = int(dx)
@@ -262,7 +262,7 @@ class SideTrackView(Gtk.DrawingArea):
 
         rows_to_draw = []
 
-        (x, y, width, height, dx, dy) = cr.text_extents(cfg.row_number_format % 999)
+        # (x, y, width, height, dx, dy) = cr.text_extents(("|" + cfg.row_number_format) % 999)
 
         if complete:
             self.configure()
