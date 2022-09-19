@@ -900,20 +900,90 @@ void sequence_set_loop_end(sequence *seq, int e) {
 }
 
 void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt) {
-	//printf("set %d - %d %d %d\n", t, tp, ch, nt);
-
 	if ((t >= N_TRIGGERS) || (t < 0))
 		return;
 
-	seq->triggers[t].type = tp;
-	seq->triggers[t].channel = ch;
-	seq->triggers[t].note = nt;
+	int g = t;
+
+	if (g > 2)
+		g -= 3;
+
+	if (seq->trg_grp[g] == 0 || t == 2) {
+		seq->triggers[t].type = tp;
+		seq->triggers[t].channel = ch;
+		seq->triggers[t].note = nt;
+
+		seq_should_save(seq);
+		return;
+	}
+
+	if (seq->trg_grp[g] > 0) {
+		if (t != 2) { // propagate
+			midi_client *clt = (midi_client *)seq->clt;
+			module *mod = (module *)clt->mod_ref;
+
+			for (int s = 0; s < mod->nseq; s++) {
+				sequence *sq = mod->seq[s];
+				if (sq->trg_grp[g] == seq->trg_grp[g]) {
+					sq->triggers[t].type = tp;
+					sq->triggers[t].channel = ch;
+					sq->triggers[t].note = nt;
+				}
+			}
+		}
+	}
+
 	seq_should_save(seq);
 }
 
+void reassign_triggers(sequence *seq, int g, int grp) {
+	midi_client *clt = (midi_client *)seq->clt;
+	module *mod = (module *)clt->mod_ref;
+
+	for (int s = 0; s < mod->nseq; s++) {
+		sequence *sq = mod->seq[s];
+		if (sq->trg_grp[g] == grp) {
+			int t = g;
+
+			do {
+				if (sq->triggers[t].type && sq != seq) {
+					seq->triggers[t].channel = sq->triggers[t].channel;
+					seq->triggers[t].note = sq->triggers[t].note;
+					seq->triggers[t].type = sq->triggers[t].type;
+				}
+
+				t+=3;
+			} while (t < 5);
+		}
+	}
+}
+
 void sequence_set_trg_grp(sequence *seq, int g, int grp) {
-	//printf("grp %d - %d\n", g, grp);
-	if ((g >= 0) && (g <= 1)) {
-		seq->trg_grp[g] = grp;
+	if (g < 0 || g > 1)
+		return;
+
+	int t = g * 3;
+	int oldg = seq->trg_grp[g];
+
+	if (oldg != 0 && grp == 0) {
+		t++;
+		seq->triggers[t].type = 0;
+		seq->triggers[t].channel = 0;
+		seq->triggers[t].note = 0;
+	}
+
+	seq_should_save(seq);
+
+	seq->trg_grp[g] = grp;
+
+	if (grp > 0) {
+		reassign_triggers(seq, g, grp);
+
+		t = g;
+		do {
+			trigger *tr = &seq->triggers[t];
+			sequence_set_trig(seq, t, tr->type, tr->channel, tr->note);
+			t+=3;
+		} while (t < 5);
 	}
 }

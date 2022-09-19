@@ -23,23 +23,24 @@
 
 # [^^^intentionally left blank]
 
+import gi
+
+gi.require_version("Gtk", "3.0")
+from gi.repository import GLib, Gtk, Gio, GdkPixbuf
+
+import sys
+import os
+import time
+import pkg_resources
+
 from vht.mainwin import MainWin
 from vht.shortcutmayhem import ShortcutMayhem
 from vht.preferenceswin import PreferencesWin
 from vht.renderwin import RenderWin
-
 from vht.portconfig import refresh_connections
 from vht import mod, cfg, ctrlcfg, autoexec, bankcfg, randomcomposer
-from gi.repository import GLib, Gtk, Gio, GdkPixbuf
 import vht.extras
 import vht.filerotator
-import sys
-import os
-import time
-import gi
-import pkg_resources
-
-gi.require_version("Gtk", "3.0")
 
 
 class VHTApp(Gtk.Application):

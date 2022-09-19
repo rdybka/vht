@@ -583,12 +583,12 @@ class VHTModule(Iterable):
             s.trg_playmode = seq["trg_playmode"]
             s.trg_quantise = seq["trg_quantise"]
 
-            for tr, trig in enumerate(seq["trig"]):
-                s.set_trig(tr, *trig)
-
             if "trig_grp" in seq:
                 for grp, n in enumerate(seq["trig_grp"]):
                     s.set_trig_grp(grp, n)
+
+            for tr, trig in enumerate(seq["trig"]):
+                s.set_trig(tr, *trig)
 
         for trk in seq["trk"]:
             t = s.add_track(
@@ -662,6 +662,3 @@ class VHTModule(Iterable):
 
     def freewheel_on(self):
         libcvht.module_set_freewheel(self._mod_handle, 1)
-
-    def mand(self, x, y, sx=0, sy=0):
-        return libcvht.mand(float(x), float(y), float(sx), float(sy))

@@ -42,7 +42,7 @@ class Configuration:
         self.seq_spacing = 1.05
         self.status_bar_font_size = 24
 
-        self.mainwin_size = (800, 400)
+        self.mainwin_size = (800, 423)
 
         self.console_scale = 1
         self.timeline_position_x = 200
@@ -395,7 +395,7 @@ class Configuration:
         mmp.clear()
         for mi, mn in self.midi_in.items():
             if mi:
-                mmp[mi] = str(mn)
+                mmp[mi] = str(mn) if mn else ""
 
         rnd = self.cfg_parser["render"]
         rnd["render_mode"] = str(self.render_mode)
@@ -498,9 +498,12 @@ class Configuration:
                 self.midi_in.clear()
 
             for m, mm in mmp.items():
-                self.midi_in[m] = tuple(
-                    [int(a.strip(" '")) for a in mm.strip("()").split(",")]
-                )
+                if mm:
+                    self.midi_in[m] = tuple(
+                        [int(a.strip(" '")) for a in mm.strip("()").split(",")]
+                    )
+                else:
+                    self.midi_in[m] = None
 
             rnd = self.cfg_parser["render"]
 
