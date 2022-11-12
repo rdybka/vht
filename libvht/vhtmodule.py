@@ -423,6 +423,14 @@ class VHTModule(Iterable):
         libcvht.module_set_pnq_hack(self._mod_handle, 1 if ph else 0)
 
     @property
+    def inception(self):
+        return libcvht.module_get_inception(self._mod_handle)
+
+    @inception.setter
+    def inception(self, i):
+        libcvht.module_set_inception(self._mod_handle, 1 if i else 0)
+
+    @property
     def is_panicking(self):
         return libcvht.module_is_panicking(self._mod_handle)
 

@@ -69,6 +69,8 @@ extern int module_get_transport(module *mod);
 
 extern void module_set_pnq_hack(module *mod, int ph);
 extern int module_get_pnq_hack(module *mod);
+extern void module_set_inception(module *mod, int i);
+extern int module_get_inception(module *mod);
 
 extern void module_set_should_save(module *mod, int ss);
 extern int module_get_should_save(module *mod);
@@ -152,10 +154,14 @@ extern void sequence_set_trg_grp(sequence *seq, int g, int grp);
 
 extern void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt);
 extern char *sequence_get_trig(sequence *seq, int t);
-extern void sequence_trigger_mute(sequence *seq);
-extern void sequence_trigger_cue(sequence *seq);
-extern void sequence_trigger_play_on(sequence *seq, int blk);
-extern void sequence_trigger_play_off(sequence *seq, int blk);
+extern void sequence_trigger_mute(sequence *seq, int nframes);
+extern void sequence_trigger_mute_forward(sequence *seq, int nframes);
+extern void sequence_trigger_mute_back(sequence *seq, int nframes);
+extern void sequence_trigger_cue(sequence *seq, int nframes);
+extern void sequence_trigger_cue_forward(sequence *seq, int nframes);
+extern void sequence_trigger_cue_back(sequence *seq, int nframes);
+extern void sequence_trigger_play_on(sequence *seq, int nframes);
+extern void sequence_trigger_play_off(sequence *seq, int nframes);
 extern int sequence_get_playing(sequence *seq);
 extern void sequence_set_playing(sequence *seq, int p);
 extern void sequence_set_lost(sequence *seq, int p);

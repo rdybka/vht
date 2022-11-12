@@ -13,7 +13,7 @@ with added value of:
 - scenes a'la 'ton
 - fractal turtles
 - fits on a floppy
-- doesn't make a sound
+- doesn't make sound
 
 Frankly speaking, vht was envisaged as a re-creation
 of seq24 in tracker form for author's "studio needs"
@@ -24,8 +24,8 @@ The GUI has similar dependencies as gnome-calculator
 and tracker paradigm was chosen to allow for rhythmic
 gymnastics otherwise hard to convey.
 
-Low level stuff was done in C and wrapped in a Python
-library. Human interfacing part of contraption employs
+Low level stuff was done in C and wrapped in Python.
+Human interfacing part of contraption employs
 GTK through gobject introspection and was also contrived
 in the language we shall no longer spam about.
 

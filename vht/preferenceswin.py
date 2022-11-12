@@ -135,7 +135,7 @@ class PreferencesWin(Gtk.Window):
         grid.set_margin_right(mrg)
 
         bx = Gtk.Box()
-        lab = Gtk.Label.new("Prefer dark theme")
+        lab = Gtk.Label.new("Dark theme")
 
         sw = Gtk.Switch()
         sw.set_active(self.cfg.dark_theme)
@@ -149,7 +149,7 @@ class PreferencesWin(Gtk.Window):
         lab = Gtk.Label.new("Opacity")
         lab.set_xalign(0)
         bx.set_hexpand(True)
-        self.opslider = self.create_slider(2, self.cfg.window_opacity, 0.232323, 1, 3)
+        self.opslider = self.create_slider(2, self.cfg.window_opacity, 0.05, 1, 3)
         bx.pack_start(lab, True, True, 0)
         bx.pack_end(self.opslider, True, True, 0)
         grid.attach(bx, 0, 1, 1, 1)
@@ -501,6 +501,20 @@ class PreferencesWin(Gtk.Window):
         bx.pack_end(sw, False, False, 0)
         grid.attach(bx, 0, 3, 1, 1)
 
+        bx = Gtk.Box()
+        lab = Gtk.Label.new("inception")
+        bx.set_hexpand(True)
+
+        sw = Gtk.Switch()
+        sw.set_active(self.cfg.inception)
+        sw.connect("state-set", self.on_inception_switch)
+        sw.set_tooltip_markup(
+            self.cfg.tooltip_markup % ("p15 will feed back to triggers")
+        )
+        bx.pack_start(lab, False, False, 0)
+        bx.pack_end(sw, False, False, 0)
+        grid.attach(bx, 0, 4, 1, 1)
+
         return grid
 
     def on_nbck_value_changed(self, adj):
@@ -658,6 +672,12 @@ class PreferencesWin(Gtk.Window):
     def on_pnq_hack_switch(self, wdg, prm):
         self.cfg.pnq_hack = prm
         self.mod.pnq_hack = prm
+        self.parent.sequence_view.zoom(1)
+        self.parent.sequence_view.zoom(-1)
+
+    def on_inception_switch(self, wdg, prm):
+        self.cfg.inception = prm
+        self.mod.inception = prm
         self.parent.sequence_view.zoom(1)
         self.parent.sequence_view.zoom(-1)
 

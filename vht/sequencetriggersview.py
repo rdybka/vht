@@ -40,10 +40,13 @@ class SequenceTriggersView(Gtk.Grid):
         self.set_column_homogeneous(False)
         self.set_row_homogeneous(False)
 
+        self.trig_butts = []
+
         for i, l in enumerate(["mute", "cue", "play"]):
             lbl = Gtk.Button.new_with_label(l)
             lbl.connect("button-press-event", self.on_butt_in, i)
             lbl.connect("button-release-event", self.on_butt_out, i)
+            self.trig_butts.append(lbl)
             self.attach(lbl, 0, i, 1, 1)
 
         entry_wc = 20
@@ -214,15 +217,26 @@ class SequenceTriggersView(Gtk.Grid):
                 self.desc_trigger(mod[self.seq].get_trig(2))
             )
 
+            ttips = [
+                "click to trigger",
+                "click      forward\nctrl-click    back",
+            ]
+
             if mod[self.seq].get_trig_grp(0):
+                self.trig_butts[0].set_tooltip_markup(cfg.tooltip_markup % (ttips[1]))
                 self.mute_capture_button2.set_sensitive(True)
             else:
                 self.mute_capture_button2.set_sensitive(False)
+                self.trig_butts[0].set_tooltip_markup(cfg.tooltip_markup % (ttips[0]))
 
             if mod[self.seq].get_trig_grp(1):
                 self.cue_capture_button2.set_sensitive(True)
+                self.trig_butts[1].set_tooltip_markup(cfg.tooltip_markup % (ttips[1]))
             else:
                 self.cue_capture_button2.set_sensitive(False)
+                self.trig_butts[1].set_tooltip_markup(cfg.tooltip_markup % (ttips[0]))
+
+            self.trig_butts[2].set_tooltip_markup(cfg.tooltip_markup % (ttips[0]))
 
             # self.mute_entry.props.text = self.desc_trigger(mod[self.seq].get_trig(0))
             # self.cue_entry.props.text = self.desc_trigger(mod[self.seq].get_trig(1))
@@ -259,11 +273,22 @@ class SequenceTriggersView(Gtk.Grid):
         mod.should_save = True
 
     def on_butt_in(self, wdg, sign, i):
+        if sign.get_click_count()[1] > 1:
+            return
+
+        ctrl = sign.state & Gdk.ModifierType.CONTROL_MASK
+
         if i == 0:
-            mod[self.seq].trigger_mute()
+            if not ctrl:
+                mod[self.seq].trigger_mute_forward()
+            else:
+                mod[self.seq].trigger_mute_back()
 
         if i == 1:
-            mod[self.seq].trigger_cue()
+            if not ctrl:
+                mod[self.seq].trigger_cue_forward()
+            else:
+                mod[self.seq].trigger_cue_back()
 
         if i == 2:
             mod[self.seq].trigger_play_on()

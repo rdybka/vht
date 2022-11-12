@@ -60,12 +60,14 @@ typedef struct module_t {
 	jack_nframes_t end_time;
 	int render_lead_out;
 	int pnq_hack;
+	int inception;
 	int should_save;
 } module;
 
 module *module_new(void);
 void module_play(module *mod, int);
 void module_free(module *mod);
+void module_handle_inception(track *trk, midi_event evt);
 void module_advance(module *mod, jack_nframes_t curr_frames);
 void module_mute(module *mod);
 void module_reset(module *mod);

@@ -55,13 +55,10 @@ sequence *sequence_new(int length) {
 
 	for (int t = 0; t < N_TRIGGERS; t ++) {
 		seq->triggers[t].type = seq->triggers[t].channel = seq->triggers[t].note = 0;
+		seq->trg_times[t] = -2;
+		seq->trg_status[t] = TRIGGER_STATUS_IDLE;
 	}
 
-	for (int t = 0; t < 3; t++) {
-		seq->trg_times[t] = -1;
-	}
-
-	seq->trg_times[3] = 0;
 	seq->trg_grp[0] = 0;
 	seq->trg_grp[1] = 0;
 
@@ -200,194 +197,6 @@ void sequence_free(sequence *seq) {
 	free(seq);
 }
 
-void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
-	midi_client *clt = (midi_client *)seq->clt;
-	module *mod = (module *)clt->mod_ref;
-
-	if (mod->render_mode == 23)
-		return;
-
-	if ((seq->trg_quantise == 0) && (seq->trg_times[2] == -2)) {
-		seq->trg_times[2] = -1;
-		if (seq->playing && seq->trg_times[3] != -2) {
-			seq->playing = 0;
-			seq->lost = 1;
-			for (int t = 0; t < seq->ntrk; t++)
-				track_reset(seq->trk[t]);
-		} else {
-			seq->playing = 1;
-			seq->pos = 0;
-			if (seq->trg_playmode == TRIGGER_ONESHOT)
-				seq->trg_times[3] = -3;
-
-			for (int t = 0; t < seq->ntrk; t++) {
-				track_reset(seq->trk[t]);
-			}
-		}
-	}
-
-	double p = ceil(seq->pos) - seq->pos;
-
-	if (period - p > 0.00000001 && nframes > 0) {
-		jack_nframes_t frm = nframes;
-		frm *= p / period;
-
-		if (frm > 0) {
-			period -= p;
-			nframes -= frm;
-
-			sequence_advance(seq, p, frm);// :]
-		}
-	}
-
-	if (seq->pos - floor(seq->pos) < 0.0000001) {
-		int r = (int)seq->pos;
-
-		for (int t = 0; t < seq->ntrk; t++) {
-			if (seq->trk[t]->mand->active) {
-				int qnt = seq->trk[t]->mand->tracies[0]->qnt;
-				if (qnt > 0 && r % qnt == 0)
-					for (int c = 0; c < seq->trk[t]->ncols; c++) {
-						int v = seq->trk[t]->mand_qnt[c];
-						if (v > -232323 && v < 0) {
-							seq->trk[t]->mand_qnt[c] = abs(v) - 1;
-						}
-					}
-			}
-		}
-
-		if (seq->parent == -1 && mod->render_mode != 1 && seq->loop_active) {
-			if (r > seq->loop_end || r < seq->loop_start) {
-				seq->pos = seq->loop_start;
-				r = seq->loop_start;
-				for (int t = 0; t < seq->ntrk; t++) {
-					track_reset(seq->trk[t]);
-					track_wind(seq->trk[t], seq->pos);
-				}
-			}
-		}
-
-		while (r >= seq->length) {
-			r-=seq->length;
-		}
-
-		// quantised play
-		if (seq->trg_times[2] == r) {
-			seq->trg_times[2] = -1;
-			if (!seq->playing) {
-				seq->playing = 1;
-				seq->pos = 0;
-				if (seq->trg_playmode == TRIGGER_ONESHOT) {
-					seq->trg_times[3] = -2;
-					if (r == 0)
-						seq->trg_times[3]--;
-				}
-
-				for (int t = 0; t < seq->ntrk; t++)
-					for (int t = 0; t < seq->ntrk; t++)
-						track_reset(seq->trk[t]);
-			} else {
-				seq->playing = 0;
-				seq->lost = 1;
-				for (int t = 0; t < seq->ntrk; t++)
-					track_reset(seq->trk[t]);
-			}
-		}
-
-		if (seq->trg_playmode == TRIGGER_HOLD && seq->trg_times[3] == -23 && seq->playing) {
-			// let it go, let it go
-			seq->trg_times[3] = 0;
-			seq->playing = 0;
-			seq->lost = 1;
-			for (int t = 0; t < seq->ntrk; t++) {
-				track_kill_notes(seq->trk[t]);
-				//track_reset(seq->trk[t]);
-			}
-		}
-
-		if(r == 0 && seq->trg_playmode == TRIGGER_ONESHOT && seq->playing) {
-			if (seq->trg_times[3] < 0) {
-				seq->trg_times[3]++;
-			}
-
-			if ((seq->trg_times[3] == -1) && (seq->trg_times[2] == -1)) {
-				seq->trg_times[3] = 0;
-				seq->playing = 0;
-				seq->lost = 1;
-				for (int t = 0; t < seq->ntrk; t++)
-					track_reset(seq->trk[t]);
-			}
-		}
-
-		// cue trigger
-		if (r == 0) {
-			if (seq->trg_times[1] > -1) {
-				seq->trg_times[1] = -1;
-
-				if (seq->playing) {
-					seq->playing = 0;
-					for (int t = 0; t < seq->ntrk; t++)
-						track_reset(seq->trk[t]);
-				} else {
-					seq->playing = 1;
-					for (int t = 0; t < seq->ntrk; t++)
-						track_reset(seq->trk[t]);
-				}
-			}
-		}
-	}
-
-	int resync = 0;
-	// mute trigger
-	if (seq->trg_times[0] > -1) {
-		seq->trg_times[0] = -1;
-
-		if(seq->playing) {
-			seq->playing = 0;
-			for (int t = 0; t < seq->ntrk; t++) {
-				track_kill_notes(seq->trk[t]);
-			}
-		} else {
-			seq->playing = 1;
-			resync = 1;
-		}
-	}
-
-	if (resync) {
-		for (int t = 0; t < seq->ntrk; t++) {
-			seq->trk[t]->resync = 0;
-			seq->trk[t]->pos = 0;
-			track_wind(seq->trk[t], seq->pos);
-			track_advance(seq->trk[t], period, nframes);
-		}
-	}
-
-	seq->last_period = period;
-	if (seq->playing) {
-		// resync tracks
-		for (int t = 0; t < seq->ntrk; t++) {
-			if (seq->trk[t]->resync) {
-				seq->trk[t]->resync = 0;
-				seq->trk[t]->pos = 0;
-				track_wind(seq->trk[t], seq->pos);
-			}
-
-			track_advance(seq->trk[t], period, nframes);
-		}
-	}
-
-	seq->pos += period;
-
-	if (seq->pos >= seq->length) {
-		if (mod->render_mode == 1 && seq->playing) {
-			mod->render_mode = 23;
-			mod->end_time = mod->clt->jack_last_frame;
-		}
-
-		seq->pos = seq->pos - seq->length;
-	}
-}
-
 void sequence_del_track(sequence *seq, int t) {
 	if (t == -1)
 		t = seq->ntrk - 1;
@@ -479,10 +288,10 @@ double sequence_get_relative_length(sequence *seq) {
 }
 
 int sequence_get_cue(sequence *seq) {
-	if (seq->trg_times[1] == -1) {
-		return 0;
-	} else {
+	if (seq->trg_status[TRIGGER_CUE] == TRIGGER_STATUS_RUN) {
 		return 1;
+	} else {
+		return 0;
 	}
 }
 
@@ -542,104 +351,551 @@ void sequence_handle_record(module *mod, sequence *seq, midi_event evt) {
 	}
 }
 
-void sequence_trigger_mute(sequence *seq) {
-	//printf("mute %d\n", seq->index);
+int trg_equal(trigger *trg, midi_event *mev) {
+	int eq = 0;
+	if ((mev->channel == trg->channel) && \
+	        (mev->type == trg->type) && \
+	        (mev->note == trg->note))
+		eq = 1;
+
+	return eq;
+}
+
+int seq_first_in_grp(sequence *seq, int t) {
+	midi_client *clt = (midi_client *)seq->clt;
+	module *mod = (module *)clt->mod_ref;
+
+	int grp = seq->trg_grp[t];
+
+	int fnd = mod->nseq + 1;
+	for (int s = mod->nseq - 1; s >= 0; s--) {
+		if (mod->seq[s]->trg_grp[t] == grp)
+			fnd = s;
+	}
+
+	if (seq->index == fnd)
+		return 1;
+
+	return 0;
+}
+
+int sequence_get_n_in_grp(sequence *seq, int t) {
+	midi_client *clt = (midi_client *)seq->clt;
+	module *mod = (module *)clt->mod_ref;
+
+	int grp = seq->trg_grp[t];
+	int nn = 0;
+	for (int s = 0; s < mod->nseq; s++) {
+		if (mod->seq[s]->trg_grp[t] == grp)
+			nn++;
+	}
+
+	return nn;
+}
+
+void sequence_handle_trigger_event(sequence *seq, midi_event mev) {
+	if (mev.velocity > 0) {
+		if (seq->trg_grp[0] == 0) {
+			if ((seq->triggers[0].type) && trg_equal(&seq->triggers[0], &mev)) {
+				sequence_trigger_mute(seq, mev.time);
+			}
+		}
+
+		if (seq->trg_grp[1] == 0) {
+			if ((seq->triggers[1].type) && trg_equal(&seq->triggers[1], &mev)) {
+				sequence_trigger_cue(seq, mev.time);
+			}
+		}
+
+		if ((seq->triggers[2].type) && trg_equal(&seq->triggers[2], &mev)) {
+			sequence_trigger_play_on(seq, mev.time);
+		}
+	}
+
+	trigger trg = seq->triggers[2];
+
+	if ((seq->triggers[2].type == note_on) && \
+	        (mev.channel == trg.channel) && \
+	        (mev.type == note_off) && \
+	        (mev.note == trg.note)) {
+		sequence_trigger_play_off(seq, mev.time);
+	}
+
+	if ((seq->triggers[2].type == control_change) && \
+	        (mev.channel == trg.channel) && \
+	        (mev.type == trg.type) && \
+	        (mev.note == trg.note) && \
+	        (mev.velocity == 0)) {
+		sequence_trigger_play_off(seq, mev.time);
+	}
+
+	if (seq->trg_grp[0] > 0) {
+		if (seq_first_in_grp(seq, 0)) {
+			if ((seq->triggers[0].type) && trg_equal(&seq->triggers[0], &mev)) {
+				sequence_trigger_mute_forward(seq, mev.time);
+			}
+
+			if ((seq->triggers[3].type) && trg_equal(&seq->triggers[3], &mev)) {
+				sequence_trigger_mute_back(seq, mev.time);
+			}
+		}
+	}
+
+	if (seq->trg_grp[1] > 0) {
+		if (seq_first_in_grp(seq, 1)) {
+			if ((seq->triggers[1].type) && trg_equal(&seq->triggers[1], &mev)) {
+				sequence_trigger_cue_forward(seq, mev.time);
+			}
+
+			if ((seq->triggers[4].type) && trg_equal(&seq->triggers[4], &mev)) {
+				sequence_trigger_cue_back(seq, mev.time);
+			}
+		}
+	}
+}
+
+void sequence_trigger_mute(sequence *seq, int nframes) {
 	midi_client *clt = (midi_client *)seq->clt;
 	module *mod = (module *)clt->mod_ref;
 
 	if (!mod->playing) {
 		seq->playing = !seq->playing;
 	} else {
-		seq->trg_times[0] = 0;
+		if (nframes == -1) {
+			nframes = 0;
+		}
+
+		seq->trg_times[TRIGGER_MUTE] = nframes;
+		seq->trg_status[TRIGGER_MUTE] = TRIGGER_STATUS_RUN;
 	}
 }
 
-
-void sequence_trigger_cue(sequence *seq) {
-	//printf("cue %d\n", seq->index);
-	if (seq->trg_times[1] == -1) {
-		seq->trg_times[1] = 0;
-	} else {
-		seq->trg_times[1] = -1;
-	}
-}
-
-void sequence_trigger_play_on(sequence *seq, int blk) {
+void sequence_trigger_mute_forward(sequence *seq, int nframes) {
 	midi_client *clt = (midi_client *)seq->clt;
 	module *mod = (module *)clt->mod_ref;
 
-	seq->trg_times[1] = -1; //clear cue
+	int nn = sequence_get_n_in_grp(seq, 0);
+	sequence *seqs[nn];
 
-	if (blk)
-		module_excl_in(mod);
 
-	if (!mod->playing)
-		goto done;
-
-	if ((seq->trg_playmode == TRIGGER_HOLD) && (seq->playing)) {
-		seq->trg_times[3] = 0;
-		goto done;
+	int n = 0;
+	for (int s = 0; s < mod->nseq; s++) {
+		if (mod->seq[s]->trg_grp[0] == seq->trg_grp[0])
+			seqs[n++] = mod->seq[s];
 	}
 
-	if (seq->playing) {
-		int np = ceil(seq->pos);
-
-		while(np >= seq->length)
-			np-=seq->length;
-
-		seq->trg_times[2] = np;
-		goto done;
+	int lp = -1;
+	for (int s = 0; s < nn; s++) {
+		if (seqs[s]->playing)
+			lp = s;
 	}
 
-	if (seq->trg_quantise == 0) {
-		seq->trg_times[2] = -2;
-	} else {
-		int np = ceil(seq->pos);
+	int np = lp + 1;
+	if (np >= nn)
+		np = 0;
 
-		while(np++ % seq->trg_quantise);
-		np--;
 
-		while(np >= seq->length)
-			np-=seq->length;
+	for (int s = 0; s < nn; s++) {
+		if (seqs[s]->playing && s != np) {
+			sequence_trigger_mute(seqs[s], nframes);
+		}
 
-		seq->trg_times[2] = np;
+		if (!seqs[s]->playing && s == np) {
+			sequence_trigger_mute(seqs[s], nframes);
+		}
 	}
-
-done:
-	if (blk)
-		module_excl_out(mod);
 }
 
-void sequence_trigger_play_off(sequence *seq, int blk) {
+void sequence_trigger_mute_back(sequence *seq, int nframes) {
 	midi_client *clt = (midi_client *)seq->clt;
 	module *mod = (module *)clt->mod_ref;
 
-	seq->trg_times[1] = -1;	// clear cue
+	int nn = sequence_get_n_in_grp(seq, 0);
+	sequence *seqs[nn];
 
-	if (blk)
-		module_excl_in(mod);
 
-	if (!mod->playing)
-		goto done;
+	int n = 0;
+	for (int s = 0; s < mod->nseq; s++) {
+		if (mod->seq[s]->trg_grp[0] == seq->trg_grp[0])
+			seqs[n++] = mod->seq[s];
+	}
 
-	if (seq->trg_playmode == TRIGGER_HOLD) {
-		if (seq->playing) {
-			seq->trg_times[3] = -23;
-		}  else {
-			seq->playing = 0;
-			seq->lost = 1;
-			seq->pos = 0;
-			seq->trg_times[3] = 0;
-			seq->trg_times[2] = -1;
-			for (int t = 0; t < seq->ntrk; t++)
-				track_reset(seq->trk[t]);
+	int lp = nn;
+	for (int s = nn - 1; s >= 0; s--) {
+		if (seqs[s]->playing)
+			lp = s;
+	}
+
+	int np = lp - 1;
+	if (np < 0)
+		np = nn -1;
+
+
+	for (int s = 0; s < nn; s++) {
+		if (seqs[s]->playing && s != np) {
+			sequence_trigger_mute(seqs[s], nframes);
+		}
+
+		if (!seqs[s]->playing && s == np) {
+			sequence_trigger_mute(seqs[s], nframes);
+		}
+	}
+}
+
+void sequence_trigger_cue(sequence *seq,  int nframes) {
+	if (nframes < 0)
+		nframes = 0;
+
+	if (seq->trg_status[TRIGGER_CUE] == TRIGGER_STATUS_IDLE) {
+		seq->trg_times[TRIGGER_CUE] = nframes;
+		seq->trg_status[TRIGGER_CUE] = TRIGGER_STATUS_RUN;
+	} else {
+		seq->trg_status[TRIGGER_CUE] = TRIGGER_STATUS_IDLE;
+	}
+}
+
+void sequence_trigger_cue_forward(sequence *seq, int nframes) {
+	midi_client *clt = (midi_client *)seq->clt;
+	module *mod = (module *)clt->mod_ref;
+
+	int nn = sequence_get_n_in_grp(seq, 1);
+	sequence *seqs[nn];
+
+
+	int n = 0;
+	for (int s = 0; s < mod->nseq; s++) {
+		if (mod->seq[s]->trg_grp[1] == seq->trg_grp[1])
+			seqs[n++] = mod->seq[s];
+	}
+
+	int lp = -1;
+	for (int s = 0; s < nn; s++) {
+		if (seqs[s]->playing) {
+			lp = s;
+		} else if (seqs[s]->trg_status[TRIGGER_CUE] == TRIGGER_STATUS_RUN) {
+			lp = s;
 		}
 	}
 
-done:
-	if (blk)
-		module_excl_out(mod);
+	int llp = nn;
+	for (int s = nn - 2; s >= 0; s--) {
+		if (!seqs[s]->playing && seqs[s]->trg_status[TRIGGER_CUE] == TRIGGER_STATUS_RUN) {
+			llp = s;
+		}
+	}
+
+	if (llp < lp)
+		lp = llp;
+
+	int np = lp + 1;
+	if (np >= nn)
+		np = 0;
+
+
+	for (int s = 0; s < nn; s++) {
+		if (!seqs[s]->playing && seqs[s]->trg_status[TRIGGER_CUE] == TRIGGER_STATUS_RUN) {
+			sequence_trigger_cue(seqs[s], nframes);
+		}
+
+		if (seqs[s]->playing && s != np && seqs[s]->trg_status[TRIGGER_CUE] == TRIGGER_STATUS_IDLE) {
+			sequence_trigger_cue(seqs[s], nframes);
+		}
+
+		if (!seqs[s]->playing && s == np) {
+			sequence_trigger_cue(seqs[s], nframes);
+		}
+
+		if (seqs[s]->playing && s == np && seqs[s]->trg_status[TRIGGER_CUE] == TRIGGER_STATUS_RUN) {
+			sequence_trigger_cue(seqs[s], nframes);
+		}
+	}
 }
+
+void sequence_trigger_cue_back(sequence *seq, int nframes) {
+	midi_client *clt = (midi_client *)seq->clt;
+	module *mod = (module *)clt->mod_ref;
+
+	int nn = sequence_get_n_in_grp(seq, 1);
+	sequence *seqs[nn];
+
+	int n = 0;
+	for (int s = 0; s < mod->nseq; s++) {
+		if (mod->seq[s]->trg_grp[1] == seq->trg_grp[1])
+			seqs[n++] = mod->seq[s];
+	}
+
+	int lp = nn;
+	for (int s = nn - 1; s >= 0; s--) {
+		if (seqs[s]->playing) {
+			lp = s;
+		} else if (seqs[s]->trg_status[TRIGGER_CUE] == TRIGGER_STATUS_RUN) {
+			lp = s;
+		}
+	}
+
+	int llp = 0;
+	for (int s = 1; s < nn; s++) {
+		if (!seqs[s]->playing && seqs[s]->trg_status[TRIGGER_CUE] == TRIGGER_STATUS_RUN) {
+			llp = s;
+		}
+	}
+
+	if (llp > lp)
+		lp = llp;
+
+	int np = lp - 1;
+	if (np < 0)
+		np = nn -1;
+
+	for (int s = 0; s < nn; s++) {
+		if (!seqs[s]->playing && seqs[s]->trg_status[TRIGGER_CUE] == TRIGGER_STATUS_RUN) {
+			sequence_trigger_cue(seqs[s], nframes);
+		}
+
+		if (seqs[s]->playing && s != np && seqs[s]->trg_status[TRIGGER_CUE] == TRIGGER_STATUS_IDLE) {
+			sequence_trigger_cue(seqs[s], nframes);
+		}
+
+		if (!seqs[s]->playing && s == np) {
+			sequence_trigger_cue(seqs[s], nframes);
+		}
+
+		if (seqs[s]->playing && s == np && seqs[s]->trg_status[TRIGGER_CUE] == TRIGGER_STATUS_RUN) {
+			sequence_trigger_cue(seqs[s], nframes);
+		}
+	}
+}
+
+void sequence_trigger_play_on(sequence *seq, int nframes) {
+	if (nframes < 0)
+		nframes = 0;
+
+	if (seq->trg_status[TRIGGER_PLAY] == TRIGGER_STATUS_IDLE) {
+		if (!seq->playing) {
+			if (seq->trg_quantise == 0) {
+				seq->trg_times[TRIGGER_PLAY] = nframes;
+				seq->trg_status[TRIGGER_PLAY] = TRIGGER_STATUS_RUN;
+			} else {
+				seq->trg_times[TRIGGER_PLAY] = seq->trg_quantise;
+				seq->trg_status[TRIGGER_PLAY] = TRIGGER_STATUS_SYNC;
+			}
+		} else {
+			seq->trg_times[TRIGGER_PLAY] = nframes;
+			seq->trg_status[TRIGGER_PLAY] = TRIGGER_STATUS_KILL;
+		}
+	}
+}
+
+void sequence_trigger_play_off(sequence *seq, int nframes) {
+	if (seq->trg_playmode == PLAY_TRIGGER_HOLD && seq->playing) {
+		seq->trg_times[TRIGGER_PLAY] = nframes;
+		seq->trg_status[TRIGGER_PLAY] = TRIGGER_STATUS_KILL;
+	}
+}
+
+
+// this will be called after advancing sequences
+void sequence_handle_triggers_post_adv(sequence *seq, double period, int nframes) {
+	int nf = nframes - seq->trg_times[TRIGGER_MUTE];
+	double pp = ((double)nf / nframes) * period;
+
+	if (seq->trg_status[TRIGGER_MUTE] == TRIGGER_STATUS_RUN) {
+		if (seq->playing) {
+			seq->playing = 0;
+
+			for (int t = 0; t < seq->ntrk; t++) {
+				track_kill_notes(seq->trk[t]);
+			}
+
+			seq->lost = 1;
+		} else {
+			seq->playing = 1;
+			seq->pos = seq->pos - pp;
+
+			for (int t = 0; t < seq->ntrk; t++) {
+				seq->trk[t]->pos = 0;
+				track_wind(seq->trk[t], seq->pos);
+				seq->trk[t]->resync = 0;
+			}
+
+			sequence_advance(seq, pp, nf);
+		}
+
+		seq->trg_status[TRIGGER_MUTE] = TRIGGER_STATUS_IDLE;
+	}
+
+	// handle play on zero qnt
+	if (seq->trg_status[TRIGGER_PLAY] == TRIGGER_STATUS_RUN) {
+		if (seq->trg_quantise == 0) { // play now!
+			seq->playing = 1;
+			seq->trg_status[TRIGGER_PLAY] = TRIGGER_STATUS_IDLE;
+			if (seq->trg_playmode == PLAY_TRIGGER_ONESHOT)
+				seq->trg_status[TRIGGER_PLAY] = TRIGGER_STATUS_KILLLATE;
+
+			seq->pos = 0;
+
+			for (int t = 0; t < seq->ntrk; t++) {
+				track_reset(seq->trk[t]);
+			}
+
+			sequence_advance(seq, pp, nf);
+		}
+	}
+
+	if (seq->trg_status[TRIGGER_PLAY] == TRIGGER_STATUS_KILL) {
+		seq->playing = 0;
+
+		for (int t = 0; t < seq->ntrk; t++) {
+			track_kill_notes(seq->trk[t]);
+		}
+
+		seq->trg_status[TRIGGER_PLAY] = TRIGGER_STATUS_IDLE;
+		seq->lost = 1;
+	}
+}
+
+// this will be called on row boundaries
+void sequence_handle_triggers_adv(sequence *seq, int r) {
+	if (seq->trg_status[TRIGGER_CUE] == TRIGGER_STATUS_RUN) {
+		if (r == 0) {
+			seq->playing =! seq->playing;
+			seq->trg_status[TRIGGER_CUE] = TRIGGER_STATUS_IDLE;
+
+			if (!seq->playing) {
+				for (int t = 0; t < seq->ntrk; t++)
+					track_kill_notes(seq->trk[t]);
+			}
+
+			seq->lost = 1;
+		}
+	}
+
+	if (seq->trg_status[TRIGGER_PLAY] == TRIGGER_STATUS_SYNC && seq->trg_quantise) {
+		seq->trg_times[TRIGGER_PLAY]--;
+
+		if (seq->trg_times[TRIGGER_PLAY] == 0) {
+			seq->playing = 1;
+			seq->pos = 0;
+
+			for (int t = 0; t < seq->ntrk; t++) {
+				track_reset(seq->trk[t]);
+			}
+
+
+			seq->trg_status[TRIGGER_PLAY] = TRIGGER_STATUS_IDLE;
+			if (seq->trg_playmode == PLAY_TRIGGER_ONESHOT)
+				seq->trg_status[TRIGGER_PLAY] = TRIGGER_STATUS_KILLLATE;
+		}
+	}
+
+	if (seq->trg_status[TRIGGER_PLAY] == TRIGGER_STATUS_KILLLATE) {
+		if (r == 0) {
+			seq->playing = 0;
+			seq->trg_status[TRIGGER_PLAY] = TRIGGER_STATUS_IDLE;
+
+			for (int t = 0; t < seq->ntrk; t++)
+				track_kill_notes(seq->trk[t]);
+
+			seq->lost = 1;
+		}
+	}
+}
+
+void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
+	midi_client *clt = (midi_client *)seq->clt;
+	module *mod = (module *)clt->mod_ref;
+
+	if (mod->render_mode == 23)
+		return;
+
+	double p = ceil(seq->pos) - seq->pos;
+
+	if (period - p > 0.00000001 && nframes > 0) {
+		jack_nframes_t frm = nframes;
+		frm *= p / period;
+
+		if (frm > 0) {
+			period -= p;
+			nframes -= frm;
+
+			sequence_advance(seq, p, frm);// :]
+		}
+	}
+
+	int rr = -1;
+	if (seq->pos - floor(seq->pos) < 0.0000001) {
+		int r = (int)seq->pos;
+		rr = r;
+
+		for (int t = 0; t < seq->ntrk; t++) {
+			if (seq->trk[t]->mand->active) {
+				int qnt = seq->trk[t]->mand->tracies[0]->qnt;
+				if (qnt > 0 && r % qnt == 0)
+					for (int c = 0; c < seq->trk[t]->ncols; c++) {
+						int v = seq->trk[t]->mand_qnt[c];
+						if (v > -232323 && v < 0) {
+							seq->trk[t]->mand_qnt[c] = abs(v) - 1;
+						}
+					}
+			}
+		}
+
+		if (seq->parent == -1 && mod->render_mode != 1 && seq->loop_active) {
+			if (r > seq->loop_end || r < seq->loop_start) {
+				seq->pos = seq->loop_start;
+				r = seq->loop_start;
+				for (int t = 0; t < seq->ntrk; t++) {
+					track_reset(seq->trk[t]);
+					track_wind(seq->trk[t], seq->pos);
+				}
+			}
+		}
+
+		while (r >= seq->length) {
+			r-=seq->length;
+		}
+	}
+
+	if (rr > -1)
+		sequence_handle_triggers_adv(seq, rr);
+
+	int resync = 0;
+
+	if (resync) {
+		for (int t = 0; t < seq->ntrk; t++) {
+			seq->trk[t]->resync = 0;
+			seq->trk[t]->pos = 0;
+			track_wind(seq->trk[t], seq->pos);
+			track_advance(seq->trk[t], period, nframes);
+		}
+	}
+
+	seq->last_period = period;
+	if (seq->playing) {
+		// resync tracks
+		for (int t = 0; t < seq->ntrk; t++) {
+			if (seq->trk[t]->resync) {
+				seq->trk[t]->resync = 0;
+				seq->trk[t]->pos = 0;
+				track_wind(seq->trk[t], seq->pos);
+			}
+
+			track_advance(seq->trk[t], period, nframes);
+		}
+	}
+
+	seq->pos += period;
+
+	if (seq->pos >= seq->length) {
+		if (mod->render_mode == 1 && seq->playing) {
+			mod->render_mode = 23;
+			mod->end_time = mod->clt->jack_last_frame;
+		}
+
+		seq->pos = seq->pos - seq->length;
+	}
+}
+
 
 int sequence_get_thumb_dirty(sequence *seq) {
 	if (seq->thumb_dirty)
@@ -812,7 +1068,6 @@ int sequence_get_loop_active(sequence *seq) {
 }
 
 void sequence_set_loop_active(sequence *seq, int v) {
-	//int prev = seq->loop_active;
 	seq->loop_active = v;
 
 	if (seq->parent > -1) {

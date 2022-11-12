@@ -38,18 +38,18 @@ void module_excl_out(module *mod) {
 	pthread_mutex_unlock(&mod->excl);
 }
 
-int trg_equal(trigger *trg, midi_event *mev) {
-	int eq = 0;
-	if ((mev->channel == trg->channel) && \
-	        (mev->type == trg->type) && \
-	        (mev->note == trg->note))
-		eq = 1;
-
-	return eq;
-}
-
 inline void mod_should_save(module *mod) {
 	mod->should_save = 1;
+}
+
+inline void module_handle_inception(track *trk, midi_event evt) {
+	midi_client *clt = (midi_client *)trk->clt;
+	module *mod = (module *)clt->mod_ref;
+
+	if (mod->inception && trk->port == 15) {
+		for (int s = 0; s < mod->nseq; s++)
+			sequence_handle_trigger_event(mod->seq[s], evt);
+	}
 }
 
 // the god-function
@@ -147,38 +147,8 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 			}
 
 			// handle triggers
-			for (int s = 0; s < mod->nseq; s++) {
-				if (mev.velocity > 0) {
-					if ((mod->seq[s]->triggers[0].type) && trg_equal(&mod->seq[s]->triggers[0], &mev)) {
-						sequence_trigger_mute(mod->seq[s]);
-					}
-
-					if ((mod->seq[s]->triggers[1].type) && trg_equal(&mod->seq[s]->triggers[1], &mev)) {
-						sequence_trigger_cue(mod->seq[s]);
-					}
-
-					if ((mod->seq[s]->triggers[2].type) && trg_equal(&mod->seq[s]->triggers[2], &mev)) {
-						sequence_trigger_play_on(mod->seq[s], 0);
-					}
-				}
-
-				trigger trg = mod->seq[s]->triggers[2];
-
-				if ((mod->seq[s]->triggers[2].type == note_on) && \
-				        (mev.channel == trg.channel) && \
-				        (mev.type == note_off) && \
-				        (mev.note == trg.note)) {
-					sequence_trigger_play_off(mod->seq[s], 0);
-				}
-
-				if ((mod->seq[s]->triggers[2].type == control_change) && \
-				        (mev.channel == trg.channel) && \
-				        (mev.type == trg.type) && \
-				        (mev.note == trg.note) && \
-				        (mev.velocity == 0)) {
-					sequence_trigger_play_off(mod->seq[s], 0);
-				}
-			}
+			for (int s = 0; s < mod->nseq; s++)
+				sequence_handle_trigger_event(mod->seq[s], mev);
 
 			midi_in_buffer_add(mod->clt, mev);
 
@@ -244,6 +214,10 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 			timeline_advance(mod->tline, per, mod->clt->jack_buffer_size);
 		}
 
+		for (int s = 0; s < mod->nseq; s++) {
+			sequence_handle_triggers_post_adv(mod->seq[s], period * mod->seq[s]->rpb * (mod->bpm / 60.0), mod->clt->jack_buffer_size);
+		}
+
 		mod->song_pos += period;
 
 		// fix mode switching
@@ -300,6 +274,14 @@ void module_set_pnq_hack(module *mod, int ph) {
 
 int module_get_pnq_hack(module *mod) {
 	return mod->pnq_hack;
+}
+
+void module_set_inception(module *mod, int i) {
+	mod->inception = i;
+}
+
+int module_get_inception(module *mod) {
+	return mod->inception;
 }
 
 void module_set_should_save(module *mod, int ss) {
@@ -359,6 +341,7 @@ module *module_new() {
 	tc->row = 0;
 	tc->linked = 0;
 	mod->pnq_hack = 0;
+	mod->inception = 0;
 	mod->should_save = 0;
 	timeline_update(mod->tline);
 

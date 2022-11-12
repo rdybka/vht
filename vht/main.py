@@ -112,13 +112,16 @@ class VHTApp(Gtk.Application):
             try:
                 mod.load(self.start_load_file)
                 mod.pnq_hack = cfg.pnq_hack
+                mod.inception = cfg.inception
             except FileNotFoundError:
                 mod.reset()
                 mod.pnq_hack = cfg.pnq_hack
+                mod.inception = cfg.inception
                 mod.play = cfg.start_playing
         else:
             mod.reset()
             mod.pnq_hack = cfg.pnq_hack
+            mod.inception = cfg.inception
             mod.play = cfg.start_playing
 
         self.main_win = MainWin(self)

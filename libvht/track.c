@@ -565,7 +565,6 @@ int track_get_wandering_note(track *trk, int c, int pos) {
 }
 
 int col_last_note(track *trk, int col, double pos) {
-	// since we only read, ignore thread safety
 	if (col >= trk->ncols)
 		return -1;
 
@@ -575,7 +574,6 @@ int col_last_note(track *trk, int col, double pos) {
 
 	if (trk->rows[col][(int)pos].type == note_off) {
 		return -1;
-		//return trk->rows[col][(int)pos].note;
 	}
 
 	int ret = -1;
@@ -688,6 +686,7 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 			evt.note = trk->ring[c];
 			evt.velocity = 64;
 			midi_buffer_add(trk->clt, trk->port, evt);
+			module_handle_inception(trk, evt);
 			trk->indicators |= 4;
 			trk->ring[c] = -1;
 			trk->lsounded[c] = -1;
@@ -703,6 +702,7 @@ void track_play_row(track *trk, int pos, int c, int delay) {
 		trk->lsounded[c] = pos;
 
 		midi_buffer_add(trk->clt, trk->port, evt);
+		module_handle_inception(trk, evt);
 
 		row_randomise(&trk->rows[c][pos]);
 
@@ -951,6 +951,7 @@ void track_strum(track *trk, double pos_from, double pos_to, jack_nframes_t nfra
 				trk->lctrlval[c] = data;
 				trk->lctrlrow[c] = drow;
 				midi_buffer_add(clt, trk->port, evt);
+				module_handle_inception(trk, evt);
 				trk->indicators |= 4;
 			}
 		}
@@ -1128,6 +1129,7 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 						if (data != trk->lctrlval[c] || rr != trk->lctrlrow[c]) {
 							trk->lctrlval[c] = data;
 							trk->lctrlrow[c] = rr;
+							module_handle_inception(trk, evt);
 							midi_buffer_add(clt, trk->port, evt);
 							trk->indicators |= 4;
 						}
@@ -1182,7 +1184,7 @@ void track_kill_notes(track *trk) {
 	evtp.channel = trk->channel;
 	evtp.note = 0;
 	evtp.velocity = 64;
-	evtp.time = 0;
+	evtp.time = clt->jack_buffer_size;
 
 	if (trk->dirty_wheel) {
 		midi_buffer_add(trk->clt, trk->port, evtp);
@@ -1201,7 +1203,7 @@ void track_kill_notes(track *trk) {
 			evt.channel = trk->channel;
 			evt.note = trk->ring[c];
 			evt.velocity = 0;
-			evt.time = 0;
+			evt.time = clt->jack_buffer_size;
 
 			if (trk->clt) {
 				midi_buffer_add(trk->clt, trk->port, evt);
@@ -1405,17 +1407,6 @@ void track_clear_updates(track *trk) {
 void track_resize(track *trk, int size) {
 	pthread_mutex_lock(&trk->excl);
 
-	// no need to realloc?
-	/*if (trk->arows >= size) {
-		trk->nrows = size;
-		trk->resync = 1;
-
-
-
-		pthread_mutex_unlock(&trk->excl);
-		return;
-	}
-	*/
 	trk->arows = size * 2;
 
 	pthread_mutex_lock(&trk->exclctrl);

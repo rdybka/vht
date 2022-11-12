@@ -441,6 +441,7 @@ class MainWin(Gtk.ApplicationWindow):
             return False
 
         mod.pnq_hack = cfg.pnq_hack
+        mod.inception = cfg.inception
         lfn = self.app.fixfn_backup(filename)
         if not append:
             self.last_filename = lfn

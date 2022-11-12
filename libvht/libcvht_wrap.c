@@ -4299,6 +4299,58 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_module_set_inception(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "module_set_inception", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_set_inception" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "module_set_inception" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  module_set_inception(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_module_get_inception(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_get_inception" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  result = (int)module_get_inception(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_module_set_should_save(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   module *arg1 = (module *) 0 ;
@@ -6451,18 +6503,83 @@ fail:
 SWIGINTERN PyObject *_wrap_sequence_trigger_mute(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   sequence *arg1 = (sequence *) 0 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  PyObject *swig_obj[1] ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
   
-  if (!args) SWIG_fail;
-  swig_obj[0] = args;
+  if (!SWIG_Python_UnpackTuple(args, "sequence_trigger_mute", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_sequence, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_trigger_mute" "', argument " "1"" of type '" "sequence *""'"); 
   }
   arg1 = (sequence *)(argp1);
-  sequence_trigger_mute(arg1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_trigger_mute" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  sequence_trigger_mute(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_trigger_mute_forward(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "sequence_trigger_mute_forward", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_trigger_mute_forward" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_trigger_mute_forward" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  sequence_trigger_mute_forward(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_trigger_mute_back(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "sequence_trigger_mute_back", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_trigger_mute_back" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_trigger_mute_back" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  sequence_trigger_mute_back(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -6473,18 +6590,83 @@ fail:
 SWIGINTERN PyObject *_wrap_sequence_trigger_cue(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   sequence *arg1 = (sequence *) 0 ;
+  int arg2 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
-  PyObject *swig_obj[1] ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
   
-  if (!args) SWIG_fail;
-  swig_obj[0] = args;
+  if (!SWIG_Python_UnpackTuple(args, "sequence_trigger_cue", 2, 2, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_sequence, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_trigger_cue" "', argument " "1"" of type '" "sequence *""'"); 
   }
   arg1 = (sequence *)(argp1);
-  sequence_trigger_cue(arg1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_trigger_cue" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  sequence_trigger_cue(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_trigger_cue_forward(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "sequence_trigger_cue_forward", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_trigger_cue_forward" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_trigger_cue_forward" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  sequence_trigger_cue_forward(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_sequence_trigger_cue_back(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  sequence *arg1 = (sequence *) 0 ;
+  int arg2 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  PyObject *swig_obj[2] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "sequence_trigger_cue_back", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_sequence, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "sequence_trigger_cue_back" "', argument " "1"" of type '" "sequence *""'"); 
+  }
+  arg1 = (sequence *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "sequence_trigger_cue_back" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  sequence_trigger_cue_back(arg1,arg2);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -13095,6 +13277,8 @@ static PyMethodDef SwigMethods[] = {
 	 { "module_get_transport", _wrap_module_get_transport, METH_O, NULL},
 	 { "module_set_pnq_hack", _wrap_module_set_pnq_hack, METH_VARARGS, NULL},
 	 { "module_get_pnq_hack", _wrap_module_get_pnq_hack, METH_O, NULL},
+	 { "module_set_inception", _wrap_module_set_inception, METH_VARARGS, NULL},
+	 { "module_get_inception", _wrap_module_get_inception, METH_O, NULL},
 	 { "module_set_should_save", _wrap_module_set_should_save, METH_VARARGS, NULL},
 	 { "module_get_should_save", _wrap_module_get_should_save, METH_O, NULL},
 	 { "module_get_nseq", _wrap_module_get_nseq, METH_O, NULL},
@@ -13170,8 +13354,12 @@ static PyMethodDef SwigMethods[] = {
 	 { "sequence_set_trg_grp", _wrap_sequence_set_trg_grp, METH_VARARGS, NULL},
 	 { "sequence_set_trig", _wrap_sequence_set_trig, METH_VARARGS, NULL},
 	 { "sequence_get_trig", _wrap_sequence_get_trig, METH_VARARGS, NULL},
-	 { "sequence_trigger_mute", _wrap_sequence_trigger_mute, METH_O, NULL},
-	 { "sequence_trigger_cue", _wrap_sequence_trigger_cue, METH_O, NULL},
+	 { "sequence_trigger_mute", _wrap_sequence_trigger_mute, METH_VARARGS, NULL},
+	 { "sequence_trigger_mute_forward", _wrap_sequence_trigger_mute_forward, METH_VARARGS, NULL},
+	 { "sequence_trigger_mute_back", _wrap_sequence_trigger_mute_back, METH_VARARGS, NULL},
+	 { "sequence_trigger_cue", _wrap_sequence_trigger_cue, METH_VARARGS, NULL},
+	 { "sequence_trigger_cue_forward", _wrap_sequence_trigger_cue_forward, METH_VARARGS, NULL},
+	 { "sequence_trigger_cue_back", _wrap_sequence_trigger_cue_back, METH_VARARGS, NULL},
 	 { "sequence_trigger_play_on", _wrap_sequence_trigger_play_on, METH_VARARGS, NULL},
 	 { "sequence_trigger_play_off", _wrap_sequence_trigger_play_off, METH_VARARGS, NULL},
 	 { "sequence_get_playing", _wrap_sequence_get_playing, METH_O, NULL},

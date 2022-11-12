@@ -25,9 +25,22 @@
 
 #define SEQUENCE_MAX_LENGTH	512
 
-#define TRIGGER_ONOFF 	0
-#define TRIGGER_ONESHOT	1
-#define TRIGGER_HOLD	2
+#define PLAY_TRIGGER_ONOFF		0
+#define PLAY_TRIGGER_ONESHOT	1
+#define PLAY_TRIGGER_HOLD		2
+
+#define TRIGGER_MUTE			0
+#define TRIGGER_CUE				1
+#define TRIGGER_PLAY			2
+#define TRIGGER_MUTE_BACK		3
+#define TRIGGER_CUE_BACK		4
+
+#define TRIGGER_STATUS_IDLE		0
+#define TRIGGER_STATUS_RUN		1
+#define TRIGGER_STATUS_SYNC		2
+#define TRIGGER_STATUS_KILL		3
+#define TRIGGER_STATUS_KILLLATE 4
+
 
 #define	TRIGGER_GROUPS	5 + 1
 
@@ -52,8 +65,9 @@ typedef struct sequence_t {
 
 	// triggers
 	trigger triggers[N_TRIGGERS];
+	int trg_times[N_TRIGGERS];
+	int trg_status[N_TRIGGERS];
 	int trg_grp[2]; // trigger group
-	int trg_times[4]; // dear children, we will contain whatever these mean in sequence.c so we can let ourselves go a bit
 	int trg_playmode;
 	int trg_quantise;
 	pthread_mutex_t *mod_excl;
@@ -99,12 +113,17 @@ int sequence_get_trg_playmode(sequence *seq);
 
 int sequence_get_playing(sequence *seq);
 void sequence_set_playing(sequence *seq, int p);
+void sequence_handle_trigger_event(sequence *seq, midi_event evt);
 
-void sequence_trigger_mute(sequence *seq);
-void sequence_trigger_cue(sequence *seq);
-void sequence_trigger_play_on(sequence *seq, int blk);
-void sequence_trigger_play_off(sequence *seq, int blk);
-
+// nframes = -1 for gui calls
+void sequence_trigger_mute(sequence *seq, int nframes);
+void sequence_trigger_mute_forward(sequence *seq, int nframes);
+void sequence_trigger_mute_back(sequence *seq, int nframes);
+void sequence_trigger_cue(sequence *seq, int nframes);
+void sequence_trigger_cue_forward(sequence *seq, int nframes);
+void sequence_trigger_cue_back(sequence *seq, int nframes);
+void sequence_trigger_play_on(sequence *seq, int nframes);
+void sequence_trigger_play_off(sequence *seq, int nframes);
 void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt);
 char *sequence_get_trig(sequence *seq, int t);
 
@@ -120,6 +139,8 @@ void sequence_set_loop_start(sequence *seq, int s);
 int sequence_get_loop_end(sequence *seq);
 void sequence_set_loop_end(sequence *seq, int e);
 
+// internal
+void sequence_handle_triggers_post_adv(sequence *seq, double period, int nframes);
 void seq_mod_excl_in(sequence *seq);
 void seq_mod_excl_out(sequence *seq);
 #endif //__SEQUENCE_H__

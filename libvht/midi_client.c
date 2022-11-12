@@ -327,7 +327,6 @@ void midi_buffer_flush(midi_client *clt) {
 	midi_buffer_clear(clt);
 }
 
-
 void queue_midi_note_on(midi_client *clt, sequence *seq, int port, int chn, int note, int velocity) {
 	midi_event evt;
 	evt.type = note_on;

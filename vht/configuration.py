@@ -42,12 +42,12 @@ class Configuration:
         self.seq_spacing = 1.05
         self.status_bar_font_size = 24
 
-        self.mainwin_size = (800, 423)
+        self.mainwin_size = (766, 423)
 
         self.console_scale = 1
         self.timeline_position_x = 200
         self.timeline_position_y = 120
-        self.console_position = 0.6
+        self.console_position = 0.5
         self.console_show = False
         self.timeline_show = True
         self.console_steal_stderr = True
@@ -72,10 +72,10 @@ class Configuration:
         self.popup_timeout = 0.2
 
         self.intensity_background = 0.2
-        self.intensity_txt = 0.66
+        self.intensity_txt = 0.9
         self.intensity_indicator = 0.75
-        self.intensity_txt_highlight = 1.0
-        self.intensity_lines = 0.6
+        self.intensity_txt_highlight = 1.6
+        self.intensity_lines = 0.9
         self.even_highlight = 1.4
         self.intensity_select = 0.7
         self.pointer_opacity = 1.0
@@ -125,6 +125,7 @@ class Configuration:
         self.default_seq_length = 16
         self.controller_resolution = 8
         self.pnq_hack = True
+        self.inception = True
 
         self.last_load_path = ""
         self.last_save_path = ""
@@ -279,7 +280,7 @@ class Configuration:
         self.n_backups = 0
         self.autosave_seq = True
         self.autosave_trk = False
-        self.ask_quit = True
+        self.ask_quit = False
 
         self.cfg_parser = self.build_parser()
 
@@ -344,6 +345,7 @@ class Configuration:
             "new_seqs_with_tracks": self.new_seqs_with_tracks,
             "port_popup": self.port_popup,
             "pnq_hack": self.pnq_hack,
+            "inception": self.inception,
         }
 
         return cfg
@@ -409,6 +411,7 @@ class Configuration:
         oth["new_seqs_with_tracks"] = str(self.new_seqs_with_tracks)
         oth["port_popup"] = str(self.port_popup)
         oth["pnq_hack"] = str(self.pnq_hack)
+        oth["inception"] = str(self.inception)
 
         with open(self.filename, "w") as cfgfile:
             self.cfg_parser.write(cfgfile)
@@ -518,6 +521,7 @@ class Configuration:
             self.new_seqs_with_tracks = oth.getboolean("new_seqs_with_tracks")
             self.port_popup = oth.getboolean("port_popup")
             self.pnq_hack = oth.getboolean("pnq_hack")
+            self.inception = oth.getboolean("inception")
 
 
 key_aliases = {

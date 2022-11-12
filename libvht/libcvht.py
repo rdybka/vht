@@ -203,6 +203,12 @@ def module_set_pnq_hack(mod, ph):
 def module_get_pnq_hack(mod):
     return _libcvht.module_get_pnq_hack(mod)
 
+def module_set_inception(mod, i):
+    return _libcvht.module_set_inception(mod, i)
+
+def module_get_inception(mod):
+    return _libcvht.module_get_inception(mod)
+
 def module_set_should_save(mod, ss):
     return _libcvht.module_set_should_save(mod, ss)
 
@@ -428,17 +434,29 @@ def sequence_set_trig(seq, t, tp, ch, nt):
 def sequence_get_trig(seq, t):
     return _libcvht.sequence_get_trig(seq, t)
 
-def sequence_trigger_mute(seq):
-    return _libcvht.sequence_trigger_mute(seq)
+def sequence_trigger_mute(seq, nframes):
+    return _libcvht.sequence_trigger_mute(seq, nframes)
 
-def sequence_trigger_cue(seq):
-    return _libcvht.sequence_trigger_cue(seq)
+def sequence_trigger_mute_forward(seq, nframes):
+    return _libcvht.sequence_trigger_mute_forward(seq, nframes)
 
-def sequence_trigger_play_on(seq, blk):
-    return _libcvht.sequence_trigger_play_on(seq, blk)
+def sequence_trigger_mute_back(seq, nframes):
+    return _libcvht.sequence_trigger_mute_back(seq, nframes)
 
-def sequence_trigger_play_off(seq, blk):
-    return _libcvht.sequence_trigger_play_off(seq, blk)
+def sequence_trigger_cue(seq, nframes):
+    return _libcvht.sequence_trigger_cue(seq, nframes)
+
+def sequence_trigger_cue_forward(seq, nframes):
+    return _libcvht.sequence_trigger_cue_forward(seq, nframes)
+
+def sequence_trigger_cue_back(seq, nframes):
+    return _libcvht.sequence_trigger_cue_back(seq, nframes)
+
+def sequence_trigger_play_on(seq, nframes):
+    return _libcvht.sequence_trigger_play_on(seq, nframes)
+
+def sequence_trigger_play_off(seq, nframes):
+    return _libcvht.sequence_trigger_play_off(seq, nframes)
 
 def sequence_get_playing(seq):
     return _libcvht.sequence_get_playing(seq)

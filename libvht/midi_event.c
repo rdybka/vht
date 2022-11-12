@@ -111,9 +111,9 @@ char *midi_describe_event(midi_event evt, char *buff, int len) {
 	}
 
 	if (evt.type == note_on || evt.type == note_off) {
-		sprintf(buff, "ch: %02d %-15s %3s (%d) %3d offset: %u", evt.channel, b, i2n(evt.note), evt.note, evt.velocity, evt.time);
+		sprintf(buff, "ch: %02d %-15s %3s (%d) %3d offs: %u", evt.channel, b, i2n(evt.note), evt.note, evt.velocity, evt.time);
 	} else
-		sprintf(buff, "ch: %02d %-15s %3d %3d offset: %u", evt.channel, b, evt.note, evt.velocity, evt.time);
+		sprintf(buff, "ch: %02d %-15s %3d %3d offs: %u", evt.channel, b, evt.note, evt.velocity, evt.time);
 
 
 	return buff;

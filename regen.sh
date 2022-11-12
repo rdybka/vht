@@ -32,5 +32,3 @@ swig -python libvht/libcvht.h
 #gzip doc/vht.1
 git add .
 git reset libvht/*.so
-git reset TODO
-

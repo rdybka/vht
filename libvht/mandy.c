@@ -673,8 +673,7 @@ long double mandy_isect(mandy *mand,\
 		return(-22);
 	}
 
-	// let's go deeper to find the angle
-	unit /= 10;
+	unit /= 9.69420;
 	mandy_isect(mand, x1, y1, x2, y2, unit, ix, iy, 1);
 	x3 = *ix;
 	y3 = *iy;
@@ -906,7 +905,7 @@ PyObject *mandy_get_pixels(mandy *mand, int width, int height, int stride) {
 				clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t_now);
 				int millis = (t_now.tv_nsec - t_start.tv_nsec) / 1000000;
 
-				if (millis > 20)
+				if (millis > 23)
 					bail = 1;
 
 				chk_time = 256;
