@@ -250,6 +250,9 @@ class VHTModule(Iterable):
     def sneakily_queue_midi_ctrl(self, seq, trk, value, ctrl):
         libcvht.queue_midi_ctrl(self._clt_handle, seq, trk, value, ctrl)
 
+    def sneakily_queue_midi_in(self, chan, tp, note, vel):
+        libcvht.queue_midi_in(self._clt_handle, chan, tp, note, vel)
+
     def reset(self):
         libcvht.module_reset(self._mod_handle)
 
@@ -670,3 +673,6 @@ class VHTModule(Iterable):
 
     def freewheel_on(self):
         libcvht.module_set_freewheel(self._mod_handle, 1)
+
+    def i2n(self, i):
+        return libcvht.i2n(i)

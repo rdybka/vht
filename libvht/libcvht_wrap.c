@@ -3127,6 +3127,22 @@ SWIG_AsCharPtrAndSize(PyObject *obj, char** cptr, size_t* psize, int *alloc)
 
 
 
+SWIGINTERN int
+SWIG_AsVal_unsigned_SS_char (PyObject * obj, unsigned char *val)
+{
+  unsigned long v;
+  int res = SWIG_AsVal_unsigned_SS_long (obj, &v);
+  if (SWIG_IsOK(res)) {
+    if ((v > UCHAR_MAX)) {
+      return SWIG_OverflowError;
+    } else {
+      if (val) *val = (unsigned char)(v);
+    }
+  }  
+  return res;
+}
+
+
 SWIGINTERNINLINE PyObject *
 SWIG_FromCharPtrAndSize(const char* carray, size_t size)
 {
@@ -3780,6 +3796,29 @@ SWIGINTERN PyObject *_wrap_midi_stop(PyObject *SWIGUNUSEDPARM(self), PyObject *a
   arg1 = (midi_client *)(argp1);
   midi_stop(arg1);
   resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_i2n(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  unsigned char arg1 ;
+  unsigned char val1 ;
+  int ecode1 = 0 ;
+  PyObject *swig_obj[1] ;
+  char *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  ecode1 = SWIG_AsVal_unsigned_SS_char(swig_obj[0], &val1);
+  if (!SWIG_IsOK(ecode1)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode1), "in method '" "i2n" "', argument " "1"" of type '" "unsigned char""'");
+  } 
+  arg1 = (unsigned char)(val1);
+  result = (char *)i2n(arg1);
+  resultobj = SWIG_FromCharPtr((const char *)result);
   return resultobj;
 fail:
   return NULL;
@@ -4941,6 +4980,59 @@ SWIGINTERN PyObject *_wrap_midi_in_clear_events(PyObject *SWIGUNUSEDPARM(self), 
   }
   arg1 = (midi_client *)(argp1);
   midi_in_clear_events(arg1);
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_queue_midi_in(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  int arg2 ;
+  int arg3 ;
+  int arg4 ;
+  int arg5 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int val2 ;
+  int ecode2 = 0 ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  int val5 ;
+  int ecode5 = 0 ;
+  PyObject *swig_obj[5] ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "queue_midi_in", 5, 5, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "queue_midi_in" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  ecode2 = SWIG_AsVal_int(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "queue_midi_in" "', argument " "2"" of type '" "int""'");
+  } 
+  arg2 = (int)(val2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "queue_midi_in" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  ecode4 = SWIG_AsVal_int(swig_obj[3], &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "queue_midi_in" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = (int)(val4);
+  ecode5 = SWIG_AsVal_int(swig_obj[4], &val5);
+  if (!SWIG_IsOK(ecode5)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode5), "in method '" "queue_midi_in" "', argument " "5"" of type '" "int""'");
+  } 
+  arg5 = (int)(val5);
+  queue_midi_in(arg1,arg2,arg3,arg4,arg5);
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -13257,6 +13349,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "module_get_midi_client", _wrap_module_get_midi_client, METH_O, NULL},
 	 { "midi_start", _wrap_midi_start, METH_VARARGS, NULL},
 	 { "midi_stop", _wrap_midi_stop, METH_O, NULL},
+	 { "i2n", _wrap_i2n, METH_O, NULL},
 	 { "get_midi_error", _wrap_get_midi_error, METH_O, NULL},
 	 { "module_get_time", _wrap_module_get_time, METH_O, NULL},
 	 { "module_get_max_ports", _wrap_module_get_max_ports, METH_O, NULL},
@@ -13301,6 +13394,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "track_clear_updates", _wrap_track_clear_updates, METH_O, NULL},
 	 { "midi_in_get_event", _wrap_midi_in_get_event, METH_O, NULL},
 	 { "midi_in_clear_events", _wrap_midi_in_clear_events, METH_O, NULL},
+	 { "queue_midi_in", _wrap_queue_midi_in, METH_VARARGS, NULL},
 	 { "midi_ignore_buffer_clear", _wrap_midi_ignore_buffer_clear, METH_O, NULL},
 	 { "midi_ignore_buffer_add", _wrap_midi_ignore_buffer_add, METH_VARARGS, NULL},
 	 { "queue_midi_note_on", _wrap_queue_midi_note_on, METH_VARARGS, NULL},

@@ -242,16 +242,36 @@ class SequenceView(Gtk.Box):
         if 65465 >= event.keyval >= 65456:
             sid = event.keyval - 65456
             if sid < len(mod):
+                ctrl = False
+
+                if event.state & Gdk.ModifierType.CONTROL_MASK:
+                    ctrl = True
+
+                grp0 = mod[sid].get_trig_grp(0)
+                grp1 = mod[sid].get_trig_grp(1)
+
                 ms = mod[sid].extras["mouse_cfg"]
-
-                if ms[0] == 3:
-                    mod[sid].trigger_mute()
-
-                if ms[1] == 3:
-                    mod[sid].trigger_cue()
 
                 if ms[2] == 3:
                     mod[sid].trigger_play_on()
+
+                if ms[0] == 3:
+                    if grp0 == 0:
+                        mod[sid].trigger_mute()
+                    else:
+                        if not ctrl:
+                            mod[sid].trigger_mute_forward()
+                        else:
+                            mod[sid].trigger_mute_back()
+
+                if ms[1] == 3:
+                    if grp1 == 0:
+                        mod[sid].trigger_cue()
+                    else:
+                        if not ctrl:
+                            mod[sid].trigger_cue_forward()
+                        else:
+                            mod[sid].trigger_cue_back()
 
         if cfg.key["fullscreen"].matches(event):
             if mod.mainwin.fs:

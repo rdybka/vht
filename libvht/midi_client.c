@@ -333,9 +333,15 @@ void queue_midi_note_on(midi_client *clt, sequence *seq, int port, int chn, int 
 	evt.channel = chn;
 	evt.note = note;
 	evt.velocity = velocity;
-	evt.time = 0;
+	evt.time = -1;
 
 	module *mod = (module *) clt->mod_ref;
+
+	if (seq->midi_focus > -1) {
+		module_handle_inception(seq->trk[seq->midi_focus], evt);
+	}
+
+	evt.time = 0;
 
 	if (mod->recording && mod->playing) {
 		jack_nframes_t jft = jack_frame_time(clt->jack_client);
@@ -359,9 +365,15 @@ void queue_midi_note_off(midi_client *clt, sequence *seq, int port, int chn, int
 	evt.channel = chn;
 	evt.note = note;
 	evt.velocity = 0;
-	evt.time = 0;
+	evt.time = -1;
 
 	module *mod = (module *) clt->mod_ref;
+
+	if (seq->midi_focus > -1) {
+		module_handle_inception(seq->trk[seq->midi_focus], evt);
+	}
+
+	evt.time = 0;
 
 	if (mod->recording && mod->playing) {
 		jack_nframes_t jft = jack_frame_time(clt->jack_client);
@@ -382,13 +394,19 @@ void queue_midi_note_off(midi_client *clt, sequence *seq, int port, int chn, int
 
 void queue_midi_ctrl(midi_client *clt, sequence *seq, track *trk, int val, int ctrl) {
 	midi_event evt;
-	evt.type = pitch_wheel;
+	evt.type = control_change;
 	evt.channel = trk->channel;
-	evt.note = 0;
+	evt.note = ctrl;
 	evt.velocity = val;
-	evt.time = 0;
+	evt.time = -1;
 
 	module *mod = (module *) clt->mod_ref;
+
+	if (seq->midi_focus > -1) {
+		module_handle_inception(seq->trk[seq->midi_focus], evt);
+	}
+
+	evt.time = 0;
 
 	if (ctrl > -1) {
 		evt.type = control_change;
@@ -433,6 +451,15 @@ void midi_in_buffer_add(midi_client *clt, midi_event evt) {
 
 	clt->midi_in_buffer[clt->curr_midi_in_event++] = evt;
 	midi_in_buff_excl_out(clt);
+}
+
+void queue_midi_in(midi_client *clt, int chan, int type, int note, int vel) {
+	midi_event evt;
+	evt.type = type;
+	evt.channel = chan;
+	evt.note = note;
+	evt.velocity = vel;
+	midi_in_buffer_add(clt, evt);
 }
 
 char *midi_in_get_event(midi_client *clt) {

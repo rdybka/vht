@@ -160,29 +160,31 @@ class SequenceTriggersView(Gtk.Grid):
         desc = None
         if trig[0] == 1:
             notes = [
-                "C-",
-                "C#",
-                "D-",
-                "D#",
-                "E-",
-                "F-",
-                "F#",
-                "G-",
-                "G#",
-                "A-",
-                "A#",
-                "B-",
+                "c-",
+                "c#",
+                "d-",
+                "d#",
+                "e-",
+                "f-",
+                "f#",
+                "g-",
+                "g#",
+                "a-",
+                "a#",
+                "b-",
             ]
             note = trig[2] % 12
-            octave = trig[2] // 12
+            octave = (trig[2] // 12) - 1
             strrep = ""
-            if octave < 10:
+            if octave < 0:
+                strrep = notes[note] + "<"
+            elif octave < 10:
                 strrep = notes[note] + str(octave)
             else:
                 strrep = notes[note] + "A"
 
             # desc = "ch:%02d %s:%03d [%3s]" % (trig[1], note_char, trig[2], strrep)
-            desc = "n%02d:%03d" % (trig[1], trig[2])
+            desc = "n%02d:%3s" % (trig[1], strrep)
 
         if trig[0] == 4:
             desc = "c%02d:%03d" % (trig[1], trig[2])

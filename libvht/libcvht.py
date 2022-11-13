@@ -143,6 +143,9 @@ def midi_start(clt, clt_name):
 def midi_stop(clt):
     return _libcvht.midi_stop(clt)
 
+def i2n(i):
+    return _libcvht.i2n(i)
+
 def get_midi_error(mod):
     return _libcvht.get_midi_error(mod)
 
@@ -274,6 +277,9 @@ def midi_in_get_event(clt):
 
 def midi_in_clear_events(clt):
     return _libcvht.midi_in_clear_events(clt)
+
+def queue_midi_in(clt, chan, type, note, vel):
+    return _libcvht.queue_midi_in(clt, chan, type, note, vel)
 
 def midi_ignore_buffer_clear(clt):
     return _libcvht.midi_ignore_buffer_clear(clt)

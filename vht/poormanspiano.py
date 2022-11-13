@@ -107,6 +107,9 @@ class PoorMansPiano:
                     self.seq._seq_handle, self.trk._trk_handle, val, ctrl
                 )
                 self.trk.indicators = self.trk.indicators | 8
+
+                if mod.gui_midi_capture:
+                    mod.sneakily_queue_midi_in(self.trk.channel, 4, ctrl, val)
             return True
 
         if key in self.mnotes:
@@ -135,6 +138,12 @@ class PoorMansPiano:
                     mnt,
                     int(cfg.velocity),
                 )
+
+                if mod.gui_midi_capture:
+                    mod.sneakily_queue_midi_in(
+                        self.trk.channel, 1, mnt, int(cfg.velocity)
+                    )
+
                 self.note_on = mnt
                 self.ringing.append(mnt)
                 self.trk.indicators = self.trk.indicators | 5

@@ -471,6 +471,11 @@ void sequence_trigger_mute(sequence *seq, int nframes) {
 }
 
 void sequence_trigger_mute_forward(sequence *seq, int nframes) {
+	if(seq->trg_grp[0] == 0) {
+		sequence_trigger_mute(seq, nframes);
+		return;
+	}
+
 	midi_client *clt = (midi_client *)seq->clt;
 	module *mod = (module *)clt->mod_ref;
 
@@ -507,6 +512,11 @@ void sequence_trigger_mute_forward(sequence *seq, int nframes) {
 }
 
 void sequence_trigger_mute_back(sequence *seq, int nframes) {
+	if(seq->trg_grp[0] == 0) {
+		sequence_trigger_mute(seq, nframes);
+		return;
+	}
+
 	midi_client *clt = (midi_client *)seq->clt;
 	module *mod = (module *)clt->mod_ref;
 
@@ -555,6 +565,11 @@ void sequence_trigger_cue(sequence *seq,  int nframes) {
 }
 
 void sequence_trigger_cue_forward(sequence *seq, int nframes) {
+	if(seq->trg_grp[1] == 0) {
+		sequence_trigger_cue(seq, nframes);
+		return;
+	}
+
 	midi_client *clt = (midi_client *)seq->clt;
 	module *mod = (module *)clt->mod_ref;
 
@@ -612,6 +627,11 @@ void sequence_trigger_cue_forward(sequence *seq, int nframes) {
 }
 
 void sequence_trigger_cue_back(sequence *seq, int nframes) {
+	if(seq->trg_grp[1] == 0) {
+		sequence_trigger_cue(seq, nframes);
+		return;
+	}
+
 	midi_client *clt = (midi_client *)seq->clt;
 	module *mod = (module *)clt->mod_ref;
 
