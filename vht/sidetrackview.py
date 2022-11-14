@@ -84,6 +84,7 @@ class SideTrackView(Gtk.DrawingArea):
 
         self.highlight_start = -1
         self.highlight_end = -1
+        self.highlight_trk = None
 
     def on_button_press(self, widget, event):
         if event.state & Gdk.ModifierType.CONTROL_MASK:
@@ -246,7 +247,7 @@ class SideTrackView(Gtk.DrawingArea):
         if from_row > to_row:
             from_row, to_row = to_row, from_row
 
-        (x, y, width, height, dx, dy) = cr.text_extents("000|")
+        (x, y, width, height, dx, dy) = cr.text_extents("0000")
 
         self.txt_height = float(height) * self.spacing * cfg.seq_spacing
         self.txt_width = int(dx)
@@ -311,7 +312,7 @@ class SideTrackView(Gtk.DrawingArea):
             if in_loop:
                 cr.set_source_rgb(0, 0, 0)
 
-            yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2.0)
+            yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2)
 
             cr.move_to(x, yy)
             txt = cfg.row_number_format % r
@@ -492,6 +493,7 @@ class SideTrackView(Gtk.DrawingArea):
 
     def on_leave(self, wdg, prm):
         self.hover = -1
+        self.highlight_trk = None
         self.redraw()
 
     def on_destroy(self, wdg):
@@ -521,21 +523,23 @@ class SideTrackView(Gtk.DrawingArea):
             if at.select_start:
                 rs, re = at.select_start[1], at.select_end[1]
 
-            # if self.hover > -1:
-            #    rs = re = self.hover
+            if self.hover > -1:
+                rs = re = self.hover
+                self.highlight_trk = None
 
             if re < rs:
                 re, rs = rs, re
 
             ys = int(rs * at.txt_height)
-            ye = int((re + 1) * at.txt_height)
+            ye = min(int((re + 1) * at.txt_height), self.seq.length * self.txt_height)
         else:
             ys, ye = -1, -1
 
-            if self.hover > -1:
-                rs = re = self.hover
-
-        if ys != self.highlight_start or ye != self.highlight_end:
+        if (
+            ys != self.highlight_start
+            or ye != self.highlight_end
+            or at != self.highlight_trk
+        ):
             cr = self._back_context
             crf = self._context
             crf.set_source_surface(self._back_surface)
@@ -559,7 +563,8 @@ class SideTrackView(Gtk.DrawingArea):
 
             if self.highlight_start > -1:
                 cr.set_source_rgb(
-                    *(col * cfg.intensity_txt_highlight for col in cfg.colour)
+                    *(col * 0 for col in cfg.colour)
+                    # *(col * cfg.intensity_txt_highlight for col in cfg.colour)
                 )
                 cr.move_to(self.txt_width - (dx / 2), self.highlight_start)
                 cr.line_to(self.txt_width - (dx / 2), self.highlight_end)
@@ -575,6 +580,11 @@ class SideTrackView(Gtk.DrawingArea):
 
             self.highlight_start = ys
             self.highlight_end = ye
+
+        if self.hover == -1:
+            self.highlight_trk = None
+        else:
+            self.highlight_trk = at
 
     def tick(self):
         redr = False

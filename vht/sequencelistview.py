@@ -299,13 +299,15 @@ class SequenceListView(Gtk.DrawingArea):
             gradient.add_color_stop_rgb(
                 0.0, *(col * cfg.intensity_background for col in cfg.mixer_colour)
             )
-            gradient.add_color_stop_rgb(
-                0.05, *(col * cfg.intensity_txt for col in cfg.mixer_colour)
-            )
 
-            gradient.add_color_stop_rgb(
-                0.1, *(col * cfg.intensity_txt for col in cfg.mixer_colour)
-            )
+            dim = cfg.intensity_txt
+
+            if not seq.playing and not seq.cue:
+                dim *= 0.5
+
+            gradient.add_color_stop_rgb(0.05, *(col * dim for col in cfg.mixer_colour))
+
+            gradient.add_color_stop_rgb(0.1, *(col * dim for col in cfg.mixer_colour))
 
             bottom_intensity = cfg.intensity_txt / 1.5
             if r == self._highlight:
@@ -409,7 +411,7 @@ class SequenceListView(Gtk.DrawingArea):
 
             cr.set_source_rgb(*(col * cfg.intensity_lines for col in cfg.mixer_colour))
             cr.set_line_width((cfg.mixer_font_size / 5.0) * cfg.seq_line_width)
-            cr.move_to(x + self._txt_height, self._txt_height / 4.0)
+            cr.move_to(x + self._txt_height, 0)
 
             itop = cfg.intensity_background
             imid = 1.0
@@ -446,6 +448,15 @@ class SequenceListView(Gtk.DrawingArea):
             cr.line_to(x + self._txt_height, h)
 
             cr.stroke()
+
+            if seq.playing:
+                cr.set_source_rgb(*(col * 2.0 for col in cfg.mixer_colour))
+                cr.set_line_width((cfg.mixer_font_size / 8.0) * cfg.seq_line_width)
+                hh = (seq.pos / seq.length) * h
+                cr.move_to(x + self._txt_height + (self._txt_height / 6), hh)
+                cr.line_to(x + self._txt_height - (self._txt_height / 6), hh)
+
+                cr.stroke()
 
         self.queue_draw()
 

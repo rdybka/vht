@@ -721,6 +721,7 @@ class TrackView(Gtk.DrawingArea):
                         (x, y, width, height, dx, dy) = cr.text_extents("000 0000 000")
 
                     yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2)
+
                     cr.move_to((c * self.txt_width) + x + xtraoffs, yy)
 
                     ts_sign = "0"
