@@ -690,6 +690,13 @@ void sequence_trigger_play_on(sequence *seq, int nframes) {
 	if (nframes < 0)
 		nframes = 0;
 
+	// one-shot kill
+	if (seq->trg_status[TRIGGER_PLAY] == TRIGGER_STATUS_KILLLATE) {
+		seq->trg_times[TRIGGER_PLAY] = nframes;
+		seq->trg_status[TRIGGER_PLAY] = TRIGGER_STATUS_KILL;
+		return;
+	}
+
 	if (seq->trg_status[TRIGGER_PLAY] == TRIGGER_STATUS_IDLE) {
 		if (!seq->playing) {
 			if (seq->trg_quantise == 0) {
