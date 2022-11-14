@@ -100,6 +100,7 @@ class SequenceListViewPopover(Gtk.Popover):
             self.pooped = False
             self._trgview.capture = -1
             self._parent._menu_handle = -1
+            mod.gui_midi_capture = False
             return True
 
     def on_scroll(self, wdg, prm):
@@ -114,6 +115,8 @@ class SequenceListViewPopover(Gtk.Popover):
 
         if last != new:
             if new in self._parent.visible_cols:
+                mod.gui_midi_capture = False
+                self._trgview.capture = -1
                 self.curr = new
                 self.refresh()
                 self._parent._menu_handle = self.curr
@@ -168,6 +171,7 @@ class SequenceListViewPopover(Gtk.Popover):
                 self.pooped = False
                 self._trgview.capture = -1
                 self._parent._menu_handle = -1
+                mod.gui_midi_capture = False
                 self._parent.redraw()
                 return False
 
