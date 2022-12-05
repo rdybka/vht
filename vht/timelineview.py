@@ -591,6 +591,17 @@ class TimelineView(Gtk.DrawingArea):
                         )
                         cr.fill()
 
+                    # loop lines
+                    ll = st.seq.relative_length * 2
+                    while ll < st.length:
+                        yyy = (mod.timeline.qb2t(st.start + ll) - tstart) / self.spl
+                        cr.move_to(thx, yyy)
+                        cr.line_to(thx + thxx, yyy)
+                        cr.set_line_width(1.0)
+                        cr.stroke()
+
+                        ll += st.seq.relative_length
+
             if not st.enabled:
                 cr.set_line_width(3.0)
                 cr.set_source_rgb(*(col * 0.9 for col in colour))
@@ -1219,6 +1230,10 @@ class TimelineView(Gtk.DrawingArea):
             nl = min(rm, max(1, int((self.resize_start + delta))))
 
             strp.length = nl
+
+            # loop hint
+            if strp.length % int(strp.seq.relative_length) == 0:
+                self.hint = strp.start + strp.length, strp.start + strp.length
 
         if self.scrollstart > -1:
             delta = (event.y - self.scrollstart) / ((h - self.scrollbar_height))
