@@ -37,11 +37,13 @@ class TrackPropViewPopover(Gtk.Popover):
             Gdk.EventMask.LEAVE_NOTIFY_MASK
             | Gdk.EventMask.ENTER_NOTIFY_MASK
             | Gdk.EventMask.KEY_PRESS_MASK
+            | Gdk.EventMask.SCROLL_MASK
         )
 
         self.connect("leave-notify-event", self.on_leave)
         self.connect("enter-notify-event", self.on_enter)
         self.connect("key-press-event", self.on_key_press)
+        self.connect("scroll-event", self.on_scroll)
 
         self.parent = parent
         self.trk = trk
@@ -182,7 +184,7 @@ class TrackPropViewPopover(Gtk.Popover):
         pad.set_vexpand(True)
         grid.attach(pad, 0, 1, 1, 1)
 
-        lab = Gtk.Label("show:")
+        lab = Gtk.Label("show")
         lab.set_vexpand(True)
 
         grid.attach(lab, 0, 0, 1, 1)
@@ -197,7 +199,7 @@ class TrackPropViewPopover(Gtk.Popover):
         show_grid.attach(self.show_probs_button, 4, 0, 1, 1)
         grid.attach(show_grid, 1, 0, 4, 1)
 
-        lab = Gtk.Label(cfg.quick_controls_desc + ":")
+        lab = Gtk.Label(cfg.quick_controls_desc)
         lab.set_vexpand(True)
         grid.attach(lab, 0, 2, 1, 1)
         lab.set_vexpand(True)
@@ -227,7 +229,7 @@ class TrackPropViewPopover(Gtk.Popover):
 
         self.name_entry.set_activates_default(False)
 
-        self.name_lab = Gtk.ToggleButton.new_with_label("name:")
+        self.name_lab = Gtk.ToggleButton.new_with_label("name")
         self.name_lab.set_tooltip_markup(
             cfg.tooltip_markup % "hold name when switching patch"
         )
@@ -248,7 +250,7 @@ class TrackPropViewPopover(Gtk.Popover):
         self.show_controllers_button.set_active(self.extras["track_show_controllers"])
         self.show_notes_button.set_active(self.extras["track_show_notes"])
 
-        lab = Gtk.Button.new_with_label("patch:")
+        lab = Gtk.Button.new_with_label("patch")
         lab.connect("button-press-event", self.on_resend_patch_clicked, 0)
         lab.set_tooltip_markup(
             cfg.tooltip_markup2 % ("resend patch", cfg.key["track_resend_patch"])
@@ -378,7 +380,7 @@ class TrackPropViewPopover(Gtk.Popover):
         self.port_adj.set_value(trk.port)
         self.port_adj.connect("value-changed", self.on_port_changed)
 
-        lbl = Gtk.Label("port:")
+        lbl = Gtk.Label("port")
         lbl.set_xalign(1.0)
 
         self.grid.attach(lbl, 0, 2, 1, 1)
@@ -390,7 +392,7 @@ class TrackPropViewPopover(Gtk.Popover):
         self.channel_adj.set_value(trk.channel)
         self.channel_adj.connect("value-changed", self.on_channel_changed)
 
-        lbl = Gtk.Label("channel:")
+        lbl = Gtk.Label("channel")
         lbl.set_xalign(1.0)
 
         self.grid.attach(lbl, 0, 3, 1, 1)
@@ -402,7 +404,7 @@ class TrackPropViewPopover(Gtk.Popover):
         self.nsrows_adj.set_value(trk.nsrows)
         self.nsrows_adj.connect("value-changed", self.on_nsrows_changed)
 
-        lbl = Gtk.Label("rows:")
+        lbl = Gtk.Label("rows")
         lbl.set_xalign(1.0)
 
         self.nsrows_check_button = Gtk.CheckButton()
@@ -418,7 +420,7 @@ class TrackPropViewPopover(Gtk.Popover):
         self.nrows_adj.set_value(trk.nsrows)
         self.nrows_adj.connect("value-changed", self.on_nrows_changed)
 
-        lbl = Gtk.Label("funk:")
+        lbl = Gtk.Label("funk")
         lbl.set_xalign(1.0)
 
         self.nrows_check_button = Gtk.CheckButton()
@@ -477,6 +479,23 @@ class TrackPropViewPopover(Gtk.Popover):
             self.hide()
             self.unpop()
             return True
+
+        return False
+
+    def on_scroll(self, wdg, prm):
+        new = 0
+        if prm.direction == Gdk.ScrollDirection.UP:
+            new -= 1
+
+        if prm.direction == Gdk.ScrollDirection.DOWN:
+            new += 1
+
+        new += self.trk.index
+
+        if new > -1 and new < len(self.parent.seq):
+            self.parent.propview.clear_popups()
+            tv = self.parent.propview.trk_prop_cache[int(self.parent.seq[new])]
+            tv.popover.pop()
 
         return False
 

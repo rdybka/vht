@@ -362,6 +362,8 @@ class MandyView(Gtk.DrawingArea):
             if event.direction == Gdk.ScrollDirection.DOWN:
                 self.mandy.zoom *= 1.05
 
+        return True
+
     def on_draw(self, widget, cr):
         if not self._surface:
             return False
