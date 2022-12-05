@@ -913,6 +913,18 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 
 	seq->pos += period;
 
+	int r = (int)seq->pos;
+	if (seq->parent == -1 && mod->render_mode != 1 && seq->loop_active) {
+		if (r > seq->loop_end || r < seq->loop_start) {
+			seq->pos = seq->loop_start;
+			r = seq->loop_start;
+			for (int t = 0; t < seq->ntrk; t++) {
+				track_reset(seq->trk[t]);
+				track_wind(seq->trk[t], seq->pos);
+			}
+		}
+	}
+
 	if (seq->pos >= seq->length) {
 		if (mod->render_mode == 1 && seq->playing) {
 			mod->render_mode = 23;
