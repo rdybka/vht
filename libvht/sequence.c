@@ -225,6 +225,10 @@ void sequence_del_track(sequence *seq, int t) {
 	if (seq->midi_focus > seq->ntrk -1)
 		seq->midi_focus = seq->ntrk -1;
 
+	midi_client *clt = (midi_client *)seq->clt;
+	if (clt)
+		module_synch_output_ports((module *)clt->mod_ref);
+
 	seq_should_save(seq);
 	seq_mod_excl_out(seq);
 }

@@ -87,7 +87,7 @@ class PortConfigView(Gtk.Grid):
         self.box_in = Gtk.Box()
         self.box_in.set_orientation(Gtk.Orientation.VERTICAL)
         self.box_in.pack_start(self.bl_in, False, False, 0)
-        self.box_in.pack_end(self.bl_unv_in, False, False, 0)
+        self.box_in.pack_start(self.bl_unv_in, False, False, 0)
 
         self.box_out = Gtk.Box()
         self.box_out.set_orientation(Gtk.Orientation.VERTICAL)
