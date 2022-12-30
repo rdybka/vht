@@ -28,6 +28,8 @@ gi.require_version("Gtk", "3.0")
 class PropView(Gtk.ScrolledWindow):
     def __init__(self, seqview):
         Gtk.ScrolledWindow.__init__(self)
+
+        self.connect("scroll-event", self.on_scroll)
         self.connect("draw", self.on_draw)
         self.connect("leave-notify-event", self.on_leave)
 
@@ -45,6 +47,18 @@ class PropView(Gtk.ScrolledWindow):
         self._track_box.show_all()
 
         self.trk_prop_cache = {}
+
+    def on_scroll(self, widget, event):
+        if event.state & Gdk.ModifierType.CONTROL_MASK:  # we're zooming!
+            if event.delta_y > 0:
+                self.seqview.zoom(-1)
+
+            if event.delta_y < 0:
+                self.seqview.zoom(1)
+
+            return True
+
+        return False
 
     def del_track(self, trk, dest=False):
         track_pv = self._track_box.get_children()[trk.index]

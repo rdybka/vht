@@ -35,7 +35,6 @@ class TrackPropView(Gtk.DrawingArea):
 
         self.set_events(
             Gdk.EventMask.POINTER_MOTION_MASK
-            | Gdk.EventMask.SCROLL_MASK
             | Gdk.EventMask.BUTTON_PRESS_MASK
             | Gdk.EventMask.BUTTON_RELEASE_MASK
             | Gdk.EventMask.LEAVE_NOTIFY_MASK
