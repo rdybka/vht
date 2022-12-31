@@ -90,7 +90,7 @@ extern void module_set_play_mode(module *mod, int m);
 extern int module_get_play_mode(module *mod);
 extern double module_get_jack_pos(module *mod);
 extern int module_get_switch_req(module *mod);
-extern char *track_get_rec_update(track *trk);
+extern PyObject *track_get_rec_update(track *trk);
 extern int track_get_last_row_played(track *trk, int col);
 extern void track_clear_updates(track *trk);
 

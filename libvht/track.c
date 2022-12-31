@@ -1531,22 +1531,21 @@ void track_trigger(track *trk) {
 	}
 }
 
-char *track_get_rec_update(track *trk) {
-	static char rc[256];
+PyObject *track_get_rec_update(track *trk) {
+	PyObject *ret = PyDict_New();
+
 	pthread_mutex_lock(&trk->exclrec);
 
-	char *ret = NULL;
-
 	if (trk->cur_rec_update > 0) {
-		sprintf(rc, "{\"col\" :%d, \"row\" : %d}", trk->updates[trk->cur_rec_update - 1].col,
-		        trk->updates[trk->cur_rec_update - 1].row);
+		PyDict_SetItemString(ret, "col", PyLong_FromLong(trk->updates[trk->cur_rec_update - 1].col));
+		PyDict_SetItemString(ret, "row", PyLong_FromLong(trk->updates[trk->cur_rec_update - 1].row));
 		trk->cur_rec_update--;
-		ret = rc;
 	}
 
 	pthread_mutex_unlock(&trk->exclrec);
 	return ret;
 }
+
 
 void track_insert_rec_update(track *trk, int col, int row) {
 	if (trk->cur_rec_update > 0) {

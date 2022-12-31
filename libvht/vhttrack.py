@@ -289,6 +289,6 @@ class VHTTrack(Iterable):
     def get_rec_update(self):
         rec = libcvht.track_get_rec_update(self._trk_handle)
         if rec:
-            return eval(rec)
+            return rec
 
         return None

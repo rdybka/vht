@@ -4873,7 +4873,7 @@ SWIGINTERN PyObject *_wrap_track_get_rec_update(PyObject *SWIGUNUSEDPARM(self), 
   void *argp1 = 0 ;
   int res1 = 0 ;
   PyObject *swig_obj[1] ;
-  char *result = 0 ;
+  PyObject *result = 0 ;
   
   if (!args) SWIG_fail;
   swig_obj[0] = args;
@@ -4882,8 +4882,8 @@ SWIGINTERN PyObject *_wrap_track_get_rec_update(PyObject *SWIGUNUSEDPARM(self), 
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "track_get_rec_update" "', argument " "1"" of type '" "track *""'"); 
   }
   arg1 = (track *)(argp1);
-  result = (char *)track_get_rec_update(arg1);
-  resultobj = SWIG_FromCharPtr((const char *)result);
+  result = (PyObject *)track_get_rec_update(arg1);
+  resultobj = result;
   return resultobj;
 fail:
   return NULL;
