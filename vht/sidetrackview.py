@@ -484,7 +484,9 @@ class SideTrackView(Gtk.DrawingArea):
             if self.hover:
                 self.redraw(self.hover)
 
-        if self.seq.loop_active and self.show_resize_handle:
+        if self.show_resize_handle and (
+            self.seq.loop_active or len(self.seq.index) > 1
+        ):
             self.get_window().set_cursor(self.resize_curs)
         else:
             self.get_window().set_cursor(None)
