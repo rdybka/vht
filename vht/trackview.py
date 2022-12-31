@@ -730,8 +730,12 @@ class TrackView(Gtk.DrawingArea):
                     if rw.delay < 0:
                         ts_sign = "-"
 
-                    if self.show_notes and rw.type == 1:  # note_on
-                        ltxt = "%3s %03d" % (str(rw), rw.velocity)
+                    if self.show_notes and (rw.type == 1 or rw.type == 2):
+                        if rw.type == 1:
+                            ltxt = "%3s %03d" % (str(rw), rw.velocity)
+                        else:
+                            ltxt = "%3s  " % (str(rw))
+
                         if rw.note == 127 and self.trk.channel == 16 and mod.pnq_hack:
                             ltxt = "pnq /o\\"
 
@@ -777,14 +781,6 @@ class TrackView(Gtk.DrawingArea):
                                 )
 
                             cr.show_text(rtxt)
-
-                    if self.show_notes and rw.type == 2:  # note_off
-                        if self.show_timeshift:
-                            cr.show_text(
-                                "%3s   %c%02d" % (str(rw), ts_sign, abs(rw.delay))
-                            )
-                        else:
-                            cr.show_text("%3s" % (str(rw)))
 
                     if rw.type == 0:  # none
                         cr.show_text("---    ")
@@ -1364,51 +1360,32 @@ class TrackView(Gtk.DrawingArea):
             flds += 1
 
         fldwidth = self.txt_width / flds
-
-        if (
-            self.trk[col][row].type == 2 and event.button == cfg.select_button
-        ):  # note_off
+        if offs < fldwidth and event.button == cfg.select_button:
             enter_edit = True
-            self.drag = True
+        else:
+            if not shift and 0 < self.trk[col][row].type < 3:
+                enter_edit = False
+                self.drag = False
 
-            if self.show_timeshift:
-                if fldwidth * 2 < offs < fldwidth * 3:
-                    enter_edit = False
-                    self.drag = False
-                    self.timeshift_editor = TimeshiftEditor(self, col, row, event)
+                if fldwidth < offs < fldwidth * 2 and self.trk[col][row].type == 1:
+                    self.velocity_editor = VelocityEditor(self, col, row, event)
+
+                if self.show_timeshift:
+                    if fldwidth * 2 < offs < fldwidth * 3:
+                        self.timeshift_editor = TimeshiftEditor(self, col, row, event)
+
+                    if self.show_probs and event.button == cfg.select_button:
+                        if fldwidth * 3 < offs < fldwidth * 4:
+                            self.prob_editor = ProbEditor(self, col, row, event)
+
+                elif self.show_probs and event.button == cfg.select_button:
+                    if fldwidth * 2 < offs < fldwidth * 3:
+                        self.prob_editor = ProbEditor(self, col, row, event)
+
                 self.configure()
                 self.redraw()
                 self.parent.prop_view.redraw()
                 self.undo_buff.add_state()
-        else:
-            if offs < fldwidth and event.button == cfg.select_button:  # edit note
-                enter_edit = True
-            else:  # edit velocity or timeshift
-                if not shift and 0 < self.trk[col][row].type < 3:
-                    enter_edit = False
-                    self.drag = False
-
-                    if fldwidth < offs < fldwidth * 2 and self.trk[col][row].type == 1:
-                        self.velocity_editor = VelocityEditor(self, col, row, event)
-
-                    if self.show_timeshift:
-                        if fldwidth * 2 < offs < fldwidth * 3:
-                            self.timeshift_editor = TimeshiftEditor(
-                                self, col, row, event
-                            )
-
-                        if self.show_probs and event.button == cfg.select_button:
-                            if fldwidth * 3 < offs < fldwidth * 4:
-                                self.prob_editor = ProbEditor(self, col, row, event)
-
-                    elif self.show_probs and event.button == cfg.select_button:
-                        if fldwidth * 2 < offs < fldwidth * 3:
-                            self.prob_editor = ProbEditor(self, col, row, event)
-
-                    self.configure()
-                    self.redraw()
-                    self.parent.prop_view.redraw()
-                    self.undo_buff.add_state()
 
         if enter_edit and event.button == cfg.select_button:
             if shift:

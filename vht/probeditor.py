@@ -62,7 +62,7 @@ class ProbEditor:
         yh = cfg.editor_row_height * self.tv.txt_height
         yp = (self.tv.txt_height - yh) / 2.0
 
-        if rw.type == 1:
+        if rw.type == 1 or rw.type == 2:
             cr.set_line_width(1.0)
             cr.set_source_rgba(*(col * cfg.intensity_txt for col in cfg.colour), 1)
             cr.rectangle(
@@ -151,7 +151,7 @@ class ProbEditor:
         )
         self.hover_row = new_hover_row
 
-        if self.tv.trk[self.col][self.row].type != 1:
+        if self.tv.trk[self.col][self.row].type not in (1, 2):
             return False
 
         y1 = new_hover_row * self.tv.txt_height
