@@ -347,7 +347,7 @@ class MandyView(Gtk.DrawingArea):
             if event.direction == Gdk.ScrollDirection.DOWN:
                 self.mandy.miter -= 1
 
-            self.parent.mandymenu.update()
+            self.parent.update()
 
         if shift_hold and len(self.mandy):
             if event.direction == Gdk.ScrollDirection.UP:
@@ -355,7 +355,7 @@ class MandyView(Gtk.DrawingArea):
             if event.direction == Gdk.ScrollDirection.DOWN:
                 self.mandy[0].speed -= 1
 
-            self.parent.mandymenu.update()
+            self.parent.update()
 
         # just scroll - zoom
         if not ctrl_hold and not shift_hold:
@@ -386,7 +386,7 @@ class MandyView(Gtk.DrawingArea):
 
             if self.mandy.follow == 0 and self.mandy.pause:
                 self.mandy.follow = -1
-                self.parent.mandymenu.update()
+                self.parent.update()
 
             handled = False
             if event.state & Gdk.ModifierType.CONTROL_MASK:
@@ -469,24 +469,24 @@ class MandyView(Gtk.DrawingArea):
             self.mandy.set_xy(-0.7, 0)
             self.mandy.set_jxy(0.0, 0)
             self.mandy.follow = -1
-            self.parent.mandymenu.update()
+            self.parent.update()
             return True
 
         if cfg.key["mandy_pause"].matches(event):
             self.mandy.pause = not self.mandy.pause
-            self.parent.mandymenu.update()
+            self.parent.update()
             return True
 
         if cfg.key["mandy_step"].matches(event):
             refr = not self.mandy.pause
             self.mandy.step()
             if refr:
-                self.parent.mandymenu.update()
+                self.parent.update()
             return True
 
         if cfg.key["mandy_active"].matches(event):
             self.mandy.active = not self.mandy.active
-            self.parent.mandymenu.update()
+            self.parent.update()
             return True
 
         if cfg.key["mandy_next"].matches(event):
@@ -494,7 +494,7 @@ class MandyView(Gtk.DrawingArea):
                 self.mandy.follow += 1
             else:
                 self.mandy.follow = -1
-            self.parent.mandymenu.update()
+            self.parent.update()
             return True
 
         if cfg.key["mandy_prev"].matches(event):
@@ -502,21 +502,21 @@ class MandyView(Gtk.DrawingArea):
                 self.mandy.follow -= 1
             else:
                 self.mandy.follow = len(self.mandy) - 1
-            self.parent.mandymenu.update()
+            self.parent.update()
             return True
 
         if cfg.key["mandy_switch_mode"].matches(event):
             if not self.mandy.julia:
                 self.mandy.follow = -1
             self.mandy.julia = not self.mandy.julia
-            self.parent.mandymenu.update()
+            self.parent.update()
 
         if cfg.key["mandy_zero_julia"].matches(event):
             self.mandy.set_jxy(0, 0)
 
         if cfg.key["mandy_direction"].matches(event):
             self.mandy[0].speed *= -1
-            self.parent.mandymenu.update()
+            self.parent.update()
 
         if cfg.key["mandy_pick_julia"].matches(event):
             if self.mandy.follow > -1:

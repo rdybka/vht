@@ -139,13 +139,10 @@ class MandyMenu(Gtk.Box):
 
         self.pack_start(pane, True, True, 0)
 
-        #        self.pack_end(self.scrlwin, False, False, 0)
-
         self.details = Gtk.Box.new(Gtk.Orientation.VERTICAL, 1)
         self.details.set_vexpand(True)
 
         self.det1 = Gtk.Grid()
-        # self.det1.set_column_homogeneous(True)
         self.det1.set_column_spacing(5)
 
         # miter
