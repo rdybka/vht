@@ -313,6 +313,8 @@ class MandyView(Gtk.DrawingArea):
             wnd.invalidate_rect(None, False)
 
     def gen_pix(self, w, h, d=1):
+        w = max(32, w)
+
         self.mandy.set_rgb(*[c * 255 for c in cfg.mandy_colour])
         w = int(w // d)
         h = int(h // d)

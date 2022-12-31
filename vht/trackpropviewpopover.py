@@ -17,7 +17,6 @@
 
 from vht.notebooklabel import NotebookLabel
 from vht.controllersview import ControllersView
-from vht.mandyview import MandyView
 from vht.mandymenu import MandyMenu
 from vht import cfg, mod
 from gi.repository import Gdk, Gtk, Gio
@@ -439,17 +438,13 @@ class TrackPropViewPopover(Gtk.Popover):
             self.ctrlsview, NotebookLabel("controllers", self.extend_notebook, 1)
         )
 
-        # self.codeview = Gtk.Box()
         self.mandypage = Gtk.Box()
 
-        # self.extend_notebook.append_page(
-        #    self.codeview, NotebookLabel("code", self.extend_notebook, 2)
-        # )
+        self.mandymenu = MandyMenu(self.trk)
+        self.mandyview = self.mandymenu.mandyview
 
-        self.mandyview = MandyView(self.trk, self, False)
-        self.mandymenu = MandyMenu(self.trk.mandy)
-        self.mandypage.pack_start(self.mandyview, True, True, 0)
-        self.mandypage.pack_end(self.mandymenu, False, False, 0)
+        self.mandypage.pack_start(self.mandymenu, True, True, 0)
+
         self.extend_notebook.append_page(
             self.mandypage, NotebookLabel("mandy", self.extend_notebook, 2)
         )

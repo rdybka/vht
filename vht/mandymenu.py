@@ -23,7 +23,7 @@ import random
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk, Gio
-
+from vht.mandyview import MandyView
 from vht import cfg, mod
 
 
@@ -46,14 +46,14 @@ def add_scale(parent, x, i, m, t, label, callback):
 
 
 class MandyMenu(Gtk.Box):
-    def __init__(self, mandy):
+    def __init__(self, trk):
         super(MandyMenu, self).__init__()
 
-        self.mandy = mandy
-
+        self.mandy = trk.mandy
+        self.mandyview = MandyView(trk, self, False)
         self.frozen = False
 
-        self.set_orientation(Gtk.Orientation.VERTICAL)
+        self.set_orientation(Gtk.Orientation.HORIZONTAL)
 
         self.buttgrid = Gtk.Grid()
 
@@ -91,8 +91,8 @@ class MandyMenu(Gtk.Box):
         )
 
         self.buttgrid.attach(self.butt_active, 0, 0, 1, 1)
-        self.buttgrid.attach(self.butt_pause, 1, 0, 1, 1)
-        self.buttgrid.attach(self.butt_dir, 2, 0, 1, 1)
+        self.buttgrid.attach(self.butt_pause, 0, 1, 1, 1)
+        self.buttgrid.attach(self.butt_dir, 0, 2, 1, 1)
 
         # follow
         self.butt_follow = Gtk.ToggleButton()
@@ -104,7 +104,7 @@ class MandyMenu(Gtk.Box):
         self.butt_follow.set_tooltip_markup(
             cfg.tooltip_markup2 % ("follow", cfg.key["mandy_next"])
         )
-        self.buttgrid.attach(self.butt_follow, 0, 1, 1, 1)
+        self.buttgrid.attach(self.butt_follow, 0, 5, 1, 1)
 
         # reset
         self.butt_reset = Gtk.Button.new_with_label("///")
@@ -112,7 +112,7 @@ class MandyMenu(Gtk.Box):
         self.butt_reset.set_tooltip_markup(
             cfg.tooltip_markup2 % ("reset", cfg.key["mandy_reset"])
         )
-        self.buttgrid.attach(self.butt_reset, 1, 1, 1, 1)
+        self.buttgrid.attach(self.butt_reset, 0, 3, 1, 1)
 
         # mnd/jul
         self.butt_jmode = Gtk.ToggleButton.new_with_label("jul")
@@ -121,15 +121,25 @@ class MandyMenu(Gtk.Box):
             cfg.tooltip_markup2
             % ("fractal type", "mandelbrot / julia\n%s" % cfg.key["mandy_switch_mode"])
         )
-        self.buttgrid.attach(self.butt_jmode, 2, 1, 1, 1)
+        self.buttgrid.attach(self.butt_jmode, 0, 4, 1, 1)
 
-        self.pack_start(self.buttgrid, False, False, 0)
-
+        box = Gtk.Box()
         self.scrlwin = Gtk.ScrolledWindow(None, None)
         self.scrlwin.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.NEVER)
         self.scrlwin.set_overlay_scrolling(False)
+        box.pack_start(self.scrlwin, True, True, 0)
 
-        self.pack_end(self.scrlwin, True, True, 0)
+        self.pack_start(self.buttgrid, False, False, 0)
+
+        pane = Gtk.Paned()
+        pane.set_orientation(Gtk.Orientation.HORIZONTAL)
+
+        pane.pack1(self.mandyview, True, True)
+        pane.pack2(box, False, True)
+
+        self.pack_start(pane, True, True, 0)
+
+        #        self.pack_end(self.scrlwin, False, False, 0)
 
         self.details = Gtk.Box.new(Gtk.Orientation.VERTICAL, 1)
         self.details.set_vexpand(True)
@@ -140,7 +150,7 @@ class MandyMenu(Gtk.Box):
 
         # miter
         self.scale_miter, self.lab_itr = add_scale(
-            self.det1, 0, 2, mandy.max_iter, 1, "itr", self.on_miter_changed
+            self.det1, 0, 2, self.mandy.max_iter, 1, "itr", self.on_miter_changed
         )
         self.lab_itr.set_tooltip_markup(
             cfg.tooltip_markup2 % ("iterations", "ctrl-scroll")
