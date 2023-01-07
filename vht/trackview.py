@@ -1348,7 +1348,7 @@ class TrackView(Gtk.DrawingArea):
                     self.select_start = None
                     self.select_end = None
 
-            if self.trk[col][row].type == 1:  # note_on
+            if self.trk[col][row].type in (1, 2):  # note_on
                 enter_edit = True
                 self.drag = True
 
