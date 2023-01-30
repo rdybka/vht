@@ -66,7 +66,7 @@ mandy *mandy_new(void *vtrk) {
 	mand->tracies = NULL;
 	mand->ntracies = 0;
 	mand->follow = -1;
-	mand->julia = 0;
+	mand->julia = 1;
 
 	mand->unit0 = 1.0 / pow(2.0, 52);
 
@@ -81,8 +81,8 @@ mandy *mandy_new(void *vtrk) {
 
 	mand->pix_mask = NULL;
 
-	mand->scan_trc = tracy_new(0, 0, 0);
-	mand->init_trc = tracy_new(0, 0, 0);
+	mand->scan_trc = tracy_new(.23, 0, 0);
+	mand->init_trc = tracy_new(.23, 0, 0);
 
 	mand->miter = MANDY_DEF_MITER;
 	mand->bail = MANDY_DEF_BAIL;
