@@ -650,11 +650,29 @@ def track_set_program(trk, p):
 def track_set_bank(trk, msb, lsb):
     return _libcvht.track_set_bank(trk, msb, lsb)
 
+def track_set_prog_send(trk, s):
+    return _libcvht.track_set_prog_send(trk, s)
+
+def track_get_prog_send(trk):
+    return _libcvht.track_get_prog_send(trk)
+
 def track_get_program(trk):
     return _libcvht.track_get_program(trk)
 
+def track_set_qc1_send(trk, s):
+    return _libcvht.track_set_qc1_send(trk, s)
+
+def track_get_qc1_send(trk):
+    return _libcvht.track_get_qc1_send(trk)
+
 def track_set_qc1(trk, ctrl, val):
     return _libcvht.track_set_qc1(trk, ctrl, val)
+
+def track_set_qc2_send(trk, s):
+    return _libcvht.track_set_qc2_send(trk, s)
+
+def track_get_qc2_send(trk):
+    return _libcvht.track_get_qc2_send(trk)
 
 def track_set_qc2(trk, ctrl, val):
     return _libcvht.track_set_qc2(trk, ctrl, val)

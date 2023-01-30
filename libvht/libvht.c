@@ -228,9 +228,18 @@ void track_set_channel(track *trk, int n) {
 	trk_should_save(trk);
 }
 
+void track_set_prog_send(track *trk, int s) {
+	trk->prog_send = s;
+	trk_should_save(trk);
+}
+
+int track_get_prog_send(track *trk) {
+	return(trk->prog_send);
+}
+
 void track_set_program(track *trk, int p) {
 	trk->prog = p;
-	trk->prog_sent = 0;
+	trk->prog_sent = -1;
 	trk_should_save(trk);
 }
 
@@ -252,10 +261,28 @@ char *track_get_qc(track *trk) {
 	return rc;
 }
 
+void track_set_qc1_send(track *trk, int s) {
+	trk->qc1_send = s;
+	trk_should_save(trk);
+}
+
+int track_get_qc1_send(track *trk) {
+	return(trk->qc1_send);
+}
+
 void track_set_qc1(track *trk, int ctrl, int val) {
 	trk->qc1_ctrl = ctrl;
 	trk->qc1_val = val;
 	trk_should_save(trk);
+}
+
+void track_set_qc2_send(track *trk, int s) {
+	trk->qc2_send = s;
+	trk_should_save(trk);
+}
+
+int track_get_qc2_send(track *trk) {
+	return(trk->qc2_send);
 }
 
 void track_set_qc2(track *trk, int ctrl, int val) {

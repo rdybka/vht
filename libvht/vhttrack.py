@@ -198,8 +198,32 @@ class VHTTrack(Iterable):
     def send_program_change(self, prog):
         libcvht.track_set_program(self._trk_handle, prog)
 
+    @property
+    def prog_send(self):
+        return libcvht.track_get_prog_send(self._trk_handle)
+
+    @prog_send.setter
+    def prog_send(self, value):
+        libcvht.track_set_prog_send(self._trk_handle, 1 if value else 0)
+
+    @property
+    def qc1_send(self):
+        return libcvht.track_get_qc1_send(self._trk_handle)
+
+    @qc1_send.setter
+    def qc1_send(self, value):
+        libcvht.track_set_qc1_send(self._trk_handle, 1 if value else 0)
+
     def set_qc1(self, ctrl, val):
         libcvht.track_set_qc1(self._trk_handle, ctrl, val)
+
+    @property
+    def qc2_send(self):
+        return libcvht.track_get_qc2_send(self._trk_handle)
+
+    @qc2_send.setter
+    def qc2_send(self, value):
+        libcvht.track_set_qc2_send(self._trk_handle, 1 if value else 0)
 
     def set_qc2(self, ctrl, val):
         libcvht.track_set_qc2(self._trk_handle, ctrl, val)

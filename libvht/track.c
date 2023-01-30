@@ -65,13 +65,16 @@ track *track_new(int port, int channel, int len, int songlen, int ctrlpr) {
 	trk->port = port;
 	trk->cur_rec_update = 0;
 	trk->resync = 0;
+	trk->prog_send = 0;
 	trk->prog = -1;
 	trk->prog_sent = 0;
 	trk->bank_msb = -1;
 	trk->bank_lsb = -1;
+	trk->qc1_send = 0;
 	trk->qc1_ctrl = -1;
 	trk->qc1_val = -1;
 	trk->qc1_last = -1;
+	trk->qc2_send = 0;
 	trk->qc2_ctrl = -1;
 	trk->qc2_val = -1;
 	trk->qc2_last = -1;
@@ -978,7 +981,13 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 	if (row_end > trk->nrows)
 		row_end = trk->nrows;
 
-	track_fix_program_change(trk);
+	if (trk->prog_sent == -1) {
+		trk->prog_sent = 0;
+		track_fix_program_change(trk);
+	}
+
+	if (trk->prog_send)
+		track_fix_program_change(trk);
 
 	// quick controls
 	if (trk->pos < trk->last_pos || trk->last_pos == 0.0 ||\
@@ -989,7 +998,7 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 		evt.channel = trk->channel;
 		evt.type = control_change;
 
-		if (trk->qc1_ctrl > 0) {
+		if (trk->qc1_ctrl > 0 && trk->qc1_send) {
 			if (trk->qc1_val != trk->qc1_last) {
 				evt.control = trk->qc1_ctrl;
 				evt.data = trk->qc1_val;
@@ -999,7 +1008,7 @@ void track_advance(track *trk, double speriod, jack_nframes_t nframes) {
 			}
 		}
 
-		if (trk->qc2_ctrl > 0 || trk->last_pos == 0.0) {
+		if (trk->qc2_ctrl > 0  && trk->qc2_send) {
 			if (trk->qc2_val != trk->qc2_last) {
 				evt.control = trk->qc2_ctrl;
 				evt.data = trk->qc2_val;

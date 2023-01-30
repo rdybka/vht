@@ -217,8 +217,23 @@ class TrackPropViewPopover(Gtk.Popover):
         self.quick_control_scale_1.set_value(v1)
         self.quick_control_scale_2.set_value(v2)
 
-        grid.attach(self.quick_control_scale_1, 1, 2, 2, 1)
-        grid.attach(self.quick_control_scale_2, 3, 2, 2, 1)
+        self.qc1_send_check_button = Gtk.CheckButton()
+        self.qc1_send_check_button.connect("toggled", self.on_qc1_send_toggled)
+        self.qc2_send_check_button = Gtk.CheckButton()
+        self.qc2_send_check_button.connect("toggled", self.on_qc2_send_toggled)
+        self.prog_send_check_button = Gtk.CheckButton()
+        self.prog_send_check_button.connect("toggled", self.on_prog_send_toggled)
+
+        # grid.attach(self.qc1_send_check_button, 1, 2, 1, 1)
+        bx = Gtk.Box()
+        bx.pack_start(self.qc1_send_check_button, False, False, 0)
+        bx.pack_end(self.quick_control_scale_1, True, True, 0)
+        grid.attach(bx, 1, 2, 2, 1)
+
+        bx = Gtk.Box()
+        bx.pack_start(self.qc2_send_check_button, False, False, 0)
+        bx.pack_end(self.quick_control_scale_2, True, True, 0)
+        grid.attach(bx, 3, 2, 2, 1)
 
         self.quick_control_scale_1.connect("value-changed", self.on_qc1_changed)
         self.quick_control_scale_2.connect("value-changed", self.on_qc2_changed)
@@ -322,6 +337,7 @@ class TrackPropViewPopover(Gtk.Popover):
         self.patch_menu_button = Gtk.MenuButton()
         self.patch_menu_button.set_popup(self.patch_menu)
 
+        box.add(self.prog_send_check_button)
         box.add(self.patch_button)
         box.add(self.patch_menu_button)
         grid.attach(box, 1, 3, 2, 1)
@@ -591,6 +607,33 @@ class TrackPropViewPopover(Gtk.Popover):
             self.nrows_button.set_sensitive(True)
             self.nrows_check_button.set_active(True)
 
+        if self.trk.qc1_send:
+            self.qc1_send_check_button.set_active(True)
+            self.quick_control_scale_1.set_sensitive(True)
+        else:
+            self.qc1_send_check_button.set_active(False)
+            self.quick_control_scale_1.set_sensitive(False)
+
+        if self.trk.qc2_send:
+            self.qc2_send_check_button.set_active(True)
+            self.quick_control_scale_2.set_sensitive(True)
+        else:
+            self.qc2_send_check_button.set_active(False)
+            self.quick_control_scale_2.set_sensitive(False)
+
+        if self.trk.prog_send:
+            self.prog_send_check_button.set_active(True)
+            self.patch_button.set_sensitive(True)
+            self.patch_menu_button.set_sensitive(True)
+            self.bank_msb.set_sensitive(True)
+            self.bank_lsb.set_sensitive(True)
+        else:
+            self.prog_send_check_button.set_active(False)
+            self.patch_button.set_sensitive(False)
+            self.patch_menu_button.set_sensitive(False)
+            self.bank_msb.set_sensitive(False)
+            self.bank_lsb.set_sensitive(False)
+
     def pop(self):
         mod.clear_popups(self)
         self.channel_adj.set_value(self.trk.channel)
@@ -792,6 +835,18 @@ class TrackPropViewPopover(Gtk.Popover):
 
         self.trkview.select_end, self.trkview.select_start = None, None
         self.parent.seqview.recalculate_row_spacing()
+
+    def on_prog_send_toggled(self, wdg):
+        self.trk.prog_send = wdg.get_active()
+        self.refresh()
+
+    def on_qc1_send_toggled(self, wdg):
+        self.trk.qc1_send = wdg.get_active()
+        self.refresh()
+
+    def on_qc2_send_toggled(self, wdg):
+        self.trk.qc2_send = wdg.get_active()
+        self.refresh()
 
     def on_nrows_toggled(self, wdg):
         if wdg.get_active():

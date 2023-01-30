@@ -57,15 +57,18 @@ typedef struct track_t {
 	int *lctrlrow;
 	int **ctrl;
 
+	int prog_send;
 	int prog;
 	int prog_sent;
 	int bank_msb;
 	int bank_lsb;
 
+	int qc1_send;
 	int qc1_ctrl;
 	int qc1_val;
 	int qc1_last;
 
+	int qc2_send;
 	int qc2_ctrl;
 	int qc2_val;
 	int qc2_last;

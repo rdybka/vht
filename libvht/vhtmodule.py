@@ -52,6 +52,9 @@ def pack_seq(seq):
         t["ctrlpr"] = trk.ctrlpr
         t["program"] = trk.get_program()
         t["qc"] = trk.get_qc()
+        t["prog_send"] = trk.prog_send
+        t["qc1_send"] = trk.qc1_send
+        t["qc2_send"] = trk.qc2_send
         t["loop"] = trk.loop
         t["extras"] = trk.extras.jsn
 
@@ -614,6 +617,19 @@ class VHTModule(Iterable):
             t.send_program_change(trk["program"][2])
             t.set_qc1(trk["qc"][0], trk["qc"][1])
             t.set_qc2(trk["qc"][2], trk["qc"][3])
+
+            t.prog_send = True
+            t.qc1_send = True
+            t.qc2_send = True
+
+            if "prog_send" in trk:
+                t.prog_send = trk["prog_send"]
+
+            if "qc1_send" in trk:
+                t.qc1_send = trk["qc1_send"]
+
+            if "qc2_send" in trk:
+                t.qc2_send = trk["qc2_send"]
 
             t.loop = trk["loop"]
 
