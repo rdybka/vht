@@ -177,7 +177,7 @@ class Configuration:
             "play_mode": cfgkey("p", False, True, False),
             "note_off": cfgkey("backslash", False, False, False),
             "track_add": cfgkey("t", False, True, False),
-            "track_del": cfgkey("d", False, True, False),
+            "track_del": cfgkey("d", False, True, True),
             "track_expand": cfgkey("r", False, True, False),
             "track_shrink": cfgkey("e", False, True, False),
             "track_move_right": cfgkey("Right", False, True, False),
@@ -235,7 +235,7 @@ class Configuration:
             "doodle_cut": cfgkey("x", True, True, False),
             "doodle_paste": cfgkey("v", True, True, False),
             "doodle_delete": cfgkey("Delete", True, True, False),
-            "doodle_render": cfgkey("d", True, True, False),
+            "doodle_render": cfgkey("Insert", True, True, False),
             "ctrl_one_up": cfgkey("Right", True, False, False),
             "ctrl_one_down": cfgkey("Left", True, False, False),
             # mandy
