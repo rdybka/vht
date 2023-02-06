@@ -292,6 +292,10 @@ double sequence_get_relative_length(sequence *seq) {
 }
 
 int sequence_get_cue(sequence *seq) {
+	if (seq->trg_status[TRIGGER_PLAY] == TRIGGER_STATUS_KILLLATE) {
+		return 1;
+	}
+
 	if (seq->trg_status[TRIGGER_CUE] == TRIGGER_STATUS_RUN) {
 		return 1;
 	} else {

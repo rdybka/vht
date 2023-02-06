@@ -301,7 +301,6 @@ class SequenceListView(Gtk.DrawingArea):
             )
 
             dim = cfg.intensity_txt
-
             if not seq.playing and not seq.cue:
                 dim *= 0.5
 
