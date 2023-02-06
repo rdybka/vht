@@ -205,6 +205,10 @@ class SequencePropViewPopover(Gtk.Popover):
         if self.time_want_to_leave == -1:  # closed - stop callback
             return False
 
+        if cfg.popup_timeout == 0.0:
+            self.unpop()
+            return True
+
         t = datetime.now() - self.time_want_to_leave
         t = float(t.seconds) + t.microseconds / 1000000
         if t > cfg.popup_timeout / 2.0:
@@ -252,7 +256,7 @@ class SequencePropViewPopover(Gtk.Popover):
         return True
 
     def unpop(self):
-        self.popdown()
+        self.hide()
         self.time_want_to_leave = -1
         self.parent.popped = False
         self.parent.button_highlight = False

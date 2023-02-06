@@ -69,7 +69,7 @@ class Configuration:
         self.mandy_colour = self.colour
         self.mandy_crosshair_colour = self.record_colour
 
-        self.popup_timeout = 0.2
+        self.popup_timeout = 0.0
 
         self.intensity_background = 0.2
         self.intensity_txt = 0.9
