@@ -146,13 +146,68 @@ class PreferencesWin(Gtk.Window):
         grid.attach(bx, 0, 0, 1, 1)
 
         bx = Gtk.Box()
+        lab = Gtk.Label.new("Popup transition")
+
+        sw = Gtk.Switch()
+        sw.set_active(self.cfg.popup_transition)
+        sw.connect("state-set", self.on_popup_transition_switch)
+        bx.pack_start(lab, False, False, 0)
+        bx.pack_end(sw, False, False, 0)
+        grid.attach(bx, 0, 1, 1, 1)
+
+        bx = Gtk.Box()
         lab = Gtk.Label.new("Opacity")
         lab.set_xalign(0)
         bx.set_hexpand(True)
         self.opslider = self.create_slider(2, self.cfg.window_opacity, 0.05, 1, 3)
         bx.pack_start(lab, True, True, 0)
         bx.pack_end(self.opslider, True, True, 0)
-        grid.attach(bx, 0, 1, 1, 1)
+        grid.attach(bx, 0, 2, 1, 1)
+
+        fr, gr = self.create_frame("Sequence", mrg)
+        scbutt = self.cbutt(Gdk.RGBA(*self.cfg.colour, 1), 0)
+        sfbutt = self.fbutt(self.cfg.seq_font, 0)
+        sslider = self.create_slider(2, self.cfg.seq_spacing, 0.5, 2, 0)
+        gr.attach(scbutt, 0, 0, 1, 1)
+        gr.attach(sfbutt, 1, 0, 1, 1)
+        gr.attach(sslider, 0, 1, 2, 1)
+        grid.attach(fr, 0, 3, 1, 1)
+
+        fr, gr = self.create_frame("Matrix", mrg)
+        scbutt = self.cbutt(Gdk.RGBA(*self.cfg.mixer_colour, 1), 1)
+        sfbutt = self.fbutt(self.cfg.mixer_font, 1)
+        gr.attach(scbutt, 1, 0, 1, 1)
+        gr.attach(sfbutt, 2, 0, 1, 1)
+        grid.attach(fr, 0, 4, 1, 1)
+
+        fr, gr = self.create_frame("Timeline", mrg)
+        scbutt = self.cbutt(Gdk.RGBA(*self.cfg.timeline_colour, 1), 2)
+        sfbutt = self.fbutt(self.cfg.timeline_font, 2)
+        gr.attach(scbutt, 1, 0, 1, 1)
+        gr.attach(sfbutt, 2, 0, 1, 1)
+        grid.attach(fr, 0, 5, 1, 1)
+
+        fr, gr = self.create_frame("Console", mrg)
+        scbutt = self.cbutt(Gdk.RGBA(*self.cfg.console_colour, 1), 3)
+        sfbutt = self.fbutt(self.cfg.console_font, 3)
+        gr.attach(scbutt, 1, 0, 1, 1)
+        gr.attach(sfbutt, 2, 0, 1, 1)
+        grid.attach(fr, 0, 6, 1, 1)
+
+        bx = Gtk.Box()
+
+        bx.pack_start(Gtk.Label.new("star"), True, True, 0)
+        scbutt = self.cbutt(Gdk.RGBA(*self.cfg.star_colour, 1), 4)
+        bx.pack_start(scbutt, False, False, 0)
+
+        scbutt = self.cbutt(Gdk.RGBA(*self.cfg.mandy_colour, 1), 6)
+        bx.pack_end(scbutt, False, False, 0)
+        bx.pack_end(Gtk.Label.new("mandy"), True, True, 0)
+
+        scbutt = self.cbutt(Gdk.RGBA(*self.cfg.record_colour, 1), 5)
+        bx.pack_end(scbutt, False, False, 0)
+        bx.pack_end(Gtk.Label.new("rec"), True, True, 0)
+        grid.attach(bx, 0, 7, 1, 1)
 
         cmb = Gtk.ComboBoxText()
         cmb.append_text("none")
@@ -173,53 +228,7 @@ class PreferencesWin(Gtk.Window):
         lab = Gtk.Label.new("Mouse-over")
         bx.pack_start(lab, False, False, 0)
         bx.pack_end(cmb, False, True, 0)
-        grid.attach(bx, 0, 7, 1, 1)
-
-        fr, gr = self.create_frame("Sequence", mrg)
-        scbutt = self.cbutt(Gdk.RGBA(*self.cfg.colour, 1), 0)
-        sfbutt = self.fbutt(self.cfg.seq_font, 0)
-        sslider = self.create_slider(2, self.cfg.seq_spacing, 0.5, 2, 0)
-        gr.attach(scbutt, 0, 0, 1, 1)
-        gr.attach(sfbutt, 1, 0, 1, 1)
-        gr.attach(sslider, 0, 1, 2, 1)
-        grid.attach(fr, 0, 2, 1, 1)
-
-        fr, gr = self.create_frame("Matrix", mrg)
-        scbutt = self.cbutt(Gdk.RGBA(*self.cfg.mixer_colour, 1), 1)
-        sfbutt = self.fbutt(self.cfg.mixer_font, 1)
-        gr.attach(scbutt, 1, 0, 1, 1)
-        gr.attach(sfbutt, 2, 0, 1, 1)
-        grid.attach(fr, 0, 3, 1, 1)
-
-        fr, gr = self.create_frame("Timeline", mrg)
-        scbutt = self.cbutt(Gdk.RGBA(*self.cfg.timeline_colour, 1), 2)
-        sfbutt = self.fbutt(self.cfg.timeline_font, 2)
-        gr.attach(scbutt, 1, 0, 1, 1)
-        gr.attach(sfbutt, 2, 0, 1, 1)
-        grid.attach(fr, 0, 4, 1, 1)
-
-        fr, gr = self.create_frame("Console", mrg)
-        scbutt = self.cbutt(Gdk.RGBA(*self.cfg.console_colour, 1), 3)
-        sfbutt = self.fbutt(self.cfg.console_font, 3)
-        gr.attach(scbutt, 1, 0, 1, 1)
-        gr.attach(sfbutt, 2, 0, 1, 1)
-        grid.attach(fr, 0, 5, 1, 1)
-
-        bx = Gtk.Box()
-
-        bx.pack_start(Gtk.Label.new("star"), True, True, 0)
-        scbutt = self.cbutt(Gdk.RGBA(*self.cfg.star_colour, 1), 4)
-        bx.pack_start(scbutt, False, False, 0)
-
-        scbutt = self.cbutt(Gdk.RGBA(*self.cfg.mandy_colour, 1), 6)
-        bx.pack_end(scbutt, False, False, 0)
-        bx.pack_end(Gtk.Label.new("mandy"), True, True, 0)
-
-        scbutt = self.cbutt(Gdk.RGBA(*self.cfg.record_colour, 1), 5)
-        bx.pack_end(scbutt, False, False, 0)
-        bx.pack_end(Gtk.Label.new("rec"), True, True, 0)
-
-        grid.attach(bx, 0, 6, 1, 1)
+        grid.attach(bx, 0, 8, 1, 1)
 
         return grid
 
@@ -650,6 +659,9 @@ class PreferencesWin(Gtk.Window):
         self.cfg.dark_theme = prm
         st = self.parent.get_settings()
         st.set_property("gtk-application-prefer-dark-theme", self.cfg.dark_theme)
+
+    def on_popup_transition_switch(self, wdg, prm):
+        self.cfg.popup_transition = prm
 
     def on_autosave_trk_switch(self, wdg, prm):
         self.cfg.autosave_trk = prm

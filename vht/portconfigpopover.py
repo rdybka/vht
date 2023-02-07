@@ -84,6 +84,11 @@ class PortConfigPopover(Gtk.Popover):
         if self.time_want_to_leave == -1:  # closed - stop callback
             return False
 
+        if not cfg.popup_transition:
+            self.hide()
+            self.pooped = False
+            return True
+
         t = datetime.now() - self.time_want_to_leave
         t = float(t.seconds) + t.microseconds / 1000000
         if t > cfg.popup_timeout / 2.0:

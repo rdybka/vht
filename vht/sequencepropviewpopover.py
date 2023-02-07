@@ -205,7 +205,7 @@ class SequencePropViewPopover(Gtk.Popover):
         if self.time_want_to_leave == -1:  # closed - stop callback
             return False
 
-        if cfg.popup_timeout == 0.0:
+        if not cfg.popup_transition:
             self.unpop()
             return True
 

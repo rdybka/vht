@@ -69,7 +69,8 @@ class Configuration:
         self.mandy_colour = self.colour
         self.mandy_crosshair_colour = self.record_colour
 
-        self.popup_timeout = 0.0
+        self.popup_timeout = 0.5
+        self.popup_transition = True
 
         self.intensity_background = 0.2
         self.intensity_txt = 0.9
@@ -303,6 +304,7 @@ class Configuration:
             "notebook_mouseover": self.notebook_mouseover,
             "track_prop_mouseover": self.track_prop_mouseover,
             "dark_theme": self.dark_theme,
+            "popup_transition": self.popup_transition,
         }
 
         cfg["advanced"] = {
@@ -369,6 +371,7 @@ class Configuration:
         lnf["track_prop_mouseover"] = str(self.track_prop_mouseover)
         lnf["dark_theme"] = str(self.dark_theme)
         lnf["timeline_show"] = str(self.timeline_show)
+        lnf["popup_transition"] = str(self.popup_transition)
 
         adv = self.cfg_parser["advanced"]
         adv["ask_quit"] = str(self.ask_quit)
@@ -472,7 +475,7 @@ class Configuration:
             self.track_prop_mouseover = lnf.getboolean("track_prop_mouseover")
             self.dark_theme = lnf.getboolean("dark_theme")
             self.timeline_show = lnf.getboolean("timeline_show")
-
+            self.popup_transition = lnf.getboolean("popup_transition")
             adv = self.cfg_parser["advanced"]
             self.ask_quit = adv.getboolean("ask_quit")
             self.quick_controls_desc = adv["quick_controls_desc"]
