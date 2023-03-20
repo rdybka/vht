@@ -48,9 +48,10 @@ tracy *tracy_new(double ix, double iy, double ir) {
 	trc->phase = 0;
 	trc->mult = 1;
 	trc->qnt = 0;
+
 	trc->homed = 0;
 	trc->bailed = 0;
-
+	trc->type = 0;
 	pthread_mutex_init(&trc->excl, NULL);
 	return trc;
 }

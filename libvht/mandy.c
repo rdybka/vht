@@ -285,6 +285,7 @@ void mandy_reset(mandy *mand) {
 	mand->jry = 0;
 	mandy_update_julia(mand);
 	mand->init_trc->unit = 0.1 / pow(MAGIC_MITER2UNIT_RATIO, mand->miter);
+	mand->unit0 = mand->init_trc->unit;//0.1 / pow(MAGIC_MITER2UNIT_RATIO, mand->miter);
 
 	mandy_trc_home(mand, mand->init_trc);
 
@@ -364,7 +365,8 @@ tracy *mandy_add_tracy(mandy *mand, double x, double y, double r) {
 
 	trc->unit = 0.1 / pow(MAGIC_MITER2UNIT_RATIO, mand->miter);
 	trc->homed = 0;
-	mand->tracies = realloc(mand->tracies, sizeof (mandy *) * mand->ntracies + 1);
+	mand->tracies = realloc(mand->tracies, sizeof (tracy *) * mand->ntracies + 1);
+
 	mand->tracies[mand->ntracies++] = trc;
 
 	mandy_trc_home(mand, trc);
@@ -1280,7 +1282,7 @@ void mandy_trc_home(mandy *mand, tracy *trc) {
 		long double isr = mandy_isect(mand, \
 		                              x1, y1,\
 		                              x2, y2,\
-		                              unit, &ix, &iy, 0);
+		                              mand->unit0, &ix, &iy, 0);
 		//mand->unit0, &ix, &iy, 0);
 
 		if ((int)isr != -23) {
