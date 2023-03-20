@@ -249,13 +249,6 @@ class SideTrackView(Gtk.DrawingArea):
 
         (x, y, width, height, dx, dy) = cr.text_extents("0000")
 
-        self.txt_height = float(height) * self.spacing * cfg.seq_spacing
-        self.txt_width = int(dx)
-
-        nw = dx
-        nh = self.txt_height * self.seq.length + 10
-        self.set_size_request(nw, nh)
-        self.width = nw
         if complete:
             cr.set_source_rgb(*(col * cfg.intensity_background for col in cfg.colour))
             cr.rectangle(0, 0, w, h)
@@ -485,7 +478,7 @@ class SideTrackView(Gtk.DrawingArea):
                 self.redraw(self.hover)
 
         if self.show_resize_handle and (
-            self.seq.loop_active or len(self.seq.index) > 1
+            self.seq.loop_active or type(self.seq.index) is tuple
         ):
             self.get_window().set_cursor(self.resize_curs)
         else:
@@ -532,10 +525,9 @@ class SideTrackView(Gtk.DrawingArea):
             if re < rs:
                 re, rs = rs, re
 
-            ys = int(rs * at.txt_height)
-            ye = min(int((re + 1) * at.txt_height), self.seq.length * self.txt_height)
-        else:
-            ys, ye = -1, -1
+            yh = at.txt_height if at.hover else self.txt_height
+            ys = int(rs * yh)
+            ye = min(int((re + 1) * yh), self.seq.length * self.txt_height)
 
         if (
             ys != self.highlight_start

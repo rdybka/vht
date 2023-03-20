@@ -1222,7 +1222,7 @@ class TrackView(Gtk.DrawingArea):
                         ctrl.on_button_press(widget, event)
             return False
 
-        if event.button == cfg.delete_button or row >= self.trk.nrows:
+        if (event.button == cfg.delete_button or row >= self.trk.nrows) and row >= 0:
             trk = mod.active_track
 
             if row >= self.trk.nrows:
@@ -1361,6 +1361,10 @@ class TrackView(Gtk.DrawingArea):
 
         fldwidth = self.txt_width / flds
         if offs < fldwidth and event.button == cfg.select_button:
+            enter_edit = True
+        elif (
+            offs < fldwidth * 2 and self.trk[col][row].type == 2
+        ) and event.button == cfg.select_button:
             enter_edit = True
         else:
             if not shift and 0 < self.trk[col][row].type < 3:

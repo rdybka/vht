@@ -953,14 +953,14 @@ class SequenceView(Gtk.Box):
         self.queue_draw()
 
     def auto_scroll(self, trk):
+        if not self.autoscroll_req:
+            return
+
         w = self._sv.get_allocated_width()
         h = self._sv.get_allocated_height()
 
         hadj = self._sv.get_hadjustment()
         vadj = self._sv.get_vadjustment()
-
-        if not self.autoscroll_req:
-            return
 
         r = trk.edit[1]
         if trk.keyboard_focus:
@@ -969,7 +969,7 @@ class SequenceView(Gtk.Box):
         if r == -1:
             return
 
-        vtarget = (r * trk.txt_height) + trk.txt_height / 2.0
+        vtarget = (r * trk.txt_height) + trk.txt_height / 16.0
         trk_height = trk.txt_height * trk.trk.nrows
         vtarget = vtarget - (h / 2)
 
