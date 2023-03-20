@@ -245,8 +245,7 @@ class MandyView(Gtk.DrawingArea):
                     ltxt = random.randint(3, 8)
 
                     while len(txt) < ltxt:
-                        r = random.randint(0, len(ltr) - 1)
-                        txt += ltr[r]
+                        txt += ltr[random.randint(0, len(ltr) - 1)]
 
                     if not self.bailed_txt:
                         x = d["x"] + ((w / 8) * random.uniform(-1, 1))
@@ -389,14 +388,13 @@ class MandyView(Gtk.DrawingArea):
                 self.parent.update()
 
             handled = False
-            if event.state & Gdk.ModifierType.CONTROL_MASK:
+            if event.state & Gdk.ModifierType.CONTROL_MASK and not self.translate_julia:
                 self.mandy.screen_zoom(x, y, w, h)
                 handled = True
 
-            if event.state & Gdk.ModifierType.SHIFT_MASK:
-                handled = True
-
+            if event.state & Gdk.ModifierType.SHIFT_MASK and not self.translate_julia:
                 self.mandy.screen_rotate(x, y, w, h)
+                handled = True
 
             if not handled:
                 if self.translate_julia:
@@ -417,20 +415,21 @@ class MandyView(Gtk.DrawingArea):
         ):
             return
 
-        if event.button == cfg.select_button and (
-            self.mandy.follow == -1 or self.mandy.pause
-        ):
-            self.mandy.follow = -1
+        if event.button == cfg.select_button:
             scan_trc = self.mandy.scan_tracy
             if scan_trc:
-                self.mandy.reinit_from_scan()
+                if self.mandy.follow == -1 or self.mandy.pause:
+                    self.mandy.reinit_from_scan()
+            else:
+                self.translate_start = (event.x, event.y)
+                self.translate_julia = False
 
         if event.button == cfg.delete_button:
             self.mandy.reset()
 
         if event.button == 2:
-            self.translate_start = (event.x, event.y)
-            self.translate_julia = False
+            self.translate_start = self.last_xy
+            self.translate_julia = True
 
     def on_button_release(self, widget, event):
         self.mandy.set_cxy(event.x, event.y)

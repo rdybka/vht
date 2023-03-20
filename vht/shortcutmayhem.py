@@ -161,6 +161,7 @@ shorts = {
         ("Reset rotation", "mandy_reset_rotation"),
         ("Reset zoom", "mandy_reset_zoom"),
     ],
+    "Mandy left mouse": [],
     "Mandy middle mouse": [],
     "Mandy scroll": [],
 }
@@ -177,10 +178,13 @@ customs = {
         ("Zoom / Add bpm node / Clone", "<ctrl>"),
         ("Shift", "<shift>"),
     ],
-    "Mandy middle mouse": [
+    "Mandy left mouse": [
         ("Translate", ""),
         ("Rotate", "<shift>"),
         ("Zoom", "<ctrl>"),
+    ],
+    "Mandy middle mouse": [
+        ("Translate julia", ""),
     ],
     "Mandy scroll": [
         ("Zoom", ""),

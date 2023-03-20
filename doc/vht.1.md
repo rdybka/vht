@@ -58,7 +58,8 @@ display tooltips for every operation, this will only list less obvious functions
     - ctrl+alt+scroll - fine snapping
     - L loops current sequence
 - Mandy
-    - mid-click and drag - translate
+    - left-click and drag - translate view
+    - mid-click and drag - translate julia
     - shift while dragging - rotate
     - ctrl while dragging - zoom
     - right-click - reset position
