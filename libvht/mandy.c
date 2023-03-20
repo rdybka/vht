@@ -77,7 +77,6 @@ mandy *mandy_new(void *vtrk) {
 	mand->last_rend_res = MANDY_REND_RES;
 	mand->last_rend_sq = 0;
 	mand->render = 0;
-	mandy_set_display(mand, 32, 32, 32);
 
 	mand->pix_mask = NULL;
 
@@ -114,7 +113,7 @@ mandy *mandy_new(void *vtrk) {
 
 	mand->mn = 2.23;
 	mand->mubrot = 0;	// maybe one day
-
+	mandy_set_display(mand, 32, 32, 32);
 	mandy_reset(mand);
 	return mand;
 }
@@ -286,6 +285,7 @@ void mandy_reset(mandy *mand) {
 	mand->jry = 0;
 	mandy_update_julia(mand);
 	mand->init_trc->unit = 0.1 / pow(MAGIC_MITER2UNIT_RATIO, mand->miter);
+
 	mandy_trc_home(mand, mand->init_trc);
 
 	if (mand->follow > -1) {
@@ -744,7 +744,6 @@ void mandy_set_display(mandy *mand, int width, int height, int stride) {
 	mand->delta_xy = (y2 - y1) / dw;
 	mand->delta_yx = (x4 - x1) / dh;
 	mand->delta_yy = (y4 - y1) / dh;
-
 
 	if ((mand->last_res_x != width) || (mand->last_res_y != height)) {
 		mand->pixmap = realloc(mand->pixmap, stride * height * 4);
@@ -1263,7 +1262,7 @@ void mandy_del_tracy(mandy *mand, int trc_id) {
 }
 
 void mandy_trc_home(mandy *mand, tracy *trc) {
-	long double unit = trc->unit / 10;
+	long double unit = trc->unit;
 	double rr = trc->rd;
 	double rd = rr + M_PI;
 	trc->homed = 0;
@@ -1281,8 +1280,8 @@ void mandy_trc_home(mandy *mand, tracy *trc) {
 		long double isr = mandy_isect(mand, \
 		                              x1, y1,\
 		                              x2, y2,\
-		                              mand->unit0,\
-		                              &ix, &iy, 0);
+		                              unit, &ix, &iy, 0);
+		//mand->unit0, &ix, &iy, 0);
 
 		if ((int)isr != -23) {
 			trc->homed = 1;

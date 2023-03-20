@@ -42,6 +42,7 @@ tracy *tracy_new(double ix, double iy, double ir) {
 	trc->zoom = 3;
 	trc->scale = 1;
 	trc->speed = 5;
+	trc->unit = 1;
 	trc->r_sm = .5;
 	trc->tail_length = 0;
 	trc->phase = 0;
