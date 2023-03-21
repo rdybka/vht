@@ -285,7 +285,6 @@ void mandy_reset(mandy *mand) {
 	mand->jry = 0;
 	mandy_update_julia(mand);
 	mand->init_trc->unit = 0.1 / pow(MAGIC_MITER2UNIT_RATIO, mand->miter);
-	mand->unit0 = mand->init_trc->unit;//0.1 / pow(MAGIC_MITER2UNIT_RATIO, mand->miter);
 
 	mandy_trc_home(mand, mand->init_trc);
 
