@@ -26,6 +26,7 @@ from vht.sequencetriggersview import SequenceTriggersView
 from vht.controllersview import ControllersView
 from vht import cfg, mod, extras
 from datetime import datetime
+from vht.poormanspiano import PoorMansPiano
 
 
 class SequenceListViewPopover(Gtk.Popover):
@@ -47,6 +48,7 @@ class SequenceListViewPopover(Gtk.Popover):
 
         self._parent = parent
         self._time_want_to_leave = 0
+        self.pmp = PoorMansPiano(None, None)
 
         box = Gtk.Box()
 
@@ -102,6 +104,14 @@ class SequenceListViewPopover(Gtk.Popover):
             self._parent._menu_handle = -1
             mod.gui_midi_capture = False
             return True
+
+        cpt = self._trgview.capture
+        tv = self._trgview
+        if cpt > -1:
+            mnt = self.pmp.k2n(event.keyval)
+            if mnt > -1:
+                mod[tv.seq].set_trig(cpt, 1, 1, mnt)
+                tv.refresh()
 
     def on_scroll(self, wdg, prm):
         last = new = self.curr

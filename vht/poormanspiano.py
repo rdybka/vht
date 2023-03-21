@@ -157,3 +157,17 @@ class PoorMansPiano:
                 self.ringing.remove(mnt)
 
         return mnt
+
+    def k2n(self, key):
+        mnt = -23
+
+        if key in self.mnotes:
+            mnt = self.mnotes.index(key)
+
+        if mnt == -23:
+            return -1
+
+        mnt += cfg.octave * 12
+        mnt = min(mnt, 127)
+
+        return mnt

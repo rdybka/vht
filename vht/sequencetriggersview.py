@@ -29,7 +29,6 @@ class SequenceTriggersView(Gtk.Grid):
         super(SequenceTriggersView, self).__init__()
 
         self.set_orientation(Gtk.Orientation.VERTICAL)
-
         self.parent = parent
         self.seq = seq
         self.capture = -1
@@ -44,6 +43,14 @@ class SequenceTriggersView(Gtk.Grid):
 
         for i, l in enumerate(["mute", "cue", "play"]):
             lbl = Gtk.Button.new_with_label(l)
+            lbl.add_events(
+                Gdk.EventMask.LEAVE_NOTIFY_MASK
+                | Gdk.EventMask.ENTER_NOTIFY_MASK
+                | Gdk.EventMask.BUTTON_PRESS_MASK
+                | Gdk.EventMask.SCROLL_MASK
+                | Gdk.EventMask.KEY_PRESS_MASK
+            )
+
             lbl.connect("button-press-event", self.on_butt_in, i)
             lbl.connect("button-release-event", self.on_butt_out, i)
             self.trig_butts.append(lbl)
@@ -367,3 +374,9 @@ class SequenceTriggersView(Gtk.Grid):
             midin = mod.get_midi_in_event()
 
         return True
+
+        if self._trgview.capture > -1:
+            mnt = self.pmp.k2n(event.keyval)
+            if mnt > -1:
+                mod[self._trgview.seq].set_trig(self._trgview.capture, 1, 1, mnt)
+                self._trgview.refresh()
