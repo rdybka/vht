@@ -2024,10 +2024,20 @@ class TrackView(Gtk.DrawingArea):
             return False
 
         shift = False
+        ctrl = False
+        alt = False
 
         if event.state:
             if event.state & Gdk.ModifierType.SHIFT_MASK:
                 shift = True
+
+            if event.state & Gdk.ModifierType.CONTROL_MASK:
+                ctrl = True
+
+            if event.state & Gdk.ModifierType.MOD1_MASK:
+                alt = True
+
+        shift = False
 
         if cfg.key["exit_edit"].matches(event):
             self.leave_all()
@@ -2166,7 +2176,11 @@ class TrackView(Gtk.DrawingArea):
 
             self.undo_buff.add_state()
 
-        note = self.pmp.key2note(Gdk.keyval_to_lower(event.keyval))
+        note = (
+            self.pmp.key2note(Gdk.keyval_to_lower(event.keyval))
+            if not ctrl and not alt and not shift
+            else -23
+        )
 
         if self.edit and self.edit[0] < len(self.trk) and note >= 0 and mod.record == 0:
             self.undo_buff.add_state()

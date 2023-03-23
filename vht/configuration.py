@@ -178,7 +178,7 @@ class Configuration:
             "play_mode": cfgkey("p", False, True, False),
             "note_off": cfgkey("backslash", False, False, False),
             "track_add": cfgkey("t", False, True, False),
-            "track_del": cfgkey("d", False, True, True),
+            "track_del": cfgkey("d", False, True, False),
             "track_expand": cfgkey("r", False, True, False),
             "track_shrink": cfgkey("e", False, True, False),
             "track_move_right": cfgkey("Right", False, True, False),

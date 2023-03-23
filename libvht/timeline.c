@@ -1123,205 +1123,199 @@ int timeline_get_loop_active(timeline *tl) {
 void timeline_set_loop_active(timeline *tl, int val) {
 	if (val && tl->pos >= tl->length) {
 		timeline_set_pos(tl, tl->loop_start, 0);
+
+		tl->loop_active = val;
+		timeline_update_loops_in_strips(tl);
+		tl_should_save(tl);
 	}
 
-	if (val && tl->pos >= tl->loop_end) {
-		if (tl->pos > tl->loop_end)
-			tl->pos = tl->loop_start;
+	long timeline_get_loop_start(timeline *tl) {
+		return tl->loop_start;
 	}
 
-	tl->loop_active = val;
-	timeline_update_loops_in_strips(tl);
-	tl_should_save(tl);
-}
+	long timeline_get_loop_end(timeline *tl) {
+		return tl->loop_end;
+	}
 
-long timeline_get_loop_start(timeline *tl) {
-	return tl->loop_start;
-}
+	void timeline_update_loops_in_strips(timeline *tl) {
+		for (int s = 0; s < tl->nstrips; s++) {
+			timestrip *strp = &tl->strips[s];
+			sequence *seq = strp->seq;
+			double mtl = sequence_get_relative_length(seq) / seq->length;
+			int strplen = ceil((seq->length) * mtl);
 
-long timeline_get_loop_end(timeline *tl) {
-	return tl->loop_end;
-}
+			if ((strp->start <= tl->loop_end) && (strp->start + strplen > tl->loop_start) && (tl->loop_active)) {
+				int ls = (tl->loop_start - strp->start);
+				if (ls > 0) {
+					ls /= mtl;
+				}
 
-void timeline_update_loops_in_strips(timeline *tl) {
-	for (int s = 0; s < tl->nstrips; s++) {
-		timestrip *strp = &tl->strips[s];
-		sequence *seq = strp->seq;
-		double mtl = sequence_get_relative_length(seq) / seq->length;
-		int strplen = ceil((seq->length) * mtl);
+				int le = tl->loop_end - (strp->start + strplen);
+				if (le < 0) {
+					le /= mtl;
+				}
 
-		if ((strp->start <= tl->loop_end) && (strp->start + strplen > tl->loop_start) && (tl->loop_active)) {
-			int ls = (tl->loop_start - strp->start);
-			if (ls > 0) {
-				ls /= mtl;
-			}
+				le += seq->length;
+				le--;
 
-			int le = tl->loop_end - (strp->start + strplen);
-			if (le < 0) {
-				le /= mtl;
-			}
-
-			le += seq->length;
-			le--;
-
-			if (ls <= 0 && le >= seq->length - 1) {
+				if (ls <= 0 && le >= seq->length - 1) {
+					seq->loop_active = 0;
+					seq->loop_start = -1;
+					seq->loop_end = -1;
+				} else {
+					seq->loop_start = ls;
+					seq->loop_end = le;
+					seq->loop_active = 1;
+				}
+			} else {
 				seq->loop_active = 0;
 				seq->loop_start = -1;
 				seq->loop_end = -1;
-			} else {
-				seq->loop_start = ls;
-				seq->loop_end = le;
-				seq->loop_active = 1;
 			}
+		}
+	}
+
+	void timeline_set_loop_start(timeline *tl, long val) {
+		tl->loop_start = val;
+		timeline_update_loops_in_strips(tl);
+		tl_should_save(tl);
+	}
+
+	void timeline_set_loop_end(timeline *tl, long val) {
+		tl->loop_end = val;
+		timeline_update_loops_in_strips(tl);
+		tl_should_save(tl);
+	}
+
+	void timeline_set_pos(timeline *tl, double npos, int let_ring) {
+		if (npos >= tl->length || npos < 0)
+			return;
+
+		module *mod = (module *)tl->clt->mod_ref;
+
+		tl->pos = npos;
+		if (!let_ring)
+			for (int s = 0; s < tl->nstrips; s++) {
+				sequence *seq = tl->strips[s].seq;
+
+				for (int t = 0; t < seq->ntrk; t++) {
+					if (seq->trk[t]->mand->active) {
+						mandy_reset(seq->trk[t]->mand);
+					}
+
+					if (seq->playing) {
+						track_kill_notes(seq->trk[t]);
+					}
+					seq->playing = 0;
+				}
+			}
+
+		if (mod->play_mode == 0 || mod->playing == 0) {
+			if (tl->loop_active) {
+				if (tl->pos > tl->loop_end)
+					tl->pos = tl->loop_start;
+			}
+		}
+
+		// do magic to non-playing seqs in matrix
+		int npsl = (int)trunc(npos);
+		double ts = tl->slices[npsl].time;
+		double remts = tl->slices[npsl].length * (npos - npsl);
+		ts += remts;
+
+		if (mod->play_mode == 1) {
+			for (int s = 0; s < mod->nseq; s++) {
+				sequence *seq = mod->seq[s];
+				if (seq->playing)
+					continue;
+
+				seq->pos = ts * seq->rpb * 2;
+				for (int t = 0; t < seq->ntrk; t++) {
+					track_wind(seq->trk[t], seq->pos);
+				}
+
+				while(seq->pos > seq->length)
+					seq->pos -= seq->length;
+			}
+		}
+
+		if (mod->transp) {
+			jack_nframes_t frames = ts * mod->clt->jack_sample_rate;
+			midi_send_transp(mod->clt, mod->playing, frames);
+		}
+	}
+
+	double timeline_get_pos(timeline *tl) {
+		return tl->pos;
+	}
+
+	int timestrip_get_enabled(timestrip *tstr) {
+		return tstr->enabled;
+	}
+
+	void timestrip_set_enabled(timestrip *tstr, int v) {
+		tstr->enabled = v;
+		sequence *seq = tstr->seq;
+
+		if (!v && seq->playing) {
+			for (int t = 0; t < seq->ntrk; t++)
+				track_kill_notes(seq->trk[t]);
+
+			seq->playing = 0;
+			seq->pos = 0;
+		}
+	}
+
+	void timestrip_insert_noteoff(timestrip *tstr, track *src_trk) {
+		sequence *seq = tstr->seq;
+
+		int port = src_trk->port;
+		int channel = src_trk->channel;
+		int ctrlpr = src_trk->ctrlpr;
+
+		int found = -1;
+		for (int t = 0; t < seq->ntrk && found == -1; t++) {
+			if (seq->trk[t]->port == port && seq->trk[t]->channel == channel) {
+				found = t;
+			}
+		}
+
+		track *trk = NULL;
+		if (found > -1) {
+			trk = seq->trk[found];
+			track_add_col(trk);
+			trk->rows[trk->ncols - 1][0].type = note_off;
+
 		} else {
-			seq->loop_active = 0;
-			seq->loop_start = -1;
-			seq->loop_end = -1;
+			trk = track_new(port, channel, seq->length, seq->length, ctrlpr);
+			trk->rows[0][0].type = note_off;
+			sequence_add_track(seq, trk);
 		}
 	}
-}
 
-void timeline_set_loop_start(timeline *tl, long val) {
-	tl->loop_start = val;
-	timeline_update_loops_in_strips(tl);
-	tl_should_save(tl);
-}
+	void timestrip_noteoffise(timeline *tl, timestrip *tstr) {
+		sequence *prev = timeline_get_prev_seq(tl, tstr);
+		if (!prev)
+			return;
 
-void timeline_set_loop_end(timeline *tl, long val) {
-	tl->loop_end = val;
-	timeline_update_loops_in_strips(tl);
-	tl_should_save(tl);
-}
+		timeline_excl_in(tl);
 
-void timeline_set_pos(timeline *tl, double npos, int let_ring) {
-	if (npos >= tl->length || npos < 0)
-		return;
-
-	module *mod = (module *)tl->clt->mod_ref;
-
-	tl->pos = npos;
-	if (!let_ring)
-		for (int s = 0; s < tl->nstrips; s++) {
-			sequence *seq = tl->strips[s].seq;
-
-			for (int t = 0; t < seq->ntrk; t++) {
-				if (seq->trk[t]->mand->active) {
-					mandy_reset(seq->trk[t]->mand);
+		for (int t = 0; t < prev->ntrk; t++) {
+			for (int c = 0; c < prev->trk[t]->ncols; c++) {
+				int found = -1;
+				for (int r = prev->trk[t]->nrows - 1; r >= 0 && found == -1; r--) {
+					if (prev->trk[t]->rows[c][r].type != none)
+						found = r;
 				}
 
-				if (seq->playing) {
-					track_kill_notes(seq->trk[t]);
+				if (found > -1) {
+					track *trk = prev->trk[t];
+					if (trk->rows[c][found].type == note_on)
+						timestrip_insert_noteoff(tstr, trk);
 				}
-				seq->playing = 0;
+
 			}
 		}
 
-	if (mod->play_mode == 0 || mod->playing == 0) {
-		if (tl->loop_active) {
-			if (tl->pos > tl->loop_end)
-				tl->pos = tl->loop_start;
-		}
+		timeline_excl_out(tl);
 	}
-
-	// do magic to non-playing seqs in matrix
-	int npsl = (int)trunc(npos);
-	double ts = tl->slices[npsl].time;
-	double remts = tl->slices[npsl].length * (npos - npsl);
-	ts += remts;
-
-	if (mod->play_mode == 1) {
-		for (int s = 0; s < mod->nseq; s++) {
-			sequence *seq = mod->seq[s];
-			if (seq->playing)
-				continue;
-
-			seq->pos = ts * seq->rpb * 2;
-			for (int t = 0; t < seq->ntrk; t++) {
-				track_wind(seq->trk[t], seq->pos);
-			}
-
-			while(seq->pos > seq->length)
-				seq->pos -= seq->length;
-		}
-	}
-
-	if (mod->transp) {
-		jack_nframes_t frames = ts * mod->clt->jack_sample_rate;
-		midi_send_transp(mod->clt, mod->playing, frames);
-	}
-}
-
-double timeline_get_pos(timeline *tl) {
-	return tl->pos;
-}
-
-int timestrip_get_enabled(timestrip *tstr) {
-	return tstr->enabled;
-}
-
-void timestrip_set_enabled(timestrip *tstr, int v) {
-	tstr->enabled = v;
-	sequence *seq = tstr->seq;
-
-	if (!v && seq->playing) {
-		for (int t = 0; t < seq->ntrk; t++)
-			track_kill_notes(seq->trk[t]);
-
-		seq->playing = 0;
-		seq->pos = 0;
-	}
-}
-
-void timestrip_insert_noteoff(timestrip *tstr, track *src_trk) {
-	sequence *seq = tstr->seq;
-
-	int port = src_trk->port;
-	int channel = src_trk->channel;
-	int ctrlpr = src_trk->ctrlpr;
-
-	int found = -1;
-	for (int t = 0; t < seq->ntrk && found == -1; t++) {
-		if (seq->trk[t]->port == port && seq->trk[t]->channel == channel) {
-			found = t;
-		}
-	}
-
-	track *trk = NULL;
-	if (found > -1) {
-		trk = seq->trk[found];
-		track_add_col(trk);
-		trk->rows[trk->ncols - 1][0].type = note_off;
-
-	} else {
-		trk = track_new(port, channel, seq->length, seq->length, ctrlpr);
-		trk->rows[0][0].type = note_off;
-		sequence_add_track(seq, trk);
-	}
-}
-
-void timestrip_noteoffise(timeline *tl, timestrip *tstr) {
-	sequence *prev = timeline_get_prev_seq(tl, tstr);
-	if (!prev)
-		return;
-
-	timeline_excl_in(tl);
-
-	for (int t = 0; t < prev->ntrk; t++) {
-		for (int c = 0; c < prev->trk[t]->ncols; c++) {
-			int found = -1;
-			for (int r = prev->trk[t]->nrows - 1; r >= 0 && found == -1; r--) {
-				if (prev->trk[t]->rows[c][r].type != none)
-					found = r;
-			}
-
-			if (found > -1) {
-				track *trk = prev->trk[t];
-				if (trk->rows[c][found].type == note_on)
-					timestrip_insert_noteoff(tstr, trk);
-			}
-
-		}
-	}
-
-	timeline_excl_out(tl);
-}

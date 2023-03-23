@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name = "vht",
-	version = "0.3.3",
+	version = "0.3.23",
 	description = "vahatraker - a live MIDI sequencer for JACK",
 	long_description=long_description,
 	long_description_content_type="text/markdown",
