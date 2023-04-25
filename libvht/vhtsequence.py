@@ -219,7 +219,6 @@ class VHTSequence(Iterable):
 
     @length.setter
     def length(self, value):
-
         tstr = None
         ind = self.index
         if type(ind) is tuple:

@@ -37,5 +37,5 @@ ubuntu - build-essential python3-dev python3-setuptools libjack-jackd2-dev jack-
 
 ## install
 ```
-./setup.py install --user
+pip3 install vht
 ```
