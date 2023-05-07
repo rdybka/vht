@@ -2037,8 +2037,6 @@ class TrackView(Gtk.DrawingArea):
             if event.state & Gdk.ModifierType.MOD1_MASK:
                 alt = True
 
-        shift = False
-
         if cfg.key["exit_edit"].matches(event):
             self.leave_all()
             return True
