@@ -31,8 +31,8 @@ in the language we shall no longer spam about.
 
 ## dependencies
 ```
-fedora - python3-devel jack-audio-connection-kit-devel jack_capture
-ubuntu - build-essential python3-dev python3-setuptools libjack-jackd2-dev jack-capture
+fedora - jack-audio-connection-kit-devel jack_capture
+ubuntu - libjack-jackd2-dev jack-capture
 ```
 
 ## install
