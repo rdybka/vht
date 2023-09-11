@@ -12,7 +12,7 @@
 **vht** (vahatraker) is a live MIDI sequencing application for GNU/Linux audio setups.
 Main motivation behind developing it was to create a fast workflow for putting down musical
 ideas, exploring exotic time signatures and generally playing with sound. It is more a
-rhythm toy than a DAW, ment to be used along programs like carla, calf, zynaddsubfx,
+rhythm toy than a DAW, meant to be used along programs like carla, calf, zynaddsubfx,
 qsynth to drive the synths/automation or like a tracker engine for LMMS/Ardour or a glorified MIDI
 repeater for a hardware setup. One of it's goals was to respond well to input from
 keyboards/surfaces - allowing it to be used as a performance/live tool.

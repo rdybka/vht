@@ -398,16 +398,13 @@ class StatusBar(Gtk.DrawingArea):
                 )
 
             if self.active_field == 4:  # bpm
-                self.tt_txt = (
-                    "<big> ⇑</big> %s\n<big> ↑</big> %s\n<big>.↑</big> %s\n<big>.↓</big> %s\n<big> ↓</big> %s\n<big> ⇓</big> %s"
-                    % (
-                        cfg.key["bpm_10_up"],
-                        cfg.key["bpm_up"],
-                        cfg.key["bpm_frac_up"],
-                        cfg.key["bpm_frac_down"],
-                        cfg.key["bpm_down"],
-                        cfg.key["bpm_10_down"],
-                    )
+                self.tt_txt = "<big> ⇑</big> %s\n<big> ↑</big> %s\n<big>.↑</big> %s\n<big>.↓</big> %s\n<big> ↓</big> %s\n<big> ⇓</big> %s" % (
+                    cfg.key["bpm_10_up"],
+                    cfg.key["bpm_up"],
+                    cfg.key["bpm_frac_up"],
+                    cfg.key["bpm_frac_down"],
+                    cfg.key["bpm_down"],
+                    cfg.key["bpm_10_down"],
                 )
 
             if self.active_field == 5:  # rpb
