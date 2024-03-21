@@ -1,9 +1,9 @@
 #!/bin/sh
 
-# - clears the tree so we can do "git add ." (I know, I know)
+# - clears the tree,
 # - regenerates the wrapper for libvht
 # - don't run without swig4 installed
-# - also uses black and astyle and pandoc and shit - don't run
+# - also uses black, astyle and pandoc
 
 rm -f log.txt
 rm -f *.so *.o
@@ -27,8 +27,8 @@ cd libvht
 cd ..
 black vht/*.py libvht/*.py
 swig -python libvht/libcvht.h
-#rm doc/vht.1.gz
-#pandoc doc/vht.1.md -s -t man -o doc/vht.1
-#gzip doc/vht.1
+rm doc/vht.1.gz
+pandoc doc/vht.1.md -s -t man -o doc/vht.1
+gzip doc/vht.1
 git add .
 git reset libvht/*.so
