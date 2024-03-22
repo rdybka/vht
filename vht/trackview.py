@@ -109,6 +109,7 @@ class TrackView(Gtk.DrawingArea):
         self.txt_height = 0
         self.fld_width = 0
         self.width = 0
+        self.height = 0
         self.spacing = 1.0
         self.pmp = PoorMansPiano(self.trk, self.seq)
 
@@ -118,6 +119,7 @@ class TrackView(Gtk.DrawingArea):
         self.sel_drag_prev = None
         self.sel_drag_back = None
         self.sel_drag_front = None
+        self.sel_drag_start = 0
         self.select = False
         self.select_start = None
         self.select_end = None
@@ -269,6 +271,7 @@ class TrackView(Gtk.DrawingArea):
         nh = (self.txt_height * self.trk.nrows) + 5
         self.set_size_request(nw, nh)
         self.width = nw
+        self.height = nh
 
         if self.pitchwheel_editor:
             self.pitchwheel_editor.configure()
@@ -1072,11 +1075,15 @@ class TrackView(Gtk.DrawingArea):
                     self.redraw(old_row)
 
         if self.sel_drag:  # dragging selection
-            self.parent.autoscroll_req = True
             dx = new_hover_column - self.sel_drag_prev[0]
             dy = new_hover_row - self.sel_drag_prev[1]
             sw = self.select_end[0] - self.select_start[0]
             sh = self.select_end[1] - self.select_start[1]
+
+            if sh > self.trk.nrows / 2:
+                self.parent.autoscroll_req = False
+            else:
+                self.parent.autoscroll_req = True
 
             if sh == self.trk.nrows - 1:  # rotate
                 if sw == len(self.trk) - 1:
@@ -1100,6 +1107,7 @@ class TrackView(Gtk.DrawingArea):
                         self.trk[nc[0]][nc[1]].delay = rr[3]
 
                     self.redraw()
+                    self.parent.prop_view.redraw(-1)
                     return False
 
             if dx or dy:
@@ -1332,6 +1340,7 @@ class TrackView(Gtk.DrawingArea):
                     if ssy <= row <= sey:
                         self.sel_drag = True
                         self.sel_drag_prev = col, row
+                        self.sel_drag_start = self.select_start[1]
 
                         self.sel_drag_front = self.to_dict(True)
                         self.sel_drag_back = self.to_dict()

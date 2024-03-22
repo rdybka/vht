@@ -902,6 +902,7 @@ class SequenceView(Gtk.Box):
             return False
 
     def switch(self, new_seq):
+        mod.clear_popups()
         if mod.active_track:
             if mod.active_track.edit:
                 self.active_tracks[self.seq.index] = mod.active_track

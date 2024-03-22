@@ -74,6 +74,8 @@ class SideTrackView(Gtk.DrawingArea):
         self.hover = -1
         self.rotating = False
         self.rotate_zero = 0
+        self.rotate_start = 0
+        self.move_start = 0
 
         self.drawing_loop = False
         self.drawing_start = -1
@@ -91,6 +93,7 @@ class SideTrackView(Gtk.DrawingArea):
             if event.button == cfg.select_button:
                 self.rotating = True
                 self.rotate_zero = self.hover
+                self.rotate_start = self.rotate_zero
                 for tv in self.parent.get_tracks():
                     tv.undo_buff.add_state()
                 return True
@@ -227,6 +230,7 @@ class SideTrackView(Gtk.DrawingArea):
             self.zero_pattern.set_matrix(matrix)
 
     def redraw(self, from_row=-666, to_row=-666, ctrl=None):
+        at = mod.active_track
         cr = self._back_context
         crf = self._context
         crf.set_source_surface(self._back_surface)
@@ -258,6 +262,22 @@ class SideTrackView(Gtk.DrawingArea):
 
         # (x, y, width, height, dx, dy) = cr.text_extents(("|" + cfg.row_number_format) % 999)
 
+        offsind = 0
+        offsindr = 0
+
+        if self.rotating:
+            offsind = self.rotate_start - self.hover
+            offsindr = self.hover
+            self.move_start = 1
+            if offsindr < 0:
+                offsindr = 0
+
+        if at:
+            if at.sel_drag:
+                if at.hover:
+                    offsind = at.sel_drag_start - at.select_start[1]
+                    offsindr = at.hover[1]
+
         if complete:
             self.configure()
             rows_to_draw = range(self.seq.length)
@@ -287,6 +307,9 @@ class SideTrackView(Gtk.DrawingArea):
                     )
                 )
 
+            if offsind and offsindr == r:
+                cr.set_source_rgb(*(col * 0 for col in cfg.colour))
+
             cr.rectangle(0, r * self.txt_height, w, self.txt_height)
             cr.fill()
 
@@ -308,7 +331,12 @@ class SideTrackView(Gtk.DrawingArea):
             yy = (r + 1) * self.txt_height - ((self.txt_height - height) / 2)
 
             cr.move_to(x, yy)
-            txt = cfg.row_number_format % r
+
+            if offsind and r == offsindr:
+                txt = "%2d" % (abs(offsind))
+                txt += "+" if offsind < 0 else "-"
+            else:
+                txt = cfg.row_number_format % r
             cr.show_text(txt)
 
             if not complete:
@@ -508,6 +536,14 @@ class SideTrackView(Gtk.DrawingArea):
         rs = -1
         re = -1
 
+        if at and at.trk:
+            if at.sel_drag:
+                self.redraw()
+                self.move_start = 1
+            elif self.move_start:
+                self.move_start = 0
+                self.redraw()
+
         if at:
             if at.hover:
                 rs, re = at.hover[1], at.hover[1]
@@ -525,7 +561,7 @@ class SideTrackView(Gtk.DrawingArea):
             if re < rs:
                 re, rs = rs, re
 
-            yh = at.txt_height if at.hover else self.txt_height
+            yh = at.txt_height
             ys = int(rs * yh)
             ye = min(int((re + 1) * yh), self.seq.length * self.txt_height)
 

@@ -29,7 +29,7 @@ from gi.repository import Gtk, Gdk
 
 
 class PreferencesWin(Gtk.Window):
-    def __init__(self, parent, mod, cfg):
+    def __init__(self, parent, mod, cfg, app):
         super(PreferencesWin, self).__init__()
         self.set_default_size(cfg.mainwin_size[0] / 2, 0)
         self.cfg = cfg
@@ -38,6 +38,7 @@ class PreferencesWin(Gtk.Window):
         self.def_cfg = Configuration()
 
         self.set_transient_for(self.parent)
+        self.set_application(app)
         self.set_resizable(False)
         self.set_modal(True)
 

@@ -159,7 +159,7 @@ class VHTApp(Gtk.Application):
         mod.transport = cfg.start_transport
 
     def on_prefs(self, action, param):
-        PreferencesWin(self.main_win, mod, cfg).show()
+        PreferencesWin(self.main_win, mod, cfg, self).show()
 
     def on_render(self, action, param):
         if not mod.render_win_showing:
