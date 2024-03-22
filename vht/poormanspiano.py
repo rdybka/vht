@@ -87,6 +87,9 @@ class PoorMansPiano:
         self.note_on = None
 
     def key2ctrl(self, key, ctrl, off=False):
+        if not key:
+            return False
+
         f = cfg.velocity_keys.find(Gdk.keyval_name(key))
         val = -1
         if f > -1:
