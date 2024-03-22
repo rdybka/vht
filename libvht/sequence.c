@@ -1,6 +1,6 @@
 /* sequence.c - vahatraker (libvht)
  *
- * Copyright (C) 2023 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2024 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -858,9 +858,13 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 	}
 
 	int rr = -1;
-	if (seq->pos - floor(seq->pos) < 0.0000001) {
+	double np = seq->pos - floor(seq->pos);
+	if (np < 0.0000001 || np > .999999) {
 		int r = (int)seq->pos;
 		rr = r;
+		
+		if (np > .999999)
+			rr = 0;
 
 		for (int t = 0; t < seq->ntrk; t++) {
 			if (seq->trk[t]->mand->active) {
@@ -885,14 +889,11 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 				}
 			}
 		}
-
-		while (r >= seq->length) {
-			r-=seq->length;
-		}
-	}
-
-	if (rr > -1)
+	} 
+	 
+	if (rr > -1) {
 		sequence_handle_triggers_adv(seq, rr);
+	} 
 
 	int resync = 0;
 
