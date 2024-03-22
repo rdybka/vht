@@ -862,7 +862,7 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 	if (np < 0.0000001 || np > .999999) {
 		int r = (int)seq->pos;
 		rr = r;
-		
+
 		if (np > .999999)
 			rr = 0;
 
@@ -889,11 +889,11 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 				}
 			}
 		}
-	} 
-	 
+	}
+
 	if (rr > -1) {
 		sequence_handle_triggers_adv(seq, rr);
-	} 
+	}
 
 	int resync = 0;
 

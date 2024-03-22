@@ -20,6 +20,7 @@ import cairo
 import gi
 import os
 import random
+import time
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk, GdkPixbuf
@@ -80,6 +81,8 @@ class MandyView(Gtk.DrawingArea):
 
         self.last_xy = (0, 0)
         self.trc_pos = None
+
+        self.last_t = time.time_ns()
 
         self.refollow = False
 
@@ -538,7 +541,13 @@ class MandyView(Gtk.DrawingArea):
         return False
 
     def tick(self, wdg, param):
-        self.redraw()
+        nt = time.time_ns()
+
+        t = (nt - self.last_t) / 1000000
+        if t > 40:
+            self.redraw()
+            self.last_t = nt
+
         return True
 
     def on_enter(self, wdg, prm):
