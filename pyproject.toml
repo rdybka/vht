@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 
 [metadata]
 name = "vht"
-version = "0.3.32"
+version = "0.3.33"
 description = "vahatraker - a live MIDI sequencer for JACK"
 author = "Remigiusz Dybka"
 author_email = "remigiusz.dybka@gmail.com"
