@@ -864,7 +864,10 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 		rr = r;
 
 		if (np > .999999)
-			rr = 0;
+			rr++;
+
+		while (rr >= seq->length)
+			rr -= seq->length;
 
 		for (int t = 0; t < seq->ntrk; t++) {
 			if (seq->trk[t]->mand->active) {
