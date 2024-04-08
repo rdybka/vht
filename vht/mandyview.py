@@ -205,11 +205,8 @@ class MandyView(Gtk.DrawingArea):
                 tl = len(tail)
 
                 tw = max(8, 8 * 0.5 / d["zoom"])
-                sm = 3
-                np = (
-                    self.trc_pos[0] + (d["x"] - self.trc_pos[0]) / sm,
-                    self.trc_pos[1] + (d["y"] - self.trc_pos[1]) / sm,
-                )
+
+                np = (d["x"], d["y"])
 
                 if math.isfinite(np[0]) and math.isfinite(np[1]):
                     self.trc_pos = np

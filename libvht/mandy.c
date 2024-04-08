@@ -531,7 +531,7 @@ void mandy_advance(mandy *mand, double tperiod, jack_nframes_t nframes) {
 
 // this runs in gui thread
 void mandy_animate(mandy *mand) {
-	double sm = 2;
+	double sm = 1.5;
 
 	long double dx = mand->dx;
 	long double dy = mand->dy;
