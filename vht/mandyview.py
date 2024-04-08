@@ -545,7 +545,7 @@ class MandyView(Gtk.DrawingArea):
         nt = time.time_ns()
 
         t = (nt - self.last_t) / 1000000
-        if t > 10:
+        if t > 15:
             self.redraw()
             self.last_t = nt
 
