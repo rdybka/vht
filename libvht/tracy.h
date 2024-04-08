@@ -21,7 +21,7 @@
 
 #include <Python.h>
 
-#define TRACY_MAX_TAIL	64
+#define TRACY_MAX_TAIL	16
 #define TRACY_MAX_SPEED	127
 
 typedef struct tracy_tail_coord {
