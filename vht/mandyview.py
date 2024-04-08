@@ -205,8 +205,12 @@ class MandyView(Gtk.DrawingArea):
                 tl = len(tail)
 
                 tw = max(8, 8 * 0.5 / d["zoom"])
+                sm = 2
 
-                np = (d["x"], d["y"])
+                np = (
+                    self.trc_pos[0] + (d["x"] - self.trc_pos[0]) / sm,
+                    self.trc_pos[1] + (d["y"] - self.trc_pos[1]) / sm,
+                )
 
                 if math.isfinite(np[0]) and math.isfinite(np[1]):
                     self.trc_pos = np
@@ -541,7 +545,7 @@ class MandyView(Gtk.DrawingArea):
         nt = time.time_ns()
 
         t = (nt - self.last_t) / 1000000
-        if t > 40:
+        if t > 10:
             self.redraw()
             self.last_t = nt
 
