@@ -246,16 +246,18 @@ class PreferencesWin(Gtk.Window):
         cmb.set_hexpand(True)
         cmb.append_text("none")
         pp = []
+        pretty = {}
         for prt in self.mod.ports:
             if prt.type == "midi" and not prt.mine and prt.output:
                 pp.append(prt.name)
+                pretty[prt.name] = prt.pname
 
         dinp = self.cfg.midi_default_input
         if dinp and dinp not in pp:
             pp.append(dinp)
 
         for prt in pp:
-            cmb.append_text(prt)
+            cmb.append(prt, pretty[prt] if prt in pretty else prt)
 
         dinp = self.cfg.midi_default_input
         if dinp and dinp in pp:
@@ -273,16 +275,18 @@ class PreferencesWin(Gtk.Window):
         cmb.append_text("none")
 
         pp = []
+        pretty = {}
         for prt in self.mod.ports:
             if prt.type == "midi" and not prt.mine and prt.input:
                 pp.append(prt.name)
+                pretty[prt.name] = prt.pname
 
         doutp = self.cfg.midi_default_output
         if doutp and doutp not in pp:
             pp.append(doutp)
 
         for prt in pp:
-            cmb.append_text(prt)
+            cmb.append(prt, pretty[prt] if prt in pretty else prt)
 
         doutp = self.cfg.midi_default_output
         if doutp and doutp in pp:
@@ -620,7 +624,7 @@ class PreferencesWin(Gtk.Window):
             self.cfg.window_opacity = val
 
     def on_combo_midi_input_changed(self, wdg):
-        self.cfg.midi_default_input = wdg.get_active_text() if wdg.get_active() else ""
+        self.cfg.midi_default_input = wdg.get_active_id() if wdg.get_active() else ""
         pc = self.mod.extras["portconfig"]
         if self.cfg.midi_default_input and self.cfg.midi_default_input not in pc["in"]:
             pc["in"].append(self.cfg.midi_default_input)
@@ -630,7 +634,7 @@ class PreferencesWin(Gtk.Window):
             self.parent._status_bar.portpopover.refresh()
 
     def on_combo_midi_output_changed(self, wdg):
-        self.cfg.midi_default_output = wdg.get_active_text() if wdg.get_active() else ""
+        self.cfg.midi_default_output = wdg.get_active_id() if wdg.get_active() else ""
         pc = self.mod.extras["portconfig"]
         if (
             self.cfg.midi_default_output

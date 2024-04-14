@@ -305,6 +305,9 @@ def midi_nport_names(clt):
 def midi_get_port_name(clt, prt):
     return _libcvht.midi_get_port_name(clt, prt)
 
+def midi_get_port_pname(clt, prtref):
+    return _libcvht.midi_get_port_pname(clt, prtref)
+
 def midi_get_port_ref(clt, name):
     return _libcvht.midi_get_port_ref(clt, name)
 
@@ -325,6 +328,9 @@ def midi_get_port_physical(prtref):
 
 def midi_get_port_connections(clt, prtref):
     return _libcvht.midi_get_port_connections(clt, prtref)
+
+def midi_get_props(clt):
+    return _libcvht.midi_get_props(clt)
 
 def midi_free_charpp(cpp):
     return _libcvht.midi_free_charpp(cpp)

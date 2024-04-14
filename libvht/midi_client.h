@@ -28,6 +28,7 @@
 #include <jack/jack.h>
 #include "sequence.h"
 #include "midi_event.h"
+#include <Python.h>
 
 /* should be easy enough to refactor this into some kind of driver architecture
 - have fun! */
@@ -96,13 +97,16 @@ void midi_refresh_port_names(midi_client *clt);
 int midi_port_names_changed(midi_client *clt);
 int midi_nport_names(midi_client *clt);
 char *midi_get_port_name(midi_client *clt, int prt);
+
 jack_port_t *midi_get_port_ref(midi_client *clt, char *name);
 char *midi_get_port_type(jack_port_t *prtref);
+char *midi_get_port_pname(midi_client *clt, jack_port_t *prtref);
 int midi_get_port_mine(midi_client *clt, jack_port_t *prtref);
 int midi_get_port_input(jack_port_t *prtref);
 int midi_get_port_output(jack_port_t *prtref);
 int midi_get_port_physical(jack_port_t *prtref);
 const char **midi_get_port_connections(midi_client *clt, jack_port_t *prtref);
+PyObject *midi_get_props(midi_client *clt);
 void midi_free_charpp(char **cpp);
 void midi_port_connect(midi_client *clt, const char *prtref, const char *prtref2);
 void midi_port_disconnect(midi_client *clt, const char *prtref, const char *prtref2);

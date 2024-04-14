@@ -51,9 +51,9 @@ class BoolListView(Gtk.ListBox):
         wdg = self.get_children()[0]
         wdg.set_sensitive(False)
 
-    def add(self, prtname, state):
+    def add(self, prtname, pretty, state):
         rw = Gtk.Box()
-        rw.pack_start(Gtk.Label(prtname), False, False, 0)
+        rw.pack_start(Gtk.Label(pretty if pretty else prtname), False, False, 0)
         statewdg = Gtk.CheckButton()
         statewdg.set_active(state)
         statewdg.connect("toggled", self.tgl_meta, prtname)
@@ -135,11 +135,11 @@ class PortConfigView(Gtk.Grid):
         for prt in mod.ports:
             if prt.type == "midi" and not prt.mine:
                 if prt.output:
-                    self.bl_in.add(*[prt.name, inp in prt.connections])
+                    self.bl_in.add(*[prt.name, prt.pname, inp in prt.connections])
 
         for p in mod.extras["portconfig"]["in"]:
             if not p in mod.ports:
-                self.bl_unv_in.add(p, 1)
+                self.bl_unv_in.add(p, p, 1)
 
         # outputs
         inp = None
@@ -157,11 +157,11 @@ class PortConfigView(Gtk.Grid):
                     if inp and inp in prt.connections:
                         conn = True
 
-                    self.bl_out.add(prt.name, conn)
+                    self.bl_out.add(prt.name, prt.pname, conn)
 
         for p in mod.extras["portconfig"]["out"][act_out]:
             if not p in mod.ports:
-                self.bl_unv_out.add(p, 1)
+                self.bl_unv_out.add(p, p, 1)
 
         self.show_all()
 

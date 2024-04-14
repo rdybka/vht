@@ -5383,6 +5383,36 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_midi_get_port_pname(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  jack_port_t *arg2 = (jack_port_t *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  void *argp2 = 0 ;
+  int res2 = 0 ;
+  PyObject *swig_obj[2] ;
+  char *result = 0 ;
+  
+  if (!SWIG_Python_UnpackTuple(args, "midi_get_port_pname", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "midi_get_port_pname" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  res2 = SWIG_ConvertPtr(swig_obj[1], &argp2,SWIGTYPE_p_jack_port_t, 0 |  0 );
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "midi_get_port_pname" "', argument " "2"" of type '" "jack_port_t *""'"); 
+  }
+  arg2 = (jack_port_t *)(argp2);
+  result = (char *)midi_get_port_pname(arg1,arg2);
+  resultobj = SWIG_FromCharPtr((const char *)result);
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_midi_get_port_ref(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   midi_client *arg1 = (midi_client *) 0 ;
@@ -5562,6 +5592,29 @@ SWIGINTERN PyObject *_wrap_midi_get_port_connections(PyObject *SWIGUNUSEDPARM(se
   arg2 = (jack_port_t *)(argp2);
   result = (char **)midi_get_port_connections(arg1,arg2);
   resultobj = SWIG_NewPointerObj(SWIG_as_voidptr(result), SWIGTYPE_p_p_char, 0 |  0 );
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_midi_get_props(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  midi_client *arg1 = (midi_client *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  PyObject *swig_obj[1] ;
+  PyObject *result = 0 ;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_midi_client, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "midi_get_props" "', argument " "1"" of type '" "midi_client *""'"); 
+  }
+  arg1 = (midi_client *)(argp1);
+  result = (PyObject *)midi_get_props(arg1);
+  resultobj = result;
   return resultobj;
 fail:
   return NULL;
@@ -13593,6 +13646,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "midi_refresh_port_names", _wrap_midi_refresh_port_names, METH_O, NULL},
 	 { "midi_nport_names", _wrap_midi_nport_names, METH_O, NULL},
 	 { "midi_get_port_name", _wrap_midi_get_port_name, METH_VARARGS, NULL},
+	 { "midi_get_port_pname", _wrap_midi_get_port_pname, METH_VARARGS, NULL},
 	 { "midi_get_port_ref", _wrap_midi_get_port_ref, METH_VARARGS, NULL},
 	 { "midi_get_port_type", _wrap_midi_get_port_type, METH_O, NULL},
 	 { "midi_get_port_mine", _wrap_midi_get_port_mine, METH_VARARGS, NULL},
@@ -13600,6 +13654,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "midi_get_port_output", _wrap_midi_get_port_output, METH_O, NULL},
 	 { "midi_get_port_physical", _wrap_midi_get_port_physical, METH_O, NULL},
 	 { "midi_get_port_connections", _wrap_midi_get_port_connections, METH_VARARGS, NULL},
+	 { "midi_get_props", _wrap_midi_get_props, METH_O, NULL},
 	 { "midi_free_charpp", _wrap_midi_free_charpp, METH_O, NULL},
 	 { "charpp_nitems", _wrap_charpp_nitems, METH_O, NULL},
 	 { "charpp_item", _wrap_charpp_item, METH_VARARGS, NULL},

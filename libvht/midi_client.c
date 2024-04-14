@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <jack/midiport.h>
+#include <jack/metadata.h>
+#include <jack/uuid.h>
 #include <errno.h>
 #include "jack_process.h"
 #include "module.h"
@@ -548,6 +550,19 @@ char *midi_get_port_name(midi_client *clt, int prt) {
 	return buff;
 }
 
+char *midi_get_port_pname(midi_client *clt, jack_port_t *prtref) {
+	static char buff[1023];
+
+	jack_uuid_t uuid = jack_port_uuid(prtref);
+	char *val, *type;
+	if (0 == jack_get_property(uuid, JACK_METADATA_PRETTY_NAME, &val, &type)) {
+		strcpy(buff, val);
+	} else {
+		buff[0] = 0;
+	}
+	return buff;
+}
+
 jack_port_t *midi_get_port_ref(midi_client *clt, char *name) {
 	return jack_port_by_name(clt->jack_client, name);
 }
@@ -586,6 +601,12 @@ const char **midi_get_port_connections(midi_client *clt, jack_port_t *prtref) {
 void midi_free_charpp(char **cpp) {
 	if (cpp)
 		jack_free(cpp);
+}
+
+PyObject *midi_get_props(midi_client *clt) {
+
+
+	return NULL;
 }
 
 void midi_port_connect(midi_client *clt, const char *prtref, const char *prtref2) {

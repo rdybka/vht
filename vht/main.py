@@ -202,7 +202,7 @@ class VHTApp(Gtk.Application):
         ab = Gtk.AboutDialog(self.main_win)
         ab.set_license_type(Gtk.License.GPL_3_0)
         ab.set_copyright(
-            "Copyright (C) 2023 Remigiusz Dybka\nremigiusz.dybka@gmail.com\n@schtixfnord"
+            "Copyright (C) 2023 Remigiusz Dybka\nremigiusz.dybka@gmail.com"
         )
         pkg = pkg_resources.require("vht")[0]
         ab.set_version(pkg.version)

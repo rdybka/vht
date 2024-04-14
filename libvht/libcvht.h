@@ -107,6 +107,8 @@ extern void queue_midi_ctrl(midi_client *clt, sequence *seq, track *trk, int val
 extern void midi_refresh_port_names(midi_client *clt);
 extern int midi_nport_names(midi_client *clt);
 extern char *midi_get_port_name(midi_client *clt, int prt);
+extern char *midi_get_port_pname(midi_client *clt, jack_port_t *prtref);
+
 extern jack_port_t *midi_get_port_ref(midi_client *clt, char *name);
 extern char *midi_get_port_type(jack_port_t *prtref);
 extern int midi_get_port_mine(midi_client *clt, jack_port_t *prtref);
@@ -115,6 +117,7 @@ extern int midi_get_port_output(jack_port_t *prtref);
 extern int midi_get_port_physical(jack_port_t *prtref);
 
 extern const char **midi_get_port_connections(midi_client *clt, jack_port_t *prtref);
+extern PyObject *midi_get_props(midi_client *clt);
 extern void midi_free_charpp(char **cpp);
 extern int charpp_nitems(char **cpp);
 extern char *charpp_item(char **cpp, int itm);

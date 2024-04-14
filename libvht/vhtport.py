@@ -112,6 +112,11 @@ class VHTPort:
     def name(self):
         return self._name
 
+    @property
+    def pname(self):
+        pn = libcvht.midi_get_port_pname(self._clt_handle, self._prtref)
+        return pn if pn else self._name
+
     def __str__(self):
         self.update_strrep()
         return self._strrep
