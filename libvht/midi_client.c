@@ -554,12 +554,19 @@ char *midi_get_port_pname(midi_client *clt, jack_port_t *prtref) {
 	static char buff[1023];
 
 	jack_uuid_t uuid = jack_port_uuid(prtref);
-	char *val, *type;
+	char *val = 0;
+	char *type = 0;
 	if (0 == jack_get_property(uuid, JACK_METADATA_PRETTY_NAME, &val, &type)) {
 		strcpy(buff, val);
 	} else {
 		buff[0] = 0;
 	}
+
+	if (val)
+		jack_free(val);
+	if (type)
+		jack_free(type);
+
 	return buff;
 }
 
