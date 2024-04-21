@@ -2,7 +2,7 @@
 
 # vahatraker - a live MIDI sequencer for JACK
 #
-# Copyright (C) 2023 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2024 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -202,7 +202,7 @@ class VHTApp(Gtk.Application):
         ab = Gtk.AboutDialog(self.main_win)
         ab.set_license_type(Gtk.License.GPL_3_0)
         ab.set_copyright(
-            "Copyright (C) 2023 Remigiusz Dybka\nremigiusz.dybka@gmail.com"
+            "Copyright (C) 2024 Remigiusz Dybka\nremigiusz.dybka@gmail.com"
         )
         pkg = pkg_resources.require("vht")[0]
         ab.set_version(pkg.version)

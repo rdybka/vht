@@ -310,6 +310,9 @@ void midi_buffer_flush_port(midi_client *clt, int port) {
 		}
 
 		module *mod = (module *) clt->mod_ref;
+		if (mod->midi_file) {
+			smf_client_flush(mod->midi_file, port, clt->midi_buffer[port][i]);
+		}
 
 		if (clt->dump_notes && !dbl) {
 			char desc[256];

@@ -24,6 +24,7 @@
 #include "midi_client.h"
 #include "track.h"
 #include "midi_event.h"
+#include "smf.h"
 
 struct rec_update_t rec_update[MIDI_EVT_BUFFER_LENGTH];
 int cur_rec_update;
@@ -218,6 +219,9 @@ void module_advance(module *mod, jack_nframes_t curr_frames) {
 			sequence_handle_triggers_post_adv(mod->seq[s], period * mod->seq[s]->rpb * (mod->bpm / 60.0), mod->clt->jack_buffer_size);
 		}
 
+		if (mod->midi_file)
+			smf_set_pos(mod->midi_file, curr_frames);
+
 		mod->song_pos += period;
 
 		// fix mode switching
@@ -304,8 +308,10 @@ void module_play(module *mod, int play) {
 
 	module_excl_out(mod);
 
-	if (play == 0)
+	if (play == 0) {
 		module_mute(mod);
+		smf_dump(mod->midi_file, NULL);
+	}
 
 	if (mod->transp && !mod->render_mode) {
 		midi_send_transp(mod->clt, play, -1);
@@ -329,6 +335,7 @@ module *module_new() {
 	mod->transp = 0;
 	pthread_mutex_init(&mod->excl, NULL);
 	mod->clt = midi_client_new(mod);
+	mod->midi_file = smf_new(mod);
 	mod->tline = timeline_new(mod->clt);
 	mod->play_mode = 0;
 	mod->switch_delay = 0.0;
@@ -352,15 +359,27 @@ void module_mute(module *mod) {
 	mod->mute = 1;
 }
 
+int module_dump_midi(module *mod, const char *phname) {
+	return smf_dump(mod->midi_file, phname);
+}
+
 void module_reset(module *mod) {
 	mod->zero_time = 0;
 	mod->song_pos = 0;
 	mod->min = mod->sec = mod->ms = 0;
+
 	for (int s = 0; s < mod->nseq; s++) {
 		mod->seq[s]->pos = 0;
-		//mod->seq[s]->lost = 1;
 		for (int t = 0; t < mod->seq[s]->ntrk; t++) {
 			track_kill_notes(mod->seq[s]->trk[t]);
+		}
+	}
+
+	smf_clear(mod->midi_file);
+
+	for (int s = 0; s < mod->nseq; s++) {
+		mod->seq[s]->pos = 0;
+		for (int t = 0; t < mod->seq[s]->ntrk; t++) {
 			track_reset(mod->seq[s]->trk[t]);
 		}
 	}
@@ -406,6 +425,8 @@ void module_free(module *mod) {
 	for (int s = 0; s < mod->nseq; s++)
 		for (int t = 0; t < mod->seq[s]->ntrk; t++)
 			track_kill_notes(mod->seq[s]->trk[t]);
+
+	smf_free(mod->midi_file);
 
 	sleep(.420);
 

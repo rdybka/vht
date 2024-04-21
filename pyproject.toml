@@ -47,6 +47,8 @@ vht = ["data/*", "data/ctrl/*", "data/bank/*"]
 "libvht/jack_process.c",
 "libvht/midi_event.c",
 "libvht/module.c",
+"libvht/smf.c",
+"libvht/stolen.c",
 "libvht/row.c",
 "libvht/ctrlrow.c",
 "libvht/sequence.c",

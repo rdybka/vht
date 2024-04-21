@@ -84,20 +84,30 @@ class RenderWin(Gtk.Window):
 
         self.grid.attach(self.format_cmb, 1, 1, 2, 1)
 
+        self.midi_sw = Gtk.Switch()
+        self.midi_sw.set_active(cfg.render_midi)
+        self.midi_sw.connect("state-set", self.on_midi_switch)
+
+        lab = Gtk.Label.new("midi")
+        bx = Gtk.Box()
+        bx.pack_start(lab, False, False, 0)
+        bx.pack_end(self.midi_sw, False, False, 0)
+        self.grid.attach(bx, 2, 2, 1, 1)
+
         lab = Gtk.Label.new("dest:")
         lab.set_xalign(labx)
-        self.grid.attach(lab, 0, 2, 1, 1)
+        self.grid.attach(lab, 0, 3, 1, 1)
 
         self.butt_fc = Gtk.FileChooserButton.new(
             "select output folder", Gtk.FileChooserAction.SELECT_FOLDER
         )
         self.butt_fc.connect("file-set", self.on_folder_set)
         self.butt_fc.set_current_folder(cfg.render_folder)
-        self.grid.attach(self.butt_fc, 1, 2, 2, 1)
+        self.grid.attach(self.butt_fc, 1, 3, 2, 1)
 
         lab = Gtk.Label.new("silence:")
         lab.set_xalign(labx)
-        self.grid.attach(lab, 0, 3, 1, 1)
+        self.grid.attach(lab, 0, 4, 1, 1)
 
         box = Gtk.Box()
         self.secs_adj = Gtk.Adjustment(0, 0, 123, 1.0, 1.0)
@@ -105,11 +115,11 @@ class RenderWin(Gtk.Window):
         self.secs_button.set_adjustment(self.secs_adj)
         self.secs_adj.set_value(cfg.render_secs)
         self.secs_adj.connect("value-changed", self.on_secs_changed)
-        self.grid.attach(self.secs_button, 1, 3, 2, 1)
+        self.grid.attach(self.secs_button, 1, 4, 2, 1)
 
         lab = Gtk.Label.new("meter:")
         lab.set_xalign(labx)
-        self.grid.attach(lab, 0, 4, 1, 1)
+        self.grid.attach(lab, 0, 5, 1, 1)
 
         self.meter_cmb = Gtk.ComboBoxText()
         self.meters = ["none", "vu", "ppm", "dpm", "jf", "sco"]
@@ -119,15 +129,15 @@ class RenderWin(Gtk.Window):
         self.meter_cmb.set_active(cfg.render_meter)
         self.meter_cmb.connect("changed", self.on_meter_cmb_changed)
 
-        self.grid.attach(self.meter_cmb, 1, 4, 2, 1)
+        self.grid.attach(self.meter_cmb, 1, 5, 2, 1)
 
         self.rbutt = Gtk.Button()
         self.rbutt.set_label("Start!")
         self.rbutt.connect("clicked", self.on_go_clicked)
-        self.grid.attach(self.rbutt, 2, 6, 1, 1)
+        self.grid.attach(self.rbutt, 2, 7, 1, 1)
 
         self.progress = Gtk.ProgressBar()
-        self.grid.attach(self.progress, 0, 5, 3, 1)
+        self.grid.attach(self.progress, 0, 6, 3, 1)
 
         self.mode_cmb.set_active(cfg.render_mode)
 
@@ -152,6 +162,9 @@ class RenderWin(Gtk.Window):
 
     def on_meter_cmb_changed(self, wdg):
         self.cfg.render_meter = wdg.get_active()
+
+    def on_midi_switch(self, wdg, prm):
+        self.cfg.render_midi = prm
 
     def on_mode_cmb_changed(self, wdg):
         self.cfg.render_mode = wdg.get_active()

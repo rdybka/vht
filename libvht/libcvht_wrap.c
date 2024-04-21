@@ -4476,6 +4476,39 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_module_dump_midi(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  module *arg1 = (module *) 0 ;
+  char *arg2 = (char *) 0 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  int res2 ;
+  char *buf2 = 0 ;
+  int alloc2 = 0 ;
+  PyObject *swig_obj[2] ;
+  int result;
+  
+  if (!SWIG_Python_UnpackTuple(args, "module_dump_midi", 2, 2, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_module, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_dump_midi" "', argument " "1"" of type '" "module *""'"); 
+  }
+  arg1 = (module *)(argp1);
+  res2 = SWIG_AsCharPtrAndSize(swig_obj[1], &buf2, NULL, &alloc2);
+  if (!SWIG_IsOK(res2)) {
+    SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "module_dump_midi" "', argument " "2"" of type '" "char const *""'");
+  }
+  arg2 = (char *)(buf2);
+  result = (int)module_dump_midi(arg1,(char const *)arg2);
+  resultobj = SWIG_From_int((int)(result));
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return resultobj;
+fail:
+  if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_module_get_nseq(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   module *arg1 = (module *) 0 ;
@@ -13617,6 +13650,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "module_get_inception", _wrap_module_get_inception, METH_O, NULL},
 	 { "module_set_should_save", _wrap_module_set_should_save, METH_VARARGS, NULL},
 	 { "module_get_should_save", _wrap_module_get_should_save, METH_O, NULL},
+	 { "module_dump_midi", _wrap_module_dump_midi, METH_VARARGS, NULL},
 	 { "module_get_nseq", _wrap_module_get_nseq, METH_O, NULL},
 	 { "module_get_seq", _wrap_module_get_seq, METH_VARARGS, NULL},
 	 { "module_add_sequence", _wrap_module_add_sequence, METH_VARARGS, NULL},

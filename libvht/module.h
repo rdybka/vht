@@ -27,6 +27,7 @@
 #include "midi_client.h"
 #include "sequence.h"
 #include "timeline.h"
+#include "smf.h"
 
 #define DEFAULT_CTRLPR 16
 
@@ -51,6 +52,7 @@ typedef struct module_t {
 	int cur_rec_update;
 	pthread_mutex_t excl;
 	midi_client *clt;
+	smf *midi_file;
 	int play_mode; // 0 - seq_loop, 1 - timeline
 	int panic;
 	double switch_delay;
@@ -72,7 +74,7 @@ void module_advance(module *mod, jack_nframes_t curr_frames);
 void module_mute(module *mod);
 void module_reset(module *mod);
 void module_dump_notes(module *mod, int n);
-
+int module_dump_midi(module *mod, const char *phname);
 void module_excl_in(module *mod);
 void module_excl_out(module *mod);
 

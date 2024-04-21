@@ -33,6 +33,7 @@ class Renderer:
         self._queue = []
         self._seqs = []
         self._orig_pm = None
+        self._midi_file = None
 
         try:
             prc = subprocess.Popen(
@@ -66,9 +67,10 @@ class Renderer:
 
             if self.mod.play_mode == 1:
                 self.mod.play_mode = self._orig_pm
-
             if self._proc:
                 stdout, stderr = self._proc.communicate(input="\n", timeout=5)
+                if self._midi_file:
+                    self.mod.dump_midi(self._midi_file)
                 self._proc = None
             if self._queue:
                 self.start_queue()
@@ -106,6 +108,11 @@ class Renderer:
         opts.append(fmt)
         opts.append("-fp")
         opts.append(os.path.join(folder, filename + "_"))
+        if self.cfg.render_midi:
+            self._midi_file = os.path.join(folder, filename + ".mid")
+        else:
+            self._midi_file = None
+
         meters = ["none", "vu", "ppm", "dpm", "jf", "sco"]
         if meter > 0:
             opts.append("-mb")
@@ -134,6 +141,10 @@ class Renderer:
         opts.append(fmt)
         opts.append("-fp")
         opts.append(os.path.join(folder, filename + "_"))
+        if self.cfg.render_midi:
+            self._midi_file = os.path.join(folder, filename + ".mid")
+        else:
+            self._midi_file = None
 
         self.mod.render_mode = 3
         self._orig_pm = self.mod.play_mode
@@ -164,6 +175,8 @@ class Renderer:
         opts.append(fmt)
         opts.append("-fp")
         opts.append(os.path.join(folder, filename + ("_seq%02d" % seqid) + "_"))
+        if self.cfg.render_midi:
+            self._midi_file = os.path.join(folder, filename + ("_seq%02d.mid" % seqid))
 
         self.mod.play = 0
         self.mod.reset()
@@ -216,6 +229,10 @@ class Renderer:
         opts.append(fmt)
         opts.append("-fp")
         opts.append(os.path.join(folder, filename + "_"))
+        if self.cfg.render_midi:
+            self._midi_file = os.path.join(folder, filename + ".mid")
+        else:
+            self._midi_file = None
 
         self.mod.play = 0
         self.mod.reset()
@@ -254,4 +271,6 @@ class Renderer:
             self._proc = None
             self._queue = []
             self._finished = True
+            if self._midi_file:
+                self.mod.dump_midi(self._midi_file)
             self.mod.render_mode = 0

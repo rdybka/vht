@@ -573,6 +573,9 @@ class VHTModule(Iterable):
         self.should_save = False
         return True
 
+    def dump_midi(self, filename):
+        return libcvht.module_dump_midi(self._mod_handle, filename)
+
     def unpack_seq(self, seq, matrix=False, append=False):
         sq = None
         par = -1

@@ -140,6 +140,7 @@ class Configuration:
         self.render_meter = 0
         self.render_secs = 5
         self.render_format = "flac"
+        self.render_midi = True
         self.render_folder = str(Path.home())
 
         self.key = {
@@ -340,6 +341,7 @@ class Configuration:
             "render_meter": str(self.render_meter),
             "render_format": self.render_format,
             "render_folder": self.render_folder,
+            "render_midi": self.render_midi,
         }
 
         cfg["other"] = {
@@ -407,6 +409,7 @@ class Configuration:
         rnd["render_secs"] = str(self.render_secs)
         rnd["render_meter"] = str(self.render_meter)
         rnd["render_format"] = self.render_format
+        rnd["render_midi"] = str(self.render_midi)
         rnd["render_folder"] = self.render_folder
 
         oth = self.cfg_parser["other"]
@@ -517,6 +520,7 @@ class Configuration:
             self.render_secs = rnd.getint("render_secs")
             self.render_meter = rnd.getint("render_meter")
             self.render_format = rnd["render_format"]
+            self.render_midi = rnd.getboolean("render_midi")
             self.render_folder = rnd["render_folder"]
 
             oth = self.cfg_parser["other"]
