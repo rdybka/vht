@@ -88,7 +88,7 @@ class RenderWin(Gtk.Window):
         self.midi_sw.set_active(cfg.render_midi)
         self.midi_sw.connect("state-set", self.on_midi_switch)
 
-        lab = Gtk.Label.new("midi")
+        lab = Gtk.Label.new("midi:")
         bx = Gtk.Box()
         bx.pack_start(lab, False, False, 0)
         bx.pack_end(self.midi_sw, False, False, 0)
