@@ -238,7 +238,7 @@ int smf_dump(smf *mf, const char *phname) {
 			jack_nframes_t tm = mf->trk_inf[t].evts[ev].time;
 			midi_event evt = mf->trk_inf[t].evts[ev].evt;
 			double dtime = (double)(tm + evt.time) / (double)(mod->clt->jack_sample_rate);
-			unsigned long smptime = smptmult * dtime;
+			unsigned long smptime = lround(smptmult * dtime);
 			unsigned long smptdelta = smptime - ltime;
 			ltime = smptime;
 
