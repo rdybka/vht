@@ -24,7 +24,6 @@
 #define SMF_MAX_TRK 1023
 #define SMF_MIN_BUFF 2
 
-
 typedef struct evthist_t {
 	jack_nframes_t time;
 	midi_event evt;
@@ -48,6 +47,8 @@ typedef struct smf_t {
 
 	int ntrk;
 	track_info trk_inf[SMF_MAX_TRK];
+	int ticks;
+	int tc;
 } smf;
 
 smf *smf_new(void *mod_ref);
@@ -61,5 +62,6 @@ void smf_push(smf *mf, unsigned char a);
 void smf_push_long(smf *mf, unsigned long a);
 void smf_push_short(smf *mf, unsigned short a);
 void smf_push_var(smf *mf, unsigned long value);
+
 
 #endif //__SMF_H__ 

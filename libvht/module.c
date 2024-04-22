@@ -359,7 +359,9 @@ void module_mute(module *mod) {
 	mod->mute = 1;
 }
 
-int module_dump_midi(module *mod, const char *phname) {
+int module_dump_midi(module *mod, const char *phname, int tc, int tpf) {
+	mod->midi_file->tc = tc;
+	mod->midi_file->ticks = tpf;
 	return smf_dump(mod->midi_file, phname);
 }
 

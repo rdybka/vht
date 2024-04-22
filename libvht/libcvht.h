@@ -74,8 +74,7 @@ extern int module_get_inception(module *mod);
 
 extern void module_set_should_save(module *mod, int ss);
 extern int module_get_should_save(module *mod);
-extern int module_dump_midi(module *mod, const char *phname);
-
+extern int module_dump_midi(module *mod, const char *phname, int tc, int tpf);
 extern int module_get_nseq(module *mod);
 extern sequence *module_get_seq(module *mod, int);
 extern void module_add_sequence(module *mod, sequence *seq);

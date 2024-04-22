@@ -378,6 +378,32 @@ class PreferencesWin(Gtk.Window):
 
         grid.attach(fr, 0, 2, 1, 1)
 
+        fr, gr = self.create_frame("Midi export SMPTE", mrg)
+
+        cmb = Gtk.ComboBoxText()
+        cmb.append_text("30fps")
+        cmb.append_text("25fps")
+
+        cmb.set_active(self.cfg.render_timecode)
+        cmb.connect("changed", self.on_combo_rendertc_changed)
+
+        tick_slider = self.create_slider(0, self.cfg.render_ticks, 40, 120, 4)
+
+        tick_slider.add_mark(40, Gtk.PositionType.TOP)
+        tick_slider.add_mark(80, Gtk.PositionType.TOP)
+        tick_slider.add_mark(100, Gtk.PositionType.TOP)
+        tick_slider.add_mark(120, Gtk.PositionType.TOP)
+
+        bx = Gtk.Box()
+        bx.set_hexpand(True)
+        bx.pack_start(cmb, False, False, 0)
+        bx.pack_end(Gtk.Label.new("ticks/frame"), False, False, 0)
+
+        bx.pack_end(tick_slider, True, True, 0)
+
+        gr.attach(bx, 0, 0, 1, 1)
+        grid.attach(fr, 0, 3, 1, 1)
+
         fr, gr = self.create_frame("White piano keys", mrg)
         self.piano_white_keys_ent = self.create_entry(self.cfg.piano_white_keys, 14)
         rsbutt = self.create_reset_butt(2)
@@ -387,7 +413,7 @@ class PreferencesWin(Gtk.Window):
         bx.pack_end(rsbutt, False, False, 0)
 
         gr.attach(bx, 0, 0, 1, 1)
-        grid.attach(fr, 0, 3, 1, 1)
+        grid.attach(fr, 0, 4, 1, 1)
 
         fr, gr = self.create_frame("Black piano keys", mrg)
         self.piano_black_keys_ent = self.create_entry(self.cfg.piano_black_keys, 10)
@@ -398,7 +424,7 @@ class PreferencesWin(Gtk.Window):
         bx.pack_end(rsbutt, False, False, 0)
 
         gr.attach(bx, 0, 0, 1, 1)
-        grid.attach(fr, 0, 4, 1, 1)
+        grid.attach(fr, 0, 5, 1, 1)
 
         fr, gr = self.create_frame("Velocity keys", mrg)
         self.velocity_keys_ent = self.create_entry(self.cfg.velocity_keys, 7)
@@ -409,7 +435,7 @@ class PreferencesWin(Gtk.Window):
         bx.pack_end(rsbutt, False, False, 0)
 
         gr.attach(bx, 0, 0, 1, 1)
-        grid.attach(fr, 0, 5, 1, 1)
+        grid.attach(fr, 0, 6, 1, 1)
 
         return grid
 
@@ -622,6 +648,8 @@ class PreferencesWin(Gtk.Window):
         if data == 3:
             self.parent.set_opacity(self.cfg.window_opacity)
             self.cfg.window_opacity = val
+        if data == 4:
+            self.cfg.render_ticks = int(val)
 
     def on_combo_midi_input_changed(self, wdg):
         self.cfg.midi_default_input = wdg.get_active_id() if wdg.get_active() else ""
@@ -644,6 +672,10 @@ class PreferencesWin(Gtk.Window):
         refresh_connections(self.mod, self.cfg)
         if self.parent._status_bar.portpopover.pooped:
             self.parent._status_bar.portpopover.refresh()
+
+    def on_combo_rendertc_changed(self, wdg):
+        v = wdg.get_active()
+        self.cfg.render_timecode = v
 
     def on_combo_mouseover_changed(self, wdg):
         v = wdg.get_active()

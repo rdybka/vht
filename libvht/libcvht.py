@@ -218,8 +218,8 @@ def module_set_should_save(mod, ss):
 def module_get_should_save(mod):
     return _libcvht.module_get_should_save(mod)
 
-def module_dump_midi(mod, phname):
-    return _libcvht.module_dump_midi(mod, phname)
+def module_dump_midi(mod, phname, tc, tpf):
+    return _libcvht.module_dump_midi(mod, phname, tc, tpf)
 
 def module_get_nseq(mod):
     return _libcvht.module_get_nseq(mod)

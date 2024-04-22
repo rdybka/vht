@@ -4480,15 +4480,21 @@ SWIGINTERN PyObject *_wrap_module_dump_midi(PyObject *SWIGUNUSEDPARM(self), PyOb
   PyObject *resultobj = 0;
   module *arg1 = (module *) 0 ;
   char *arg2 = (char *) 0 ;
+  int arg3 ;
+  int arg4 ;
   void *argp1 = 0 ;
   int res1 = 0 ;
   int res2 ;
   char *buf2 = 0 ;
   int alloc2 = 0 ;
-  PyObject *swig_obj[2] ;
+  int val3 ;
+  int ecode3 = 0 ;
+  int val4 ;
+  int ecode4 = 0 ;
+  PyObject *swig_obj[4] ;
   int result;
   
-  if (!SWIG_Python_UnpackTuple(args, "module_dump_midi", 2, 2, swig_obj)) SWIG_fail;
+  if (!SWIG_Python_UnpackTuple(args, "module_dump_midi", 4, 4, swig_obj)) SWIG_fail;
   res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_module, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "module_dump_midi" "', argument " "1"" of type '" "module *""'"); 
@@ -4499,7 +4505,17 @@ SWIGINTERN PyObject *_wrap_module_dump_midi(PyObject *SWIGUNUSEDPARM(self), PyOb
     SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "module_dump_midi" "', argument " "2"" of type '" "char const *""'");
   }
   arg2 = (char *)(buf2);
-  result = (int)module_dump_midi(arg1,(char const *)arg2);
+  ecode3 = SWIG_AsVal_int(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "module_dump_midi" "', argument " "3"" of type '" "int""'");
+  } 
+  arg3 = (int)(val3);
+  ecode4 = SWIG_AsVal_int(swig_obj[3], &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "module_dump_midi" "', argument " "4"" of type '" "int""'");
+  } 
+  arg4 = (int)(val4);
+  result = (int)module_dump_midi(arg1,(char const *)arg2,arg3,arg4);
   resultobj = SWIG_From_int((int)(result));
   if (alloc2 == SWIG_NEWOBJ) free((char*)buf2);
   return resultobj;

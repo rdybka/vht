@@ -74,7 +74,7 @@ void module_advance(module *mod, jack_nframes_t curr_frames);
 void module_mute(module *mod);
 void module_reset(module *mod);
 void module_dump_notes(module *mod, int n);
-int module_dump_midi(module *mod, const char *phname);
+int module_dump_midi(module *mod, const char *phname, int tc, int tpf);
 void module_excl_in(module *mod);
 void module_excl_out(module *mod);
 

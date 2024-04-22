@@ -141,6 +141,8 @@ class Configuration:
         self.render_secs = 5
         self.render_format = "flac"
         self.render_midi = True
+        self.render_timecode = 0
+        self.render_ticks = 120
         self.render_folder = str(Path.home())
 
         self.key = {
@@ -342,6 +344,8 @@ class Configuration:
             "render_format": self.render_format,
             "render_folder": self.render_folder,
             "render_midi": self.render_midi,
+            "render_timecode": str(self.render_timecode),
+            "render_ticks": str(self.render_ticks),
         }
 
         cfg["other"] = {
@@ -411,6 +415,8 @@ class Configuration:
         rnd["render_format"] = self.render_format
         rnd["render_midi"] = str(self.render_midi)
         rnd["render_folder"] = self.render_folder
+        rnd["render_timecode"] = str(self.render_timecode)
+        rnd["render_ticks"] = str(self.render_ticks)
 
         oth = self.cfg_parser["other"]
         oth["new_tracks_left"] = str(self.new_tracks_left)
@@ -521,6 +527,8 @@ class Configuration:
             self.render_meter = rnd.getint("render_meter")
             self.render_format = rnd["render_format"]
             self.render_midi = rnd.getboolean("render_midi")
+            self.render_timecode = rnd.getint("render_timecode")
+            self.render_ticks = rnd.getint("render_ticks")
             self.render_folder = rnd["render_folder"]
 
             oth = self.cfg_parser["other"]

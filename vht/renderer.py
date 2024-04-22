@@ -70,7 +70,9 @@ class Renderer:
             if self._proc:
                 stdout, stderr = self._proc.communicate(input="\n", timeout=5)
                 if self._midi_file:
-                    self.mod.dump_midi(self._midi_file)
+                    self.mod.dump_midi(
+                        self._midi_file, self.cfg.render_timecode, self.cfg.render_ticks
+                    )
                 self._proc = None
             if self._queue:
                 self.start_queue()
@@ -273,5 +275,7 @@ class Renderer:
             self._queue = []
             self._finished = True
             if self._midi_file:
-                self.mod.dump_midi(self._midi_file)
+                self.mod.dump_midi(
+                    self._midi_file, self.cfg.render_timecode, self.cfg.render_ticks
+                )
             self.mod.render_mode = 0

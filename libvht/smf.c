@@ -19,11 +19,16 @@
 #include "smf.h"
 #include "module.h"
 
+const unsigned char timecodes [2] = {0xE2, 0xE7};
+const int timecode_fps [2] = {30, 25};
+
 smf *smf_new(void *mod_ref) {
 	smf *ret = malloc(sizeof(smf));
 	ret->mod_ref = mod_ref;
 	ret->ntrk = 0;
 	ret->bin = 0;
+	ret->ticks = 120;
+	ret->tc = 0;
 	smf_clear(ret);
 
 	return ret;
@@ -191,8 +196,9 @@ int smf_dump(smf *mf, const char *phname) {
 	smf_push_long(mf, 6);
 	smf_push_short(mf, 1);
 	smf_push_short(mf, mf->ntrk + 1);
-	smf_push(mf, 0xE2); // 30fps
-	smf_push(mf, 100); // 100b/frame
+	smf_push(mf, timecodes[mf->tc]);
+	smf_push(mf, mf->ticks);
+	double smptmult = timecode_fps[mf->tc] * mf->ticks;
 
 	// time-track
 	ulong loffs;
@@ -232,7 +238,7 @@ int smf_dump(smf *mf, const char *phname) {
 			jack_nframes_t tm = mf->trk_inf[t].evts[ev].time;
 			midi_event evt = mf->trk_inf[t].evts[ev].evt;
 			double dtime = (double)(tm + evt.time) / (double)(mod->clt->jack_sample_rate);
-			unsigned long smptime = 3000.0 * dtime;
+			unsigned long smptime = smptmult * dtime;
 			unsigned long smptdelta = smptime - ltime;
 			ltime = smptime;
 
@@ -266,7 +272,6 @@ int smf_dump(smf *mf, const char *phname) {
 		fclose(ph);
 	}
 
-	smf_clear(mf);
 	midi_buff_excl_out(mod->clt);
 	return 0;
 }
