@@ -54,6 +54,7 @@ void smf_clear(smf *mf) {
 	}
 
 	mf->ntrk = 0;
+	mf->curr_frame = 0;
 	smf_clear_bin(mf);
 }
 
@@ -116,10 +117,10 @@ void smf_client_flush(smf *mf, int port, midi_event evt) {
 		}
 
 		mf->trk_inf[found].evts[mf->trk_inf[found].nevt].evt = evt;
-		unsigned long t = mf->curr_frame - mod->zero_time;
-		if (t < 0)
-			t = 0;
-		mf->trk_inf[found].evts[mf->trk_inf[found].nevt].time = t;
+		long tm = mf->curr_frame - mod->zero_time;
+		if (tm < 0)
+			tm = 0;
+		mf->trk_inf[found].evts[mf->trk_inf[found].nevt].time = tm;
 		mf->trk_inf[found].nevt++;
 	}
 
@@ -163,6 +164,15 @@ void smf_push_evt(smf *mf, uint8_t ch, int chn, long time, midi_event evt) {
 		smf_push(mf, evt.note);
 		smf_push(mf, evt.velocity);
 	}
+	//printf("%ld:%02x\n", time, ch);
+}
+
+int comp_evts(const void *evt1, const void *evt2) {
+	const evthist *e1 = evt1;
+	const evthist *e2 = evt2;
+	if (e1->time < e2->time) return -1;
+	if (e2->time < e1->time) return 1;
+	return 0;
 }
 
 int smf_dump(smf *mf, const char *phname) {
@@ -196,6 +206,10 @@ int smf_dump(smf *mf, const char *phname) {
 	mf->bin_l = curr;
 
 	for (int t = 0; t < mf->ntrk; t++) {
+		// sort evts
+		qsort(mf->trk_inf[t].evts, mf->trk_inf[t].nevt, sizeof(evthist), comp_evts);
+
+		// dump track
 		smf_push_str(mf, "MTrk");
 		loffs = mf->bin_l;
 		smf_push_long(mf, 0);

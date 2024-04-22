@@ -180,6 +180,7 @@ class Renderer:
 
         self.mod.play = 0
         self.mod.reset()
+        self.mod.reset()  # in case some old note-offs hang
         for s in self.mod:
             s.playing = False
 

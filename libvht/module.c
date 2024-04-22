@@ -376,6 +376,7 @@ void module_reset(module *mod) {
 	}
 
 	midi_buff_excl_in(mod->clt);
+	midi_buffer_clear(mod->clt);
 	smf_clear(mod->midi_file);
 	smf_set_pos(mod->midi_file, 0);
 	midi_buff_excl_out(mod->clt);
