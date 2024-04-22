@@ -299,6 +299,7 @@ int module_get_should_save(module *mod) {
 void module_play(module *mod, int play) {
 	module_excl_in(mod);
 	int prev_state = mod->playing;
+
 	mod->playing = play;
 
 	if (mod->render_mode > 0 && mod->playing && !prev_state) {
@@ -310,7 +311,6 @@ void module_play(module *mod, int play) {
 
 	if (play == 0) {
 		module_mute(mod);
-		smf_dump(mod->midi_file, NULL);
 	}
 
 	if (mod->transp && !mod->render_mode) {
@@ -375,7 +375,10 @@ void module_reset(module *mod) {
 		}
 	}
 
+	midi_buff_excl_in(mod->clt);
 	smf_clear(mod->midi_file);
+	smf_set_pos(mod->midi_file, 0);
+	midi_buff_excl_out(mod->clt);
 
 	for (int s = 0; s < mod->nseq; s++) {
 		mod->seq[s]->pos = 0;

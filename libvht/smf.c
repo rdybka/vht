@@ -47,7 +47,12 @@ void smf_clear(smf *mf) {
 	for (int t = 0; t < mf->ntrk; t++) {
 		if (mf->trk_inf[t].evts)
 			free(mf->trk_inf[t].evts);
+
+		mf->trk_inf[t].evts = 0;
+		mf->trk_inf[t].nevt = 0;
+		mf->trk_inf[t].aevt = 0;
 	}
+
 	mf->ntrk = 0;
 	smf_clear_bin(mf);
 }
@@ -58,6 +63,8 @@ void smf_set_pos(smf *mf, jack_nframes_t pos) {
 
 void smf_client_flush(smf *mf, int port, midi_event evt) {
 	module *mod = (module *)mf->mod_ref;
+
+	midi_buff_excl_in(mod->clt);
 
 	int found = -1;
 	for (int t = 0; t < mf->ntrk; t++) {
@@ -109,9 +116,14 @@ void smf_client_flush(smf *mf, int port, midi_event evt) {
 		}
 
 		mf->trk_inf[found].evts[mf->trk_inf[found].nevt].evt = evt;
-		mf->trk_inf[found].evts[mf->trk_inf[found].nevt].time = mf->curr_frame - mod->zero_time;
+		unsigned long t = mf->curr_frame - mod->zero_time;
+		if (t < 0)
+			t = 0;
+		mf->trk_inf[found].evts[mf->trk_inf[found].nevt].time = t;
 		mf->trk_inf[found].nevt++;
 	}
+
+	midi_buff_excl_out(mod->clt);
 }
 
 void smf_push(smf *mf, unsigned char a) {
@@ -135,7 +147,10 @@ void smf_push_str(smf *mf, char *s) {
 	}
 }
 
-void smf_push_evt(smf *mf, uint8_t ch, int chn, unsigned long time, midi_event evt) {
+void smf_push_evt(smf *mf, uint8_t ch, int chn, long time, midi_event evt) {
+	if (time < 0)
+		time = 0;
+
 	if (ch == 0xc0) {
 		ch += chn - 1;
 		smf_push_var(mf, time);
