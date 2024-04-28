@@ -37,6 +37,7 @@ from vht.mainwin import MainWin
 from vht.shortcutmayhem import ShortcutMayhem
 from vht.preferenceswin import PreferencesWin
 from vht.renderwin import RenderWin
+from vht.codedaemon import CodeDaemon
 from vht.portconfig import refresh_connections
 from vht import mod, cfg, ctrlcfg, autoexec, bankcfg, randomcomposer
 import vht.extras
@@ -330,7 +331,7 @@ def run():
     vht.extras.register(mod)
     mod.set_midi_record_ignore(midig)
     randomcomposer.muzakize()
-
+    mod.cdaemon = CodeDaemon()
     # fix data path
     paths2try = []
 

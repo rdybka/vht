@@ -20,6 +20,7 @@ from vht.portconfig import *
 from vht.propview import PropView
 from vht.trackview import TrackView
 from vht.sidetrackview import SideTrackView
+from vht.codedaemon import CodeDaemon
 from vht import *
 import cairo
 import gi
@@ -844,6 +845,8 @@ class SequenceView(Gtk.Box):
         close_connections(mod)
         TrackView.leave_all()
 
+        del mod.cdaemon
+        mod.clear_popups()
         self.clear()
         for i in self.trk_cache:
             self.trk_cache[i].destroy()
@@ -887,6 +890,7 @@ class SequenceView(Gtk.Box):
             mod.mainwin.seq_mode_butt_ignore_signal = True
             mod.mainwin.seq_mode_butt.set_active(not mod.play_mode)
             mod.mainwin.seq_mode_butt_ignore_signal = False
+            mod.cdaemon = CodeDaemon()
             return True
         else:
             mod.new()
@@ -899,6 +903,7 @@ class SequenceView(Gtk.Box):
             mod.mainwin.seq_mode_butt_ignore_signal = True
             mod.mainwin.seq_mode_butt.set_active(not mod.play_mode)
             mod.mainwin.seq_mode_butt_ignore_signal = False
+            mod.cdaemon = CodeDaemon()
             return False
 
     def switch(self, new_seq):

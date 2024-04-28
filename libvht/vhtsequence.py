@@ -52,6 +52,9 @@ class VHTSequence(Iterable):
 
         return False
 
+    def __hash__(self):
+        return int(self._seq_handle)
+
     def __getitem__(self, itm):
         if itm >= self.__len__():
             return None
@@ -345,6 +348,10 @@ class VHTSequence(Iterable):
 
     def trigger_play_off(self):
         libcvht.sequence_trigger_play_off(self._seq_handle, -1)
+
+    @property
+    def next_row(self):
+        return libcvht.sequence_get_next_row(self._seq_handle)
 
     def __str__(self):
         ret = ""

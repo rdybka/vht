@@ -19,6 +19,7 @@
 #ifndef __SEQUENCE_H__
 #define __SEQUENCE_H__
 #include <pthread.h>
+#include <semaphore.h>
 #include "midi_event.h"
 #include "track.h"
 
@@ -71,6 +72,7 @@ typedef struct sequence_t {
 	int trg_playmode;
 	int trg_quantise;
 	pthread_mutex_t *mod_excl;
+	int next_row;
 	void *clt;
 	char *extras;
 	int playing;

@@ -155,7 +155,6 @@ extern int sequence_get_trg_quantise(sequence *seq);
 extern int module_get_max_trg_grp();
 extern int sequence_get_trg_grp(sequence *seq, int g);
 extern void sequence_set_trg_grp(sequence *seq, int g, int grp);
-
 extern void sequence_set_trig(sequence *seq, int t, int tp, int ch, int nt);
 extern char *sequence_get_trig(sequence *seq, int t);
 extern void sequence_trigger_mute(sequence *seq, int nframes);
@@ -191,6 +190,8 @@ extern int sequence_get_loop_start(sequence *seq);
 extern void sequence_set_loop_start(sequence *seq, int s);
 extern int sequence_get_loop_end(sequence *seq);
 extern void sequence_set_loop_end(sequence *seq, int e);
+
+extern int sequence_get_next_row(sequence *seq);
 
 // track
 extern row *track_get_row_ptr(track *, int c, int r);

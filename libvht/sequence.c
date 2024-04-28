@@ -65,6 +65,8 @@ sequence *sequence_new(int length) {
 	seq->trg_playmode = 0;
 	seq->trg_quantise = 1;
 	seq->mod_excl = NULL;
+
+	seq->next_row = -1;
 	seq->clt = NULL;
 	seq->playing = 0;
 	seq->lost = 1;
@@ -768,7 +770,7 @@ void sequence_handle_triggers_post_adv(sequence *seq, double period, int nframes
 				seq->trg_status[TRIGGER_PLAY] = TRIGGER_STATUS_KILLLATE;
 
 			seq->pos = 0;
-
+			seq->next_row = 0;
 			for (int t = 0; t < seq->ntrk; t++) {
 				track_reset(seq->trk[t]);
 			}
@@ -795,7 +797,7 @@ void sequence_handle_triggers_adv(sequence *seq, int r) {
 		if (r == 0) {
 			seq->playing =! seq->playing;
 			seq->trg_status[TRIGGER_CUE] = TRIGGER_STATUS_IDLE;
-
+			seq->next_row = 0;
 			if (!seq->playing) {
 				for (int t = 0; t < seq->ntrk; t++)
 					track_kill_notes(seq->trk[t]);
@@ -811,7 +813,7 @@ void sequence_handle_triggers_adv(sequence *seq, int r) {
 		if (seq->trg_times[TRIGGER_PLAY] == 0) {
 			seq->playing = 1;
 			seq->pos = 0;
-
+			seq->next_row = 0;
 			for (int t = 0; t < seq->ntrk; t++) {
 				track_reset(seq->trk[t]);
 			}
@@ -868,6 +870,9 @@ void sequence_advance(sequence *seq, double period, jack_nframes_t nframes) {
 
 		while (rr >= seq->length)
 			rr -= seq->length;
+
+		// let waiter pass
+		seq->next_row = rr;
 
 		for (int t = 0; t < seq->ntrk; t++) {
 			if (seq->trk[t]->mand->active) {
@@ -1292,4 +1297,8 @@ void sequence_set_trg_grp(sequence *seq, int g, int grp) {
 			t+=3;
 		} while (t < 5);
 	}
+}
+
+int sequence_get_next_row(sequence *seq) {
+	return seq->next_row;
 }

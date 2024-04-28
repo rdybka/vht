@@ -246,6 +246,7 @@ class MainWin(Gtk.ApplicationWindow):
             return True
 
     def tick(self, wdg, param):
+        mod.cdaemon.tick()
         self.time_display.set_markup(
             """<span font_desc="Roboto bold" font_family="monospace" size="x-large">%s</span>"""
             % mod.time
@@ -525,6 +526,7 @@ class MainWin(Gtk.ApplicationWindow):
                 if int(trk) in self.sequence_view.prop_view.trk_prop_cache:
                     del self.sequence_view.prop_view.trk_prop_cache[int(trk)]
 
+            mod.cdaemon.remove_seq(mod[seq_id])
             mod.del_sequence(seq_id)
             self.sequence_view.switch(nxt)
             mod.timeline.update()

@@ -536,6 +536,9 @@ def sequence_get_loop_end(seq):
 def sequence_set_loop_end(seq, e):
     return _libcvht.sequence_set_loop_end(seq, e)
 
+def sequence_get_next_row(seq):
+    return _libcvht.sequence_get_next_row(seq)
+
 def track_get_row_ptr(arg1, c, r):
     return _libcvht.track_get_row_ptr(arg1, c, r)
 
