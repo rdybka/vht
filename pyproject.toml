@@ -1,7 +1,8 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+build-backend = 'setuptools.build_meta'
+requires = ["setuptools>=61.0"]
 
-[metadata]
+[project]
 name = "vht"
 version = "0.3.33"
 description = "vahatraker - a live MIDI sequencer for JACK"
