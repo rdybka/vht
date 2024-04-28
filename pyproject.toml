@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["wheel"]
 
 [metadata]
 name = "vht"
@@ -28,6 +28,9 @@ install_requires = []
 
 [options.entry_points]
 vht = "vht.main:run"
+
+[options.build-dependencies]
+vht = ["jack"]
 
 [options.package_data]
 vht = ["data/*", "data/ctrl/*", "data/bank/*"]
