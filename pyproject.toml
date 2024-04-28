@@ -2,13 +2,12 @@
 build-backend = 'setuptools.build_meta'
 requires = ["setuptools>=61.0"]
 
-[project]
+[metadata]
 name = "vht"
-version = "0.3.33"
+version = "0.3.69"
 description = "vahatraker - a live MIDI sequencer for JACK"
 author = "Remigiusz Dybka"
 author_email = "remigiusz.dybka@gmail.com"
-license = "GPLv3+"
 url = "https://github.com/rdybka/vht"
 long_description = "file: README.md"
 long_description_content_type = "text/markdown"

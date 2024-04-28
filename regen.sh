@@ -29,6 +29,6 @@ black vht/*.py libvht/*.py
 swig -python libvht/libcvht.h
 #rm doc/vht.1.gz
 #pandoc doc/vht.1.md -s -t man -o doc/vht.1
-gzip doc/vht.1
+#gzip doc/vht.1
 git add .
 git reset libvht/*.so
