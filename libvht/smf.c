@@ -220,7 +220,7 @@ int smf_dump(smf *mf, const char *phname) {
 		loffs = mf->bin_l;
 		smf_push_long(mf, 0);
 		// name
-		if (mf->trk_inf[t].name) {
+		if (mf->trk_inf[t].name[0]) {
 			smf_push(mf, 0);
 			smf_push_short(mf, 0xff03);
 			smf_push(mf, strlen(mf->trk_inf[t].name));
