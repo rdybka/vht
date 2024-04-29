@@ -30,7 +30,15 @@ void timeline_excl_out(timeline *tl) {
 	pthread_mutex_unlock(&tl->excl);
 }
 
-inline void tl_should_save(timeline *tl) {
+void ts_should_save(timestrip *ts) {
+	if (ts->seq->clt) {
+		midi_client *clt = (midi_client *)ts->seq->clt;
+		module *mod = (module *)clt->mod_ref;
+		mod->should_save = 1;
+	}
+}
+
+void tl_should_save(timeline *tl) {
 	if (tl->clt) {
 		midi_client *clt = (midi_client *)tl->clt;
 		module *mod = (module *)clt->mod_ref;

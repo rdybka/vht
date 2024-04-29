@@ -39,11 +39,11 @@ void module_excl_out(module *mod) {
 	pthread_mutex_unlock(&mod->excl);
 }
 
-inline void mod_should_save(module *mod) {
+void mod_should_save(module *mod) {
 	mod->should_save = 1;
 }
 
-inline void module_handle_inception(track *trk, midi_event evt) {
+void module_handle_inception(track *trk, midi_event evt) {
 	midi_client *clt = (midi_client *)trk->clt;
 	module *mod = (module *)clt->mod_ref;
 

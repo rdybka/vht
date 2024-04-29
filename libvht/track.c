@@ -28,17 +28,17 @@
 #include "track.h"
 #include "row.h"
 
-inline void trk_mod_excl_in(track *trk) {
+void trk_mod_excl_in(track *trk) {
 	if (trk->mod_excl)
 		pthread_mutex_lock(trk->mod_excl);
 }
 
-inline void trk_mod_excl_out(track *trk) {
+void trk_mod_excl_out(track *trk) {
 	if (trk->mod_excl)
 		pthread_mutex_unlock(trk->mod_excl);
 }
 
-inline void trk_should_save(track *trk) {
+void trk_should_save(track *trk) {
 	if (trk->clt) {
 		midi_client *clt = (midi_client *)trk->clt;
 		module *mod = (module *)clt->mod_ref;

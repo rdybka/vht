@@ -157,7 +157,7 @@ class ControllersViewRow(Gtk.ActionBar):
         self.parent.ctrl_names[str(self.index)] = (self.parn, self.entry.get_text())
         self.parent.trk.extras.write()
         self.trk.ctrl[self.index].ctrlnum = self.ctrlnum
-        self.parent.trkview.controller_editors[
-            self.index - 1
-        ].midi_ctrlnum = self.ctrlnum
+        self.parent.trkview.controller_editors[self.index - 1].midi_ctrlnum = (
+            self.ctrlnum
+        )
         self.parent.rebuild()

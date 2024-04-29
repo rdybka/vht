@@ -135,7 +135,7 @@ void mandy_free(mandy *mand) {
 	free(mand);
 }
 
-inline double rad2deg(double r) {
+double rad2deg(double r) {
 	double deg = r * (180.0 / M_PI);
 	while(deg < -180.0)
 		deg += 360.0;
@@ -570,7 +570,7 @@ void mandy_animate(mandy *mand) {
 }
 
 // the algo
-inline unsigned char mandy_v(mandy *mand, long double x, long double y) {
+unsigned char mandy_v(mandy *mand, long double x, long double y) {
 	long double xx = mand->jx;
 	long double yy = mand->jy;
 	long double nx = 0.0;

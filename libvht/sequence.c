@@ -33,7 +33,7 @@ void seq_mod_excl_out(sequence *seq) {
 		pthread_mutex_unlock(seq->mod_excl);
 }
 
-inline void seq_should_save(sequence *seq) {
+void seq_should_save(sequence *seq) {
 	if (seq->clt) {
 		midi_client *clt = (midi_client *)seq->clt;
 		module *mod = (module *)clt->mod_ref;

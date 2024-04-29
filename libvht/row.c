@@ -21,7 +21,7 @@
 #include "midi_client.h"
 #include "module.h"
 
-inline void rw_should_save(row *rw) {
+void rw_should_save(row *rw) {
 	if (rw->clt) {
 		midi_client *clt = (midi_client *)rw->clt;
 		module *mod = (module *)clt->mod_ref;

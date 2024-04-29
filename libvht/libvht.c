@@ -26,45 +26,10 @@
 // getters/setters and stuff for python
 
 // dear mother of god...
-inline void trk_should_save(track *trk) {
-	if (trk->clt) {
-		midi_client *clt = (midi_client *)trk->clt;
-		module *mod = (module *)clt->mod_ref;
-		mod->should_save = 1;
-	}
-}
-
-inline void seq_should_save(sequence *seq) {
-	if (seq->clt) {
-		midi_client *clt = (midi_client *)seq->clt;
-		module *mod = (module *)clt->mod_ref;
-		mod->should_save = 1;
-	}
-}
-
-inline void mod_should_save(module *mod) {
-	if (mod->clt) {
-		midi_client *clt = (midi_client *)mod->clt;
-		module *mod = (module *)clt->mod_ref;
-		mod->should_save = 1;
-	}
-}
-
-inline void tl_should_save(timeline *tl) {
-	if (tl->clt) {
-		midi_client *clt = (midi_client *)tl->clt;
-		module *mod = (module *)clt->mod_ref;
-		mod->should_save = 1;
-	}
-}
-
-inline void ts_should_save(timestrip *ts) {
-	if (ts->seq->clt) {
-		midi_client *clt = (midi_client *)ts->seq->clt;
-		module *mod = (module *)clt->mod_ref;
-		mod->should_save = 1;
-	}
-}
+void trk_should_save(track *trk);
+void ts_should_save(timestrip *ts);
+void tl_should_save(timeline *tl);
+void seq_should_save(sequence *seq);
 
 int charpp_nitems(char **cpp) {
 	if (!cpp)
