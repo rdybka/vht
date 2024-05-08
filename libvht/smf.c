@@ -97,14 +97,16 @@ void smf_client_flush(smf *mf, int port, midi_event evt) {
 					char *b;
 					char *xtr = track_get_extras(trk);
 
-					b = strstr(xtr, "\"track_name\": \"");
-					if (b) {
-						b+=15;
-						char *bb = strstr(b, "\"");
-						int l = bb - b;
-						if (l > 0) {
-							strncpy(mf->trk_inf[t].name, b, l);
-							mf->trk_inf[t].name[l] = 0;
+					if (xtr) {
+						b = strstr(xtr, "\"track_name\": \"");
+						if (b) {
+							b+=15;
+							char *bb = strstr(b, "\"");
+							int l = bb - b;
+							if (l > 0) {
+								strncpy(mf->trk_inf[t].name, b, l);
+								mf->trk_inf[t].name[l] = 0;
+							}
 						}
 					}
 				}
