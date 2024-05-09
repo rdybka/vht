@@ -929,7 +929,7 @@ class TrackView(Gtk.DrawingArea):
 
                 if self.keyboard_focus:
                     if self.keyboard_focus.selection:
-                        self.keyboard_focus = None
+                        return
 
         if self.show_pitchwheel:
             self.pitchwheel_editor.on_motion(widget, event)
@@ -1741,6 +1741,8 @@ class TrackView(Gtk.DrawingArea):
             ssy = self.select_start[1]
             sex = min(self.select_end[0], len(self.trk) - 1)
             sey = self.select_end[1]
+        else:
+            return None
 
         # single row - don't copy if empty
         if ssy == sey:
