@@ -24,7 +24,7 @@
 #include "track.h"
 
 
-#define SEQUENCE_MAX_LENGTH	512
+#define SEQUENCE_MAX_LENGTH	1024
 
 #define PLAY_TRIGGER_ONOFF		0
 #define PLAY_TRIGGER_ONESHOT	1
