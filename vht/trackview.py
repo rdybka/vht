@@ -120,6 +120,7 @@ class TrackView(Gtk.DrawingArea):
         self.sel_drag_back = None
         self.sel_drag_front = None
         self.sel_drag_start = 0
+        self.drag_cloned = False
         self.select = False
         self.select_start = None
         self.select_end = None
@@ -1066,9 +1067,15 @@ class TrackView(Gtk.DrawingArea):
             ):  # dragging single cell
                 if self.edit[1] != new_hover_row or self.edit[0] != new_hover_column:
                     old_row = self.edit[1]
+                    olr = self.trk[self.edit[0]][self.edit[1]]
                     self.swap_row(
                         self.edit[0], self.edit[1], new_hover_column, new_hover_row
                     )
+
+                    if self.drag_cloned:
+                        olr.copy(self.trk[new_hover_column][new_hover_row])
+                        self.drag_cloned = False
+
                     self.edit = new_hover_column, new_hover_row
 
                     self.redraw(new_hover_row)
@@ -1315,9 +1322,6 @@ class TrackView(Gtk.DrawingArea):
         if event.button != cfg.select_button and event.button != 2:
             return False
 
-        if event.state & Gdk.ModifierType.CONTROL_MASK:
-            return False
-
         if row >= self.trk.nrows:
             return False
 
@@ -1360,6 +1364,12 @@ class TrackView(Gtk.DrawingArea):
             if self.trk[col][row].type in (1, 2):  # note_on
                 enter_edit = True
                 self.drag = True
+
+                if event.state & Gdk.ModifierType.CONTROL_MASK:
+                    self.drag_cloned = True
+        else:
+            if event.state & Gdk.ModifierType.CONTROL_MASK:
+                return False
 
         flds = 2
         if self.show_timeshift:
@@ -1495,10 +1505,9 @@ class TrackView(Gtk.DrawingArea):
                 self.select_start = ssx, ssy
                 self.select_end = sex, sey
 
-            if not event.state & Gdk.ModifierType.CONTROL_MASK:
-                if self.drag:
-                    self.drag = False
-                    self.undo_buff.add_state()
+            if self.drag:
+                self.drag = False
+                self.undo_buff.add_state()
 
         redr = False
 
