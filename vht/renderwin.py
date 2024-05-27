@@ -29,6 +29,7 @@ from gi.repository import GLib, Gtk, Gdk
 class RenderWin(Gtk.Window):
     def __init__(self, parent, mod, cfg):
         super(RenderWin, self).__init__()
+
         self.cfg = cfg
         self.mod = mod
         self.parent = parent

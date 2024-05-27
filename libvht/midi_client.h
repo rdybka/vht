@@ -38,6 +38,7 @@ typedef struct midi_client_t {
 	int default_midi_port;
 	char *error;
 	int running;
+	int freewheeling;
 	int dump_notes;
 
 	jack_client_t *jack_client;

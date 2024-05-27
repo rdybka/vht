@@ -38,6 +38,7 @@ midi_client *midi_client_new(void *mod) {
 	clt->default_midi_port = 0;
 	clt->mod_ref = mod;
 	clt->running = 0;
+	clt->freewheeling = 0;
 	clt->dump_notes = 0;
 	clt->ports = 0;
 	clt->ports_changed = 0;
@@ -691,6 +692,6 @@ int get_default_midi_out_port(midi_client *clt) {
 }
 
 void midi_set_freewheel(midi_client *clt, int on) {
-	//printf("freewheel %d\n", on);
+	clt->freewheeling = on;
 	jack_set_freewheel(clt->jack_client, on);
 }

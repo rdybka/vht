@@ -186,9 +186,9 @@ class Renderer:
         for s in self.mod:
             s.playing = False
 
-        self.mod.play_mode = 0
         self.mod.render_mode = 1
         self._orig_pm = self.mod.play_mode
+        self.mod.play_mode = 0
         self.mod.set_lead_out(lead_out)
 
         for m in self.mod:
