@@ -31,11 +31,5 @@ in the language we shall no longer spam about.
 
 ## dependencies
 ```
-fedora - jack-audio-connection-kit-devel jack_capture
-ubuntu - libjack-jackd2-dev jack-capture
-```
-
-## install
-```
-pip3 install vht
+jack jack-capture
 ```
