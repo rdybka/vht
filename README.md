@@ -33,3 +33,7 @@ in the language we shall no longer spam about.
 ```
 jack jack-capture
 ```
+## install
+```
+pip3 install .
+```
