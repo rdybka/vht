@@ -13,7 +13,7 @@ with added value of:
 - scenes a'la 'ton
 - fractal turtles
 - fits on a floppy
-- doesn't make sound
+- doesn't make a sound
 
 Frankly speaking, vht was envisaged as a re-creation
 of seq24 in tracker form for author's "studio needs"
@@ -31,9 +31,9 @@ in the language we shall no longer spam about.
 
 ## dependencies
 ```
-jack jack-capture
+pipewire-audio-client-libraries [jack_capture]
 ```
 ## install
 ```
-pip3 install .
+pip3 install vht
 ```

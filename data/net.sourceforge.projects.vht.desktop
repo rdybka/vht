@@ -1,12 +1,12 @@
 [Desktop Entry]
 Name=vahatraker
-Comment=live MIDI sequencer for JACK
+Comment=live MIDI sequencer for pipewire/JACK
 GenericName=MIDI sequencer
 Encoding=UTF-8
 Version=1.0
 Type=Application
 Categories=Music;Audio;Midi;X-Jack;AudioVideo;
-Keywords=audio;sound;jackd;sequencer;midi;tracker
+Keywords=audio;sound;sequencer;midi;tracker
 Terminal=false
 StartupNotify=false
 Icon=vht

@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setup(name = "vht",
 	version = "0.3.69",
-	description = "vahatraker - a live MIDI sequencer for JACK",
+	description = "vahatraker - a live MIDI sequencer for pipewire/JACK",
 	long_description=long_description,
 	long_description_content_type="text/markdown",
 	author = "Remigiusz Dybka",
@@ -46,7 +46,7 @@ setup(name = "vht",
 		('share/vht/bank', ['data/bank/10-gm1', 'data/bank/20-gm2']),
 		('share/icons', ['data/vht.svg']),
 		('share/man/man1', ['doc/vht.1.gz']),
-		('share/applications', ['data/com.github.rdybka.vht.desktop'])
+		('share/applications', ['data/net.sourceforge.projects.vht.desktop'])
 		
 	],
 	

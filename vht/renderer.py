@@ -138,7 +138,6 @@ class Renderer:
 
         opts = ["jack_capture"]
         opts.append("-jf")
-        # opts.append("--daemon")
         opts.append("-f")
         opts.append(fmt)
         opts.append("-fp")
@@ -172,7 +171,6 @@ class Renderer:
 
         opts = ["jack_capture"]
         opts.append("-jf")
-        # opts.append("--daemon")
         opts.append("-f")
         opts.append(fmt)
         opts.append("-fp")
@@ -227,7 +225,6 @@ class Renderer:
 
         opts = ["jack_capture"]
         opts.append("-jf")
-        # opts.append("--daemon")
         opts.append("-f")
         opts.append(fmt)
         opts.append("-fp")

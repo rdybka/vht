@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # I hereby testify,
-# on Boomtime, the 9th day of Discord in the YOLD 3189,
+# on Pungenday, the 2nd day of Confusion in the YOLD 3190,
 # that everything in this program checks out with The Law of Fives
 
 # [^^^intentionally left blank]
@@ -48,7 +48,7 @@ class VHTApp(Gtk.Application):
     def __init__(self, *args, **kwargs):
         super().__init__(
             *args,
-            application_id="com.github.rdybka.vht",
+            application_id="net.sourceforge.projects.vht",
             flags=Gio.ApplicationFlags.HANDLES_OPEN | Gio.ApplicationFlags.NON_UNIQUE,
             **kwargs
         )
@@ -208,7 +208,7 @@ class VHTApp(Gtk.Application):
         pkg = pkg_resources.require("vht")[0]
         ab.set_version(pkg.version)
         ab.set_program_name("vahatraker")
-        ab.set_comments("a live MIDI sequencer for JACK")
+        ab.set_comments("a live MIDI sequencer for pipewire/JACK")
         ab.set_logo(
             GdkPixbuf.Pixbuf.new_from_file_at_size(
                 mod.data_path + os.sep + "vht.svg", 160, 160

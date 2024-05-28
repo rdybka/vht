@@ -1,6 +1,6 @@
-% VHT(1) vht 0.3.69
+% VHT(1) vht 0.3.96
 % Remigiusz Dybka
-% April 2024
+% May 2024
 
 # NAME
 **vht** - a minimalistic MIDI sequencer for JACK/GNOME
