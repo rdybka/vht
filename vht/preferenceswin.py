@@ -243,7 +243,7 @@ class PreferencesWin(Gtk.Window):
 
         fr, gr = self.create_frame("Default input", mrg)
         cmb = Gtk.ComboBoxText()
-        cmb.set_hexpand(True)
+        cmb.set_hexpand(False)
         cmb.append_text("none")
         pp = []
         pretty = {}
@@ -257,7 +257,7 @@ class PreferencesWin(Gtk.Window):
             pp.append(dinp)
 
         for prt in pp:
-            cmb.append(prt, pretty[prt] if prt in pretty else prt)
+            cmb.append(prt, pretty[prt][:33] if prt in pretty else prt)
 
         dinp = self.cfg.midi_default_input
         if dinp and dinp in pp:
@@ -271,7 +271,7 @@ class PreferencesWin(Gtk.Window):
 
         fr, gr = self.create_frame("Default output", mrg)
         cmb = Gtk.ComboBoxText()
-        cmb.set_hexpand(True)
+        cmb.set_hexpand(False)
         cmb.append_text("none")
 
         pp = []
@@ -286,7 +286,7 @@ class PreferencesWin(Gtk.Window):
             pp.append(doutp)
 
         for prt in pp:
-            cmb.append(prt, pretty[prt] if prt in pretty else prt)
+            cmb.append(prt, pretty[prt][:33] if prt in pretty else prt)
 
         doutp = self.cfg.midi_default_output
         if doutp and doutp in pp:

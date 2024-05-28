@@ -53,7 +53,13 @@ class BoolListView(Gtk.ListBox):
 
     def add(self, prtname, pretty, state):
         rw = Gtk.Box()
-        rw.pack_start(Gtk.Label(pretty if pretty else prtname), False, False, 0)
+        lb = Gtk.Label(prtname[:33])
+        if pretty:
+            lb.set_tooltip_markup(
+                """<span font_family="Monospace" size="medium">%s</span>""" % (pretty)
+            )
+
+        rw.pack_start(lb, False, False, 0)
         statewdg = Gtk.CheckButton()
         statewdg.set_active(state)
         statewdg.connect("toggled", self.tgl_meta, prtname)
