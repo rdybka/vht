@@ -33,17 +33,17 @@ int jack_process(jack_nframes_t nframes, void *arg) {
 	jack_get_cycle_times(clt->jack_client, &curr_frames, &curr_usecs, &next_usecs, &period_usecs);
 	midi_synch_output_ports(clt);
 
+	if (curr_frames < clt->jack_last_frame) { // drop-out
+		curr_frames = clt->jack_last_frame + nframes;
+	}
+
 	if (clt->freewheeling) {
 		curr_frames = clt->jack_last_frame + nframes;
 	}
 
 	module_advance(mod, curr_frames);
 
-	if (!clt->freewheeling) {
-		clt->jack_last_frame = jack_last_frame_time(clt->jack_client);
-	} else {
-		clt->jack_last_frame = curr_frames;
-	}
+	clt->jack_last_frame = curr_frames;
 
 	midi_buffer_flush(clt);
 
