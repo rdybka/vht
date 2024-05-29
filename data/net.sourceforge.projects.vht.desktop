@@ -9,5 +9,5 @@ Categories=Music;Audio;Midi;X-Jack;AudioVideo;
 Keywords=audio;sound;sequencer;midi;tracker
 Terminal=false
 StartupNotify=false
-Icon=vht.png
+Icon=net.sourceforge.projects.vht
 Exec=vht

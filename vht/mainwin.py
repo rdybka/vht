@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from vht.console import Console
 from vht.sequencelistview import SequenceListView
 from vht.timelineview import TimelineView
 from vht.statusbar import StatusBar
@@ -33,8 +32,14 @@ import gi
 import os
 
 gi.require_version("Gtk", "3.0")
-gi.require_version("Vte", "2.91")
+
 from gi.repository import Gtk, Gdk, Gio
+
+try:
+    gi.require_version("Vte", "2.91")
+    from vht.console import Console
+except Exception:
+    Console = None
 
 
 class MainWin(Gtk.ApplicationWindow):
@@ -132,7 +137,10 @@ class MainWin(Gtk.ApplicationWindow):
         self.seqbox.pack1(self.sequence_view, True, True)
 
         self.hbox.pack1(self.seqbox, True, True)
-        self.console = Console()
+        if Console:
+            self.console = Console()
+        else:
+            self.console = None
 
         self.timeline_box = Gtk.Paned()
         self.timeline_box.set_orientation(Gtk.Orientation.VERTICAL)
@@ -362,6 +370,9 @@ class MainWin(Gtk.ApplicationWindow):
         cfg.timeline_show = True
 
     def hide_console(self):
+        if not Console:
+            return
+
         if not mod.console_visible:
             return
 
@@ -370,6 +381,9 @@ class MainWin(Gtk.ApplicationWindow):
         self.sequence_view.auto_scroll_req = True
 
     def show_console(self):
+        if not Console:
+            return
+
         if mod.console_visible:
             return
 

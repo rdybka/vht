@@ -19,9 +19,14 @@ import copy
 import gi
 
 gi.require_version("Gtk", "3.0")
-gi.require_version("GtkSource", "4")
 
-from gi.repository import Gdk, Gtk, Gio, GtkSource
+from gi.repository import Gdk, Gtk, Gio
+
+try:
+    gi.require_version("GtkSource", "4")
+    from gi.repository import GtkSource
+except Exception:
+    GtkSource = None
 
 from vht.notebooklabel import NotebookLabel
 from vht.sequencetriggersview import SequenceTriggersView
@@ -94,43 +99,48 @@ class SequenceListViewPopover(Gtk.Popover):
 
         self._code_butt = Gtk.ToggleButton()
         self._code_butt.set_active(False)
+
         icon = Gio.ThemedIcon(name="system-run")
         image = Gtk.Image.new_from_gicon(icon, Gtk.IconSize.BUTTON)
         self._code_butt.add(image)
         self._code_butt.connect("clicked", self.on_code_butt_toggled)
-        box.pack_end(self._code_butt, False, False, 2)
+        if GtkSource:
+            box.pack_end(self._code_butt, False, False, 2)
+
         # self._trgview.attach(self._code_butt, 0, 3, 1, 1)
 
         self._run_switch = Gtk.Switch()
         self._run_switch.set_state(False)
         self._run_switch.connect("state-set", self.on_run_switch)
 
-        self._err_butt = Gtk.Button.new_with_label("err")
-        self._err_butt.connect("clicked", self.on_err_butt_clicked)
+        if GtkSource:
+            self._err_butt = Gtk.Button.new_with_label("err")
+            self._err_butt.connect("clicked", self.on_err_butt_clicked)
 
-        box.pack_end(self._err_butt, False, False, 2)
-        box.pack_end(self._run_switch, False, False, 2)
+            box.pack_end(self._err_butt, False, False, 2)
+            box.pack_end(self._run_switch, False, False, 2)
 
         box.pack_end(self._entry, True, True, 2)
         # self._trgview.attach(self._run_switch, 5, 3, 1, 1)
 
-        self._textview = GtkSource.View()  # .GtkSourceView()
-        self._textview.set_monospace(True)
-        self._textview.set_tab_width(4)
-        self._textview.set_indent_width(4)
-        self._textview.set_indent_on_tab(True)
-        self._textview.set_show_line_numbers(True)
-        self._textview.set_auto_indent(True)
-        self._textview.set_smart_backspace(True)
-        self._textview.set_insert_spaces_instead_of_tabs(True)
-        tb = self._textview.get_buffer()
-        tb.connect("changed", self.on_tb_changed)
+        if GtkSource:
+            self._textview = GtkSource.View()
+            self._textview.set_monospace(True)
+            self._textview.set_tab_width(4)
+            self._textview.set_indent_width(4)
+            self._textview.set_indent_on_tab(True)
+            self._textview.set_show_line_numbers(True)
+            self._textview.set_auto_indent(True)
+            self._textview.set_smart_backspace(True)
+            self._textview.set_insert_spaces_instead_of_tabs(True)
+            tb = self._textview.get_buffer()
+            tb.connect("changed", self.on_tb_changed)
 
-        self._scroll = Gtk.ScrolledWindow()
-        self._scroll.add(self._textview)
-        grid.attach(self._scroll, 0, 2, 3, 2)
+            self._scroll = Gtk.ScrolledWindow()
+            self._scroll.add(self._textview)
+            grid.attach(self._scroll, 0, 2, 3, 2)
 
-        self._scrollgrid = grid
+            self._scrollgrid = grid
 
         grid2.attach(grid, 0, 0, 3, 1)
 
@@ -164,6 +174,9 @@ class SequenceListViewPopover(Gtk.Popover):
                 tv.refresh()
 
     def hide_code(self):
+        if not GtkSource:
+            return
+
         buff = self._textview.get_buffer()
         buff.set_text("")
         if self._scroll in self._scrollgrid:
@@ -175,6 +188,9 @@ class SequenceListViewPopover(Gtk.Popover):
         self._code_butt.set_active(False)
 
     def show_code(self):
+        if not GtkSource:
+            return
+
         if not self._scroll in self._scrollgrid:
             self._scrollgrid.attach(self._scroll, 0, 2, 3, 2)
 
@@ -250,7 +266,7 @@ class SequenceListViewPopover(Gtk.Popover):
         if self.time_want_to_leave == -1:  # closed - stop callback
             return False
 
-        if self._scroll in self._scrollgrid:
+        if GtkSource and self._scroll in self._scrollgrid:
             self.time_want_to_leave = 0
             return True
 
