@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>net.sourceforge.projects.vht</id>
+    
+    <developer id="com.github.rdybka">
+    <name>Remigiusz Dybka</name>
+    </developer>
+    <name>vahatraker</name>
+    <summary>Live MIDI sequencer</summary>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPL-3.0-or-later</project_license>
+  
+    <description>
+        <p>Vahatraker is a MIDI sequencing companion for GNU/Linux audio setups. Adhering to Unix philosophy, driving MIDI is the one thing it tries to do well, adhering to other doctrines - enabling expression, with added value of:</p>
+        <ul>
+        <li>live editing</li>
+        <li>fast workflow</li>
+        <li>intuitive midi-in</li>
+        <li>unheard of time signatures</li>
+        <li>scenes</li>
+        <li>fractal turtles</li>
+        </ul>
+    <p>Frankly speaking, vht was envisaged as a re-creation of seq24 in tracker form for author&apos;s &quot;studio needs&quot; and offers similar functionality (and limitations). It relies 100% on JACK audio connection kit for  input/output/synch and uses jack_capture for rendering. The GUI has similar dependencies as gnome-calculator and tracker paradigm was chosen to allow for rhythmic gymnastics otherwise hard to convey.</p>
+    <p>>Low level stuff was done in C and wrapped in Python. Human interfacing part of contraption employs GTK through gobject introspection and was also contrived in the language we shall no longer spam about.</p>
+    </description>
+  
+    <url type="homepage">https://github.com/rdybka/vht/</url>
+  
+    <launchable type="desktop-id">net.sourceforge.projects.vht.desktop</launchable>
+    <screenshots>
+        <screenshot type="default">
+            <image>https://a.fsdn.com/con/app/proj/vht/screenshots/vht_header-2951.png/max/max/1</image>
+        </screenshot>
+        <screenshot>
+            <image>https://a.fsdn.com/con/app/proj/vht/screenshots/vhtscrn2.png/max/max/1</image>
+        </screenshot>
+    </screenshots>
+
+    <content_rating type="oars-1.1" />
+    
+    <releases>
+      <release version="0.3.96" date="2024-05-30">
+        <description>
+          <p>First flatpak release</p>
+            <ul>
+              <li>Pretty names</li>
+              <li>Pipewire/flatpak integration</li>
+              <li>Cloning of single notes</li>
+              <li>Rendering fixes</li>
+            </ul>
+        </description>
+      </release>
+      <release version="0.3.69" date="2023-04-29">
+       <description>
+          <p>Code and midi release</p>
+            <ul>
+              <li>Midi export</li>
+              <li>Code execution</li>
+              <li>Mandy ftp throttle</li>
+            </ul>
+        </description>
+      </release>
+    </releases>
+    
+</component>
