@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-    <id>net.sourceforge.projects.vht</id>
+    <id>io.github.rdybka.vht</id>
     
     <developer id="com.github.rdybka">
     <name>Remigiusz Dybka</name>
@@ -39,7 +39,7 @@
     <content_rating type="oars-1.1" />
     
     <releases>
-      <release version="0.3.97" date="2024-05-31">
+      <release version="0.3.98" date="2024-05-31">
         <description>
           <p>Flatpak version zero</p>
         </description>

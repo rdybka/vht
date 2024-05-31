@@ -1,13 +1,16 @@
-id: net.sourceforge.projects.vht
+id: io.github.rdybka.vht
 runtime: org.gnome.Platform
 runtime-version: '46'
 sdk: org.gnome.Sdk
 command: vht
 finish-args:
-  - --filesystem=home
+  - --filesystem=xdg-home
+  - --filesystem=xdg-config
+  - --filesystem=xdg-data
   - --filesystem=xdg-run/pipewire-0
   - --socket=wayland
   - --socket=fallback-x11
+  - --share=ipc
 modules:
   - name: vht
     buildsystem: simple
@@ -16,4 +19,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/rdybka/vht
-        tag: v0.3.97
+        tag: v0.3.98
