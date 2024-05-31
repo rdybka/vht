@@ -115,7 +115,9 @@ class MainWin(Gtk.ApplicationWindow):
         self.menubutt.add(image)
         self.menubutt.set_use_popover(True)
 
-        with open(os.path.join(mod.data_path, "menu.ui"), "r") as f:
+        menu_phile = "menu.ui" if Console else "menu_norend.ui"
+
+        with open(os.path.join(mod.data_path, menu_phile), "r") as f:
             builder = Gtk.Builder.new_from_string(f.read(), -1)
             menu = builder.get_object("app-menu")
             self.menubutt.set_menu_model(menu)

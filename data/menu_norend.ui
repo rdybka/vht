@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <menu id="app-menu">
+    <section>
+    <item>
+        <attribute name="action">app.load</attribute>
+        <attribute name="label">_Load</attribute>
+      </item>
+    <item>
+        <attribute name="action">app.append</attribute>
+        <attribute name="label">_Append</attribute>
+      </item>
+      <item>
+        <attribute name="action">app.save</attribute>
+        <attribute name="label">_Save</attribute>
+      </item>
+      <item>
+        <attribute name="action">app.save_as</attribute>
+        <attribute name="label">Save as</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="action">app.prefs</attribute>
+        <attribute name="label">_Preferences</attribute>
+      </item>
+      <item>
+        <attribute name="action">app.keyb</attribute>
+        <attribute name="label">_Keyboard Shortcuts</attribute>
+      </item>
+      <item>
+        <attribute name="action">app.about</attribute>
+        <attribute name="label">_About vahatraker</attribute>
+      </item>
+    </section>
+  </menu>
+</interface>
