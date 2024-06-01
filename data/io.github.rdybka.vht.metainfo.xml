@@ -39,9 +39,9 @@
     <content_rating type="oars-1.1" />
     
     <releases>
-      <release version="0.3.98" date="2024-05-31">
+      <release version="0.4" date="2024-06-01">
         <description>
-          <p>Flatpak version zero</p>
+          <p>Flatpak release</p>
         </description>
       </release>
       <release version="0.3.96" date="2024-05-30">

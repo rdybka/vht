@@ -167,17 +167,9 @@ class VHTApp(Gtk.Application):
             RenderWin(self.main_win, mod, cfg).show()
 
     def load(self, append=False):
-        dialog = Gtk.FileChooserDialog(
+        dialog = Gtk.FileChooserNative(
             title="Please choose a file",
-            parent=self.get_active_window(),
             action=Gtk.FileChooserAction.OPEN,
-        )
-
-        dialog.add_buttons(
-            Gtk.STOCK_CANCEL,
-            Gtk.ResponseType.CANCEL,
-            Gtk.STOCK_OPEN,
-            Gtk.ResponseType.OK,
         )
 
         self.add_file_filters(dialog)
@@ -188,8 +180,8 @@ class VHTApp(Gtk.Application):
             dialog.set_current_folder_uri(cfg.last_save_path)
 
         response = dialog.run()
-        dialog.close()
-        if response == Gtk.ResponseType.OK:
+
+        if response == -3:
             if self.main_win.load(dialog.get_filename(), append):
                 cfg.last_load_path = dialog.get_current_folder_uri()
 
@@ -238,17 +230,9 @@ class VHTApp(Gtk.Application):
         mod.extras["timeline_win_pos_y"] = mod.mainwin.timeline_box.get_position()
 
         if not self.main_win.last_filename:
-            dialog = Gtk.FileChooserDialog(
+            dialog = Gtk.FileChooserNative(
                 title="Please choose a file",
-                parent=self.get_active_window(),
                 action=Gtk.FileChooserAction.SAVE,
-            )
-
-            dialog.add_buttons(
-                Gtk.STOCK_CANCEL,
-                Gtk.ResponseType.CANCEL,
-                Gtk.STOCK_SAVE,
-                Gtk.ResponseType.OK,
             )
 
             self.add_file_filters(dialog)
@@ -260,8 +244,7 @@ class VHTApp(Gtk.Application):
 
             response = dialog.run()
 
-            dialog.close()
-            if response == Gtk.ResponseType.OK:
+            if response == -3:
                 cfg.last_save_path = dialog.get_current_folder_uri()
                 fname = dialog.get_filename()
 
