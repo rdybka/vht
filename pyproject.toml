@@ -40,7 +40,7 @@ vht = ["data/*", "data/ctrl/*", "data/bank/*"]
 "share/vht/bank" = ["data/bank/10-gm1", "data/bank/20-gm2"]
 "share/icons/hicolor/256x256/apps" = ["data/io.github.rdybka.vht.png"]
 "share/man/man1" = ["doc/vht.1.gz"]
-"share/applications" = ["data/io.github.rdybka.desktop"]
+"share/applications" = ["data/io.github.rdybka.vht.desktop"]
 "share/metainfo" = ["data/io.github.rdybka.metainfo.xml"]
 
 [options.extensions]
