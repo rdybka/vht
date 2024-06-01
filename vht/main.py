@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # I hereby testify,
-# on Sweetmorn, the 5nd day of Confusion in the YOLD 3190,
+# on Boomtime, the 6nd day of Confusion in the YOLD 3190,
 # that everything in this program checks out with The Law of Fives
 
 # [^^^intentionally left blank]
@@ -313,7 +313,7 @@ def run():
         mod.start_error = "you will need JACK for this"
 
     # fix local config path
-    mod.cfg_path = os.path.expanduser("~/.config/vht")
+    mod.cfg_path = GLib.get_user_config_dir()
     if not os.path.exists(mod.cfg_path):
         print("creating", mod.cfg_path)
         os.mkdir(mod.cfg_path)
@@ -334,7 +334,6 @@ def run():
     mod.cdaemon = CodeDaemon()
     # fix data path
     paths2try = []
-
     paths2try.append(os.path.normpath(os.path.join(pkg.module_path, "data")))
     paths2try.append(os.path.normpath(os.path.join(pkg.module_path, "share/vht")))
 
