@@ -1,6 +1,6 @@
 /* mandy_pix_scan.c - vahatraker (libvht)
  *
- * Copyright (C) 2023 Remigiusz Dybka - remigiusz.dybka@gmail.com
+ * Copyright (C) 2024 Remigiusz Dybka - remigiusz.dybka@gmail.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
