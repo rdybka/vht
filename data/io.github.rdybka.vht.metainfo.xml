@@ -25,8 +25,8 @@
     </description>
 
     <branding>
-        <color type="primary" scheme_preference="light">#af7faf</color>
-        <color type="primary" scheme_preference="dark">#a599a5</color>
+      <color type="primary" scheme_preference="light">#b9e3d8</color>
+      <color type="primary" scheme_preference="dark">#0e3339</color>
     </branding>
     
     <url type="homepage">https://github.com/rdybka/vht/</url>
