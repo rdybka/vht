@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name = "vht",
-	version = "0.4.02",
+	version = "0.4.03",
 	description = "vahatraker - a live MIDI sequencer for pipewire/JACK",
 	long_description=long_description,
 	long_description_content_type="text/markdown",
@@ -41,7 +41,7 @@ setup(name = "vht",
 		]},
 	
 	data_files = [
-		('share/vht', ['data/mandy.png', 'data/vht.svg', 'data/vht.png', 'data/menu.ui', 'data/menu_norend.ui']),
+		('share/vht', ['data/mandy.png', 'data/vht.svg', 'data/menu.ui', 'data/menu_norend.ui']),
 		('share/vht/ctrl', ['data/ctrl/10-gm', 'data/ctrl/20-zyn']),
 		('share/vht/bank', ['data/bank/10-gm1', 'data/bank/20-gm2']),
 		('share/icons/hicolor/256x256/apps', ['data/io.github.rdybka.vht.png']),

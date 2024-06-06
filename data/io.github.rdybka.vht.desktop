@@ -1,7 +1,7 @@
 [Desktop Entry]
-Name=vahatraker
-Comment=live MIDI sequencer for pipewire/JACK
-GenericName=MIDI sequencer
+Name=Vahatraker
+Comment=Live MIDI sequencer
+GenericName=Live MIDI sequencer
 Encoding=UTF-8
 Version=1.0
 Type=Application

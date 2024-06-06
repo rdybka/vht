@@ -5,7 +5,7 @@
     <developer id="com.github.rdybka">
     <name>Remigiusz Dybka</name>
     </developer>
-    <name>vahatraker</name>
+    <name>Vahatraker</name>
     <summary>Live MIDI sequencer</summary>
     <metadata_license>CC0-1.0</metadata_license>
     <project_license>GPL-3.0-or-later</project_license>
@@ -21,22 +21,24 @@
             <li>fractal turtles</li>
         </ul>
         <p>Frankly speaking, vht was envisaged as a re-creation of seq24 in tracker form for author&apos;s &quot;studio needs&quot; and offers similar functionality (and limitations). It relies 100% on JACK audio connection kit for  input/output/synch and uses jack_capture for rendering. The GUI has similar dependencies as gnome-calculator and tracker paradigm was chosen to allow for rhythmic gymnastics otherwise hard to convey.</p>
-        <p>>Low level stuff was done in C and wrapped in Python. Human interfacing part of contraption employs GTK through gobject introspection and was also contrived in the language we shall no longer spam about.</p>
+        <p>Low level stuff was done in C and wrapped in Python. Human interfacing part of contraption employs GTK through gobject introspection and was also contrived in the language we shall no longer spam about.</p>
     </description>
-  
-    <branding>
-        <color type="primary" scheme_preference="light">#8ff0a4</color>
-        <color type="primary" scheme_preference="dark">#0e3339</color>
-    </branding>  
 
+    <branding>
+        <color type="primary" scheme_preference="light">#af7faf</color>
+        <color type="primary" scheme_preference="dark">#a599a5</color>
+    </branding>
+    
     <url type="homepage">https://github.com/rdybka/vht/</url>
   
     <launchable type="desktop-id">io.github.rdybka.vht.desktop</launchable>
     <screenshots>
-        <screenshot type="default">
+        <screenshot type="default" xml:lang="en">
+            <caption>Main window</caption>
             <image>https://rdybka.github.io/vht.github.io/screen1.png</image>
         </screenshot>
-        <screenshot>
+        <screenshot xml:lang="en">
+            <caption>Input/output configuration</caption>
             <image>https://rdybka.github.io/vht.github.io/screen2.png</image>
         </screenshot>
     </screenshots>
@@ -44,7 +46,7 @@
     <content_rating type="oars-1.1" />
     
     <releases>
-      <release version="0.4.02" date="2024-06-05">
+      <release version="0.4.03" date="2024-06-05">
         <description>
           <p>Final touches</p>
         </description>
