@@ -48,7 +48,7 @@ class VHTApp(Gtk.Application):
     def __init__(self, *args, **kwargs):
         super().__init__(
             *args,
-            application_id="net.sourceforge.projects.vht",
+            application_id="io.github.rdybka.vht",
             flags=Gio.ApplicationFlags.HANDLES_OPEN | Gio.ApplicationFlags.NON_UNIQUE,
             **kwargs
         )

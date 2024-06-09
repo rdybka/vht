@@ -76,8 +76,8 @@ class MainWin(Gtk.ApplicationWindow):
         self.hb.set_show_close_button(True)
         # self.hb.set_has_subtitle(False)
         self.set_titlebar(self.hb)
-        self.set_default_icon_name("vht")
-        self.set_icon_name("vht")
+        self.set_default_icon_name("io.github.rdybka.vht")
+        self.set_icon_name("io.github.rdybka.vht")
         self.set_icon_from_file(os.path.join(mod.data_path, "vht.svg"))
 
         self.set_opacity(cfg.window_opacity)
