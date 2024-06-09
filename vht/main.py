@@ -200,7 +200,7 @@ class VHTApp(Gtk.Application):
         pkg = pkg_resources.require("vht")[0]
         ab.set_version(pkg.version)
         ab.set_program_name("vahatraker")
-        ab.set_comments("a live MIDI sequencer for pipewire/JACK")
+        ab.set_comments("Live MIDI sequencer")
         ab.set_logo(
             GdkPixbuf.Pixbuf.new_from_file_at_size(
                 mod.data_path + os.sep + "vht.svg", 160, 160
