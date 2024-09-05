@@ -177,8 +177,8 @@ class SequenceListViewPopover(Gtk.Popover):
         if not GtkSource:
             return
 
-        buff = self._textview.get_buffer()
-        buff.set_text("")
+        #buff = self._textview.get_buffer()
+        #buff.set_text("")
         if self._scroll in self._scrollgrid:
             self._scrollgrid.remove(self._scroll)
         self._run_switch.set_state(False)
