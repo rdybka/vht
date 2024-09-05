@@ -20,15 +20,15 @@ rm -rf libvht/*.pyc
 rm -rf vht/*.pyc
 rm -rf dist
 rm -rf vht.egg-info
-rm -f libvht/libcvht_wrap.c
+#rm -f libvht/libcvht_wrap.c
 
-cd libvht
-./beautify.sh
-cd ..
-black vht/*.py libvht/*.py
-swig -python libvht/libcvht.h
+#cd libvht
+#./beautify.sh
+#cd ..
+#black vht/*.py libvht/*.py
+#swig -python libvht/libcvht.h
 rm doc/vht.1.gz
 pandoc doc/vht.1.md -s -t man -o doc/vht.1
 gzip doc/vht.1
-git add .
-git reset libvht/*.so
+#git add .
+#git reset libvht/*.so

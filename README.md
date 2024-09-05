@@ -29,11 +29,12 @@ Human interfacing part of contraption employs
 GTK through gobject introspection and was also contrived
 in the language we shall no longer spam about.
 
-## dependencies for pip build
+## dependencies
 ```
-pipewire-audio-client-libraries [jack_capture]
+pipewire-audio-client-libraries / libjack-jackd2-dev
+[jack-capture]
 ```
 ## install
 ```
-pip3 install vht
+pipx install vht
 ```

@@ -25,8 +25,8 @@
     </description>
 
     <branding>
-      <color type="primary" scheme_preference="light">#fafafa</color>
-      <color type="primary" scheme_preference="dark">#251f32</color>
+      <color type="primary" scheme_preference="light">#fff5cc</color>
+      <color type="primary" scheme_preference="dark">#37436f</color>
     </branding>
     
     <url type="homepage">https://github.com/rdybka/vht/</url>
@@ -46,7 +46,7 @@
     <content_rating type="oars-1.1" />
     
     <releases>
-      <release version="0.4.05" date="2024-06-09">
+      <release version="0.4.06" date="2024-09-05">
         <description>
           <p>Final touches</p>
         </description>
@@ -73,7 +73,7 @@
             <ul>
               <li>Midi export</li>
               <li>Code execution</li>
-              <li>Mandy ftp throttle</li>
+              <li>Mandy fps throttle</li>
             </ul>
         </description>
       </release>
