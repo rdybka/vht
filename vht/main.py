@@ -296,7 +296,7 @@ def run():
         mod.start_error = "you will need JACK for this"
 
     # fix local config path
-    mod.cfg_path = GLib.get_user_config_dir()
+    mod.cfg_path = os.path.join(GLib.get_user_config_dir(), "vht")
     if not os.path.exists(mod.cfg_path):
         print("creating", mod.cfg_path)
         os.mkdir(mod.cfg_path)
