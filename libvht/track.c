@@ -1428,6 +1428,9 @@ void track_resize(track *trk, int size) {
 			trk->rows[c][n].note = 0;
 			trk->rows[c][n].velocity = 0;
 			trk->rows[c][n].delay = 0;
+			trk->rows[c][n].prob = 0;
+			trk->rows[c][n].velocity_range = 0;
+			trk->rows[c][n].delay_range = 0;
 			trk->rows[c][n].clt = trk->clt;
 		}
 	}

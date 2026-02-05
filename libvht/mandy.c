@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -25,6 +25,7 @@
 #include "track.h"
 #include "mandy_trk_disp.h"
 #include "mandy_pix_scan.h"
+#include "mandy.h"
 
 void mandy_excl_in(mandy *mand) {
 	pthread_mutex_lock(&mand->excl);
