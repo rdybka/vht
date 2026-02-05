@@ -31,7 +31,8 @@ from gi.repository import GLib, Gtk, Gio, GdkPixbuf
 import sys
 import os
 import time
-import pkg_resources
+from importlib.resources import files
+from importlib.metadata import version
 
 from vht.mainwin import MainWin
 from vht.shortcutmayhem import ShortcutMayhem
@@ -197,8 +198,8 @@ class VHTApp(Gtk.Application):
         ab.set_copyright(
             "Copyright (C) 2024 Remigiusz Dybka\nremigiusz.dybka@gmail.com"
         )
-        pkg = pkg_resources.require("vht")[0]
-        ab.set_version(pkg.version)
+
+        ab.set_version(version("vht"))
         ab.set_program_name("vahatraker")
         ab.set_comments("Live MIDI sequencer")
         ab.set_logo(
@@ -288,8 +289,7 @@ class VHTApp(Gtk.Application):
 
 
 def run():
-    pkg = pkg_resources.require("vht")[0]
-    print("vahatraker %s" % (pkg.version))
+    print("vahatraker %s" % (version("vht")))
 
     mod.start_error = None
     if mod.midi_start() != 0:
@@ -316,22 +316,11 @@ def run():
     randomcomposer.muzakize()
     mod.cdaemon = CodeDaemon()
     # fix data path
-    paths2try = []
-    paths2try.append(os.path.normpath(os.path.join(pkg.module_path, "data")))
-    paths2try.append(os.path.normpath(os.path.join(pkg.module_path, "share/vht")))
+    p = os.path.normpath(os.path.join(files(), "../share/vht"))
+    mod.data_path = "./data" # for dev-mode
 
-    p = pkg.module_path
-    pf = p.find("/lib")
-    if pf:
-        p = p[:pf]
-
-        paths2try.append(os.path.normpath(os.path.join(p, "share/vht")))
-
-    mod.data_path = "."
-
-    for p in paths2try:
-        if os.path.exists(p):
-            mod.data_path = p
+    if os.path.exists(p):
+        mod.data_path = p
 
     # fix controller configs
     mod.ctrls = ctrlcfg.load()
