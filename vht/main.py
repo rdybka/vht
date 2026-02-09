@@ -2,7 +2,7 @@
 
 # vahatraker - a live MIDI sequencer for JACK
 #
-# Copyright (C) 2024 Remigiusz Dybka - remigiusz.dybka@gmail.com
+# Copyright (C) 2026 Remigiusz Dybka - remigiusz.dybka@gmail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # I hereby testify,
-# on Pungenday, the 29th day of Bureaucracy in the YOLD 3190,
+# on Setting Orange, the 40th day of Chaos in the YOLD 3192,
 # that everything in this program checks out with The Law of Fives
 
 # [^^^intentionally left blank]
@@ -43,7 +43,6 @@ from vht.portconfig import refresh_connections
 from vht import mod, cfg, ctrlcfg, autoexec, bankcfg, randomcomposer
 import vht.extras
 import vht.filerotator
-
 
 class VHTApp(Gtk.Application):
     def __init__(self, *args, **kwargs):
@@ -316,12 +315,10 @@ def run():
     randomcomposer.muzakize()
     mod.cdaemon = CodeDaemon()
     # fix data path
-    p = os.path.normpath(os.path.join(files(), "../share/vht"))
-    mod.data_path = "./data" # for dev-mode
-
-    if os.path.exists(p):
-        mod.data_path = p
-
+    mod.data_path = "/app/share/vht"
+    if not os.path.exists(mod.data_path):
+        mod.data_path = str(files().joinpath("../share/vht"))
+    
     # fix controller configs
     mod.ctrls = ctrlcfg.load()
     # fix patches

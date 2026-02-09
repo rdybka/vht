@@ -1,12 +1,11 @@
 id: io.github.rdybka.vht
 runtime: org.gnome.Platform
-runtime-version: '46'
+runtime-version: '49'
 sdk: org.gnome.Sdk
 command: vht
 finish-args:
   - --filesystem=xdg-run/pipewire-0
   - --socket=wayland
-  - --socket=fallback-x11
   - --share=ipc
 modules:
   - name: vht
@@ -16,4 +15,4 @@ modules:
     sources:
       - type: git
         url: https://github.com/rdybka/vht
-        tag: v0.4.06
+        tag: v0.4.07

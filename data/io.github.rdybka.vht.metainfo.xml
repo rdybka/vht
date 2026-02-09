@@ -46,6 +46,11 @@
     <content_rating type="oars-1.1" />
     
     <releases>
+      <release version="0.4.07" date="2025-02-09">
+        <description>
+          <p>Flatpak refresh build</p>
+        </description>
+      </release>
       <release version="0.4.06" date="2024-09-05">
         <description>
           <p>Final touches</p>
